@@ -2,24 +2,22 @@
 
 namespace App\Communications;
 
-use App\Manager\CryptoManagerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class CachedCryptoRatesFetcher extends CryptoRatesFetcher
+class CachedCryptoRatesFetcher implements CryptoRatesFetcherInterface
 {
     private const CACHE_KEY = 'rates';
 
-    /** @var CacheInterface */
-    private $cache;
+    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
+    private CacheInterface $cache;
 
     public function __construct(
-        CryptoManagerInterface $cryptoManager,
-        RestRpcInterface $rpc,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher,
         CacheInterface $cache
     ) {
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
         $this->cache = $cache;
-        parent::__construct($cryptoManager, $rpc);
     }
 
     public function fetch(): array
@@ -27,7 +25,7 @@ class CachedCryptoRatesFetcher extends CryptoRatesFetcher
         return $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
-            return parent::fetch();
+            return $this->cryptoRatesFetcher->fetch();
         });
     }
 }

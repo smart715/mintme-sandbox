@@ -57,8 +57,11 @@ class KnowledgeBaseController extends Controller
             )
         );
 
+        $related = $kbManager->getRelated($article);
+
         return $this->render('pages/knowledge_base_show.html.twig', [
            'article' => $article,
+           'related' => $related,
            'metaDescription' => substr($metaDescription, 0, 200),
         ]);
     }

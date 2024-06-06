@@ -1,15 +1,15 @@
 security.login.username: 'Nom d''utilisateur:'
-security.login.password: 'Mot de passe:'
+security.login.password: 'Mot de passe'
 security.login.remember_me: 'Se souvenir de moi'
 security.login.submit: Connexion
-security.login.locked: 'Votre compte est bloqué, bien vouloir contacter l''assistance technique'
+security.login.blocked: null
 form.group_name: 'Nom du groupe:'
 form.username: 'Nom d''utilisateur:'
-form.email: 'Adresse électronique:'
+form.email: 'Adresse électronique'
 form.current_password: 'Mot de passe actuel:'
 form.password: 'Mot de passe:'
 form.password_confirmation: 'Entrez à nouveau le mot de passe:'
-form.new_password: 'Nouveau mot de passe:'
+form.new_password: 'Nouveau mot de passe'
 form.new_password_confirmation: 'Entrez le nouveau mot de passe une fois de plus:'
 form.save: Sauvegarder
 form.login.submit: Connexion
@@ -18,23 +18,35 @@ form.signup.submit: Inscription
 registration.back: Retour
 registration.email.subject: Bienvenue
 resetting.email.subject: 'Réinitialiser le mot de passe'
-resetting.reset.submit: 'Changer le mot de passe'
+resetting.reset.submit: 'Reset password'
 page.login.title: Connexion
+page.login.new_here: null
+page.login.sign_up: null
+page.register.already_registered: null
+page.register.log_in: null
 page.register.title: Inscription
+page.register.welcome: null
+page.register.join_us: null
+page.register.create_1: null
+page.register.create_2: null
+page.register.earn_1: null
+page.register.earn_2: null
+page.register.grow_1: null
+page.register.grow_2: null
 error.credentials: 'Accès Invalides.'
 login.header: Connexion
 resetting.header: 'Réinitialiser le mot de passe'
-request.header: 'Changer le mot de passe'
 email.resetting.body: 'Réinitialisation de votre mot de passe!'
 email.resetting.link: 'Vous pouvez réinitialiser votre mot de passe en cliquant sur le bouton suivant:'
 email.sent: 'Message envoyé!'
-email.sent.body: 'Si l''adresse mail saisie correspond à la votre, vous recevrez un message contenant un lien sur lequel vous devez cliquer pour réinitialiser votre mot de passe. <br/> Note: Vous ne pourrez effectuer qu''une requête toutes les %hours% heures.'
+email.sent.body: 'Si l''adresse mail saisie correspond à la votre, vous recevrez un message contenant un lien sur lequel vous devez cliquer pour réinitialiser votre mot de passe.'
+email.sent.note: '<br/> Note: Vous ne pourrez effectuer qu''une requête toutes les %hours% heure.'
 email.sent.help: 'Si vous n''avez pas reçu de message, vérifier les courriers indésirables ou essayez à nouveau.'
 email.register.complete: 'Pour terminer votre enregistrement, cliquez sur le bouton suivant:'
-register.accepting: 'En cliquant sur Inscription, vous acceptez'
+register.accepting: null
 register.confirmed.header: Félicitations!
 register.confirmed.body: 'Utilisateur crée avec succès!'
 register.confirmed.activated: 'votre compte est maintenant activé'
 register.email_sent.header: 'Activez votre compte!'
 register.email_sent.body: 'Un message a été envoyé à:'
-register.email_sent.help: 'Il contient un lien d''activation sur lequel vous devez cliquer afin d''activer votre compte <br/> N''oubliez pas de vérifier les courriers indésirables'
+register.email_sent.help: 'Il contient un lien d''activation sur lequel vous devez cliquer afin d''activer votre compte. N''oubliez pas de vérifier les courriers indésirables'

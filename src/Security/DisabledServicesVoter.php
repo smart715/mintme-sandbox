@@ -2,23 +2,26 @@
 
 namespace App\Security;
 
+use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Security\Config\DisabledServicesConfig;
+use App\Utils\Symbols;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class DisabledServicesVoter extends Voter
 {
-    private const DEPOSIT = 'deposit';
-    private const WITHDRAW = 'withdraw';
-    private const TOKEN_DEPOSIT = 'token-deposit';
-    private const TOKEN_WITHDRAW = 'token-withdraw';
-    private const DEPLOY = 'deploy';
-    private const NEW_TRADES = 'new-trades';
-    private const TRADING = 'trading';
+    public const COIN_DEPOSIT = 'coin-deposit';
+    public const COIN_WITHDRAW = 'coin-withdraw';
+    public const TOKEN_DEPOSIT = 'token-deposit';
+    public const TOKEN_WITHDRAW = 'token-withdraw';
+    public const DEPLOY = 'deploy';
+    public const NEW_TRADES = 'new-trades';
+    public const TRADING = 'trading';
 
     private const ALL_ACTIONS = [
-        self::DEPOSIT,
-        self::WITHDRAW,
+        self::COIN_DEPOSIT,
+        self::COIN_WITHDRAW,
         self::TOKEN_DEPOSIT,
         self::TOKEN_WITHDRAW,
         self::DEPLOY,
@@ -27,11 +30,11 @@ class DisabledServicesVoter extends Voter
     ];
 
     /** @var DisabledServicesConfig */
-    private $disbledServicesConfig;
+    private DisabledServicesConfig $disabledServicesConfig;
 
     public function __construct(DisabledServicesConfig $disabledServicesConfig)
     {
-        $this->disbledServicesConfig = $disabledServicesConfig;
+        $this->disabledServicesConfig = $disabledServicesConfig;
     }
 
     /**
@@ -44,30 +47,34 @@ class DisabledServicesVoter extends Voter
 
     /**
      * {@inheritdoc}
+     *
+     * @param Crypto|Token|null $subject
      */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
-        if ($this->disbledServicesConfig->isAllServicesDisabled()) {
-            return false;
-        }
-
         switch ($attribute) {
-            case self::DEPOSIT:
-                return !$this->disbledServicesConfig->isDepositDisabled();
-            case self::WITHDRAW:
-                return !$this->disbledServicesConfig->isWithdrawalsDisabled();
+            case self::COIN_DEPOSIT:
+                return $subject instanceof Crypto
+                    ? !$this->disabledServicesConfig->isCryptoDepositDisabled($subject->getSymbol())
+                    : !$this->disabledServicesConfig->isCoinDepositsDisabled();
+            case self::COIN_WITHDRAW:
+                return $subject instanceof Crypto
+                    ? !$this->disabledServicesConfig->isCryptoWithdrawalDisabled($subject->getSymbol())
+                    : !$this->disabledServicesConfig->isCoinWithdrawalsDisabled();
             case self::TOKEN_DEPOSIT:
-                return !$this->disbledServicesConfig->isTokenDepositsDisabled();
+                return !$this->disabledServicesConfig->isTokenDepositsDisabled()
+                    && (!$subject instanceof Token || !$subject->getDepositsDisabled());
             case self::TOKEN_WITHDRAW:
-                return !$this->disbledServicesConfig->isTokenWithdrawalsDisabled();
+                return !$this->disabledServicesConfig->isTokenWithdrawalsDisabled()
+                    && (!$subject instanceof Token || !$subject->getWithdrawalsDisabled());
             case self::DEPLOY:
-                return !$this->disbledServicesConfig->isDeployDisabled();
+                return !$this->disabledServicesConfig->isDeployDisabled();
             case self::NEW_TRADES:
-                return !$this->disbledServicesConfig->isNewTradesDisabled();
+                return !$this->disabledServicesConfig->isNewTradesDisabled();
             case self::TRADING:
-                return !$this->disbledServicesConfig->isTradingDisabled();
+                return !$this->disabledServicesConfig->isTradingDisabled();
+            default:
+                return false;
         }
-
-        return false;
     }
 }

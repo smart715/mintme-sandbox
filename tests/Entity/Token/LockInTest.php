@@ -4,6 +4,7 @@ namespace App\Tests\Entity\Token;
 
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Entity\Token\TokenDeploy;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use Money\Currency;
@@ -46,10 +47,6 @@ class LockInTest extends TestCase
             ->expects($this->once())
             ->method('isDeployed')
             ->willReturn(true);
-        $token
-            ->expects($this->atLeast(2))
-            ->method('getDeployed')
-            ->willReturn((new \DateTimeImmutable())->add(new \DateInterval('P1D')));
 
         $releasedAtStartObj = new Money($releasedAtStart, new Currency(Symbols::TOK));
         $li->setReleasedAtStart($releasedAtStart);
@@ -91,18 +88,17 @@ class LockInTest extends TestCase
             ->setAmountToRelease($amountToRelease)
             ->setReleasedAtStart($initialAmount)
             ->updateFrozenAmount();
-        $this->assertEquals($initialAmount, (int)$li->getReleasedAmount()->getAmount());
+
+
+        $this->assertEquals($initialAmount, $li->getReleasedAmount()->getAmount());
+
         $this->assertEquals($amountToRelease->getAmount(), $li->getFrozenAmount()->getAmount());
 
         /** @var Token|MockObject $token */
-        $token = $this->mockToken();
-        $li = new LockIn($token);
+        $deploy = $this->mockTokenDeploy((new \DateTimeImmutable())->add(new \DateInterval('P5D')));
+        $token = $this->mockToken($deploy);
 
-        date_default_timezone_set('UTC');
-        $token
-            ->expects($this->atLeast(2))
-            ->method('getDeployed')
-            ->willReturn((new \DateTimeImmutable())->add(new \DateInterval('P5D')));
+        $li = new LockIn($token);
 
         $li
             ->setAmountToRelease($amountToRelease)
@@ -113,13 +109,29 @@ class LockInTest extends TestCase
             $amountToRelease->subtract($li->getHourlyRate())->getAmount(),
             $li->getFrozenAmount()->getAmount()
         );
+
         $this->assertEquals(5 * 24, $li->getCountHoursFromDeploy());
         $this->assertGreaterThan($initialAmount, $li->getReleasedAmount()->getAmount());
         $this->assertLessThan($amountToRelease, $li->getFrozenAmount()->getAmount());
     }
 
-    private function mockToken(): Token
+    private function mockToken(?TokenDeploy $deploy = null): Token
     {
-        return $this->createMock(Token::class);
+        $token = $this->createMock(Token::class);
+        $token
+            ->method('getMainDeploy')
+            ->willReturn($deploy ?? $this->mockTokenDeploy());
+
+        return $token;
+    }
+
+    private function mockTokenDeploy(?\DateTimeImmutable $date = null): TokenDeploy
+    {
+        $deploy = $this->createMock(TokenDeploy::class);
+        $deploy
+            ->method('getDeployDate')
+            ->willReturn($date ?? new \DateTimeImmutable());
+
+        return $deploy;
     }
 }

@@ -11,7 +11,7 @@ interface UserNotificationManagerInterface
         String $notificationType,
         ?array $extraData
     ): void;
-    public function updateNotifications(User $user, int $notificationLimit): void;
+    public function updateNotifications(User $user): void;
     public function getNotifications(User $user, ?int $notificationLimit): ?array;
     public function isNotificationAvailable(User $user, String $type, String $channel): Bool;
 }

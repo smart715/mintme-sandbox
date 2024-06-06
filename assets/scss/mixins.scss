@@ -1,5 +1,6 @@
 @import "~bootstrap/scss/functions";
-
+@import 'variables';
+@import "~bootstrap/scss/mixins";
 //mixins.scss
 
 // =============================================================================
@@ -73,6 +74,87 @@
 }
 
 // =============================================================================
+// HOME PAGE
+// =============================================================================
+
+@mixin background-img-home-page {
+  background-blend-mode: screen multiply;
+  background-position: right;
+  background-repeat: no-repeat;
+}
+
+@mixin button-hover-home-page($background, $color, $background-hover, $color-hover) {
+  background-color: $background;
+  color: $color;
+  &:hover {
+    background-color: $background-hover !important;
+    color: $color-hover !important;
+  }
+}
+
+// =============================================================================
+// TRADING PAGE
+// =============================================================================
+@mixin d-flex-column-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+@mixin reset-margin-botton-table-footer {
+  form {
+    label {
+      margin-bottom: 0.8rem !important;
+    }
+  }
+}
+
+@mixin chevron($direction) {
+
+  @if $direction == right {
+    border-right: 6px solid $primary
+  } @else if $direction == left {
+    border-left: 6px solid $primary
+  }
+
+}
+
+@mixin button-sort-table($direction) {
+  $arrows-width: 5px;
+
+  content: '';
+  position: absolute;
+  height: 0px;
+  width: 0px;
+  left: 8px;
+  top: 50%;
+  border-left: $arrows-width solid transparent;
+  border-right: $arrows-width solid transparent;
+
+  @if $direction == bottom {
+    margin-bottom: -8px;
+    border-top: $arrows-width solid $chevron-color;
+  } @else if $direction == top {
+    margin-top: -7px;
+    border-bottom: $arrows-width solid $chevron-color;
+  }
+
+}
+
+// =============================================================================
+// Selection
+// =============================================================================
+
+@mixin link-highlight-selection {
+  &::selection {
+    color: $bg-primary-dark;
+    background-color: $primary;
+  }
+}
+
+// =============================================================================
 // Header
 // =============================================================================
 
@@ -84,4 +166,41 @@
   }
 }
 
-@import "~bootstrap/scss/mixins";
+// =============================================================================
+// Link
+// =============================================================================
+
+@mixin link-content-primary {
+  color: $primary !important;
+  background-color: $bg-primary-dark !important;
+  text-decoration: underline !important;
+
+  &:hover{
+    color: $primary-highlight  !important;
+    background-color: $bg-primary-dark !important;
+  }
+
+  &::selection{
+    color: $primary !important;
+    background-color: $bg-secondary !important;
+  }
+}
+
+// =============================================================================
+// light outline
+// =============================================================================
+
+@mixin focus-light-outline {
+  box-shadow: none !important;
+  outline: 2px solid rgba(255, 255, 255, 0.3) !important;
+  outline-offset: 2px !important;
+}
+
+// =============================================================================
+// dark outline
+// =============================================================================
+
+@mixin focus-dark-outline {
+  outline: 3px solid rgba(212, 183, 29, 0.7) !important;
+  outline-offset: 2px !important;
+}

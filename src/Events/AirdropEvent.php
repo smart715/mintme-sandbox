@@ -4,14 +4,17 @@ namespace App\Events;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Token\Token;
-use Symfony\Contracts\EventDispatcher\Event;
+use App\Events\Activity\TokenEventActivity;
 
-class AirdropEvent extends Event implements AirdropEventInterface, TokenEventInterface
+/** @codeCoverageIgnore */
+class AirdropEvent extends TokenEventActivity implements AirdropEventInterface
 {
     protected Airdrop $airdrop;
 
-    public function __construct(Airdrop $airdrop)
+    public function __construct(Airdrop $airdrop, int $type)
     {
+        parent::__construct($airdrop->getToken(), $type);
+
         $this->airdrop = $airdrop;
     }
 

@@ -3,7 +3,7 @@
 namespace App\Command\Blacklist;
 
 use App\Communications\CryptoSynchronizerInterface;
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;

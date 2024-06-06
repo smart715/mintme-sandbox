@@ -12,6 +12,7 @@ framework:
         cookie_secure: true
         cookie_httponly: true
         cookie_samesite: 'none'
+        cookie_lifetime: 7776000
 
     #esi: true
     #fragments: true

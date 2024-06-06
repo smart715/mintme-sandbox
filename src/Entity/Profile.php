@@ -30,10 +30,11 @@ class Profile implements ImagineInterface
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Groups({"API", "Default"})
-     * @var string
+     * @Groups({"API", "Default", "API_BASIC"})
+     * @Assert\Length(max="30")
+     * @Assert\Length(min="2")
      */
-    protected $nickname;
+    protected ?string $nickname = null; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -133,9 +134,8 @@ class Profile implements ImagineInterface
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
-     * @var Image|null
      */
-    protected $image;
+    protected ?Image $image = null; // phpcs:ignore
 
     /**
      * @ORM\Column(name="number_of_reminder", type="smallint")
@@ -199,7 +199,7 @@ class Profile implements ImagineInterface
 
     private function filterAnonymous(?string $property): string
     {
-        return  is_null($property)
+        return  is_null($property) || '' === trim($property)
             ? ''
             : ($property && $this->returnDefault()
             ? $property
@@ -311,21 +311,21 @@ class Profile implements ImagineInterface
         return $this;
     }
 
-    public function setNickname(string $nickname): self
+    public function setNickname(?string $nickname): self
     {
         $this->nickname = $nickname;
 
         return $this;
     }
 
-    public function setFirstName(string $firstName): self
+    public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function setLastName(string $lastName): self
+    public function setLastName(?string $lastName): self
     {
         $this->lastName = $lastName;
 
@@ -352,17 +352,53 @@ class Profile implements ImagineInterface
     public function getFirstToken(): ?Token
     {
         if ($this->hasTokens()) {
-            return $this->tokens[0];
+            return $this->tokens->first();
         }
 
         return null;
     }
 
+    public function getOwnTokenByName(string $name): ?Token
+    {
+        foreach ($this->getTokens() as $token) {
+            if ($token->getName() === $name) {
+                return $token;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Token[]
+     */
     public function getTokens(): array
     {
         return null !== $this->tokens
             ? $this->tokens->toArray()
             : [];
+    }
+
+    /**
+     * @return Token[]
+     */
+    public function getUndeployedTokens(): array
+    {
+        return array_filter($this->getTokens(), function ($token) {
+            return Token::DEPLOYED !== $token->getDeploymentStatus();
+        });
+    }
+
+    public function getNotBlockedTokens(): array
+    {
+        return array_filter($this->getTokens(), function ($token) {
+            return !$token->isBlocked();
+        });
+    }
+
+    public function getTokensCount(): int
+    {
+        return count($this->getNotBlockedTokens());
     }
 
     public function hasTokens(): bool
@@ -372,9 +408,19 @@ class Profile implements ImagineInterface
 
     public function hasBlockedTokens(): bool
     {
-        /** @var Token $token */
         foreach ($this->getTokens() as $token) {
             if ($token->isBlocked()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasDeployedTokens(): bool
+    {
+        foreach ($this->getTokens() as $token) {
+            if (Token::DEPLOYED === $token->getDeploymentStatus()) {
                 return true;
             }
         }
@@ -409,11 +455,15 @@ class Profile implements ImagineInterface
 
     /**
      * @return Image
-     * @Groups({"API", "Default"})
+     * @Groups({"API", "Default", "API_BASIC"})
      */
     public function getImage(): Image
     {
-        return $this->image ?? Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
+        if ($this->user->isBlocked() || !$this->image) {
+            return Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
+        }
+
+        return $this->image;
     }
 
 
@@ -482,7 +532,6 @@ class Profile implements ImagineInterface
     {
         return $this->phoneNumber;
     }
-
 
     public function setPhoneNumber(?PhoneNumber $phoneNumber): self
     {

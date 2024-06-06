@@ -5,7 +5,7 @@ import TradeTradeHistory from '../../js/components/trade/TradeTradeHistory';
 import moxios from 'moxios';
 import axios from 'axios';
 
-let rebrandingTest = (val) => {
+const rebrandingTest = (val) => {
     if (!val) {
         return val;
     }
@@ -14,7 +14,7 @@ let rebrandingTest = (val) => {
         {regexp: /(webTest)/g, replacer: 'mintimeTest'},
     ];
     brandDict.forEach((item) => {
-        if (typeof val !== 'string') {
+        if ('string' !== typeof val) {
             return;
         }
         val = val.replace(item.regexp, item.replacer);
@@ -53,12 +53,13 @@ function mockVue() {
             Vue.prototype.$routing = $routing;
             Vue.prototype.$store = $store;
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = {error: () => {}};
         },
     });
     return localVue;
 }
 
-let propsForTestCorrectlyRenders = {
+const propsForTestCorrectlyRenders = {
     websocketUrl: '',
     market: {
         base: {
@@ -66,12 +67,18 @@ let propsForTestCorrectlyRenders = {
             symbol: 'BTC',
             subunit: 8,
             identifier: 'BTC',
+            image: {
+                url: require('../../img/BTC.svg'),
+            },
         },
         quote: {
             name: 'Webchain',
             symbol: 'WEB',
             subunit: 4,
             identifier: 'WEB',
+            image: {
+                url: require('../../img/default_token_avatar.svg'),
+            },
         },
     },
 };
@@ -79,29 +86,29 @@ let propsForTestCorrectlyRenders = {
 const tableData = [
     {
         'maker':
+        {
+            'id': 1,
+            'profile':
             {
-                'id': 1,
-                'profile':
-                    {
-                        'nickname': 'test',
-                        'token': {
-                            'name': 'test',
-                            'image': {
-                                'url': '/media/default_token.png',
-                                'avatar_small': '../avatar_middle/media/default_token.png',
-                            },
-                            'symbol': 'test',
-                            'deploymentStatus': 'not-deployed',
-                            'blocked': false,
-                            'identifier': 'TOK000000000001',
-                            'subunit': 4,
-                        },
-                        'image': {
-                            'url': '/media/default_token.png',
-                            'avatar_small': '../avatar_middle/media/default_token.png',
-                        },
+                'nickname': 'test',
+                'token': {
+                    'name': 'test',
+                    'image': {
+                        'url': '/media/default_token.png',
+                        'avatar_small': '../avatar_middle/media/default_token.png',
                     },
+                    'symbol': 'test',
+                    'deploymentStatus': 'not-deployed',
+                    'blocked': false,
+                    'identifier': 'TOK000000000001',
+                    'subunit': 4,
+                },
+                'image': {
+                    'url': '/media/default_token.png',
+                    'avatar_small': '../avatar_middle/media/default_token.png',
+                },
             },
+        },
         'taker': {
             'id': 1,
             'profile': {
@@ -166,7 +173,7 @@ describe('TradeTradeHistory', () => {
     describe('should compute shouldTruncate correctly', () => {
         it('when truncate isn\'t necessary', () => {
             const localVue = mockVue();
-            propsForTestCorrectlyRenders.market.quote.symbol = '1234';
+            propsForTestCorrectlyRenders.market.quote.symbol = '123';
             const wrapper = shallowMount(TradeTradeHistory, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
@@ -175,7 +182,7 @@ describe('TradeTradeHistory', () => {
         });
         it('when truncate is necessary', () => {
             const localVue = mockVue();
-            propsForTestCorrectlyRenders.market.quote.symbol = '12345';
+            propsForTestCorrectlyRenders.market.quote.symbol = '1234';
             const wrapper = shallowMount(TradeTradeHistory, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
@@ -190,6 +197,7 @@ describe('TradeTradeHistory', () => {
         const wrapper = shallowMount(TradeTradeHistory, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            attachTo: document.body,
         });
         wrapper.vm.tableData = false;
         expect(wrapper.vm.hasOrders).toBe(false);
@@ -202,6 +210,7 @@ describe('TradeTradeHistory', () => {
         const wrapper = shallowMount(TradeTradeHistory, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            attachTo: document.body,
         });
         wrapper.vm.tableData = tableData;
         expect(wrapper.vm.hasOrders).toBe(true);
@@ -212,6 +221,7 @@ describe('TradeTradeHistory', () => {
         const wrapper = shallowMount(TradeTradeHistory, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            attachTo: document.body,
         });
         wrapper.vm.tableData = tableData;
         expect(wrapper.vm.lastId).toBe(101);
@@ -220,7 +230,7 @@ describe('TradeTradeHistory', () => {
     });
 
     describe('updateTableData', () => {
-        it('should do $axios request and set tableData correctly when attach is false and result of $axios request is not empty', (done) => {
+        it(`should do $axios request and set tableData correctly`, () => {
             moxios.stubRequest('executed_orders', {
                 status: 200,
                 response: tableData,
@@ -230,53 +240,87 @@ describe('TradeTradeHistory', () => {
             const wrapper = shallowMount(TradeTradeHistory, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
+                attachTo: document.body,
             });
-            wrapper.vm.updateTableData();
+            wrapper.vm.addOrderTableData(tableData);
 
             moxios.wait(() => {
                 expect(wrapper.vm.tableData).toEqual(tableData);
-                done();
             });
         });
 
-        it('should do $axios request and set tableData correctly when attach is true and result of $axios request is not empty', (done) => {
-            moxios.stubRequest('executed_orders', {
-                status: 200,
-                response: tableData,
-            });
+        it(
+            `should do $axios request and set tableData correctly
+             when attach is false and result of $axios request is not empty`,
+            (done) => {
+                moxios.stubRequest('executed_orders', {
+                    status: 200,
+                    response: tableData,
+                });
 
-            const localVue = mockVue();
-            const wrapper = shallowMount(TradeTradeHistory, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.updateTableData(true);
+                const localVue = mockVue();
+                const wrapper = shallowMount(TradeTradeHistory, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                    attachTo: document.body,
+                });
 
-            moxios.wait(() => {
-                expect(wrapper.vm.tableData).toEqual(tableData);
-                done();
-            });
-        });
+                wrapper.vm.updateTableData();
 
-        it('should do $axios request and set tableData correctly when attach is true and result of $axios request is empty', (done) => {
-            moxios.stubRequest('executed_orders', {
-                status: 200,
-                response: [],
-            });
+                moxios.wait(() => {
+                    expect(wrapper.vm.tableData).toEqual(tableData);
+                    done();
+                });
+            }
+        );
 
-            const localVue = mockVue();
-            const wrapper = shallowMount(TradeTradeHistory, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
+        it(
+            `should do $axios request and set tableData correctly
+            when attach is true and result of $axios request is not empty`,
+            (done) => {
+                moxios.stubRequest('executed_orders', {
+                    status: 200,
+                    response: tableData,
+                });
 
-            wrapper.vm.updateTableData(true);
+                const localVue = mockVue();
+                const wrapper = shallowMount(TradeTradeHistory, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                    attachTo: document.body,
+                });
+                wrapper.vm.updateTableData(true);
 
-            moxios.wait(() => {
-                expect(wrapper.vm.tableData).toEqual([]);
-                done();
-            });
-        });
+                moxios.wait(() => {
+                    expect(wrapper.vm.tableData).toEqual(tableData);
+                    done();
+                });
+            }
+        );
+
+        it(
+            `should do $axios request and set tableData correctly
+            when attach is true and result of $axios request is empty`,
+            (done) => {
+                moxios.stubRequest('executed_orders', {
+                    status: 200,
+                    response: [],
+                });
+
+                const localVue = mockVue();
+                const wrapper = shallowMount(TradeTradeHistory, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                });
+
+                wrapper.vm.updateTableData(true);
+
+                moxios.wait(() => {
+                    expect(wrapper.vm.tableData).toEqual([]);
+                    done();
+                });
+            }
+        );
     });
 
     it('renders correctly with assigned props', () => {
@@ -298,8 +342,59 @@ describe('TradeTradeHistory', () => {
         });
 
         moxios.wait(() => {
-            expect(wrapper.find('.card').html()).toContain('mintmeTest');
+            expect(wrapper.findComponent('.card').html()).toContain('mintmeTest');
             done();
         });
+    });
+
+    it('should render crypto icon correctly', () => {
+        const localVue = mockVue();
+        propsForTestCorrectlyRenders.market.base.symbol = 'BTC';
+        const wrapper = shallowMount(TradeTradeHistory, {
+            localVue,
+            propsData: propsForTestCorrectlyRenders,
+        });
+
+        moxios.stubRequest('executed_orders', {
+            status: 200,
+            response: [],
+        });
+
+        moxios.wait(() => {
+            expect(wrapper.findComponent('#base-avatar').attributes('src'))
+                .toContain(propsForTestCorrectlyRenders.market.base.symbol);
+            done();
+        });
+    });
+
+    it('should render token icon correctly', () => {
+        const localVue = mockVue();
+        propsForTestCorrectlyRenders.market.quote.cryptoSymbol = 'BTC';
+        const wrapper = shallowMount(TradeTradeHistory, {
+            localVue,
+            propsData: propsForTestCorrectlyRenders,
+        });
+
+        moxios.stubRequest('executed_orders', {
+            status: 200,
+            response: [],
+        });
+
+        moxios.wait(() => {
+            expect(wrapper.findComponent('#quote-avatar').attributes('src'))
+                .toContain(propsForTestCorrectlyRenders.market.quote.quote.image.avatar_small);
+            done();
+        });
+    });
+
+    it('should return order row class correctly', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(TradeTradeHistory, {
+            localVue,
+            propsData: propsForTestCorrectlyRenders,
+        });
+
+        expect(wrapper.vm.orderRowClass('Buy')).toBe('justify-content-end flex-row-reverse');
+        expect(wrapper.vm.orderRowClass('Sell')).toBe('justify-content-start flex-row');
     });
 });

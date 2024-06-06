@@ -1,127 +1,134 @@
-import {shallowMount, createLocalVue} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Modal from '../../js/components/modal/Modal';
+
+const localVue = mockVue();
 
 /**
  * @return {Wrapper<Vue>}
  */
 function mockVue() {
-    const localVue = createLocalVue();
-    return localVue;
+    return createLocalVue();
 }
 
+/**
+ * @param {Object} props
+ * @return {Object}
+ */
+function createSharedTestProps(props = {}) {
+    return {
+        ...props,
+    };
+}
+
+
 describe('Modal', () => {
-    it('shouldn\'t be visible when visible props is false', () => {
-        const wrapper = shallowMount(Modal, {
-            propsData: {
-               visible: false,
-               noClose: false,
-               withoutPadding: false,
-           },
-            localVue: mockVue(),
+    let wrapper;
+
+    beforeEach(() => {
+        wrapper = shallowMount(Modal, {
+            localVue: localVue,
+            propsData: createSharedTestProps(),
         });
-        expect(wrapper.find('b-modal-stub').attributes('visible')).toBe(undefined);
     });
 
-    it('should be visible when visible props is true', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: false,
-               withoutPadding: false,
-           },
-            localVue: mockVue(),
-        });
-        expect(wrapper.find('b-modal-stub').attributes('visible')).toBe('true');
+    afterEach(() => {
+        wrapper.destroy();
     });
 
-    it('enable closing on ESC and enable closing on backdrop click when noClose props is false', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: false,
-               withoutPadding: false,
-           },
-            localVue: mockVue(),
+    it('shouldn\'t be visible when visible props is false', async () => {
+        await wrapper.setProps({
+            visible: false,
+            noClose: false,
+            withoutPadding: false,
         });
-        expect(wrapper.find('b-modal-stub').attributes('nocloseonbackdrop')).toBe(undefined);
-        expect(wrapper.find('b-modal-stub').attributes('nocloseonesc')).toBe(undefined);
+
+        expect(wrapper.findComponent('b-modal-stub').attributes('visible')).toBe(undefined);
     });
 
-    it('disable closing on ESC and disable closing on backdrop click when noClose props is true', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: true,
-               withoutPadding: false,
-           },
-            localVue: mockVue(),
+    it('should be visible when visible props is true', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: false,
+            withoutPadding: false,
         });
-        expect(wrapper.find('b-modal-stub').attributes('nocloseonbackdrop')).toBe('true');
-        expect(wrapper.find('b-modal-stub').attributes('nocloseonesc')).toBe('true');
+
+        expect(wrapper.findComponent('b-modal-stub').attributes('visible')).toBe('true');
     });
 
-    it('a padding should be present when withoutPadding props is false', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: false,
-               withoutPadding: false,
-           },
-            localVue: mockVue(),
+    it('enable closing on ESC and enable closing on backdrop click when noClose props is false', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: false,
+            withoutPadding: false,
         });
-        expect(wrapper.find('b-modal-stub').attributes('bodyclass')).toBe('');
-        expect(wrapper.find('.modal-body').attributes('class')).toBe('modal-body');
+
+        expect(wrapper.findComponent('b-modal-stub').attributes('nocloseonbackdrop')).toBe(undefined);
+        expect(wrapper.findComponent('b-modal-stub').attributes('nocloseonesc')).toBe(undefined);
     });
 
-    it('a padding should be absent when withoutPadding props is true', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: false,
-               withoutPadding: true,
-           },
-            localVue: mockVue(),
+    it('disable closing on ESC and disable closing on backdrop click when noClose props is true', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: true,
+            withoutPadding: false,
         });
-        expect(wrapper.find('b-modal-stub').attributes('bodyclass')).toBe('m-0 p-0');
-        expect(wrapper.find('.modal-body').attributes('class')).toBe('modal-body m-0 p-0');
+
+        expect(wrapper.findComponent('b-modal-stub').attributes('nocloseonbackdrop')).toBe('true');
+        expect(wrapper.findComponent('b-modal-stub').attributes('nocloseonesc')).toBe('true');
     });
 
-    it('emit "close" when clicking on <a>', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: false,
-               withoutPadding: true,
-           },
-            localVue: mockVue(),
+    it('a padding should be present when withoutPadding props is false', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: false,
+            withoutPadding: false,
         });
-        wrapper.find('a').trigger('click');
+
+        expect(wrapper.findComponent('b-modal-stub').attributes('bodyclass')).toBe('');
+        expect(wrapper.findComponent('.modal-body').attributes('class')).toBe('modal-body');
+    });
+
+    it('a padding should be absent when withoutPadding props is true', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: false,
+            withoutPadding: true,
+        });
+
+        expect(wrapper.findComponent('b-modal-stub').attributes('bodyclass')).toBe('m-0 p-0');
+        expect(wrapper.findComponent('.modal-body').attributes('class')).toBe('modal-body m-0 p-0');
+    });
+
+    it('emit "close" when clicking on <a>', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: false,
+            withoutPadding: true,
+        });
+
+        wrapper.findComponent('a.modal-close-visible').trigger('click');
         expect(wrapper.emitted('close').length).toBe(1);
     });
 
-    it('emit "close" when the function closeModal() is called', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: false,
-               withoutPadding: true,
-           },
-            localVue: mockVue(),
+    it('emit "close" when the function closeModal() is called', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: false,
+            withoutPadding: true,
         });
+
         wrapper.vm.closeModal();
         expect(wrapper.emitted('close').length).toBe(1);
     });
 
-    it('set size attribute when props size is present', () => {
-        const wrapper = shallowMount(Modal, {
-           propsData: {
-               visible: true,
-               noClose: false,
-               withoutPadding: true,
-               size: 'xl',
-           },
-            localVue: mockVue(),
+    it('set size attribute when props size is present', async () => {
+        await wrapper.setProps({
+            visible: true,
+            noClose: false,
+            withoutPadding: true,
+            size: 'xl',
         });
-        expect(wrapper.find('b-modal-stub').attributes('size')).toBe('xl');
+
+        expect(wrapper.findComponent('b-modal-stub').attributes('size')).toBe('xl');
     });
 });

@@ -2,6 +2,7 @@
 
 namespace App\Security\Model;
 
+/** @codeCoverageIgnore */
 class OAuthCredentials implements ApiAuthCredentialsInterface
 {
     /** @var string */

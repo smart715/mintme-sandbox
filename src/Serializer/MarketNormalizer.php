@@ -9,11 +9,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class MarketNormalizer implements NormalizerInterface
 {
-    /** @var ObjectNormalizer */
-    private $normalizer;
-
-    /** @var MarketNameConverterInterface */
-    private $marketNameConverter;
+    private ObjectNormalizer $normalizer;
+    private MarketNameConverterInterface $marketNameConverter;
 
     public function __construct(ObjectNormalizer $normalizer, MarketNameConverterInterface $marketNameConverter)
     {

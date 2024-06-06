@@ -2,9 +2,22 @@
 
 namespace App\Controller;
 
+use App\Activity\ActivityTypes;
+use App\Config\PostsConfig;
+use App\Entity\Translation;
+use App\Entity\User;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\ActivityManagerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\MainDocumentsManagerInterfaces;
+use App\Manager\MarketStatusManager;
 use App\Manager\ReciprocalLinksManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Manager\TranslationsManagerInterface;
+use App\Services\TranslatorService\TranslatorInterface;
+use App\Utils\BaseQuote;
+use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,11 +27,12 @@ use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultController extends Controller
 {
     private const ACTIVITIES_AMOUNT = 30;
+    private const USERS_TOP_TOKENS_AMOUNT = 10;
+    private const GUESTS_TOP_TOKENS_AMOUNT = 5;
 
     /**
      * @Route("/",
@@ -26,12 +40,64 @@ class DefaultController extends Controller
      *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
      * )
      */
-    public function index(ActivityManagerInterface $activityManager): Response
-    {
+    public function index(
+        Request $request,
+        ActivityManagerInterface $activityManager,
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
+        PostsConfig $postsConfig,
+        MarketFactoryInterface $marketFactory,
+        MarketStatusManager $marketStatusManager,
+        RebrandingConverterInterface $rebrandingConverter
+    ): Response {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        $topTokens = $this->getTopTokens(
+            $activityManager,
+            $marketStatusManager,
+            $rebrandingConverter,
+            $user
+        );
+
+        if ($user) {
+            return $this->renderUserFeedPage(
+                $request,
+                $activityManager,
+                $marketFactory,
+                $cryptoManager,
+                $tokenManager,
+                $postsConfig,
+                $topTokens,
+            );
+        }
+
+        $market = $marketFactory->create(
+            $cryptoManager->findBySymbol(Symbols::BTC),
+            $cryptoManager->findBySymbol(Symbols::WEB)
+        );
+
         $activities = $activityManager->getLast(self::ACTIVITIES_AMOUNT);
 
+        $tab = $request->query->get('tab');
+        $tab = in_array($tab, ['all', 'feed'])
+            ? $tab
+            : 'all';
+
         return $this->render('pages/index.html.twig', [
+            'postRewardsCollectableDays' => $this->getParameter('post_rewards_collectable_days'),
             'activities' => $this->normalize($activities),
+            'enabledCryptos' => $this->normalize($cryptoManager->findAll()),
+            'youtube_video_id' => $this->getParameter('homepage_youtube_video_id'),
+            'isAuthorizedForReward' => $this->isGranted('collect-reward'),
+            'commentTipCost' => $postsConfig->getCommentsTipCost(),
+            'commentTipMinAmount' => $postsConfig->getCommentsTipMinAmount(),
+            'commentTipMaxAmount' => $postsConfig->getCommentsTipMaxAmount(),
+            'precision' => $this->getParameter('token_precision'),
+            'market' => $this->normalize($market),
+            'hashtag' => $request->query->get('hashtag'),
+            'activeTab' => $tab,
+            'topTokens' => $this->normalize($topTokens),
         ]);
     }
 
@@ -53,6 +119,7 @@ class DefaultController extends Controller
     ): Response {
         $filepath = $this->getParameter('ui_trans_keys_filepath');
         $locale = $request->getLocale();
+        $translator->setLocale($locale);
 
         // Disabling caching in debug mode/while developing
         $beta = $this->getParameter('kernel.debug') ?
@@ -103,9 +170,21 @@ class DefaultController extends Controller
      *      options={"sitemap" = true, "2fa_progress"=false}
      * )
      */
-    public function privacyPolicy(): Response
-    {
-        return $this->render('pages/privacy_policy.html.twig');
+    public function privacyPolicy(
+        Request $request,
+        TranslationsManagerInterface $translationsManagerInterface
+    ): Response {
+        $locale = $request->getLocale();
+
+        $translations = $translationsManagerInterface->getAllTranslationByLanguage(
+            Translation::PP,
+            $locale,
+            true,
+        );
+
+        return $this->render('pages/privacy_policy.html.twig', [
+            'translations' => $translations,
+        ]);
     }
 
     /**
@@ -114,9 +193,21 @@ class DefaultController extends Controller
      *      options={"sitemap" = true, "2fa_progress"=false}
      * )
      */
-    public function termsOfService(): Response
-    {
-        return $this->render('pages/terms_of_service.html.twig');
+    public function termsOfService(
+        Request $request,
+        TranslationsManagerInterface $translationsManagerInterface
+    ): Response {
+        $locale = $request->getLocale();
+
+        $translations = $translationsManagerInterface->getAllTranslationByLanguage(
+            Translation::TOS,
+            $locale,
+            true,
+        );
+
+        return $this->render('pages/terms_of_service.html.twig', [
+            'translations' => $translations,
+        ]);
     }
 
     /**
@@ -158,5 +249,76 @@ class DefaultController extends Controller
         return $this->render('pages/links.html.twig', [
             'links' => $manager->getAll(),
         ]);
+    }
+
+    private function renderUserFeedPage(
+        Request $request,
+        ActivityManagerInterface $activityManager,
+        MarketFactoryInterface $marketFactory,
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
+        PostsConfig $postsConfig,
+        array $topTokens
+    ): Response {
+        $market = $marketFactory->create(
+            $cryptoManager->findBySymbol(Symbols::WEB),
+            $cryptoManager->findBySymbol(Symbols::BTC)
+        );
+        $market = BaseQuote::reverseMarket($market);
+
+        $activities = $activityManager->getLast(self::ACTIVITIES_AMOUNT);
+
+        $tab = $request->query->get('tab');
+        $tab = in_array($tab, ['all', 'feed'])
+            ? $tab
+            : 'all';
+
+        return $this->render('pages/show_user_feed.html.twig', [
+            'postRewardsCollectableDays' => $this->getParameter('post_rewards_collectable_days'),
+            'isAuthorizedForReward' => $this->isGranted('collect-reward'),
+            'ownDeployedTokens' => $this->normalize($tokenManager->getOwnDeployedTokens(), ['API_BASIC']),
+            'commentTipCost' => $postsConfig->getCommentsTipCost(),
+            'commentTipMinAmount' => $postsConfig->getCommentsTipMinAmount(),
+            'commentTipMaxAmount' => $postsConfig->getCommentsTipMaxAmount(),
+            'precision' => $this->getParameter('token_precision'),
+            'market' => $this->normalize($market),
+            'hashtag' => $request->query->get('hashtag'),
+            'tokens' => $this->normalize($tokenManager->getOwnTokens(), ['API_BASIC']),
+            'activities' => $this->normalize($activities),
+            'activeTab' => $tab,
+            'topTokens' => $this->normalize($topTokens),
+        ]);
+    }
+
+    private function getTopTokens(
+        ActivityManagerInterface $activityManager,
+        MarketStatusManager $marketStatusManager,
+        RebrandingConverterInterface $rebrandingConverter,
+        ?User $user
+    ): array {
+        $topTokens = $activityManager->getLastByTypes(
+            [ActivityTypes::TOKEN_TRADED, ActivityTypes::DONATION],
+            $user ? self::USERS_TOP_TOKENS_AMOUNT : self::GUESTS_TOP_TOKENS_AMOUNT
+        );
+        $markets = [];
+
+        foreach ($topTokens as $token) {
+            if (null === $token['fullTokenName']) {
+                continue;
+            }
+
+            $market = $marketStatusManager->findByBaseQuoteNames(
+                $rebrandingConverter->reverseConvert($token['symbol']),
+                $token['fullTokenName']
+            );
+
+            if (null === $market) {
+                continue;
+            }
+
+            $markets[] = $market;
+        }
+
+        return $marketStatusManager->convertMarketStatusKeys($markets);
     }
 }

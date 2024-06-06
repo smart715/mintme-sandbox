@@ -7,18 +7,12 @@ use App\Entity\User;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
-use Doctrine\ORM\EntityManagerInterface;
 
 class TokenDeployedNotificationStrategy implements NotificationStrategyInterface
 {
-    /** @var UserNotificationManagerInterface */
     private UserNotificationManagerInterface $userNotificationManager;
 
-    /** @var MailerInterface */
     private MailerInterface $mailer;
-
-    /** @var EntityManagerInterface */
-    private EntityManagerInterface $em;
 
     private Token $token;
 
@@ -27,13 +21,11 @@ class TokenDeployedNotificationStrategy implements NotificationStrategyInterface
     public function __construct(
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
-        EntityManagerInterface $em,
         Token $token,
         string $type
     ) {
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
-        $this->em = $em;
         $this->token = $token;
         $this->type = $type;
     }
@@ -41,8 +33,10 @@ class TokenDeployedNotificationStrategy implements NotificationStrategyInterface
     public function sendNotification(User $user): void
     {
         $tokenName = $this->token->getName();
+        $tokenAvatar = $this->token->getImage()->getUrl();
         $jsonData = (array)json_encode([
             'tokenName' => $tokenName,
+            'tokenAvatar' => $tokenAvatar,
         ], JSON_THROW_ON_ERROR);
 
         if ($this->userNotificationManager->isNotificationAvailable(

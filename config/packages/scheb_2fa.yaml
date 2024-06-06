@@ -1,0 +1,32 @@
+# See the configuration reference at https://symfony.com/bundles/SchebTwoFactorBundle/5.x/configuration.html
+scheb_two_factor:
+    security_tokens:
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+        # If you're using guard-based authentication, you have to use this one:
+        # - Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken
+        # If you're using authenticator-based security (introduced in Symfony 5.1), you have to use this one:
+        # - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+
+    google:
+        issuer: MintMe.com
+        enabled: true
+        template: security/2fa_login.html.twig
+
+    backup_codes:
+        enabled: true
+
+    email:
+        enabled: true
+        sender_email: '%env(MAILER_USER)%'
+        sender_name: '%env(MAILER_NAME)%'
+        digits: 6
+        template: security/email_login.html.twig
+        mailer: app.mailer
+
+    ip_whitelist:
+        - 127.0.0.1
+
+    trusted_device:
+        enabled: '%trusted_device_enabled%'
+        lifetime: '%trusted_device_cookie_lifetime%'
+        extend_lifetime: '%trusted_device_extend_lifetime%'

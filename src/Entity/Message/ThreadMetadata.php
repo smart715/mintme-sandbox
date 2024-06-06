@@ -34,6 +34,16 @@ class ThreadMetadata
      */
     private $participant;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default"=false})
+     */
+    private bool $isBlocked = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", options={"default"=false})
+     */
+    private bool $isHidden = false; // phpcs:ignore
+
     public function getId(): int
     {
         return $this->id;
@@ -64,5 +74,35 @@ class ThreadMetadata
     public function getParticipant(): User
     {
         return $this->participant;
+    }
+
+    public function setIsBlocked(bool $value): self
+    {
+        $this->isBlocked = $value;
+
+        return $this;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function getIsBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setHidden(bool $isHidden): self
+    {
+        $this->isHidden = $isHidden;
+
+        return $this;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function isHidden(): bool
+    {
+        return $this->isHidden;
     }
 }

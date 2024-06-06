@@ -1,20 +1,24 @@
 <template>
-    <div class="feed-container" v-if="showFeed">
-        <div class="feed d-flex flex-column">
-            <div v-for="(n, i) in itemsToShow" :key="i" class="feed-row d-flex flex-row justify-content-between">
-                <div class="feed-cell" v-html="sanitizedItems[i].message"></div>
-                <div class="feed-cell d-flex align-items-center">
+    <div v-if="showFeed">
+        <div
+            v-for="(n, i) in itemsToShow"
+            :key="i"
+            class="feed d-flex flex-column"
+            :class="itemClass"
+        >
+            <div :class="{'padding-feed-cell': !isFeedPage}">
+                <div :class="{'w-100': !isFeedPage}" v-html="sanitizedItems[i].message"></div>
+                <div :class="dateClass">
                     {{ sanitizedItems[i].date }}
                 </div>
             </div>
         </div>
-        <div class="text-center">
-            <font-awesome-icon
-                class="icon-default mt-3 c-pointer"
-                :icon="['fac', 'downArrow']"
-                :transform="showMore ? 'rotate-180' : ''"
-                @click="toggle"
-            />
+        <div class="text-center mt-4" v-if="!isHomePage && min !== max">
+            <button class="btn btn-lg button-secondary rounded-pill" @click="toggle">
+                <span class="pt-2 pb-2 pl-3 pr-3">
+                    {{ showMoreText }}
+                </span>
+            </button>
         </div>
     </div>
 </template>
@@ -22,133 +26,167 @@
 <script>
 import moment from 'moment';
 import Decimal from 'decimal.js';
-import {toMoney} from '../utils';
-import {currencies, TOK, WSAPI} from '../utils/constants';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {downArrow} from '../utils/icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {RebrandingFilterMixin} from '../mixins';
+import {getCoinAvatarAssetName} from '../utils';
+import {RebrandingFilterMixin, BnbToBscFilterMixin} from '../mixins';
 import TruncateFilterMixin from '../mixins/filters/truncate';
-
-library.add(downArrow);
+import {
+    TOK,
+    WSAPI,
+    TOKEN_DEFAULT_ICON_URL,
+    WEB,
+} from '../utils/constants';
+import {mapGetters} from 'vuex';
 
 export default {
     name: 'Feed',
-    components: {
-        FontAwesomeIcon,
-    },
     mixins: [
         TruncateFilterMixin,
         RebrandingFilterMixin,
+        BnbToBscFilterMixin,
     ],
     props: {
         itemsProp: Array,
         mercureHubUrl: String,
         min: Number,
         max: Number,
+        lang: String,
+        isFeedPage: Boolean,
+        isHomePage: {
+            type: Boolean,
+            default: false,
+        },
+        showMoreHomePage: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             items: this.itemsProp,
             topic: 'activities',
-            showMore: false,
+            showMoreFeedPage: false,
         };
     },
     mounted() {
+        moment.locale(this.lang);
         const es = new EventSource(this.mercureHubUrl + '?topic=' + encodeURIComponent(this.topic));
         this.items = this.groupedItems;
 
         es.onmessage = (e) => {
-            let data = JSON.parse(e.data);
-            this.items.unshift(data);
-            this.items = this.groupedItems;
+            const data = JSON.parse(e.data);
+
+            if (this.isNotADuplicate(data)) {
+                this.items.unshift(data);
+                this.items = this.groupedItems;
+            }
         };
     },
     computed: {
+        ...mapGetters('crypto', {
+            enabledCryptosMap: 'getCryptosMap',
+        }),
         sanitizedItems() {
             return this.items.map((item) => {
                 return {
-                    message: this.$t(`activity_${item.type}_message`, this.createTranslationContext(item)),
+                    message: this.$t(`activity_${item.type}_message`, item.context),
                     date: moment(item.createdAt).fromNow(),
                 };
             });
         },
         showFeed() {
-            return this.items.length > 0;
+            return 0 < this.items.length;
         },
         itemsToShow() {
-            let max = this.showMore ? this.max : this.min;
+            const max = this.showMore ? this.max : this.min;
             return Math.min(max, this.items.length);
         },
         groupedItems() {
-            let temp = [];
-
-            for (let index = 0; index < this.items.length; index++) {
-                let grouped = false;
-                const item = this.items[index];
-
+            return this.items.reduce((items, item) => {
                 if (!this.isGroupableType(item)) {
-                    temp.push(item);
-                    continue;
+                    items.push(item);
+
+                    return items;
                 }
 
-                for (let tempIndex = 0; tempIndex < temp.length; tempIndex++) {
-                    const tempItem = temp[tempIndex];
-
-                    if (tempItem.type !== item.type) {
-                        continue;
-                    }
-
-                    if (this.isDonation(tempItem, item) || this.isTrade(tempItem, item)) {
-                        const amount = new Decimal(temp[tempIndex].amount).add(item.amount);
-                        temp[tempIndex].amount = amount.toFixed();
-                        grouped = true;
-                        break;
-                    }
+                if (0 < items.length
+                    && items[items.length - 1].type === item.type
+                    && (this.isDonation(items[items.length - 1], item) || this.isTrade(items[items.length - 1], item))
+                ) {
+                    const amount = new Decimal(items[items.length - 1].context.amount).add(item.context.amount);
+                    items[items.length - 1].context.amount = amount.toFixed();
+                } else {
+                    items.push(item);
                 }
 
-                if (!grouped) {
-                    temp.push(item);
-                }
+                return items;
+            }, []);
+        },
+        showMoreText() {
+            return this.showMore ? this.$t('page.index.see_less') : this.$t('page.index.see_more');
+        },
+        itemClass() {
+            return this.isFeedPage ? 'mt-3' : 'mb-4';
+        },
+        showMore() {
+            return this.isHomePage ? this.showMoreHomePage : this.showMoreFeedPage;
+        },
+        dateClass() {
+            if (this.isFeedPage) {
+                return 'date text-right';
             }
 
-            return temp;
+            return 'font-size-12 text-subtitle recent-activities-date';
         },
     },
     methods: {
+        isNotADuplicate(item) {
+            return !this.items.some((i) => i.type === item.type && this.isEqualObject(i.context, item.context));
+        },
+        isEqualObject(obj1, obj2) {
+            return JSON.stringify(obj1) === JSON.stringify(obj2);
+        },
         isDonation(savedItem, receivedItem) {
             return WSAPI.order.type.DONATION === savedItem.type
-                && savedItem.token.name === receivedItem.token.name
-                && savedItem.currency === receivedItem.currency;
+                && savedItem.context.token === receivedItem.context.token
+                && savedItem.context.tradeIconUrl === receivedItem.context.tradeIconUrl;
         },
         isTrade(savedItem, receivedItem) {
             return WSAPI.order.type.TOKEN_TRADED === savedItem.type
-                && savedItem.token.name === receivedItem.token.name
-                && savedItem.buyer.id === receivedItem.buyer.id;
+                && savedItem.context.token === receivedItem.context.token
+                && savedItem.context.buyer === receivedItem.context.buyer
+                && savedItem.context.tradeIconUrl === receivedItem.context.tradeIconUrl;
         },
         isGroupableType(item) {
             return WSAPI.order.type.DONATION === item.type
                 || WSAPI.order.type.TOKEN_TRADED === item.type;
         },
-        createTranslationContext(item) {
-            let subunit = item.currency ? currencies[item.currency].subunit : TOK.subunit;
-            let symbol = this.rebrandingFunc(TOK.symbol === item.currency ? 'tokens' : item.currency);
-
-            return {
-                token: this.truncateFunc(item.token.name, 25),
-                tokenUrl: this.$routing.generate('token_show', {name: item.token.name}),
-                user: item.user ? this.truncateFunc(item.user.profile.nickname, 12) : null,
-                userUrl: item.user ? this.$routing.generate('profile-view', {nickname: item.user.profile.nickname}) : null,
-                amount: item.amount ? toMoney(item.amount, subunit) : null,
-                buyer: item.buyer ? this.truncateFunc(item.buyer.profile.nickname, 12) : null,
-                buyerUrl: item.buyer ? this.$routing.generate('profile-view', {nickname: item.buyer.profile.nickname}) : null,
-                post: item.post ? `"${this.truncateFunc(item.post.title, 32)}"` : '',
-                postUrl: item.post ? this.$routing.generate('show_post', {id: item.post.id}) : '',
-                symbol,
-            };
-        },
         toggle() {
-            this.showMore = !this.showMore;
+            this.showMoreFeedPage = !this.showMoreFeedPage;
+        },
+        tokenIcon(token) {
+            return token
+                && token.image
+                && TOKEN_DEFAULT_ICON_URL !== token.image.url
+                ? token.image.avatar_small
+                : this.getDefaultTokenIcon(token);
+        },
+        getDefaultTokenIcon(token) {
+            const icon = getCoinAvatarAssetName(token.cryptoSymbol) || WEB.icon;
+
+            return require(`../../img/${icon}`);
+        },
+        tradeIcon(symbol, token = null) {
+            return TOK.symbol === symbol && token?.image
+                ? this.tokenIcon(token)
+                : require('../../img/' + getCoinAvatarAssetName(symbol));
+        },
+        profileIcon(profileType) {
+            return profileType && profileType.profile.image
+                ? profileType.profile.image.avatar_small
+                : require('../../img/user-avatar.png');
+        },
+        rebrandBlockchain: function(blockchain) {
+            return this.rebrandingFunc(this.bnbToBscFunc(blockchain));
         },
     },
 };

@@ -4,39 +4,82 @@ namespace App\Tests\Validator\Constraints;
 
 use App\Entity\User;
 use App\Manager\TwoFactorManager;
+use App\Services\TranslatorService\TranslatorInterface;
 use App\Validator\Constraints\TwoFactorAuth;
 use App\Validator\Constraints\TwoFactorAuthValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TwoFactorAuthValidatorTest extends TestCase
 {
-    public function testValidate(): void
+    public function testValidateWithValue(): void
     {
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $builder->method('setParameter')->willReturnSelf();
-
-        $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->once())->method('buildViolation')->willReturn(
-            $builder
+        $twoFactorAuthValidator = new TwoFactorAuthValidator(
+            $this->mockTokenStorageInterface(),
+            $this->mockTwoFactorManager(),
+            $this->createMock(TranslatorInterface::class)
         );
 
-        $token = $this->createMock(TokenInterface::class);
+        $twoFactorAuthValidator->user = $this->createMock(User::class);
+        $twoFactorAuthValidator->initialize($this->mockContextInterface());
+        $twoFactorAuthValidator->validate('123', $this->createMock(TwoFactorAuth::class));
+    }
 
-        $storage = $this->createMock(TokenStorageInterface::class);
-        $storage->method('getToken')->willReturn($token);
+    public function testValidateWithValueEmpty(): void
+    {
+        $twoFactorAuthValidator = new TwoFactorAuthValidator(
+            $this->mockTokenStorageInterface(),
+            $this->mockTwoFactorManager(),
+            $this->createMock(TranslatorInterface::class)
+        );
 
-        $tm = $this->createMock(TwoFactorManager::class);
-        $tm->method('checkCode')->willReturn(false);
+        $twoFactorAuthValidator->user = $this->createMock(User::class);
+        $twoFactorAuthValidator->initialize($this->mockContextInterface());
+        $twoFactorAuthValidator->validate('', $this->createMock(TwoFactorAuth::class));
+    }
 
-        $validator = new TwoFactorAuthValidator($storage, $tm, $this->createMock(TranslatorInterface::class));
-        $validator->user = $this->createMock(User::class);
-        $validator->initialize($context);
-        $validator->validate('123', $this->createMock(TwoFactorAuth::class));
-        $validator->validate('', $this->createMock(TwoFactorAuth::class));
+    private function mockTwoFactorManager(): TwoFactorManager
+    {
+        /** @var TwoFactorManager|MockObject $twoFactorManager */
+        $twoFactorManager = $this->createMock(TwoFactorManager::class);
+        $twoFactorManager->method('checkCode')->willReturn(false);
+
+        return $twoFactorManager;
+    }
+
+    private function mockTokenStorageInterface(): TokenStorageInterface
+    {
+        /** @var TokenInterface|MockObject $tokenInterface */
+        $tokenInterface = $this->createMock(TokenInterface::class);
+
+        /** @var TokenStorageInterface|MockObject $tokenStorageInterface */
+        $tokenStorageInterface = $this->createMock(TokenStorageInterface::class);
+        $tokenStorageInterface->method('getToken')->willReturn($tokenInterface);
+
+        return $tokenStorageInterface;
+    }
+
+    private function mockContextInterface(): ExecutionContextInterface
+    {
+        /** @var ExecutionContextInterface|MockObject $contextInterface */
+        $contextInterface = $this->createMock(ExecutionContextInterface::class);
+        $contextInterface->expects($this->once())->method('buildViolation')->willReturn(
+            $this->mockConstraintViolationBuilderInterface()
+        );
+
+        return $contextInterface;
+    }
+
+    private function mockConstraintViolationBuilderInterface(): ConstraintViolationBuilderInterface
+    {
+        /** @var ConstraintViolationBuilderInterface|MockObject $builderInterface */
+        $builderInterface = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $builderInterface->method('setParameter')->willReturnSelf();
+
+        return $builderInterface;
     }
 }

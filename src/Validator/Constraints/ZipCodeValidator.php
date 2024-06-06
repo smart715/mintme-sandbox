@@ -11,8 +11,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class ZipCodeValidator extends ConstraintValidator
 {
 
-    /** {@inheritdoc} */
-    public function validate($value, Constraint $constraint)
+    /**
+     * {@inheritdoc}
+     *
+     * @param $value string|null
+     * @param $constraint ZipCode
+     */
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof ZipCode) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\ZipCode');

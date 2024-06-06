@@ -1,0 +1,194 @@
+{% include 'pages/pair_quick_trade.html.twig' with {'displayOn': 'mobile', class: 'mt-4'} %}
+
+{% set isCreatedOnMintmeSite = token.isCreatedOnMintmeSite %}
+
+{% if token.description or isOwner == 'true' %}
+    <div class="card token-description-wrp">
+        <token-introduction-description
+            name="{{ token.name }}"
+            :description="tokenDescription"
+            :editable="{{ isOwner }}"
+            :is-mobile-screen="isMobileScreen"
+            :should-unfold-description="true"
+            @updated="descriptionUpdated"
+            @fold="shouldUnfoldDescription = $event"
+        ></token-introduction-description>
+        <div v-if="false" class="fix-height custom-scrollbar">
+            <div class="overflow-y-hidden">
+                <div id="description-text" class="show-hide-text">
+                    {% if token.description %}
+                        <div>
+                            <p class="bbcode-content">
+                                {{ token.description|safeHtml|raw }}
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="text-muted text-center mb-3">
+                            {{ 'page.pair.no_description'|trans }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+<div v-if="!statisticsOpened" class="row flex-nowrap justify-content-between px-0 mx-0 mt-2">
+    <div class="card mb-3 px-2 py-2 w-100 text-center font-weight-semibold mr-2 d-flex align-items-center justify-content-center">
+        {% if isCreatedOnMintmeSite %}
+            {% trans %}token.intro.statistics.created{% endtrans %}
+        {% else %}
+            {% trans %}token.intro.statistics.listed{% endtrans %}
+        {% endif %}
+        <div class="text-primary">
+            {{ token.getCreated().format('d M Y') }}
+        </div>
+    </div>
+    <div class="card mb-3 px-2 py-2 w-100 text-center font-weight-semibold mr-2 d-flex align-items-center justify-content-center">
+        {% trans %}token.intro.statistics.holders.header{% endtrans %}
+        <div class="text-primary">
+            {{ tokenStatistics.holders }}
+        </div>
+    </div>
+    {% if isCreatedOnMintmeSite %}
+        <div class="card mb-3 px-2 py-2 w-100 text-center font-weight-semibold mr-2 d-flex align-items-center justify-content-center">
+            {% trans %}token.intro.statistics.already_released.header{% endtrans %}
+            <div class="text-primary">
+                {{ lockIn ? lockIn['releasedAmount'] | toMoney(precision) : '-' }}
+            </div>
+        </div>
+        <div class="card mb-3 px-2 py-2 w-100 text-center font-weight-semibold mr-2 d-flex align-items-center justify-content-center">
+            {% trans %}token.intro.statistics.not_yet_released.header{% endtrans %}
+            <div class="text-primary">
+                {{ lockIn ? lockIn['frozenAmount'] | toMoney(precision) : '-' }}
+            </div>
+        </div>
+    {% endif %}
+    <div class="card mb-3 px-2 py-2 w-100 text-center font-weight-semibold mr-2 d-flex align-items-center justify-content-center">
+        {% trans %}token.intro.statistics.active.header{% endtrans %}
+        <div class="text-primary">
+            {{ tokenStatistics.totalPendingSellOrders ? tokenStatistics.totalPendingSellOrders | toMoney(precision) : '-' }}
+        </div>
+    </div>
+    <div class="
+            card mb-3 px-2 py-2 w-100
+            text-center font-weight-semibold
+            d-flex align-items-center justify-content-center
+            statistics-show-more c-pointer
+    " @click="openStatistics">
+        <font-awesome-icon icon="caret-down" class="text-primary font-size-3" />
+    </div>
+</div>
+<div v-cloak v-show="statisticsOpened" class="row m-0 mt-4">
+    {% if lockIn %}
+        <div class="col-12 col-sm-5 mb-3 mr-4 card p-3 d-flex align-items-center justify-content-center position-relative">
+            <token-release-chart
+                :released="{{ lockIn['releasedAmount'] }}"
+                :not-released="{{ lockIn['frozenAmount'] }}"
+            ></token-release-chart>
+        </div>
+    {% endif %}
+    <div class="col p-0 mb-3">
+        <div class="row m-0 font-weight-semibold">
+            <div class="col p-0 mr-4 text-center">
+                <div class="card mb-3 px-2 py-2">
+                    {% if isCreatedOnMintmeSite %}
+                        {% trans %}token.intro.statistics.created{% endtrans %}
+                    {% else %}
+                        {% trans %}token.intro.statistics.listed{% endtrans %}
+                    {% endif %}
+                    <div class="text-primary">
+                        {{ token.getCreated().format('d M Y') }}
+                    </div>
+                </div>
+                <div class="card mb-3 px-2 py-2">
+                    {% trans %}token.intro.statistics.active.header{% endtrans %}
+                    <div class="text-primary">
+                        {{ tokenStatistics.totalPendingSellOrders ? tokenStatistics.totalPendingSellOrders | toMoney(precision) : '-' }}
+                    </div>
+                </div>
+                {% if isCreatedOnMintmeSite %}
+                    <div class="card mb-3 px-2 py-2">
+                        {% trans %}token.intro.statistics.period.header{% endtrans %}
+                        <div class="text-primary">
+                            {{ lockIn ? lockIn['releasePeriod'] : '-' }}
+                            {{ 'text.time.year' | trans }}
+                        </div>
+                    </div>
+                    <div class="card mb-3 px-2 py-2">
+                        {% trans %}token.intro.statistics.hourly.header{% endtrans %}
+                        <div class="text-primary">
+                            {{ lockIn ? lockIn['hourlyRate'] | toMoney(precision) : '-' }}
+                        </div>
+                    </div>
+                    <div class="card mb-3 px-2 py-2">
+                        {% trans %}token.intro.statistics.already_released.header{% endtrans %}
+                        <div class="text-primary">
+                            {{ lockIn ? lockIn['releasedAmount'] | toMoney(precision) : '-' }}
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="card mb-3 px-2 py-2">
+                    {% trans %}token.intro.statistics.holders.header{% endtrans %}
+                    <div class="text-primary">
+                        {{ tokenStatistics.holders }}
+                    </div>
+                </div>
+            </div>
+            <div class="col p-0 text-center">
+                <div class="card mb-3 px-2 py-2">
+                    {% trans %}token.intro.statistics.exchange.header{% endtrans %}
+                    <div class="text-primary">
+                        {{ tokenStatistics.exchangeAmount ? tokenStatistics.exchangeAmount | toMoney(precision) : '-' }}
+                    </div>
+                </div>
+                {% if isCreatedOnMintmeSite %}
+                    <div class="card mb-3 px-2 py-2">
+                        {% trans %}token.intro.statistics.withdraw.header{% endtrans %}
+                        <div class="text-primary">
+                            {{ withdrawn | toMoney(precision) }}
+                        </div>
+                    </div>
+                    <div class="card mb-3 px-2 py-2">
+                        {% trans %}token.intro.statistics.sold.header{% endtrans %}
+                        <div class="text-primary">
+                            {{ tokenStatistics.sold ? tokenStatistics.sold | toMoney(precision) : '-' }}
+                        </div>
+                    </div>
+                    <div class="card mb-3 px-2 py-2">
+                        {% trans %}token.intro.statistics.not_yet_released.header{% endtrans %}
+                        <div class="text-primary">
+                            {{ lockIn ? lockIn['frozenAmount'] | toMoney(precision) : '-' }}
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="card px-2 py-2">
+                    {% trans %}token.intro.statistics.donation.header{% endtrans %}
+                    <div class="text-primary">
+                        {{ volumeDonation | toMoney(0) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-4">
+    <div v-if="false" class="d-flex justify-content-between align-items-center">
+        <div class="font-size-3 font-weight-semibold header-highlighting">
+            {{ 'page.pair.latest_news' | trans | raw }}
+        </div>
+    </div>
+
+    {% include 'spinners/posts_list.html.twig' with {'posts' : posts, 'showMore' : true} %}
+
+    <token-posts class="col-12 p-0 m-0"
+        :token="{{ normalizedToken | json_encode }}"
+        :posts="{{ posts | json_encode }}"
+        :posts-amount="{{ posts_amount }}"
+        :logged-in="{{ app.user ? 'true' : 'false' }}"
+        :is-owner="{{ isOwner }}"
+        :subunit="{{ tokenSubunit }}"
+        :is-mobile-screen="isMobileScreen"
+        @go-to-trade="goToTrade"
+        @go-to-post="goToPost"
+    ></token-posts>
+</div>

@@ -1,0 +1,23 @@
+<div v-if="false" class="d-flex align-items-center justify-content-center verify-code-wrp">
+    <input type="text" maxlength="1" class="text-center form-control mx-1 mx-sm-2" inputmode="numeric">
+    <input type="text" maxlength="1" class="text-center form-control mx-1 mx-sm-2" inputmode="numeric">
+    <input type="text" maxlength="1" class="text-center form-control mx-1 mx-sm-2" inputmode="numeric">
+    <input type="text" maxlength="1" class="text-center form-control mx-1 mx-sm-2" inputmode="numeric">
+    <input type="text" maxlength="1" class="text-center form-control mx-1 mx-sm-2" inputmode="numeric">
+    <input type="text" maxlength="1" class="text-center form-control mx-1 mx-sm-2" inputmode="numeric">
+</div>
+{% if hide_send_code is not defined or not hide_send_code %}
+    <span v-if="false" class="btn-cancel btn-disabled text-left px-0 my-1 c-pointer d-flex align-items-center">
+        {{ 'phone_confirmation.send_code_again'|trans }}
+        <div
+            v-if="isRequestingCode"
+            class="spinner-border spinner-border-sm ml-2"
+            role="status"
+        ></div>
+    </span>
+{% endif %}
+{% if backup_code is defined and backup_code %}
+    <div v-if="false" class="text-right small px-4 px-sm-4 mt-1 mx-5 mx-sm-1">
+        <a href="#" @click.prevent="toggleBackupMode">{{ 'page.login_2fa.backup_link.backup_code'|trans }}</a>
+    </div>
+{% endif %}

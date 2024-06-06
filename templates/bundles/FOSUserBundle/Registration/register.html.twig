@@ -2,6 +2,10 @@
 
 {% block title %} {% trans from 'messages' %}sign_up{% endtrans %} | mintMe{% endblock %}
 
+{% block head %}
+    <meta name="robots" content="noindex, follow">
+{% endblock %}
+
 {% block fos_user_content %}
     {{ include("@FOSUser/Registration/register_content.html.twig") }}
 {% endblock fos_user_content %}
@@ -9,9 +13,4 @@
 {% block pagescripts %}
     {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
     {{ encore_entry_script_tags('pages/register') }}
-    <script>
-        window.onload = function() {
-            document.getElementById("fos_user_registration_form_email").focus();
-        }
-    </script>
 {% endblock %}

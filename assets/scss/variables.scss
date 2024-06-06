@@ -3,43 +3,160 @@
 // Change bootstrap variables to match Mintme style
 
 // Fonts
-$lato-font: 'Lato', 'Arial', sans-serif;
-$concord-font: 'Concord';
-$concord-bold-font: 'ConcordBold';
+$poppins-font: 'Poppins', 'Arial', sans-serif;
+
+// Mail fonts
+$helvetica: Helvetica, Arial, sans-serif;
+$courier: 'Courier New', monospace;
 
 $font-scales: (
   xs: 13px,
-  sm: 15px,
-  md: 18px,
-  lg: 32px
+  sm: 14px,
+  md: 16px,
+  sl: 18px,
+  lg: 32px,
+  ml: 36px,
+  xl: 48px,
+  xxl: 51px,
 );
 
+$small-font-size: 0.8rem;
+$font-size-sm: 1rem;
+$font-size-md: 1.3rem;
+$font-size-sl: 1.5rem;
+$font-size-ml: 1.8rem;
+$font-size-lg: 2rem;
+$font-size-xl: 2.5rem;
+$font-size-xxl: 3rem;
+$font-size-xxxl: 3.5rem;
+$font-size-xxxxl: 4.5rem;
+
 // Borders
-$border-radius: 0;
+$border-radius: 8px;
+$border-radius-sm: 2px;
+$form-radius: 6px;
+$h-divider-size: 1px;
+$border-radius-large: 25px;
+$half-border-radius: 4px;
+
+// Z-index
+$z-index-hacker-menu: 1040;
+$z-index-sticky-header: 999;
 
 // Colors
-$ghost-dark: rgba(0, 0, 0, 0.15);
-$ghost-light: rgba(255, 255, 255, 0.25);
-$grey-light: #8A96A4;
+$primary: #D1B000;
+$primary-highlight: #ebc500;
+$primary-dark: #373321;
+$primary-dark-border-color: #6e6536;
+$bg-primary-darker: #1C1C1C;
+$bg-primary-dark: #202020;
+$bg-primary: #252525;
+$bg-secondary-dark: #151414;
+$bg-primary-light: #353535;
+$bg-primary-lighter: #AAAAAA;
+$bg-secondary: #FFF;
+$bg-secondary-hover: #F2F2F2;
+$bg-secondary-dark: #131519;
+$bg-avatar-primary: #0B0B0B;
+$bg-dropdown: #f9f9f9;
+$bg-color-darkest: #000;
+$bg-danger-input: #777C80;
+$block-background-hover: #423D15;
+
+// Text colors
+$text-color-primary: #FFF;
+$text-color-primary-dark: #CBCBCB;
+$text-color-primary-darker: #929292;
+$text-color-primary-darkest: #7B7B7B;
+$text-color-secondary: #313131;
+$text-color-secondary-light: #898A8C;
+$text-color-secondary-dark: #202020;
+$text-color-secondary-semilight: #555555;
+$text-color-dark: #343a40;
+$text-color-dark-primary: #252525;
+$text-color-dark-secondary: #100000;
+$text-color-darkest-secondary: #000;
+// infoBar
+$infobar-bg: #01579B;
+$infobar-circle-bg: #012D50;
+
+// Page
+$page-content-width-narrower: 1000px;
+$page-content-width: 1170px;
+$page-content-width-wider: 1360px;
+$page-content-width-widest: 1560px;
+$page-post-image-max-height: 26rem;
+$page-news-post-height: 445px;
+$page-news-post-width: 370px;
+
+// Links
+$link-color: $text-color-primary;
+$link-color-hover: $primary;
+$link-color-active: $primary;
+$link-hover-decoration: none;
+$link-color-highlight: $primary;
+$link-color-highlight-hover: lighten($primary, 5);
+
+// Dropdown
+$dropdown-link-color: $text-color-secondary;
+$dropdown-link-color-hover: $text-color-secondary;
+$dropdown-link-bg-hover: #D9D9D9;
+$dropdown-link-active-color: $text-color-secondary;
+$dropdown-link-active-bg: $dropdown-link-bg-hover;
+$dropdown-border-color: transparent;
+
+// Buttons
+$btn-default-bg: $bg-primary-light;
+$btn-default-color: $text-color-primary;
+$btn-default-bg-hover: lighten($bg-primary-light, 3);
+
+$btn-link-color: $text-color-primary;
+$btn-link-bg: transparent;
+$btn-link-color-hover: $primary;
+$btn-link-bg-hover: transparent;
+$btn-see-more-border-color: #303030;
+
+$btn-border-radius: 5px;
+$btn-border-radius-extra: 25px;
+
+$btn-font-size: 16px;
+$btn-font-size-extra: 20px;
+
+$btn-primary-disabled-color: #7a7a7a;
+$btn-border-color: #1B679D;
+$btn-error-text-color: #F86363;
+
+// Other colors
 $grey: #a09999;
-$grey-dark: #778588;
 $yellow: #be8817;
 $orange: #f7931e;
-$green: #8dc63f;
+$green: #3AB54A;
 $red: #fe6e43;
 $white: white;
 $dark-white: #ebebeb;
-$pale-gray: #ced4da;
-$black: #131313;
-$secondary: #152D47;
-$notification-link: #3DB5FF;
-$secondary-dark: #112438;
-$primary: #0E3B58;
+$secondary: #474747;
 $primary-light: #017bbc;
-$blue: #1da1f3;
 $meterbg-list: (#b71c1c, #d32f2f, #f9a825, #8bc34a, #558b2f);
-$gold: #C1AE83;
-$odd-item-color: #00334E;
+$message-box-border: #cdd2d5;
+$unread-message-icon: #eb5874;
+$messages-text-color: #727a7e;
+$messages-subtitle-color: #5A5A5A;
+$subtitle-text-color: #bababa;
+
+// Pair page orders
+$sell-order-price-color: #e25334;
+$sell-order-fill-color: #2D2524;
+$buy-order-price-color: #78bc61;
+$buy-order-fill-color: #232B24;
+
+// Mail colors
+$cod-gray: #0a0a0a;
+$concrete: #f3f3f3;
+$firefly: #102238;
+$woodsmoke: #060607;
+$black: #131313;
+$mail-link-color: #4590E8;
+
 // This variable affects the `.h-*` and `.w-*` classes.
 $sizes: () !default;
 
@@ -66,38 +183,26 @@ $container-max-widths: (
 ) !default;
 
 $theme-colors: (
-  "ghost-dark": $ghost-dark,
-  "ghost-light": $ghost-light,
+  "primary": $primary,
   "yellow": $yellow,
   "orange": $orange,
   "green": $green,
-  "blue": $blue
 );
 
-$body-background: $black url("../img/sky_image.webp") no-repeat fixed;
-$body-background-sm: linear-gradient(#184b80, #193a5d);
-$module-background: linear-gradient(#0b3c57, #19263d);
-$body-text-color: #1a1a1a;
-$color-nav: $dark-white;
-$color-nav-active: $gold;
-$color-nav-hover: $gold;
-$color-link: $blue;
-$color-link-hover: #90c7ff;
-$color-tabs: $primary;
-$color-tabs-links: #0078bb;
-$color-slider-range: #007ABB;
 $color-facebook: #3b5998;
-$color-twitter: $blue;
+$color-twitter: #1da1f3;
 $color-tooltip: #5B6C7E;
 $color-badge: #4FC2F8;
 $color-linkedin: #0077b5;
 $color-toggle-password-active: #0071bc;
 $color-toggle-password-hover: #0071bc;
-$modal-alert-border-color: $primary;
-$index-description-bg: linear-gradient(180deg, #102238, #102238, #102238, #102238, transparent, transparent) repeat-x;
+
+$focus-shadow-color: rgba(255, 255, 255, 0.1);
+$tooltip-color: $bg-secondary;
+$odd-item-color: $bg-primary;
 
 // Forms
-$input-bg: #1D3D61;
+$input-bg: $bg-secondary;
 $input-btn-padding-y: .25rem;
 $input-btn-padding-x: 1rem;
 $input-focus-border-color: $input-bg;
@@ -105,14 +210,20 @@ $input-btn-focus-color: $input-bg;
 $input-focus: #193554;
 $search-input: #1D3D61;
 $input-placeholder-color: $white;
+$white-input-placeholder-color: $text-color-secondary-semilight;
+$textarea-max-height: 1820px;
+$checkbox-border-color: #B6B6B6;
+
+// Progress
+$progress-bg: $bg-primary;
 
 // Card
-$card-border-width: 0.6rem;
-$card-border-color: $ghost-dark;
+$card-border-width: 0;
+$card-border-color: transparent;
 $card-input-color: $input-bg;
-$card-header-bg: $primary;
-$card-body-bg: $secondary;
-$card-text-color: $dark-white;
+$card-bg: $bg-primary-dark;
+$card-icon-lg: 90px;
+$card-icon-less-lg: 70px;
 
 // Pagination
 $pagination-color: $primary;
@@ -121,11 +232,15 @@ $pagination-border-width: 0;
 // Modal
 $modal-content-border-radius: $border-radius;
 $modal-content-border-width: 0;
+$modal-max-width: 630px;
 
 $navbar-toogler: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
 $navbar-sm-background: radial-gradient(#184b80, #1b4776);
+$topnav-width: 100%;
 
 // Tables
+$sort-chevron-width: 7px;
+$chevron-color: #606266;
 $b-table-sort-icon-bg-not-sorted: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/></svg>") !default;
 $b-table-sort-icon-bg-ascending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' d='M51 1l25 23 24 22H1l25-22z'/><path fill='white' opacity='.3' d='M51 101l25-23 24-22H1l25 22z'/></svg>") !default;
 $b-table-sort-icon-bg-descending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22z'/><path fill='white' d='M51 101l25-23 24-22H1l25 22z'/></svg>") !default;
@@ -133,20 +248,45 @@ $b-table-sort-icon-bg-descending: url("data:image/svg+xml,<svg xmlns='http://www
 // Notifications
 $toast-error-bg: #ff524e;
 $toast-error-text: #ffffff;
-$toast-info-bg: #6fcbfa;
-$toast-info-text: #003858;
+$toast-info-bg: #D1B000;
+$toast-info-text: $text-color-secondary;
 $toast-success-bg: #8dd7a6;
 $toast-success-text: #2e7d32;
 $toast-warning-bg: #ffcc7c;
 $toast-warning-text: #de3300;
 
-// spaces
-$token-avatar-margin-left: 115px;
-
-// Posts
-$post-border-color: #0e3b59;
-
 // This variable should mirror config/paramaters.dist.yml translation_flags.flag variable.
-$translation-flags: gb, es, ru, ua, pl, ae, pt, fr;
+$translation-flags: gb, es, ru, ua, pl, ae, pt, fr, de;
+
+// Transition
+$micro-transition-speed: 50ms;
+$fast-transition-speed: 150ms;
+$normal-transition-speed: 300ms;
+$long-transition-speed: 400ms;
+
+// Headers
+$page-header-font-size: 30px;
+$table-header-font-size: 26px;
+
+// Tables
+$td-padding: 0.5rem;
+
+//pagination
+$pagination-bg: $bg-primary-dark;
+$pagination-hover-bg: $bg-primary-light;
+
+// logo-footer
+$logo-medium-width: 220px;
+
+// scroll
+$scroll-width: 10px;
+$scroll-handle-bg: lighten($bg-primary-light, 5);
+$scroll-handle-bg-hover: lighten($scroll-handle-bg, 5);
+
+// title
+$token-title-width: 255px;
+
+// Post
+$post-content-color: $subtitle-text-color;
 
 @import "~bootstrap/scss/variables";

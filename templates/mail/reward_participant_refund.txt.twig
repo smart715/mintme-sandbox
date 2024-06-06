@@ -1,0 +1,23 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ nickname }}!
+
+{{ absolute_url(path('profile-view', {'nickname': ownerNickname})) }}
+
+{{ absolute_url(path('token_show', {'name': rewardToken})) }}
+
+{{ absolute_url(path('token_show', {'name': rewardToken, 'tab': 'intro', 'modal': 'reward-finalize', 'slug': slug})) }}
+
+{% trans with {
+    '%ownerProfileUrl%': ownerProfileUrl,
+    '%ownerNickname%': ownerNickname,
+    '%amount%': amount,
+    '%urlToken%': urlToken,
+    '%tokenName%': rewardToken,
+    '%urlProduct%': urlProduct,
+    '%productTitle%': rewardTitle,
+}%} mail.reward.refund {% endtrans %}
+
+{% endblock %}
+

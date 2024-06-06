@@ -1,61 +1,153 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/referral') }}
+{% endblock %}
+
 {% block title %}{% trans %}page.referral.title{% endtrans %} | mintMe{% endblock %}
 
 {% block bodyclass %}referral{% endblock %}
 
 {% block content %}
-    <div id="referral" class="container">
-        <div class="row pt-4 pb-3 justify-content-center">
-            <div class="col-12 card-fixed-large px-0 card">
-                <div class="card-header">{% trans %}page.referral.header{% endtrans %}</div>
-                <div class="card-body text-center m-0 pt-4">
-                    <p class="m-0">{% trans %}page.referral.body_1{% endtrans %} <span class="text-bold">{% trans with {'%referralPercentage%': referralPercentage} %}page.referral.body_2{% endtrans %}</span> {% trans %}page.referral.body_3{% endtrans %}</p>
-                    <p>{% trans with {'%deployCostReward%': deployCostReward} %}page.referral.body_4{% endtrans %}</p>
-                    <p>{% trans with {'%referralPercentage%': referralPercentage} %}page.referral.body_5{% endtrans %}</p>
-                    <p>{% trans %}page.referral.body_6{% endtrans %}</p>
-                    <div class="mt-3 mx-auto text-center">
-                        <div class="mb-1" id="referral-link-text">
-                            {% if userToken %}
-                            <code class="p-2 text-blue">
-                                <span> {{ absolute_url(path('register-referral-by-token', { userToken: userToken })) }} </span>
-                                <copy-link class="code-copy c-pointer" id="code-copy-btn" content-to-copy="{{ absolute_url(path('register-referral-by-token', { userToken: userToken })) }}">
-                                    <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                                </copy-link>
-                            </code>
+    <section
+        id="referral"
+        class="d-flex align-items-center justify-content-center min-height-75 container"
+    >
+        <crypto-init :cryptos="{{ enabledCryptos | json_encode }}"></crypto-init>
+        <div class="row align-items-center justify-content-center overflow-auto">
+            <div class="col-lg-6 col-12 mt-3 mb-2 text-left pl-lg-0 pl-3">
+                <h1 class="text-title-program">
+                    {% trans %}page.referral.header.title_1{% endtrans %}
+                    <span class="text-primary">
+                        {% trans %}page.referral.header.title_2{% endtrans %}
+                    </span>
+                </h1>
+                <p class="text-paragraph pl-1 mb-3">
+                    {% trans %}page.referral.body_1{% endtrans %}
+                    <span>
+                        {% trans with {'%referralPercentage%': referralPercentage} %}page.referral.body_2{% endtrans %}
+                    </span>
+                    {% trans %}page.referral.body_3{% endtrans %}
+                </p>
+                <p class="text-paragraph pl-1">
+                    {% trans with {'%deployCostReward%': deployCostReward} %}page.referral.body_4{% endtrans %}
+                </p>
+            </div>
+            <div class="col-lg-6 col-12">
+                <div class="card w-100 px-3 py-4">
+                    <div class="row card-header">
+                        <div class="col align-self-center">
+                            <h5 class="text-title-card header-highlighting">
+                                {% trans %}page.referral.body_7{% endtrans %}
+                            </h5>
+                        </div>
+                        <div class="col align-self-center">
+                            <h6 class="text text-right text-uppercase">
+                                {% trans %}page.referral.body_8{% endtrans %}
+                                <span class="text-primary">
+                                    {{ referralsCount }}
+                                </span>
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="card-body pb-0">
+                        <div class="referral-balances-background mb-4">
+                            <div class="p-2 d-flex align-items-center justify-content-center">
+                                <div v-if="referralBalances">
+                                    <ul class="mb-0 row justify-content-md-center p-2">
+                                        <li v-for="(amount, symbol) in referralBalances" class="d-inline col-md-auto text text-center">
+                                            <span v-text="parseAmount(amount, symbol)" class="text-primary text-amount"></span>
+                                            <coin-avatar
+                                                :symbol="symbol"
+                                                :is-crypto="true"
+                                            ></coin-avatar>
+                                            <span v-text="rebrandingFunc(symbol)" class="text-symbol"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div v-else class="p-2">
+                                    <div class="spinner-border" role="status">
+                                        <span class="sr-only"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text text-primary">
+                                {% trans %}page.referral.card.body_title{% endtrans %}
+                            </p
+                            {% if app.user.profile.getTokensCount > 1 %}>
+                                <p class="text-card-paragraph">
+                                    {% trans with {'%referralPercentage%': referralPercentage} %}
+                                        page.referral.body_5_plural
+                                    {% endtrans %}
+                                </p>
                             {% else %}
-                            <code class="p-2 text-blue">
-                                <span> {{ absolute_url(path('register-referral-by-code', { code: referralCode })) }} </span>
-                                <copy-link class="code-copy c-pointer" id="code-copy-btn" content-to-copy="{{ absolute_url(path('register-referral-by-code', { code: referralCode })) }}">
+                                <p class="text-card-paragraph">
+                                    {% trans with {'%referralPercentage%': referralPercentage} %}
+                                        page.referral.body_5
+                                    {% endtrans %}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer pt-0">
+                        {% if app.user.profile.getTokensCount > 1 %}
+                            <p class="text-card-paragraph">
+                                {% trans %} page.referral.body_6_plural {% endtrans %}
+                            </p>
+                        {% else %}
+                            <p class="text-card-paragraph">
+                                {% trans %} page.referral.body_6 {% endtrans %}
+                            </p>
+                        {% endif %}
+                        <div class="link-referral" id="referral-link-text">
+                            {% if app.user.profile.tokens is not empty %}
+                                {% for token in app.user.profile.tokens %}
+                                    <code class="code-link d-block word-break-all">
+                                        <copy-link
+                                            class="code-copy c-pointer"
+                                            content-to-copy="{{ absolute_url(path(
+                                                'register-referral-by-token',
+                                                { userToken: token.name }
+                                            )) }}"
+                                        >
+                                            <span>
+                                                {{ absolute_url(path(
+                                                    'register-referral-by-token',
+                                                    { userToken: token.name }
+                                                )) }}
+                                            </span>
+                                            <font-awesome-icon
+                                                :icon="['far', 'copy']">
+                                            </font-awesome-icon>
+                                        </copy-link>
+                                    </code>
+                                {% endfor %}
+                            {% else %}
+                            <code class="code-link">
+                                <copy-link
+                                    class="code-copy c-pointer"
+                                    content-to-copy="{{ absolute_url(path(
+                                        'register-referral-by-code',
+                                        { code: referralCode }
+                                    )) }}"
+                                >
+                                    <span>
+                                        {{ absolute_url(path('register-referral-by-code', { code: referralCode })) }}
+                                    </span>
                                     <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                                 </copy-link>
                             </code>
                             {% endif %}
                             <div class="clearfix"></div>
                         </div>
-                        <div class="row justify-content-center text-bold mt-4">
-                            <div class="col-auto p-2 mt-2">
-                                {% trans %}page.referral.body_7{% endtrans %}
-                                <span>
-                                    <span v-if="referralBalance" v-text="balance"></span>
-                                    <span v-else>
-                                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                                    </span>
-                                    <small>MINTME</small>
-                                </span>
-                            </div>
-                            <div class="col-auto p-2 mt-2">
-                                {% trans %}page.referral.body_8{% endtrans %}
-                                <span>
-                                    {{ referralsCount }}
-                                </span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
 
 {% block pagescripts %}

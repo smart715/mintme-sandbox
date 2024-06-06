@@ -2,7 +2,7 @@
 
 namespace App\Tests\Request\ParamConverter;
 
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Request\ParamConverter\MarketConverter;
@@ -16,8 +16,8 @@ class MarketConverterTest extends TestCase
 {
     public function testApply(): void
     {
-        $base = $this->createMock(TradebleInterface::class);
-        $quote = $this->createMock(TradebleInterface::class);
+        $base = $this->createMock(TradableInterface::class);
+        $quote = $this->createMock(TradableInterface::class);
 
         $market = $this->createMock(Market::class);
         $market->method('getBase')->willReturn($base);

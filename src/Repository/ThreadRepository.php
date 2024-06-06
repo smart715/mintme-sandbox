@@ -2,8 +2,19 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use App\Entity\Message\Thread;
+use App\Entity\Message\ThreadMetadata;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class ThreadRepository extends EntityRepository
+/**
+ * @extends ServiceEntityRepository<Thread>
+ * @codeCoverageIgnore
+ */
+class ThreadRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Thread::class);
+    }
 }

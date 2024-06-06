@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
 import ConfirmModal from '../../js/components/modal/ConfirmModal';
+import {MButton} from '../../js/components/UI';
 
 Vue.use({
     install(Vue, options) {
@@ -29,7 +30,7 @@ describe('ConfirmModal', () => {
         const wrapper = shallowMount(ConfirmModal, {
             propsData: {visible: true},
         });
-        wrapper.find('button.btn.btn-primary').trigger('click');
+        wrapper.findComponent(MButton).vm.$emit('click');
         expect(wrapper.emitted('confirm').length).toBe(1);
     });
 
@@ -45,7 +46,7 @@ describe('ConfirmModal', () => {
         const wrapper = shallowMount(ConfirmModal, {
             propsData: {visible: true},
         });
-        wrapper.find('button.btn-cancel.pl-3').trigger('click');
+        wrapper.findComponent('button.btn-cancel.pl-3').trigger('click');
         expect(wrapper.emitted('cancel').length).toBe(1);
     });
 
@@ -63,10 +64,28 @@ describe('ConfirmModal', () => {
             propsData: {visible: true},
         });
         const event = {preventDefault: () => {
-                wrapper.vm.$emit('startPreventDefault');
-            },
+            wrapper.vm.$emit('startPreventDefault');
+        },
         };
         wrapper.vm.onCancel(event);
         expect(wrapper.emitted('startPreventDefault').length).toBe(1);
+    });
+
+    it('should display default header when no titl prop is provided', async () => {
+        const wrapper = shallowMount(ConfirmModal);
+
+        expect(wrapper.vm.modalTitle).toBe('confirm_modal.header');
+    });
+
+    it('should display custom title', async () => {
+        const wrapper = shallowMount(ConfirmModal, {propsData: {title: 'test'}});
+
+        expect(wrapper.vm.modalTitle).toBe('test');
+    });
+
+    it('should not display title when noTitle prop is provided', async () => {
+        const wrapper = shallowMount(ConfirmModal, {propsData: {noTitle: true}});
+
+        expect(wrapper.vm.modalTitle).toBe('');
     });
 });

@@ -2,7 +2,13 @@
 
 namespace App\Controller\API;
 
+use App\Communications\Exception\FetchException;
+use App\Controller\Traits\ViewOnlyTrait;
+use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exception\ApiForbiddenException;
+use App\Exception\ApiNotFoundException;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -10,7 +16,13 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Logger\UserActionLogger;
+use App\Manager\DeployNotificationManagerInterface;
 use App\Manager\MarketStatusManager;
+use App\Manager\TokenManagerInterface;
+use App\Security\DisabledServicesVoter;
+use App\Security\TradingVoter;
+use App\Services\TranslatorService\TranslatorInterface;
+use App\Utils\LockFactory;
 use App\Utils\Symbols;
 use App\Utils\Validator\MaxAllowedOrdersValidator;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -20,41 +32,52 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/orders")
  */
 class OrdersController extends AbstractFOSRestController
 {
-    private const OFFSET = 100;
+    private const LIMIT_EXECUTED_ORDERS = 50;
     private const PENDING_OFFSET = 100;
-    private const WALLET_OFFSET = 20;
+    private const WALLET_ITEMS_BATCH_SIZE = 11;
 
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
+    private MarketHandlerInterface $marketHandler;
+    private MarketFactoryInterface $marketManager;
+    private UserActionLogger $userActionLogger;
+    private TranslatorInterface $translations;
+    private LockFactory $lockFactory;
+    protected SessionInterface $session;
+    private TokenManagerInterface $tokenManager;
+    private LoggerInterface $logger;
+    private DeployNotificationManagerInterface $deployNotificationManager;
 
-    /** @var MarketFactoryInterface */
-    private $marketManager;
-
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
-    /** @var TranslatorInterface */
-    private $translations;
+    use ViewOnlyTrait;
 
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger,
-        TranslatorInterface $translations
+        TranslatorInterface $translations,
+        LockFactory $lockFactory,
+        SessionInterface $session,
+        TokenManagerInterface $tokenManager,
+        LoggerInterface $logger,
+        DeployNotificationManagerInterface $deployNotificationManager
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
         $this->translations = $translations;
+        $this->lockFactory = $lockFactory;
+        $this->session = $session;
+        $this->tokenManager = $tokenManager;
+        $this->logger = $logger;
+        $this->deployNotificationManager = $deployNotificationManager;
     }
 
     /**
@@ -67,17 +90,40 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
-        $this->denyAccessUnlessGranted('new-trades');
-        $this->denyAccessUnlessGranted('trading');
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::NEW_TRADES);
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::TRADING);
 
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
 
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
+        $this->denyAccessUnlessGranted('operate', $market);
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
+
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$currentUser->getId());
+        $orderDelay = (int)$this->getParameter('order_delay');
+        $lockOrder = $this->lockFactory->createLock(
+            LockFactory::LOCK_ORDER.$currentUser->getId(),
+            $orderDelay,
+            false
+        );
+
+        if (!$lock->acquire()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$lockOrder->acquire()) {
+            return $this->view([
+                'error' =>  $this->translations->trans('cancel_order.delay', ['%seconds%' => $orderDelay]),
+            ]);
+        }
 
         foreach ($request->get('orderData') as $id) {
             $order = new Order(
@@ -95,6 +141,8 @@ class OrdersController extends AbstractFOSRestController
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
         }
 
+        $lock->release();
+
         return $this->view(Response::HTTP_OK);
     }
 
@@ -110,10 +158,42 @@ class OrdersController extends AbstractFOSRestController
         Market $market,
         MoneyWrapperInterface $moneyWrapper,
         ParamFetcherInterface $request,
+        BalanceHandlerInterface $balanceHandler,
         ExchangerInterface $exchanger
     ): View {
-        $this->denyAccessUnlessGranted('new-trades');
-        $this->denyAccessUnlessGranted('trading');
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+
+        if (!$currentUser) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::NEW_TRADES);
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::TRADING);
+        $this->denyAccessUnlessGranted('operate', $market);
+
+        if (!$this->isGranted(TradingVoter::ALL_ORDERS_ENABLED, $market)) {
+            /** @var Token $token */
+            $token = $market->getQuote();
+
+            return $this->view(
+                [
+                    'message' => 'token.not_deployed_response',
+                    'notified' => $this->deployNotificationManager->alreadyNotified($currentUser, $token),
+                ],
+                Response::HTTP_OK
+            );
+        }
+
+        if (!$this->isGranted('trades-enabled', $market)) {
+            return $this->view([
+                'message' => $this->translations->trans('trading_disabled'),
+            ], Response::HTTP_OK);
+        }
 
         if (!$this->isGranted('make-order', $market)
             || (Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
@@ -121,11 +201,34 @@ class OrdersController extends AbstractFOSRestController
              return $this->view(['error' => true, 'type' => 'action'], Response::HTTP_OK);
         }
 
-        /** @var User $currentUser */
-        $currentUser = $this->getUser();
+        if (!$this->isGranted('not-blocked', $market->getQuote())) {
+            return $this->view(
+                ['result' => 2, 'message' => $this->translations->trans('api.user.blocked')],
+                Response::HTTP_OK,
+            );
+        }
+
+        $lockBalance = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$currentUser->getId());
+        $orderDelay = (int)$this->getParameter('order_delay');
+        $lockOrder = $this->lockFactory->createLock(
+            LockFactory::LOCK_ORDER.$currentUser->getId(),
+            $orderDelay,
+            false
+        );
+
+        if (!$lockBalance->acquire()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$lockOrder->acquire()) {
+            return $this->view([
+                'result' => TradeResult::FAILED,
+                'message' => $this->translations->trans('place_order.delay', ['%seconds%' => $orderDelay]),
+            ], Response::HTTP_OK);
+        }
+
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
         $maximum = $moneyWrapper->parse((string)99999999.9999, Symbols::TOK);
-        $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 
         $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
         $maxAllowedValidator = new MaxAllowedOrdersValidator(
@@ -135,35 +238,53 @@ class OrdersController extends AbstractFOSRestController
             $this->marketManager
         );
 
-        if (!$maxAllowedValidator->validate()) {
-            return $this->view([
-                'result' => TradeResult::FAILED,
-                'message' => $this->translations->trans(
-                    'api.orders.max_allowed_active_orders',
-                    ['%maxAllowed%' => $maxAllowedOrders],
-                ),
-            ], Response::HTTP_OK);
+        try {
+            if (!$maxAllowedValidator->validate()) {
+                return $this->view([
+                    'result' => TradeResult::FAILED,
+                    'message' => $this->translations->trans(
+                        'api.orders.max_allowed_active_orders',
+                        ['%maxAllowed%' => $maxAllowedOrders],
+                    ),
+                ], Response::HTTP_OK);
+            }
+        } catch (\Throwable $e) {
+            $this->logger->error('Fetch exception (token_place_order): ' . $e->getMessage());
         }
 
-        if ($priceInput->greaterThanOrEqual($maximum)) {
-            return $this->view([
-                'result' => TradeResult::FAILED,
-                'message' => 'Invalid price quantity',
-            ], Response::HTTP_OK);
+        try {
+            if ($priceInput->greaterThanOrEqual($maximum)) {
+                return $this->view([
+                    'result' => TradeResult::FAILED,
+                    'message' => 'Invalid price quantity',
+                ], Response::HTTP_OK);
+            }
+
+            $tradeResult = $exchanger->placeOrder(
+                $currentUser,
+                $market,
+                (string)$request->get('amountInput'),
+                (string)$request->get('priceInput'),
+                (bool)$request->get('marketPrice'),
+                Order::SIDE_MAP[$request->get('action')]
+            );
+        } catch (\Throwable $e) {
+            $this->logger->error('Exception (token_place_order): ' . $e->getMessage());
+
+            throw $e;
+        } finally {
+            $lockBalance->release();
         }
 
-        $tradeResult = $exchanger->placeOrder(
+        $balance = $balanceHandler->balance(
             $currentUser,
-            $market,
-            (string)$request->get('amountInput'),
-            (string)$request->get('priceInput'),
-            (bool)$request->get('marketPrice'),
-            Order::SIDE_MAP[$request->get('action')]
+            $market->getQuote()
         );
 
         return $this->view([
             'result' => $tradeResult->getResult(),
             'message' => $tradeResult->getMessage(),
+            'balance' => $balance->getFullAvailable(),
         ], Response::HTTP_OK);
     }
 
@@ -191,7 +312,7 @@ class OrdersController extends AbstractFOSRestController
         $totalSellOrders = $this->marketHandler->getSellOrdersSummary($market)->getQuoteAmount();
         $totalBuyOrders = $this->marketHandler->getBuyOrdersSummary($market)->getBasePrice();
 
-        $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
+        $buyDepth = $marketStatusManager->getOrCreateMarketStatus($market)->getBuyDepth();
 
         return [
             'sell' => $pendingSellOrders,
@@ -204,30 +325,51 @@ class OrdersController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
+     *     "/{quote}/pending/summary", name="token_sell_orders_summary", options={"expose"=true}
+     * )
+     * @Rest\View()
+     * @return string
+     * @throws ApiNotFoundException
+     */
+    public function getTokenSellOrdersSummary(string $quote): string
+    {
+        $token = $this->tokenManager->findByName($quote);
+
+        if (!$token) {
+            throw new ApiNotFoundException('Token not found');
+        }
+
+        $user = $token->getOwner();
+
+        if (!$user) {
+            throw new ApiNotFoundException('Owner not found');
+        }
+
+        return $this->marketHandler->getTokenSellOrdersSummary($token, $user);
+    }
+
+    /**
+     * @Rest\Get(
      *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=1}, options={"expose"=true}
      * )
      * @Rest\View()
      */
     public function getExecutedOrders(Market $market, int $id): array
     {
-        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET * $id);
+        return $this->marketHandler->getExecutedOrders($market, $id, self::LIMIT_EXECUTED_ORDERS);
     }
 
     /**
      * @Rest\Get(
-     *     "/executed/page/{page}/{donations}",
+     *     "/executed/page/{page}/{donations}/{fullDonations}",
      *     name="executed_user_orders",
-     *     defaults={"page"=1,"donations"=0},
+     *     defaults={"page"=1,"donations"=0,"fullDonations"=0},
      *     options={"expose"=true}
      * )
      * @Rest\View()
      */
-    public function getExecutedUserOrders(int $page, int $donations): array
+    public function getExecutedUserOrders(int $page, int $donations, int $fullDonations): array
     {
-        if (!$this->getUser()) {
-            throw new AccessDeniedHttpException();
-        }
-
         /** @var User $user*/
         $user = $this->getUser();
 
@@ -240,10 +382,11 @@ class OrdersController extends AbstractFOSRestController
         return $this->marketHandler->getUserExecutedHistory(
             $user,
             $markets,
-            ($page - 1) * self::WALLET_OFFSET,
-            self::WALLET_OFFSET,
+            ($page - 1) * self::WALLET_ITEMS_BATCH_SIZE,
+            self::WALLET_ITEMS_BATCH_SIZE,
             false,
-            $donations
+            $donations,
+            $fullDonations
         );
     }
 
@@ -253,7 +396,13 @@ class OrdersController extends AbstractFOSRestController
      */
     public function getExecutedOrderDetails(Market $market, int $id): View
     {
-        return $this->view($this->marketHandler->getExecutedOrder($market, $id, self::OFFSET));
+        $order = $this->marketHandler->getExecutedOrder($market, $id, self::LIMIT_EXECUTED_ORDERS);
+
+        if (!$order) {
+            throw new ApiNotFoundException();
+        }
+
+        return $this->view($order);
     }
 
     /**
@@ -262,7 +411,13 @@ class OrdersController extends AbstractFOSRestController
      */
     public function getPendingOrderDetails(Market $market, int $id): View
     {
-        return $this->view($this->marketHandler->getPendingOrder($market, $id));
+        $order = $this->marketHandler->getPendingOrder($market, $id);
+
+        if (!$order) {
+            throw new ApiNotFoundException();
+        }
+
+        return $this->view($order, Response::HTTP_OK);
     }
 
     /**
@@ -272,18 +427,14 @@ class OrdersController extends AbstractFOSRestController
      */
     public function getPendingUserOrders(int $page): array
     {
-        if (!$this->getUser()) {
-            throw new AccessDeniedHttpException();
-        }
-
         /** @var User $user */
         $user = $this->getUser();
 
         return $this->marketHandler->getPendingOrdersByUser(
             $user,
             $this->marketManager->createUserRelated($user),
-            ($page - 1) * self::WALLET_OFFSET,
-            self::WALLET_OFFSET
+            ($page - 1) * self::WALLET_ITEMS_BATCH_SIZE,
+            self::WALLET_ITEMS_BATCH_SIZE
         );
     }
 }

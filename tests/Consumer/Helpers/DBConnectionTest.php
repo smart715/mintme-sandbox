@@ -7,7 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 
 class DBConnectionTest extends TestCase
@@ -26,8 +26,8 @@ class DBConnectionTest extends TestCase
 
     private function mockEM(
         bool $isConnected,
-        Invocation $closeInv,
-        Invocation $connectInv
+        InvokedCount $closeInv,
+        InvokedCount $connectInv
     ): EntityManagerInterface {
         $connection = $this->createMock(Connection::class);
 

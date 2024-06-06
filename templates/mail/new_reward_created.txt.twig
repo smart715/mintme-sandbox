@@ -1,0 +1,19 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ nickname }}!
+
+{{ absolute_url(path('token_show',  {'name': rewardToken })) }}
+{{ rewardToken }}
+
+{% if rewardType == 'reward.new' %}
+    {% trans %} mail.reward.new {% endtrans %}
+{% endif %}
+{% if rewardType == 'bounty.new' %}
+    {% trans %} mail.bounty.new {% endtrans %}
+{% endif %}
+
+{{ absolute_url(path('token_show',  {'name': rewardToken, 'tab': 'intro', 'modal': 'reward-finalize', 'slug': slug})) }}
+{{ rewardTitle }}
+
+{% endblock %}

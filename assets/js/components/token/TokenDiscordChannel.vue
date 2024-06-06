@@ -4,34 +4,24 @@
             v-if="editing"
             class="form-group col-12"
         >
-            <label for="discord-err">{{ $t('token.discord.label') }}</label>
-            <input
-                id="discord-err"
+            <m-input
                 v-model="newDiscord"
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': showDiscordError }"
-                @keyup.enter="checkDiscordUrl"
+                :invalid="showDiscordError"
+                :label="$t('token.discord.label')"
             >
-            <div
-                v-if="showDiscordError"
-                class="invalid-feedback"
-            >
-                {{ $t('token.discord.invalid_url') }}
-            </div>
-            <div class="col-12 text-left mt-3 px-0">
-                <button
-                    class="btn btn-primary"
-                    @click="editDiscord"
-                >
+                <template v-slot:errors>
+                    <div v-if="showDiscordError">
+                        {{ $t('token.discord.invalid_url') }}
+                    </div>
+                </template>
+            </m-input>
+            <div class="col-12 text-left px-0 d-flex align-items-center">
+                <m-button type="primary" :loading="submitting" @click="editDiscord">
                     {{ $t('token.discord.submit') }}
-                </button>
-                <span
-                    class="btn-cancel pl-3 c-pointer"
-                    @click="toggleEdit"
-                >
+                </m-button>
+                <m-button type="link" @click="toggleEdit" class="ml-2">
                     {{ $t('token.discord.cancel') }}
-                </span>
+                </m-button>
             </div>
         </div>
         <div
@@ -40,28 +30,23 @@
         >
             <span
                 id="discord-link"
-                class="c-pointer text-white hover-icon"
+                class="c-pointer text-white"
                 @click.prevent="toggleEdit"
             >
-                <span class="token-introduction-profile-icon text-center d-inline-block">
+                <span class="token-introduction-profile-icon text-center d-inline-block mr-2">
                     <font-awesome-icon
                         :icon="{prefix: 'fab', iconName: 'discord'}"
                         size="lg"
                     />
                 </span>
-                <a href="#" class="text-reset">
+                <a href="#" class="link highlight">
                     {{ computedDiscordUrl }}
                 </a>
             </span>
-            <b-tooltip
-                v-if="currentDiscord"
-                target="discord-link"
-                :title="computedDiscordUrl"
-            />
         </div>
-        <div class="col-auto">
+        <div class="col-auto" v-if="!editing">
             <a
-                v-if="currentDiscord"
+                v-if="currentDiscord && !submitting"
                 @click.prevent="deleteDiscord"
             >
                 <font-awesome-icon
@@ -69,6 +54,7 @@
                     class="text-danger c-pointer ml-2"
                 />
             </a>
+            <div v-if="submitting" class="spinner-border spinner-border-sm" role="status"></div>
         </div>
     </div>
 </template>
@@ -78,23 +64,23 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faDiscord} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {BTooltip} from 'bootstrap-vue';
-import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, NotificationMixin} from '../../mixins/';
 import {isValidDiscordUrl} from '../../utils';
-import {HTTP_OK} from '../../utils/constants';
+import {HTTP_OK, DISCORD_DEFAULT_URL} from '../../utils/constants';
+import {MInput, MButton} from '../UI';
 
 library.add(faDiscord, faTimes);
 
 export default {
     name: 'TokenDiscordChannel',
     components: {
-        BTooltip,
         FontAwesomeIcon,
+        MInput,
+        MButton,
     },
     mixins: [
         FiltersMixin,
         NotificationMixin,
-        LoggerMixin,
     ],
     props: {
         currentDiscord: String,
@@ -104,7 +90,7 @@ export default {
     data() {
         return {
             editing: this.editingDiscord,
-            newDiscord: this.currentDiscord || 'https://discord.gg/',
+            newDiscord: this.currentDiscord || DISCORD_DEFAULT_URL,
             showDiscordError: false,
             submitting: false,
             updateUrl: this.$routing.generate('token_update', {
@@ -116,6 +102,13 @@ export default {
         editingDiscord: function() {
             this.submitting = false;
             this.editing = this.editingDiscord;
+        },
+        newDiscord: function() {
+            if (this.newDiscord === DISCORD_DEFAULT_URL) {
+                this.showDiscordError = false;
+            } else {
+                this.checkDiscordUrl();
+            }
         },
     },
     computed: {
@@ -129,7 +122,7 @@ export default {
                 this.checkDiscordUrl();
             }
 
-            if (this.discordError) {
+            if (this.showDiscordError) {
                 return;
             }
             this.saveDiscord('edit');
@@ -152,17 +145,19 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_OK) {
-                       let state = this.newDiscord ? 'added' : 'deleted';
-                       this.$emit('saveDiscord', this.newDiscord);
-                       this.newDiscord = this.newDiscord || 'https://discord.gg/';
-                       this.notifySuccess(this.$t('toasted.success.discord.' + state));
-                       this.editing = false;
+                        const state = this.newDiscord ? 'added' : 'deleted';
+                        this.$emit('saveDiscord', this.newDiscord);
+                        this.newDiscord = this.newDiscord || DISCORD_DEFAULT_URL;
+                        this.notifySuccess(this.$t('toasted.success.discord.' + state));
+                        this.editing = false;
                     }
                     this.submitting = false;
-                }, (error) => {
+                })
+                .catch((error) => {
                     this.notifyError(error.response.data.message);
-                    this.sendLogs('error', 'Can not save discord', response);
-            });
+                    this.$logger.error('Can not save discord', error);
+                    this.submitting = false;
+                });
         },
         toggleEdit: function() {
             this.editing = !this.editing;

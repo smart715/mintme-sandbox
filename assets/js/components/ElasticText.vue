@@ -1,5 +1,8 @@
 <template>
-    <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+    <div
+        class="elastic-text-wrapper d-flex flex-row flex-nowrap
+            justify-content-between w-100 align-items-center position-relative"
+    >
         <b-tooltip
             :target="() => $refs['a']"
             :title="value"
@@ -9,8 +12,15 @@
         <img
             v-if="img"
             :src="img"
-            class="d-block rounded-circle"
-            alt="avatar">
+            class="d-block rounded-circle mr-2"
+            alt="avatar"
+        />
+        <img
+            v-if="frame"
+            :src="frame"
+            class="wreath d-block mr-2"
+            alt="wreath"
+        />
         <comment
             :is="component"
             ref="a"
@@ -27,10 +37,12 @@
 <script>
 import VClamp from 'vue-clamp/dist/vue-clamp';
 import {BTooltip} from 'bootstrap-vue';
+import Comment from './posts/Comment.vue';
 
 export default {
     name: 'ElasticText',
     components: {
+        Comment,
         BTooltip,
         VClamp,
     },
@@ -44,6 +56,10 @@ export default {
             type: String,
             default: null,
         },
+        frame: {
+            type: String,
+            default: null,
+        },
     },
     computed: {
         component: function() {
@@ -51,9 +67,9 @@ export default {
         },
     },
     data() {
-      return {
-          disableTooltip: false,
-      };
+        return {
+            disableTooltip: false,
+        };
     },
     methods: {
         updateTooltip: function(val) {

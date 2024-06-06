@@ -38,7 +38,7 @@ class Airdrop
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="airdrops")
-     * @ORM\JoinColumn(name="token_id", nullable=false)
+     * @ORM\JoinColumn(name="token_id", nullable=false, onDelete="CASCADE")
      * @var Token
      */
     private $token;
@@ -72,13 +72,13 @@ class Airdrop
     private $endDate;
 
     /**
-     * @ORM\Column(name="actual_amount", type="string", length=100, nullable=true)
+     * @ORM\Column(name="actual_amount", type="string", length=100, nullable=true, options={"default": "0"})
      * @var string
      */
     private $actualAmount = '0';
 
     /**
-     * @ORM\Column(name="actual_participants", type="float", nullable=true)
+     * @ORM\Column(name="actual_participants", type="float", nullable=true, options={"default": 0})
      * @Groups({"API"})
      */
     private float $actualParticipants = 0; // phpcs:ignore

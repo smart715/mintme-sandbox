@@ -8,6 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * @ORM\Table(name="knowledge_base_category")
  * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
+ * @codeCoverageIgnore
  */
 class Category
 {
@@ -21,9 +22,8 @@ class Category
 
     /**
      * @ORM\Column(type="string", nullable=false)
-     * @var string
      */
-    protected $name;
+    protected ?string $name;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -61,11 +61,15 @@ class Category
     protected ?string $uaName;
 
     /**
-     * @Gedmo\SortablePosition
-     * @ORM\Column(type="integer")
-     * @var int
+     * @ORM\Column(type="string", nullable=true)
      */
-    private $position;
+    protected ?string $deName;
+
+    /**
+     * @Gedmo\SortablePosition
+     * @ORM\Column(type="integer", options={"default": -1})
+     */
+    protected int $position = -1; // @phpcs:ignore
 
     public function getName(): string
     {
@@ -157,6 +161,18 @@ class Category
     public function setUaName(?string $uaName): self
     {
         $this->uaName = $uaName;
+
+        return $this;
+    }
+
+    public function getDeName(): string
+    {
+        return $this->deName ?? '';
+    }
+
+    public function setDeName(?string $deName): self
+    {
+        $this->deName = $deName;
 
         return $this;
     }

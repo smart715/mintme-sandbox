@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+/** @codeCoverageIgnore */
 abstract class AbstractPendingWithdrawRepository extends ServiceEntityRepository
 {
     /** @var int */
@@ -21,7 +22,6 @@ abstract class AbstractPendingWithdrawRepository extends ServiceEntityRepository
         parent::__construct($registry, $entityClass);
     }
 
-    /** @codeCoverageIgnore */
     public function getWithdrawByHash(string $hash): ?PendingWithdrawInterface
     {
         $datetime = new DateTimeImmutable('now - '.$this->expirationTime.' seconds');

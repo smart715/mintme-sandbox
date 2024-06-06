@@ -1,0 +1,41 @@
+<html>
+<head>
+{% block stylesheets %}
+    {% block pagestyles %}
+        {{ encore_entry_link_tags('base_main') }}
+    {% endblock %}
+{% endblock %}
+</head>
+
+<body>
+    <p>
+        <span class="text-uppercase">{% trans %}admin.check_email_address.token{% endtrans %}<span>:
+        <form action="{{ path('check_email_address_token') }}" method="post">
+            <input type="text" name="token" value="{{ token }}" />
+            <input
+                class="text-uppercase"
+                type="submit"
+                value="{% trans %}admin.check_email_address.show_email{% endtrans %}"
+            />
+        </form>
+    </p>
+    <p>
+        <span class="text-uppercase">{% trans %}admin.check_email_address.nickname{% endtrans %}</span>:
+        <form action="{{ path('check_email_address_nickname') }}" method="post">
+            <input type="text" name="nickname" value="{{ nickname }}" />
+            <input
+                class="text-uppercase"
+                type="submit"
+                value="{% trans %}admin.check_email_address.show_email{% endtrans %}"
+            />
+        </form>
+    </p>
+    <p>
+        <span class="text-uppercase">
+            {% trans %}admin.check_email_address.email{% endtrans %}
+        </span>
+        : {{ email }}
+    </p>
+</body>
+
+</html>

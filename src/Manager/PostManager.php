@@ -8,29 +8,26 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\PostRepository;
 use App\Utils\Symbols;
-use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 
 class PostManager implements PostManagerInterface
 {
-    /** @var PostRepository */
-    private $repository;
-
+    private PostRepository $repository;
     private TokenManagerInterface $tokenManager;
-
     private BalanceHandlerInterface $balanceHandler;
+    private UserTokenFollowManagerInterface $userTokenFollowManager;
 
     public function __construct(
-        EntityManagerInterface $em,
+        PostRepository $repository,
         TokenManagerInterface $tokenManager,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        UserTokenFollowManagerInterface $userTokenFollowManager
     ) {
-        /** @var PostRepository $repository */
-        $repository = $em->getRepository(Post::class);
         $this->repository = $repository;
         $this->tokenManager = $tokenManager;
         $this->balanceHandler = $balanceHandler;
+        $this->userTokenFollowManager = $userTokenFollowManager;
     }
 
     public function getRepository(): PostRepository
@@ -45,14 +42,28 @@ class PostManager implements PostManagerInterface
 
     public function getBySlug(string $slug): ?Post
     {
-        return $this->repository->findOneBy(['slug' => $slug]);
+        return $this->repository->findOneBy([
+            'slug' => $slug,
+            'status' => POST::STATUS_ACTIVE,
+        ]);
     }
 
-    public function getRecentPost(User $user, int $page): array
+    public function getRecentPosts(int $page, int $max): array
+    {
+        return $this->repository->findRecentPosts($page, $max);
+    }
+
+    public function getRecentPostsByUserFeed(User $user, int $page): array
     {
         $tokens = [];
 
-        foreach ($user->getTokens() as $token) {
+        $followedTokens = $this->userTokenFollowManager->getFollowedTokens($user);
+
+        foreach ($followedTokens as $token) {
+            if ($token->isQuiet()) {
+                continue;
+            }
+
             $available = $this->tokenManager->getRealBalance(
                 $token,
                 $this->balanceHandler->balance($user, $token),
@@ -64,7 +75,10 @@ class PostManager implements PostManagerInterface
             }
         }
 
-        return $this->repository->findRecentPostsByTokens($tokens, $page);
+        return $this->repository->findRecentPostsByTokens(
+            array_merge($tokens, $this->tokenManager->getOwnTokens()),
+            $page
+        );
     }
 
     public function getPostsCreatedAt(\DateTimeImmutable $date): array
@@ -72,8 +86,48 @@ class PostManager implements PostManagerInterface
         return $this->repository->getPostsCreatedAt($date);
     }
 
-    public function getPostsCreatedAtByToken(Token $token, \DateTimeImmutable $date): array
+    public function getPostsCreatedAtByToken(Token $token, \DateTimeImmutable $date, bool $includeDeleted = false): array
     {
-        return $this->repository->getPostsCreatedAtByToken($token, $date);
+        return $this->repository->getPostsCreatedAtByToken($token, $date, $includeDeleted);
+    }
+
+    public function getPostsByToken(Token $token, int $offset, int $limit): array
+    {
+        return $this->repository->findBy(
+            [
+                'token' => $token,
+                'status' => POST::STATUS_ACTIVE,
+            ],
+            ['createdAt' => 'DESC'],
+            $limit,
+            $offset
+        );
+    }
+
+    public function getTokenPostsCount(Token $token): int
+    {
+        return $this->repository->count([
+            'token' => $token,
+            'status' => POST::STATUS_ACTIVE,
+        ]);
+    }
+
+    public function getActivePostsByToken(Token $token, int $offset, int $limit): array
+    {
+        return $this->repository->getActivePostsByToken($token, $offset, $limit);
+    }
+
+    public function getActivePostsCountByToken(Token $token): int
+    {
+        return $this->repository->count([
+            'token' => $token,
+            'status' => POST::STATUS_ACTIVE,
+        ]);
+    }
+
+    /** {@inheritDoc} */
+    public function getPostsByHashtag(string $hashtag, int $page): array
+    {
+        return $this->repository->findPostsByHashtag($hashtag, $page);
     }
 }

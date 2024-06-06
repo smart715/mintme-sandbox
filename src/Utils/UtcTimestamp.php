@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 
+/** @codeCoverageIgnore */
 class UtcTimestamp extends FunctionNode
 {
     public function getSql(SqlWalker $sqlWalker): string

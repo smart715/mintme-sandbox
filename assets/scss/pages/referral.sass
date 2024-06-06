@@ -1,0 +1,54 @@
+@import '../variables'
+@import '../mixins'
+
+$font-size-md: 26px
+$font-size-ml: 20px
+$font-size-lg: 30px
+$font-size-xl: 47.88px
+
+@include media-breakpoint-up(md)
+  .text-paragraph
+    font-size: $font-size-ml
+
+  .text-card-paragraph
+    @include font-scale(sm)
+
+  .text-title-program
+    font-size: $font-size-xl
+
+  .text-title-card
+    font-size: $font-size-md
+
+  .text
+    @include font-scale(sl)
+
+  .text-amount
+    font-size: $font-size-ml
+
+  .text-symbol
+    @include font-scale(sl)
+
+.referral-balances-background
+  background-color: $bg-primary
+  border-radius: $border-radius
+
+.link-referral
+  background-color: $bg-color-darkest
+  border-radius: $border-radius
+  padding: 0 10px
+  span
+    font-family: $poppins-font
+
+.min-height-75
+  min-height: 75vh
+
+.text-primary::selection
+  background-color: $bg-secondary
+  color: $primary
+
+.card-header
+  color: $text-color-primary !important
+
+.code-link
+  @include font-scale(sm)
+  color: $text-color-primary

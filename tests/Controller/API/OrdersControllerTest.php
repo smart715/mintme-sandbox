@@ -181,5 +181,10 @@ class OrdersControllerTest extends WebTestCase
 
         $this->assertEquals($tokName, $res['market']['quote']['name']);
         $this->assertEquals('pending', $res['status']);
+
+        $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/' . '123');
+
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertTrue($this->client->getResponse()->isNotFound());
     }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
+use App\Utils\Symbols;
 use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\UserInterface;
+use Money\Currency;
+use Money\Money;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BonusRepository")
@@ -15,49 +17,51 @@ class Bonus
 {
     public const PENDING_STATUS = 'pending';
 
+    public const PENDING_CLAIM_STATUS = 'pending-claim';
+
     public const PAID_STATUS = 'paid';
 
     public const SIGN_UP_TYPE = 'sign-up';
+
+    public const TOKEN_SIGN_UP_TYPE = 'token-sign-up';
 
     /**
      * @ORM\Id()
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     * @var UserInterface
      */
-    private $user;
+    private User $user;
 
-    /**
-     * @ORM\Column(type="string")
-     * @var string
-     */
-    private $status;
+    /** @ORM\Column(type="string") */
+    private string $status;
 
-    /**
-     * @ORM\Column(type="integer")
-     * @var int
-     */
-    private $quantityWeb;
+    /** @ORM\Column(type="string") */
+    private string $quantity;
 
-    /**
-     * @ORM\Column(type="string")
-     * @var string
-     */
-    private $type;
+    /** @ORM\Column(type="string") */
+    private string $type;
 
-    public function __construct(UserInterface $user, string $status, int $quantityWeb, string $type)
-    {
+    /** @ORM\Column(type="string", length=100) */
+    private string $tradableName;
+
+    public function __construct(
+        User $user,
+        string $status,
+        string $quantity,
+        string $type,
+        string $tradableName
+    ) {
         $this->user = $user;
         $this->status = $status;
-        $this->quantityWeb = $quantityWeb;
+        $this->quantity = $quantity;
         $this->type = $type;
+        $this->tradableName = $tradableName;
     }
 
     public function getId(): int
@@ -65,7 +69,7 @@ class Bonus
         return $this->id;
     }
 
-    public function getUser(): UserInterface
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -85,18 +89,23 @@ class Bonus
         $this->status = $status;
     }
 
-    public function getQuantityWeb(): int
+    public function getQuantity(): Money
     {
-        return $this->quantityWeb;
+        return new Money($this->quantity, new Currency(Symbols::TOK));
     }
 
-    public function setQuantityWeb(int $quantityWeb): void
+    public function setQuantity(Money $quantity): void
     {
-        $this->quantityWeb = $quantityWeb;
+        $this->quantity = $quantity->getAmount();
     }
 
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getTradableName(): string
+    {
+        return $this->tradableName;
     }
 }

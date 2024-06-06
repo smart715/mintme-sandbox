@@ -1,0 +1,11 @@
+
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ nickName }}
+
+{% trans %} email.verification_code.tittle {% endtrans %}
+
+{{ code }}
+
+{% endblock %}

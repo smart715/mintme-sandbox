@@ -1,0 +1,67 @@
+@import '../variables'
+@import '../mixins'
+
+#coin_faq
+  max-width: $page-content-width
+  margin: 0 auto
+
+  .unstyled-list
+    list-style: none
+
+  .code-block
+    background-color: $bg-primary-light
+    border-radius: $border-radius
+    padding: 0.75rem 1rem
+
+  .accordion
+    .card-header
+      padding: 0
+
+      svg
+        font-size: 1.5rem
+        transition: transform $micro-transition-speed
+
+    .collapse
+      background-color: $bg-primary-darker
+
+      &.show
+        border-bottom: 1px solid $bg-primary-light
+
+      code
+        color: $primary
+
+      img
+        border-radius: $border-radius
+
+    .card:last-child
+      .btn, .collapse
+        border-bottom: none
+
+    .card-header[aria-expanded="true"]
+      svg
+        transform: rotate(180deg)
+
+      .btn
+        color: $text-color-dark-primary
+        background-color: $primary
+        border-color: $primary
+
+        &:hover
+          background-color: $primary
+
+    .btn-link
+      display: flex
+      width: 100%
+      justify-content: space-between
+      align-items: center
+      padding: 1rem
+      border-bottom: 1px solid $bg-primary-light
+      border-radius: 0
+      text-align: left
+      font-weight: 600
+
+      &:focus
+        outline: 0 !important
+      &:hover
+        background-color: $bg-primary-darker
+        color: $white

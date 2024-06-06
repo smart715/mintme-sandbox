@@ -12,7 +12,7 @@
         <ini name="error_reporting" value="-1" />
 
         <!-- ###+ symfony/framework-bundle ### -->
-        <env name="APP_ENV" value="test"/>
+        <env name="APP_ENV" value="test" force="true"/>
         <env name="APP_DEBUG" value="1"/>
         <env name="APP_SECRET" value="632318237b6d7a41e40c6ee83f8e6385"/>
         <env name="KERNEL_CLASS" value="App\Kernel" />
@@ -25,7 +25,7 @@
         <!-- Format described at http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url -->
         <!-- For an SQLite database, use: "sqlite:///%kernel.project_dir%/var/data.db" -->
         <!-- Configure your db driver and server_version in config/packages/doctrine.yaml -->
-        <env name="DATABASE_URL" value="mysql://root:root@db:3306/panel"/>
+        <env name="DATABASE_URL" value="sqlite:///:memory:" force="true"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
 
         <!-- ###+ symfony/swiftmailer-bundle ### -->
@@ -36,11 +36,16 @@
 
         <env name="MAILER_USER" value="mintme@mintme.abchosting.org"/>
 
+        <env name="MAILER_NAME" value="MintMe"/>
+
         <!-- ###+ google/recaptcha ### -->
         <!-- To use Google Recaptcha, you must register a site on Recaptcha's admin panel: -->
         <!-- https://www.google.com/recaptcha/admin -->
         <env name="GOOGLE_RECAPTCHA_SITE_KEY" value=""/>
         <env name="GOOGLE_RECAPTCHA_SECRET" value=""/>
+
+        <env name="REG_GOOGLE_RECAPTCHA_SITE_KEY" value=""/>
+        <env name="REG_GOOGLE_RECAPTCHA_SECRET" value=""/>
         <!-- ###- google/recaptcha ### -->
 
         <!-- ###+ php-amqplib/rabbitmq-bundle ### -->
@@ -57,6 +62,7 @@
         <env name="VIABTC_FORCE_WS_AUTH" value="0"/>
 
 
+        <env name="DEPLOY_RPC" value="http://deploy:4001"/>
         <env name="DEPOSIT_RPC" value="http://deposit:3000"/>
         <env name="WITHDRAW_RPC" value="http://nginx:8000"/>
         <env name="VIABTC_RPC" value="http://btc:8080"/>
@@ -70,14 +76,28 @@
         <env name="TWITTER_API_SECRET" value=""/>
         <env name="TWITTER_API_BEARER_TOKEN" value=""/>
 
-        <env name="D7_NETWORKS_TOKEN" value=""/>
+        <env name="D7_NETWORKS_API_TOKEN" value=""/>
 
         <!-- ###+ symfony/mercure-bundle ### -->
         <!-- See https://symfony.com/doc/current/mercure.html#configuration -->
         <env name="MERCURE_PUBLISH_URL" value="http://mercure/.well-known/mercure"/>
-        <!-- The default token is signed with the secret key: !ChangeMe! -->
-        <env name="MERCURE_JWT_TOKEN" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.Oo0yg7y4yMa1vr_bziltxuTCqb8JVHKxp-f_FwwOim0"/>
+        <env name="MERCURE_PUBLIC_URL" value="https://localhost/.well-known/mercure"/>
+        <env name="MERCURE_JWT_SECRET" value="!ChangeThisMercureHubJWTSecretKey!"/>
         <!-- ###- symfony/mercure-bundle ### -->
+
+        <env name="DISCORD_BOT_TOKEN" value="ODI5NTIzOTUxNDc0MTgwMTQ3.YG5YYQ.fsIAt47EyrkR77L5oXLB3jZNpLs"/>
+        <env name="DISCORD_CLIENT_ID" value="829523951474180147"/>
+        <env name="DISCORD_CLIENT_SECRET" value="lXnpqYf7kFB3ySucI9GHyJe52dVujifH"/>
+        <env name="DISCORD_PUBLIC_KEY" value="3bba5001355af279df95bb235d12df88eccf7d261bd7836c0f99e3a7f5c240f3"/>
+
+        <env name="CREATE_SERVICE_SCRIPT" value="create-branchs-ngw.sh"/>
+
+        <env name="LINKEDIN_CLIENT_ID" value="77904jqlb5cq6u"/>
+
+        <!-- ###+ symfony/mailer ### -->
+        <!-- MAILER_DSN=null://null -->
+        <!-- ###- symfony/mailer ### -->
+
     </php>
 
     <testsuites>
@@ -101,6 +121,7 @@
                 <directory>src/*Bundle/Resources</directory>
                 <directory>src/*/*Bundle/Resources</directory>
                 <directory>src/*/Bundle/*Bundle/Resources</directory>
+                <directory>src/Controller</directory>
                 <directory>src/Migrations</directory>
                 <directory>src/Kernel.php</directory>
             </exclude>

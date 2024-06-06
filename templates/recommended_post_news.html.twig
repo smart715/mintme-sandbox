@@ -1,0 +1,27 @@
+{% for post in postNews %}
+    <div class="card mb-4 col-12 col-md-3 col-lg-12">
+        <a href="{{ path('sonata_news_view', {'permalink': sonata_news_permalink(post) }) }}">
+            {% if post.image is not null %}
+                <img
+                    class="card-img-top right-side-img object-fit-cover"
+                    src="{% path post.image.id, 'wide' %}"
+                    alt="{{ post|translateArticle('title') }}"
+                />
+            {% else %}
+                <img
+                    class="card-img-top right-side-img"
+                    src="{{ asset('build/images/default-post-image.png') }}"
+                    alt="{{ post|translateArticle('title') }}"
+                />
+            {% endif %}
+        </a>
+        <div class="card-body">
+            <a
+                class="d-flex text-break text-white text-decoration-none"
+                href="{{ path('sonata_news_view', {'permalink': sonata_news_permalink(post)}) }}"
+            >
+                {{ post|translateArticle('title') }}
+            </a>
+        </div>
+    </div>
+{% endfor %}

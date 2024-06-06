@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+]>
+<svg version="1.1"
+	 id="svg8" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" inkscape:export-filename="blockchain-connect-button.png" inkscape:export-xdpi="96" inkscape:export-ydpi="96" inkscape:version="1.2.2 (732a01da63, 2022-12-09)" sodipodi:docname="blockchain-connect-button_logo.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 70 520 370"
+	 style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#202020;}
+</style>
+<switch>
+	<foreignObject requiredExtensions="&ns_ai;" x="0" y="0" width="1" height="1">
+		<i:aipgfRef  xlink:href="#adobe_illustrator_pgf">
+		</i:aipgfRef>
+	</foreignObject>
+	<g i:extraneous="self">
+		
+			<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" guidetolerance="20" id="base" inkscape:bbox-paths="false" inkscape:current-layer="layer1" inkscape:cx="256" inkscape:cy="256" inkscape:deskcolor="#d1d1d1" inkscape:document-rotation="0" inkscape:document-units="px" inkscape:guide-bbox="true" inkscape:pagecheckerboard="0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:showpageshadow="false" inkscape:snap-bbox="false" inkscape:snap-bbox-edge-midpoints="false" inkscape:snap-bbox-midpoints="false" inkscape:snap-page="true" inkscape:snap-path-clip="false" inkscape:snap-path-mask="false" inkscape:window-height="1017" inkscape:window-maximized="1" inkscape:window-width="1920" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:zoom="1.546875" objecttolerance="20" pagecolor="#ffffff" showgrid="false" showguides="true" units="px">
+			</sodipodi:namedview>
+		<g id="layer1" transform="translate(-2.6458336,-23.834228)" inkscape:groupmode="layer" inkscape:label="Capa 1">
+			<g id="g209">
+				<path id="path229" class="st0" d="M318.7,99.9c-23.5,0-46.8,4.6-68.6,13.6v30.6h-36v-10.6c-10.8,7.7-20.8,16.7-29.6,26.6h3.7v36
+					h-28.7c-8.3,15.8-14.3,32.9-17.6,50.5h22.1v36h-25.2c0.2,11.1,1.4,22.1,3.5,33h30v36h-18.7c11.6,26.8,29.6,50.4,52.4,68.7v-9.7
+					h36v32.2c24,11.3,50.2,17.2,76.7,17.2c99.4,0,179.9-80.5,179.9-179.9C498.6,180.5,418.1,99.9,318.7,99.9L318.7,99.9z M164.1,204
+					h36v36h-36V204z M210.9,210.5h30.4h7.1l18.4,90.7l50.5-90.7h37.4l-23.2,129.9h-29l11.9-75.4L274,337.4l-1.7,3h0h-23.4h0
+					l-1.1-5.3l0,0l-15.3-75.8l-14.5,81.1h-29l11.9-75.4L210.9,210.5z M414.1,234.9c28.6,0,47.5,23.8,42.2,53.2v0
+					c-0.5,2.5-1.1,5.1-1.9,7.6h-16.8h-16.3h-39.9c0.2,11.6,6.6,19.6,15.8,19.7c5.4,0,11.2-2.8,16.1-7.7H449
+					c-11.5,20.3-33.1,33.7-54.4,33.7c-28.6,0-47.5-23.8-42.2-53.2C357.8,258.8,385.4,234.9,414.1,234.9z M408.5,260.9
+					c-8.4,0-17.4,6.6-22.8,16.8h38.5C423.1,267.5,416.9,260.9,408.5,260.9z M176.7,353.5h36v36h-36V353.5z"/>
+				<path id="path231" class="st0" d="M142.7,109.9h36v36h-36V109.9z"/>
+				<path id="path233" class="st0" d="M107.7,160h36v36h-36V160z"/>
+				<path id="path235" class="st0" d="M19.2,165.1h36v36h-36V165.1z"/>
+				<path id="path237" class="st0" d="M55.4,233.5h36v36h-36V233.5z"/>
+				<path id="path239" class="st0" d="M85.3,315.4h36v36h-36L85.3,315.4z"/>
+				<path id="path241" class="st0" d="M18.6,352h36v36h-36V352z"/>
+				<path id="path243" class="st0" d="M116.7,407.1h36v36h-36V407.1z"/>
+			</g>
+		</g>
+	</g>
+</switch>
+</svg>

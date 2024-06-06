@@ -6,7 +6,7 @@ const newOption = {title: '', errorMessage: ''};
 const newVotingData = {
     title: '',
     description: '',
-    endDate: generateEndDate(),
+    endDate: null,
     options: [
         {...newOption},
         {...newOption},
@@ -17,7 +17,7 @@ const newVotingData = {
  * @return {string}
  */
 function generateEndDate() {
-    return moment().add(1, 'hour').add(30, 'seconds').format(GENERAL.dateTimeFormatPicker);
+    return moment().add(1, 'day').add(30, 'seconds').format(GENERAL.dateTimeFormatPicker);
 }
 
 const storage = {
@@ -27,6 +27,9 @@ const storage = {
         votings: [],
         currentVoting: {},
         invalidForm: true,
+        invalidOptions: true,
+        isInitialized: false,
+        votingCount: 0,
         ...JSON.parse(JSON.stringify(newVotingData)),
     },
     getters: {
@@ -55,7 +58,7 @@ const storage = {
             return {
                 title: state.title,
                 description: state.description,
-                endDate: moment(state.endDate, GENERAL.dateTimeFormatPicker).format(),
+                endDate: moment(state.endDate ?? generateEndDate(), GENERAL.dateTimeFormatPicker).format(),
                 options: state.options.map((option) => {
                     return {title: option.title};
                 }),
@@ -70,6 +73,15 @@ const storage = {
         getInvalidForm(state) {
             return state.invalidForm;
         },
+        getInvalidOptions(state) {
+            return state.invalidOptions;
+        },
+        getIsInitialized(state) {
+            return state.isInitialized;
+        },
+        getVotingsCount(state) {
+            return state.votingCount;
+        },
     },
     actions: {
         init({commit, getters}, {tokenName, votings}) {
@@ -79,6 +91,7 @@ const storage = {
 
             commit('setTokenName', tokenName);
             commit('setVotings', votings);
+            commit('setIsInitialized', true);
         },
         addOption({commit, getters}) {
             if (getters.canAddOptions) {
@@ -97,11 +110,11 @@ const storage = {
             if (state.currentVoting.id === val.id) {
                 commit('setCurrentVoting', val);
             }
-            for (let i in state.votings) {
-               if (state.votings[i].id === val.id) {
-                   state.votings[i] = val;
-                   break;
-               }
+            for (const i in state.votings) {
+                if (state.votings[i].id === val.id) {
+                    state.votings[i] = val;
+                    break;
+                }
             }
         },
         updateVotingOption({state}, {key, option}) {
@@ -112,34 +125,74 @@ const storage = {
                 }
             });
         },
+        clearVotingData({state}) {
+            const votingData = JSON.parse(JSON.stringify(newVotingData));
+
+            for (const [key, value] of Object.entries(votingData)) {
+                state[key] = value;
+            }
+        },
     },
     mutations: {
-        setTokenName(state, val) {
-            state.tokenName = val;
+        setTokenName(state, payload) {
+            state.tokenName = payload;
         },
-        setVotings(state, val) {
-            state.votings = val;
+        setVotings(state, payload) {
+            state.votings = payload;
         },
-        setCurrentVoting(state, val) {
-            state.currentVoting = val;
+        insertVotings(state, payload) {
+            if (!payload.length) {
+                state.votings = [];
+            } else {
+                state.votings.push(...payload);
+            };
         },
-        setTitle(state, val) {
-            state.title = val;
+        setCurrentVoting(state, payload) {
+            state.currentVoting = payload;
         },
-        setDescription(state, val) {
-            state.description = val;
+        setTitle(state, payload) {
+            state.title = payload;
         },
-        setEndDate(state, val) {
-            state.endDate = val;
+        setDescription(state, payload) {
+            state.description = payload;
+        },
+        setEndDate(state, payload) {
+            state.endDate = payload;
         },
         addOption(state) {
             state.options.push({...newOption});
         },
-        deleteOption(state, i) {
-            state.options.splice(i, 1);
+        deleteOption(state, payload) {
+            state.options.splice(payload, 1);
         },
-        setInvalidForm(state, val) {
-            state.invalidForm = val;
+        setInvalidForm(state, payload) {
+            state.invalidForm = payload;
+        },
+        setInvalidOptions(state, payload) {
+            state.invalidOptions = payload;
+        },
+        setIsInitialized(state, payload) {
+            state.isInitialized = payload;
+        },
+        setActiveVoting(state, payload) {
+            state.activeVoting = payload;
+        },
+        setVotingsCount(state, payload) {
+            state.votingCount = payload;
+        },
+        addVoting(state, payload) {
+            if (state.votings) {
+                state.votings.unshift(payload);
+            } else {
+                state.votings = [payload];
+            }
+        },
+        deleteVoting(state, payload) {
+            if (!state.votings) {
+                return;
+            }
+
+            state.votings = state.votings.filter((p) => p.id !== payload.id);
         },
     },
 };

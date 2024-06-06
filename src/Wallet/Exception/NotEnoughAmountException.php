@@ -2,6 +2,7 @@
 
 namespace App\Wallet\Exception;
 
+/** @codeCoverageIgnore */
 class NotEnoughAmountException extends \Exception
 {
 

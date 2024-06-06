@@ -42,7 +42,7 @@
                             {% endif %}
 
                             {% block sonata_mosaic_description %}
-                                {{ meta.title|truncate(40) }}
+                                {{ meta.title | u.truncate(40) }}
                             {% endblock %}
                         </div>
                     </div>

@@ -23,7 +23,7 @@ class HackerVoter extends Voter
     /** {@inheritdoc} */
     protected function supports($attribute, $subject): bool
     {
-        return 'hacker' == $attribute;
+        return 'hacker' === $attribute;
     }
 
     /** {@inheritdoc} */

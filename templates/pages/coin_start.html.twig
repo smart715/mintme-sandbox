@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'page.coin_start.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/coin_start') }}
+{% endblock %}
+
+{% block content %}
+    <section id="coin_start" class="section mt-4">
+        <div class="row px-4 mx-0">
+            <div class="col-12">
+                <h2 class="mb-2 page-header font-weight-semibold">
+                    {{ 'page.coin_start.header.1'|trans }}
+                    <span class="text-primary">
+                        {{ 'page.coin_start.header.2'|trans }}
+                    </span>
+                </h2>
+            </div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h3 class="title h4 mb-4 text-primary">1. {{ 'page.coin_start.title.1'|trans }}</h3>
+                            <p class="mb-2">{{ 'page.coin_start.content.1'|trans }}</p>
+                            <a
+                                class="btn btn-primary btn-sm mb-4"
+                                href="{{ urls['getWalletUrl'] }}" 
+                                target="_blank"
+                            >
+                                {{ 'page.coin_start.content.2'|trans }}
+                            </a>
+                            <div class="code-block mb-3">
+                                <samp>
+                                    {{ 'page.coin_start.content.3'|trans }}
+                                </samp>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="title h4 mb-4 text-primary">2. {{ 'page.coin_start.title.2'|trans }}</h3>
+                            <p><strong>2.1</strong> {{ 'page.coin_start.content.4'|trans|raw }}</p>
+                            <p><strong>Webchain-miner</strong> {{ 'page.coin_start.content.5'|trans }}</p>
+                            <div class="code-block mb-3">
+                                <samp>
+                                    {{ 'page.coin_start.content.6'|trans }}
+                                </samp>
+                            </div>
+                            <p><strong>2.2</strong> {{ 'page.coin_start.content.7'|trans }}</p>
+                            <div class="code-block mb-3">
+                                <samp><code>></code> "user": "YOUR_WALLET"</samp>
+                            </div>
+                            <p><strong>2.3</strong> {{ 'page.coin_start.content.8'|trans }}</p>
+                            <ul class="unstyled-list">
+                                <li>
+                                    <p>
+                                       <strong>2.3.1</strong> {{ 'page.coin_start.content.9'|trans }} 
+                                    </p>
+                                </li>
+                                <li>
+                                    <strong>Linux</strong>
+                                    <div class="code-block mb-3">
+                                        <samp><code>$</code> ./webchain-miner</samp>
+                                    </div>
+                                </li>
+                                <li>
+                                    <strong>Windows</strong>
+                                    <div class="code-block mb-3">
+                                        <samp><code>></code> webchain-miner.exe</samp>
+                                    </div>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>2.3.2</strong> {{ 'page.coin_start.content.10'|trans }} 
+                                    </p>
+                                </li>
+                                <li><p>{{ 'page.coin_start.content.11'|trans }}</p></li>
+                                <li>
+                                    <img
+                                        src="{{ asset('build/images/mining_linux.png') }}"
+                                        alt="cpu mining linux vs windows"
+                                        class="img-fluid img-thumbnail mb-2"
+                                    />
+                                </li>
+                            </ul>
+                            <p><strong>2.4</strong> {{ 'page.coin_start.content.12'|trans }}</p>
+                            <ul>
+                                <li>{{ 'page.coin_start.content.13'|trans|raw }}</li>
+                                <li>{{ 'page.coin_start.content.14'|trans }}</li>
+                                <li>{{ 'page.coin_start.content.15'|trans }}</li>
+                            </ul>
+                            <p>{{ 'page.coin_start.content.16'|trans|raw }}</p>
+                            <img src="{{ asset('build/images/mining_monitoring.png') }}" alt="mining monitoring" class="img-fluid img-thumbnail mb-4" />
+                            <p>{{ 'page.coin_start.content.17'|trans }}</p>
+                            <p>{{ 'page.coin_start.content.18'|trans|raw }}</p>
+                            <p>{{ 'page.coin_start.content.19'|trans|raw }}</p>
+                            <p>{{ 'page.coin_start.content.20'|trans|raw }}</p>
+                            <p>{{ 'page.coin_start.content.21'|trans|raw }}</p>
+                            <p>{{ 'page.coin_start.content.22'|trans|raw }}</p>
+                            <p>{{ 'page.coin_start.content.23'|trans|raw }}</p>
+                            <p>{{ 'page.coin_start.content.24'|trans|raw }}</p>
+                            <p class="mb-4">{{ 'page.coin_start.content.25'|trans|raw }}</p>
+                            <div class="code-block mb-3">
+                                <samp>
+                                    {{ 'page.coin_start.content.26'|trans|raw }}
+                                </samp>
+                            </div>
+                            <img src="{{ asset('build/images/explorer.png') }}" alt="explorer MintMe.com Coin" class="img-fluid img-thumbnail mb-4" />
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="title h4 mb-4 text-primary">3. {{ 'page.coin_start.title.3'|trans }}</h3>
+                            <p><strong>{{ 'page.coin_start.content.27'|trans }}</strong></p>
+                            <ul class="list-unstyled">
+                                <li>{{ 'page.coin_start.content.28'|trans|raw }}</li>
+                                <li>{{ 'page.coin_start.content.29'|trans|raw }}</li>
+                            </ul>
+                            <p><strong>{{ 'page.coin_start.content.30'|trans }}</strong></p>
+                            <ul class="list-unstyled mb-4">
+                                <li>{{ 'page.coin_start.content.31'|trans|raw }}</li>
+                                <li>{{ 'page.coin_start.content.35'|trans|raw }}</li>
+                            </ul>
+                            <div class="code-block mb-3">
+                                <samp>
+                                    {{ 'page.coin_start.content.38'|trans }}
+                                </samp>
+                            </div>
+                            <img src="{{ asset('build/images/config_json.jpg') }}" alt="mining config.json file" class="img-fluid img-thumbnail mb-4" />
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="title h4 mb-4 text-primary">4. {{ 'page.coin_start.title.4'|trans }}</h3>
+                            <p class="mb-2">{{ 'page.coin_start.content.39'|trans }}</p>
+                            <a
+                                class="btn btn-primary btn-sm mb-3"
+                                href="{{ urls['getWalletUrl'] }}" 
+                                target="_blank"
+                            >
+                                {{ 'page.coin_start.content.2'|trans }}
+                            </a>
+                            <ol class="no-padding-list mb-4">
+                                <li>{{ 'page.coin_start.content.40'|trans }}</li>
+                                <li>{{ 'page.coin_start.content.41'|trans }}</li>
+                                <li>{{ 'page.coin_start.content.42'|trans }}</li>
+                            </ol>
+                            <div class="code-block mb-3">
+                                <samp>
+                                    {{ 'page.coin_start.content.43'|trans }}
+                                </samp>
+                            </div>
+                            <p>{{ 'page.coin_start.content.44'|trans }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/coin_start') }}
+{% endblock %}

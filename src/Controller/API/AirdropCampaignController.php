@@ -2,6 +2,8 @@
 
 namespace App\Controller\API;
 
+use App\Activity\ActivityTypes;
+use App\Controller\Traits\ViewOnlyTrait;
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Token\Token;
@@ -15,18 +17,21 @@ use App\Exception\ApiUnauthorizedException;
 use App\Exception\InvalidTwitterTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\AirdropConfig;
+use App\Logger\UserActionLogger;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\AirdropReferralCodeManager;
 use App\Manager\BlacklistManagerInterface;
+use App\Manager\LinkedinManager;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwitterManagerInterface;
+use App\Manager\YoutubeManager;
+use App\Services\TranslatorService\TranslatorInterface;
 use App\Utils\AirdropCampaignActions;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -39,14 +44,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/airdrop_campaign")
  */
-class AirdropCampaignController extends AbstractFOSRestController
+class AirdropCampaignController extends APIController
 {
-    private TokenManagerInterface $tokenManager;
+    protected TokenManagerInterface $tokenManager;
     private AirdropCampaignManagerInterface $airdropCampaignManager;
     private AirdropConfig $airdropConfig;
     private TranslatorInterface $translator;
@@ -55,7 +59,10 @@ class AirdropCampaignController extends AbstractFOSRestController
     private LockFactory $lockFactory;
     private EventDispatcherInterface $eventDispatcher;
     private AirdropReferralCodeManager $arcManager;
-    private SessionInterface $session;
+    protected SessionInterface $session;
+    private UserActionLogger $userActionLogger;
+
+    use ViewOnlyTrait;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -67,7 +74,8 @@ class AirdropCampaignController extends AbstractFOSRestController
         LockFactory $lockFactory,
         EventDispatcherInterface $eventDispatcher,
         AirdropReferralCodeManager $arcManager,
-        SessionInterface $session
+        SessionInterface $session,
+        UserActionLogger $userActionLogger
     ) {
         $this->tokenManager = $tokenManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
@@ -79,6 +87,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         $this->eventDispatcher = $eventDispatcher;
         $this->arcManager = $arcManager;
         $this->session = $session;
+        $this->userActionLogger = $userActionLogger;
     }
 
     /**
@@ -153,6 +162,9 @@ class AirdropCampaignController extends AbstractFOSRestController
         BalanceHandlerInterface $balanceHandler,
         Request $request
     ): View {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
 
         /** @var User|null $user */
         $user = $this->getUser();
@@ -172,6 +184,9 @@ class AirdropCampaignController extends AbstractFOSRestController
         if ($token->getActiveAirdrop()) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.already_has_active_airdrop'));
         }
+
+        // Validate amount and participants
+        $this->validateProperties([(string)$request->get('participants')], [(string)$request->get('amount')]);
 
         $amount = $moneyWrapper->parse((string)$request->get('amount'), Symbols::TOK);
         $participants = (int)$request->get('participants');
@@ -221,9 +236,19 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(new AirdropEvent($airdrop), TokenEvents::AIRDROP_CREATED);
+        $this->eventDispatcher->dispatch(
+            new AirdropEvent($airdrop, ActivityTypes::AIRDROP_CREATED),
+            TokenEvents::AIRDROP_CREATED
+        );
 
         $lock->release();
+
+        $this->userActionLogger->info('New Airdrop', [
+            'name' => $token->getName(),
+            'reached/limit' => $airdrop->getActualParticipants().'/'.$airdrop->getParticipants(),
+            'claimed/total amount' => $airdrop->getActualAmount()->getAmount().'/'.$airdrop->getAmount()->getAmount(),
+            'endDate' => $airdrop->getEndDate() ? $airdrop->getEndDate()->format('Y-m-d H:i:s') : null,
+        ]);
 
         return $this->view([
             'id' => $airdrop->getId(),
@@ -241,11 +266,22 @@ class AirdropCampaignController extends AbstractFOSRestController
      */
     public function deleteAirdropCampaign(Airdrop $airdrop): View
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         $this->denyAccessUnlessGranted('edit', $airdrop->getToken());
 
         if ($airdrop->isActive()) {
             $this->airdropCampaignManager->deleteAirdrop($airdrop);
         }
+
+        $this->userActionLogger->info('Ended Airdrop', [
+            'name' => $airdrop->getToken()->getName(),
+            'reached/limit' => $airdrop->getActualParticipants().'/'.$airdrop->getParticipants(),
+            'claimed/total amount' => $airdrop->getActualAmount()->getAmount().'/'.$airdrop->getAmount()->getAmount(),
+            'endDate' => $airdrop->getEndDate() ? $airdrop->getEndDate()->format('Y-m-d H:i:s') : null,
+        ]);
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
     }
@@ -254,8 +290,15 @@ class AirdropCampaignController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{tokenName}/{id}/claim", name="claim_airdrop_campaign", options={"expose"=true})
      */
-    public function claimAirdropCampaign(string $tokenName, Airdrop $airdrop): View
-    {
+    public function claimAirdropCampaign(
+        string $tokenName,
+        BalanceHandlerInterface $balanceHandler,
+        Airdrop $airdrop
+    ): View {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         /** @var User|null $user */
         $user = $this->getUser();
 
@@ -264,6 +307,8 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         $token = $this->fetchToken($tokenName, false, true);
+
+        $this->denyAccessUnlessGranted('interact', $token);
 
         if (!$token->getActiveAirdrop()) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.nonexistent_campaign'));
@@ -298,80 +343,63 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            new UserAirdropEvent($airdrop, $user),
+            new UserAirdropEvent($airdrop, $user, ActivityTypes::AIRDROP_CLAIMED),
             TokenEvents::AIRDROP_CLAIMED
         );
 
-        return $this->view(null, Response::HTTP_OK);
+        $this->userActionLogger->info('Claimed Airdrop', [
+            'name' => $token->getName(),
+            'nickname' => $user->getNickname(),
+            'amount claimed' => $airdrop->getReward()->getAmount() . '/' . $airdrop->getAmount()->getAmount(),
+        ]);
+
+        $balance = null;
+
+        try {
+            $balance = $balanceHandler->balance(
+                $user,
+                $token
+            )->getFullAvailable();
+        } catch (\Throwable $err) {
+            $this->userActionLogger->error('Could not fetch balance after claiming airdrop', [
+                'user' => $user->getEmail(),
+                'token' => $token->getName(),
+                'message' => $err->getMessage(),
+            ]);
+        }
+
+        return $this->view(['balance' => $balance], Response::HTTP_OK);
     }
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{tokenName}/action/{id}/claim", name="claim_airdrop_action", options={"expose"=true})
+     * @Rest\Post("/{tokenName}/action/{id}/page-visit", name="claim_page_visit", options={"expose"=true})
+     * @Rest\RequestParam(
+     *     name="data",
+     *     allowBlank=true,
+     *     nullable=true,
+     *     description="visit external page"
+     * )
      */
-    public function claimAirdropAction(string $tokenName, AirdropAction $action): View
-    {
+    public function claimPageVisit(
+        string $tokenName,
+        AirdropAction $action,
+        ParamFetcherInterface $request
+    ): View {
         $this->fetchToken($tokenName, false, true);
 
         $user = $this->getUser();
 
-        if (!$user instanceof User) {
-            throw new ApiUnauthorizedException();
+        $data = $request->get('data');
+
+        if ($action->getData() && $action->getData() != $data) {
+            throw new ApiUnauthorizedException('not verified');
         }
 
-        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
-
-        if (!$lock->acquire()) {
-            throw new AccessDeniedException();
-        }
-
-        $this->airdropCampaignManager->claimAirdropAction($action, $user);
-
-        $lock->release();
+        $this->completeActionUserToken($action, $user, $tokenName);
 
         return $this->view(null, Response::HTTP_OK);
     }
-
-    /**
-     * @Rest\View()
-     * @Rest\Post(
-     *     "/action/save",
-     *     name="claim_airdrop_action_for_guest_user",
-     *     options={"expose"=true}
-     *     )
-     * @Rest\RequestParam(
-     *     name="tokenName",
-     *     allowBlank=false,
-     *     description="token name of airdrop"
-     * )
-     * @Rest\RequestParam(
-     *     name="actionId",
-     *     allowBlank=false,
-     *     description="id of airdrop action"
-     * )
-     * @return View
-     * @param ParamFetcherInterface $request
-     */
-    public function storeAirdropTaskCompleted(ParamFetcherInterface $request): View
-    {
-        $tokenName = $request->get('tokenName');
-        $actionId = $request->get('actionId');
-
-        $airdropTasksCompleted =  $this->session->get('airdrops', []);
-
-        if (!array_key_exists($tokenName, $airdropTasksCompleted)) {
-            $airdropTasksCompleted[$tokenName] = [];
-        }
-
-        if (!in_array($actionId, $airdropTasksCompleted[$tokenName], true)) {
-            $airdropTasksCompleted[$tokenName][] = $actionId;
-        }
-
-        $this->session->set('airdrops', $airdropTasksCompleted);
-
-        return $this->view(null, Response::HTTP_OK);
-    }
-
 
     /**
      * @Rest\View()
@@ -393,30 +421,60 @@ class AirdropCampaignController extends AbstractFOSRestController
         );
     }
 
+    /**
+     * @Rest\View()
+     * @Rest\Post(
+     *     "{tokenName}/action/{id}/fb-message",
+     *      name="claim_fb_message_post",
+     *      options={"expose"=true}
+     *     )
+     * @Rest\RequestParam(
+     *     name="data",
+     *     allowBlank=true,
+     *     nullable=true,
+     *     description="url"
+     * )
+     */
+    public function claimFbMessagePost(
+        string $tokenName,
+        ParamFetcherInterface $request,
+        WebsiteVerifierInterface $websiteVerifier,
+        AirdropAction $action
+    ): View {
+        $user = $this->getUser();
 
+        $this->completeActionUserToken($action, $user, $tokenName);
+
+        return $this->view(null, Response::HTTP_OK);
+    }
 
     /**
      * @Rest\View()
      * @Rest\Post(
-     *     "{tokenName}/action/post-link/verify",
-     *      name="verify_post_link_action",
+     *     "{tokenName}/action/{id}/post-link",
+     *      name="claim_post_link",
      *      options={"expose"=true}
      *     )
      * @Rest\RequestParam(
-     *     name="url",
-     *     allowBlank=false,
-     *     description="Url to inspect."
+     *     name="data",
+     *     allowBlank=true,
+     *     nullable=true,
+     *     description="url"
      * )
      */
     public function verifyPostLinkAction(
         string $tokenName,
         ParamFetcherInterface $request,
-        WebsiteVerifierInterface $websiteVerifier
+        WebsiteVerifierInterface $websiteVerifier,
+        AirdropAction $action
     ): View {
-        $this->fetchToken($tokenName, false, true);
-        $message = $this->generateUrl('token_show', ['name' => $tokenName], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $url = $request->get('url');
+        $user = $this->getUser();
+
+        $message = $this->generateUrl('token_show_intro', ['name' => $tokenName], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $url = $request->get('data');
+
         $validator = Validation::createValidator();
 
         $errors = $validator->validate($url, new Url());
@@ -433,29 +491,40 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $verified = $websiteVerifier->verifyAirdropPostLinkAction($url, $message);
 
-        return $this->view(['verified' => $verified], Response::HTTP_OK);
+        if ($verified) {
+            $this->completeActionUserToken($action, $user, $tokenName);
+
+            return $this->view(null, Response::HTTP_OK);
+        }
+
+        return $this->view(['verified' => $verified], Response::HTTP_BAD_REQUEST);
     }
 
     /**
      * @Rest\View()
-     * @Rest\Post("{tokenName}/share/twitter", name="airdrop_share_twitter", options={"expose"=true})
+     * @Rest\Post("{tokenName}/action/{id}/share-twitter", name="claim_share_twitter", options={"expose"=true})
      */
-    public function shareOnTwitter(string $tokenName): View
+    public function shareOnTwitter(string $tokenName, AirdropAction $action): View
     {
-        $token = $this->fetchToken($tokenName, false, true);
-
-        $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            throw new ApiUnauthorizedException();
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
         }
 
-        $airdrop = $token->getActiveAirdrop();
+        $token = $this->fetchToken($tokenName, false, true);
 
-        $arc = $this->arcManager->getByAirdropAndUser($airdrop, $user) ?? $this->arcManager->create($airdrop, $user);
-        $hash = $this->arcManager->encode($arc);
+        /** @var User|null $user */
+        $user = $this->getUser();
 
-        $url = $this->generateUrl('airdrop_referral', ['name' => $tokenName, 'hash' => $hash], UrlGeneratorInterface::ABSOLUTE_URL);
+        if ($user instanceof User) {
+            $airdrop = $token->getActiveAirdrop();
+
+            $arc = $this->arcManager->getByAirdropAndUser($airdrop, $user) ?? $this->arcManager->create($airdrop, $user);
+            $hash = $this->arcManager->encode($arc);
+
+            $url = $this->generateUrl('airdrop_referral', ['tokenName' => $tokenName, 'hash' => $hash], UrlGeneratorInterface::ABSOLUTE_URL);
+        } else {
+            $url = $this->generateUrl('token_show_intro', ['name' => $tokenName], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
 
         $message = $this->translator->trans('ongoing_airdrop.actions.message', [
             '%tokenName%' => $tokenName,
@@ -470,20 +539,19 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
 
+        $this->completeActionUserToken($action, $user, $tokenName);
+
         return $this->view(['message' => $this->translator->trans('api.success')], Response::HTTP_OK);
     }
 
     /**
      * @Rest\View()
-     * @Rest\Post("{tokenName}/action/{id}/retweet", name="retweet_action", options={"expose"=true})
+     * @Rest\Post("{tokenName}/action/{id}/retweet", name="claim_retweet", options={"expose"=true})
      */
     public function retweetAction(string $tokenName, AirdropAction $action): View
     {
+        /** @var User|null $user */
         $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            throw new ApiUnauthorizedException();
-        }
 
         $token = $this->fetchToken($tokenName, false, true);
 
@@ -501,8 +569,108 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
 
-        return $this->view();
+        $this->completeActionUserToken($action, $user, $tokenName);
+
+        return $this->view(null, Response::HTTP_OK);
     }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("{tokenName}/action/{id}/share-linkedin", name="claim_share_linkedin", options={"expose"=true})
+     */
+    public function shareOnLinkedin(string $tokenName, AirdropAction $action, LinkedinManager $linkedinManager): View
+    {
+        $user = $this->getUser();
+
+        $url = $this->generateUrl('token_show_intro', ['name' => $tokenName], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $message = $this->translator->trans('ongoing_airdrop.actions.message', [
+            '%tokenName%' => $tokenName,
+            '%tokenUrl%' => $url,
+        ]);
+
+        try {
+            $linkedinManager->shareMessage($message, $url);
+
+            $this->completeActionUserToken($action, $user, $tokenName);
+
+            return $this->view(null, Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            return $this->view(null, (int)$e->getCode());
+        }
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("{tokenName}/action/{id}/subscribe-youtube", name="claim_subscribe_youtube", options={"expose"=true})
+     */
+    public function checkSubscriptionsYoutube(
+        string $tokenName,
+        AirdropAction $action,
+        YoutubeManager $youtubeManager
+    ): View {
+        $user = $this->getUser();
+
+        $isSubscribed = $youtubeManager->checkIfSubscribed($action->getData());
+
+        if ($isSubscribed) {
+            $this->completeActionUserToken($action, $user, $tokenName);
+
+            return $this->view(null, Response::HTTP_OK);
+        }
+
+        $subscriptionId = $youtubeManager->subscribe($action->getData());
+
+        if ($subscriptionId) {
+            $this->completeActionUserToken($action, $user, $tokenName);
+
+            return $this->view(null, Response::HTTP_OK);
+        }
+
+        return $this->view(['message'=>'not subscribed'], Response::HTTP_BAD_REQUEST);
+    }
+
+    private function lockReleaseAirdropAction(AirdropAction $action, User $user): void
+    {
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw new AccessDeniedException();
+        }
+
+        $this->airdropCampaignManager->claimAirdropAction($action, $user);
+
+        $lock->release();
+    }
+
+    private function completeActionUserToken(AirdropAction $action, ?object $user, string $tokenName): void
+    {
+        if (null !== $user && !$user instanceof User) {
+            throw new ApiUnauthorizedException();
+        }
+
+        if ($user instanceof User) {
+            $this->lockReleaseAirdropAction($action, $user);
+        } else {
+            $this->storeGuestTasksCompleted($tokenName, $action->getId());
+        }
+    }
+
+    private function storeGuestTasksCompleted(string $tokenName, int $actionId): void
+    {
+        $airdropTasksCompleted =  $this->session->get('airdrops', []);
+
+        if (!array_key_exists($tokenName, $airdropTasksCompleted)) {
+            $airdropTasksCompleted[$tokenName] = [];
+        }
+
+        if (!in_array($actionId, $airdropTasksCompleted[$tokenName], true)) {
+            $airdropTasksCompleted[$tokenName][] = $actionId;
+        }
+
+        $this->session->set('airdrops', $airdropTasksCompleted);
+    }
+
 
     private function checkAirdropParams(Money $amount, int $participants, Money $balance): void
     {

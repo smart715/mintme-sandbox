@@ -1,0 +1,16 @@
+{% set avatarSrc = token.image is null or token.image.url == '/media/default_token.png'
+                    ? asset('build/images/default_token_avatar.svg')
+                    : token.image.url | imagine_filter('avatar_large')
+%}
+{% include 'pages/pair_quick_trade.html.twig' with {'displayOn': 'mobile', class: 'mb-4'} %}
+<token-single-post-page
+    :is-owner="{{ isOwner }}"
+    :is-logged-in="{{ loggedIn }}"
+    :token-subunit="{{ tokenSubunit }}"
+    :comment-min-amount="{{ commentMinAmount }}"
+    :initial-post="{{ post ? post|json_encode : 'null' }}"
+    :initial-comments="{{ comments and post.content ? comments|json_encode : '[]' }}"
+    :top-holders="{{ topHolders | json_encode }}"
+    @go-to-trade="goToTrade"
+    @post-deleted="singlePostDeleted"
+></token-single-post-page>

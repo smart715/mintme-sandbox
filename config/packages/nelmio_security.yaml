@@ -17,8 +17,6 @@ nelmio_security:
                 - 'strict-dynamic'
                 - 'unsafe-inline'
                 - 'unsafe-eval'
-                - 'https:'
-                - 'http:'
             style-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -29,17 +27,20 @@ nelmio_security:
                 - 'self'
                 - 'wss://api.mintme.com/'
                 - 'wss://api.mintme.abchosting.org/'
+                - 'wss://api.staging.abchosting.org/'
                 - 'https://*.facebook.net'
                 - 'https://*.facebook.com'
                 - 'https://connect.facebook.net'
                 - 'https://www.facebook.com'
                 - 'https://www.google-analytics.com'
+                - 'https://analytics.google.com'
                 - 'https://*.doubleclick.net'
                 - 'https://*.mintme.com'
                 - 'https://mintme.com'
                 - 'https://*.tawk.to'
                 - 'wss://*.tawk.to'
-                - '%env(MERCURE_PUBLISH_URL)%'
+                - '%env(MERCURE_PUBLIC_URL)%'
+                - 'https://identitytoolkit.googleapis.com'
             img-src:
                 - 'data:'
                 - '*'
@@ -48,6 +49,7 @@ nelmio_security:
                 - 'https://fonts.gstatic.com'
                 - 'https://static-v.tawk.to'
                 - 'https://embed.tawk.to'
+                - 'https://fonts.googleapis.com'
             frame-src:
                 - 'https://www.facebook.com'
                 - 'https://accounts.google.com'
@@ -58,6 +60,7 @@ nelmio_security:
                 - 'https://*.coinify.com'
                 - 'https://platform.twitter.com'
                 - 'https://content-youtube.googleapis.com'
+                - 'https://mintme.firebaseapp.com'
             base-uri:
                 - 'self'
             worker-src:

@@ -1,0 +1,48 @@
+<?php declare(strict_types = 1);
+
+namespace App\Notifications\Strategy;
+
+use App\Entity\Rewards\Reward;
+use App\Entity\User;
+use App\Mailer\MailerInterface;
+use App\Manager\UserNotificationManagerInterface;
+
+class RewardNewVolunteerNotificationStrategy implements NotificationStrategyInterface
+{
+    private UserNotificationManagerInterface $userNotificationManager;
+    private MailerInterface $mailer;
+    private string $type;
+    private Reward $reward;
+
+    public function __construct(
+        Reward $reward,
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer,
+        string $type
+    ) {
+        $this->reward = $reward;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
+        $this->type = $type;
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function sendNotification(User $user): void
+    {
+        $rewardTitle = $this->reward->getTitle();
+        $token = $this->reward->getToken();
+        $rewardToken = $token->getName();
+        $tokenAvatar = $token->getImage()->getUrl();
+        $slug = $this->reward->getSlug();
+        $jsonData = (array)json_encode([
+            'rewardTitle' => $rewardTitle,
+            'rewardToken' => $rewardToken,
+            'tokenAvatar' => $tokenAvatar,
+            'slug' => $slug,
+        ], JSON_THROW_ON_ERROR);
+        $this->userNotificationManager->createNotification($user, $this->type, $jsonData);
+        $this->mailer->sendRewardNewVolunteerMail($user, $rewardToken, $rewardTitle, $slug);
+    }
+}

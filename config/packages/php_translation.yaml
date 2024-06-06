@@ -1,5 +1,6 @@
 translation:
     locales: '%translation_locales%'
+    default_locale: '%locale%'
     edit_in_place:
         enabled: true
         config_name: app
@@ -9,6 +10,8 @@ translation:
             output_dir: "%kernel.project_dir%/translations"
             excluded_names: ["*TestCase.php", "*Test.php"]
             excluded_dirs: [cache, data, logs]
+            output_format: yml
+            whitelist_domains: [FOSUserBundle, messages, SonataNewsBundle, pp, tos]
     symfony_profiler:
         enabled: false
     webui:

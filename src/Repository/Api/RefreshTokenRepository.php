@@ -11,6 +11,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  * @method RefreshToken|null findOneBy(array $criteria, array $orderBy = null)
  * @method RefreshToken[]    findAll()
  * @method RefreshToken[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @codeCoverageIgnore
  */
 class RefreshTokenRepository extends ServiceEntityRepository
 {

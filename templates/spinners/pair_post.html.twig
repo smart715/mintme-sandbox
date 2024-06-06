@@ -1,0 +1,36 @@
+{% set avatarSrc = token.image is null or token.image.url == '/media/default_token.png'
+                    ? asset('build/images/default_token_avatar.svg')
+                    : token.image.url | imagine_filter('avatar_large')
+%}
+<div v-if="false" class="card post p-3">
+    <div class="d-flex align-items-center">
+        <div class="mr-4 ml-2">
+            <img src="{{ avatarSrc }}" class="avatar-img rounded-circle img-fluid">
+        </div>
+        <div class="flex-fill">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="font-weight-semibold font-size-2 d-flex justify-content-between align-items-center text-white">
+                    {{ post.title }}
+                </span>
+            </div>
+            <div class="font-italic">
+                {{ post.createdAt | date('H:m:s d M, Y') }}
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        {% if post.content %}
+            <p class="post-content">
+                {{ post.content | raw }}
+            </p>
+        {% else %}
+            <p>
+                {{ 'post.logged_in.1' | trans }}
+                <a href="#">
+                    {{ post.amount | toMoney(precision) }} {{ post.token.name }}
+                </a>
+                {{ 'post.logged_in.2' | trans }}
+            </p>
+        {% endif %}
+    </div>
+</div>

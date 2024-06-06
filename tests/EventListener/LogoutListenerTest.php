@@ -4,6 +4,7 @@ namespace App\Tests\EventListener;
 
 use App\EventListener\LogoutListener;
 use App\Logger\UserActionLogger;
+use App\Mercure\Authorization as MercureAuthorization;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -23,6 +24,7 @@ class LogoutListenerTest extends TestCase
         $logger = $this->createMock(UserActionLogger::class);
         $session = $this->createMock(SessionInterface::class);
         $route = $this->createMock(UrlGeneratorInterface::class);
+        $mercureAuth = $this->createMock(MercureAuthorization::class);
 
         $checker->method('isGranted')->with('IS_AUTHENTICATED_REMEMBERED')->willReturn(true);
 
@@ -30,7 +32,8 @@ class LogoutListenerTest extends TestCase
             $logger,
             $checker,
             $session,
-            $route
+            $route,
+            $mercureAuth
         );
 
         $event = $this->createMock(FilterUserResponseEvent::class);
@@ -63,6 +66,7 @@ class LogoutListenerTest extends TestCase
         $logger = $this->createMock(UserActionLogger::class);
         $session = $this->createMock(SessionInterface::class);
         $route = $this->createMock(UrlGeneratorInterface::class);
+        $mercureAuth = $this->createMock(MercureAuthorization::class);
 
         $checker->method('isGranted')->with('IS_AUTHENTICATED_REMEMBERED')->willReturn(false);
 
@@ -70,7 +74,8 @@ class LogoutListenerTest extends TestCase
             $logger,
             $checker,
             $session,
-            $route
+            $route,
+            $mercureAuth
         );
 
         $event = $this->createMock(FilterUserResponseEvent::class);

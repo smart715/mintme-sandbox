@@ -84,7 +84,7 @@ const storage = {
             }
 
             state.clients[url].ws.onmessage = function(result) {
-                result = typeof result.data === 'string' ? JSON.parse(result.data): result;
+                result = 'string' === typeof result.data ? JSON.parse(result.data): result;
                 state.clients[url].handlers.message.forEach((handler) => {
                     if (Array.isArray(handler)) {
                         handler[1](result);

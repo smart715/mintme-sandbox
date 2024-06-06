@@ -4,6 +4,7 @@ import Vuelidate from 'vuelidate';
 import sanitizeHtml from './sanitize_html';
 import store from './storage';
 import UserInit from './components/UserInit';
+import {mapGetters} from 'vuex';
 
 /*
     To enable passive listeners,
@@ -46,3 +47,15 @@ new Vue({
     },
     store,
 });
+
+if (document.querySelector('#add-phone-notification')) {
+    new Vue({
+        el: '#add-phone-notification',
+        computed: {
+            ...mapGetters('user', {
+                hasPhoneVerified: 'getHasPhoneVerified',
+            }),
+        },
+        store,
+    });
+}

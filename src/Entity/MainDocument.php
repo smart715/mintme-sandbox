@@ -33,9 +33,8 @@ class MainDocument
      * @ORM\JoinColumn(name="media_id", referencedColumnName="id")
      * @Assert\NotBlank
      * @MainDocs()
-     * @var Media
      */
-    private $document;
+    private ?Media $document = null; // phpcs:ignore
 
     public function getId(): int
     {
@@ -49,7 +48,7 @@ class MainDocument
 
     public function getName(): string
     {
-        return $this->name ?? '';
+        return $this->name;
     }
 
     public function setName(string $name): void

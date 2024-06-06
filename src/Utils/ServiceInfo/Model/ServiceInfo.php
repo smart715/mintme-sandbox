@@ -4,49 +4,33 @@ namespace App\Utils\ServiceInfo\Model;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class ServiceInfo
 {
     /**
-     * @var string|null
      * @Groups({"API"})
      */
-    private $tokenName;
+    private ?string  $tokenName;
 
     /**
-     * @var string|null
      * @Groups({"API"})
      */
-    private $panelBranch;
+    private ?string $panelBranch;
 
     /**
-     * @var string|null
      * @Groups({"API"})
      */
-    private $depositBranch;
+    private ?string $gatewayBranch;
 
     /**
-     * @var string|null
      * @Groups({"API"})
      */
-    private $contractBranch;
+    private array $consumersInfo;
 
     /**
-     * @var string|null
      * @Groups({"API"})
      */
-    private $withdrawBranch;
-
-    /**
-     * @var array<string>
-     * @Groups({"API"})
-     */
-    private $consumersInfo;
-
-    /**
-     * @var bool
-     * @Groups({"API"})
-     */
-    private $isTokenContractActive;
+    private bool $isGatewayActive;
 
     public function getTokenName(): ?string
     {
@@ -60,14 +44,14 @@ class ServiceInfo
         return $this;
     }
 
-    public function getDepositBranch(): ?string
+    public function getGatewayBranch(): ?string
     {
-        return $this->depositBranch;
+        return $this->gatewayBranch;
     }
 
-    public function setDepositBranch(?string $depositBranch): self
+    public function setGatewayBranch(?string $gatewayBranch): self
     {
-        $this->depositBranch = $depositBranch;
+        $this->gatewayBranch = $gatewayBranch;
 
         return $this;
     }
@@ -84,28 +68,6 @@ class ServiceInfo
         return $this;
     }
 
-    public function getContractBranch(): ?string
-    {
-        return $this->contractBranch;
-    }
-
-    public function setContractBranch(?string $contractBranch): void
-    {
-        $this->contractBranch = $contractBranch;
-    }
-
-    public function getWithdrawBranch(): ?string
-    {
-        return $this->withdrawBranch;
-    }
-
-    public function setWithdrawBranch(?string $withdrawBranch): self
-    {
-        $this->withdrawBranch = $withdrawBranch;
-
-        return $this;
-    }
-
     public function getConsumersInfo(): array
     {
         return $this->consumersInfo;
@@ -118,14 +80,14 @@ class ServiceInfo
         return $this;
     }
 
-    public function isTokenContractActive(): bool
+    public function isGatewayActive(): bool
     {
-        return $this->isTokenContractActive;
+        return $this->isGatewayActive;
     }
 
-    public function setIsTokenContractActive(bool $isActive): self
+    public function setIsGatewayActive(bool $isActive): self
     {
-        $this->isTokenContractActive = $isActive;
+        $this->isGatewayActive = $isActive;
 
         return $this;
     }

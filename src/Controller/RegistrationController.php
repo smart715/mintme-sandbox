@@ -2,19 +2,31 @@
 
 namespace App\Controller;
 
+use App\Activity\ActivityTypes;
+use App\Config\WithdrawalDelaysConfig;
+use App\Controller\Traits\ReferralRedirectionTrait;
 use App\Entity\Bonus;
 use App\Entity\Token\Token;
+use App\Entity\TokenSignupBonusCode;
 use App\Entity\User;
+use App\Events\Activity\UserEventActivity;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\BalanceTransactionBonusType;
+use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\AirdropReferralCodeManagerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Manager\TokenSignupBonusCodeManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Manager\UserNotificationConfigManagerInterface;
+use App\Repository\TokenSignupBonusCodeRepository;
 use App\Security\Request\RefererRequestHandlerInterface;
+use App\Utils\LockFactory;
 use App\Utils\Symbols;
+use App\Validator\Constraints\TokenSignupBonusCode as TokenSignupBonusCodeConstraint;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -25,18 +37,22 @@ use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
+/** @phpstan-ignore-next-line final class */
 class RegistrationController extends FOSRegistrationController
 {
+    private UserActionLogger $userActionLogger;
     private EventDispatcherInterface $eventDispatcher;
     private FactoryInterface $formFactory;
     private UserManagerInterface $userManager;
@@ -50,12 +66,20 @@ class RegistrationController extends FOSRegistrationController
     private string $mintmeHostFreeDays;
     private string $mintmeHostPrice;
     private string $mintmeHostPath;
-    private AirdropReferralCodeManagerInterface $arcManager;
     private RefererRequestHandlerInterface $refererRequestHandler;
     private AirdropCampaignManagerInterface $airdropCampaignManager;
-    private SessionInterface $session;
+    private ValidatorInterface $validator;
+    private TokenSignupBonusCodeRepository $tokenSignUpBonusRepository;
+    private TranslatorInterface $translations;
+    private TokenManagerInterface $tokenManager;
+    private TokenSignupBonusCodeManagerInterface $tokenSignUpBonusCodeManager;
+    private LockFactory $lockFactory;
+    private WithdrawalDelaysConfig $withdrawalDelaysConfig;
+
+    use ReferralRedirectionTrait;
 
     public function __construct(
+        UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
         UserManagerInterface $userManager,
@@ -70,11 +94,18 @@ class RegistrationController extends FOSRegistrationController
         string $mintmeHostFreeDays,
         string $mintmeHostPrice,
         string $mintmeHostPath,
-        AirdropReferralCodeManagerInterface $arcManager,
         RefererRequestHandlerInterface $refererRequestHandler,
         AirdropCampaignManagerInterface $airdropCampaignManager,
-        SessionInterface $session
+        ValidatorInterface $validator,
+        TokenSignupBonusCodeRepository $tokenSignUpBonusRepository,
+        TranslatorInterface $translations,
+        TokenManagerInterface $tokenManager,
+        TokenSignupBonusCodeManagerInterface $tokenSignUpBonusCodeManager,
+        LockFactory $lockFactory,
+        AirdropReferralCodeManagerInterface $arcManager,
+        WithdrawalDelaysConfig $withdrawalDelaysConfig
     ) {
+        $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
         $this->userManager = $userManager;
@@ -88,11 +119,17 @@ class RegistrationController extends FOSRegistrationController
         $this->mintmeHostFreeDays = $mintmeHostFreeDays;
         $this->mintmeHostPrice =$mintmeHostPrice;
         $this->mintmeHostPath = $mintmeHostPath;
-        $this->arcManager = $arcManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
-        $this->session = $session;
+        $this->tokenSignUpBonusRepository = $tokenSignUpBonusRepository;
+        $this->validator = $validator;
+        $this->translations = $translations;
+        $this->tokenManager = $tokenManager;
+        $this->tokenSignUpBonusCodeManager = $tokenSignUpBonusCodeManager;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
         $this->refererRequestHandler = $refererRequestHandler;
+        $this->lockFactory = $lockFactory;
+        $this->arcManager = $arcManager;
+        $this->withdrawalDelaysConfig = $withdrawalDelaysConfig;
     }
 
     /**
@@ -105,7 +142,7 @@ class RegistrationController extends FOSRegistrationController
         $form = $this->formFactory->createForm();
 
         if ($this->bonusManager->isLimitReached(
-            $this->getParameter('landing_web_bonus_limit'),
+            (string)$this->getParameter('landing_web_bonus_limit'),
             Bonus::SIGN_UP_TYPE
         )) {
             return $this->redirectToRoute('homepage');
@@ -127,6 +164,13 @@ class RegistrationController extends FOSRegistrationController
      */
     public function registerAction(Request $request): Response
     {
+        if (!$request->query->get('withReferral')) {
+            $request->cookies->remove('login-bonus');
+            $request->cookies->remove('referral-code');
+            $request->cookies->remove('referral-type');
+            $request->cookies->remove('referral-token');
+        }
+
         $form = $this->formFactory->createForm();
 
         try {
@@ -149,9 +193,12 @@ class RegistrationController extends FOSRegistrationController
             return $response;
         }
 
+        $this->checkTokenSignupBonusCode($request);
+
         if ($request->get('formContentOnly', false)) {
             return $this->render("@FOSUser/Registration/register_content_body.html.twig", [
                 'form' => $form->createView(),
+                'embedded' => true,
             ]);
         }
 
@@ -189,6 +236,10 @@ class RegistrationController extends FOSRegistrationController
 
                 /** @psalm-suppress TooManyArguments */
                 $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
+                $this->eventDispatcher->dispatch(
+                    new UserEventActivity($user, ActivityTypes::USER_REGISTERED),
+                    UserEventActivity::NAME
+                );
 
                 $this->userManager->updateUser($user);
 
@@ -197,12 +248,20 @@ class RegistrationController extends FOSRegistrationController
                     $bonus = new Bonus(
                         $user,
                         Bonus::PENDING_STATUS,
-                        $this->getParameter('landing_web_bonus'),
-                        Bonus::SIGN_UP_TYPE
+                        $this->moneyWrapper->parse(
+                            (string)$this->getParameter('landing_web_bonus'),
+                            Symbols::WEB
+                        )->getAmount(),
+                        Bonus::SIGN_UP_TYPE,
+                        Symbols::WEB
                     );
                     $user->setBonus($bonus);
                     $this->em->persist($bonus);
                     $this->em->flush();
+                }
+
+                if ($request->get('formContentOnly', false)) {
+                    $this->get('session')->set('registered_form_content_only', true);
                 }
 
                 if (null === $event->getResponse()) {
@@ -217,6 +276,8 @@ class RegistrationController extends FOSRegistrationController
                     new FilterUserResponseEvent($user, $request, $response),
                     FOSUserEvents::REGISTRATION_COMPLETED
                 );
+
+                $this->processTokenSignupBonusCode($request, $user);
 
                 return $response;
             }
@@ -242,6 +303,16 @@ class RegistrationController extends FOSRegistrationController
             return parent::confirmedAction($request);
         }
 
+        $withdrawAfterRegisterSeconds = $this->withdrawalDelaysConfig->getWithdrawAfterRegisterTime();
+
+        $lockWithdrawRegister = $this->lockFactory->createLock(
+            LockFactory::LOCK_WITHDRAW_AFTER_REGISTER.$user->getId(),
+            $withdrawAfterRegisterSeconds,
+            false
+        );
+
+        $lockWithdrawRegister->acquire();
+
         $bonus = $user->getBonus();
         $this->userNotificationConfigManager->initializeUserNotificationConfig($user);
         $this->mailer->sendMintmeHostMail(
@@ -256,7 +327,7 @@ class RegistrationController extends FOSRegistrationController
         if ($bonus &&
             Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&
             Bonus::SIGN_UP_TYPE === $user->getBonus()->getType()) {
-            $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
+            $crypto = $this->cryptoManager->findBySymbol($bonus->getTradableName());
 
             if (!$crypto) {
                 return parent::confirmedAction($request);
@@ -267,18 +338,23 @@ class RegistrationController extends FOSRegistrationController
             $this->em->flush();
 
             try {
-                $this->balanceHandler->deposit(
+                $this->balanceHandler->beginTransaction();
+                $this->balanceHandler->depositBonus(
                     $user,
                     $crypto,
                     $this->moneyWrapper->parse(
                         (string)$this->getParameter('landing_web_bonus'),
                         $crypto->getSymbol()
-                    )
+                    ),
+                    BalanceTransactionBonusType::SIGN_UP
                 );
             } catch (Throwable $exception) {
+                $this->balanceHandler->rollback();
                 $this->em->rollback();
             }
         }
+
+        $this->withdrawTokenSignupBonusCode($user, $bonus);
 
         /** @var Session $session */
         $session = $this->get('session');
@@ -296,32 +372,112 @@ class RegistrationController extends FOSRegistrationController
             return $this->redirect($referer);
         }
 
-        $referralCode = $request->cookies->get('referral-code');
-        $referralType = $request->cookies->get('referral-type');
-
-        if (null !== $referralCode) {
-            switch ($referralType) {
-                case 'invite':
-                    $referrerUser = $this->userManager->findByReferralCode($referralCode);
-                    $token = $referrerUser
-                        ? $referrerUser->getProfile()->getFirstToken()
-                        : null;
-
-                    break;
-                case 'airdrop':
-                    $arc = $this->arcManager->decode($referralCode);
-                    $token = $arc
-                        ? $arc->getAirdrop()->getToken()
-                        : null;
-
-                    break;
-            }
-        }
-
-        if (isset($token)) {
-            return $this->redirectToRoute("token_show", ["name" => $token->getName()]);
+        if ($referralRedirection = $this->referralRedirect($request, $this->tokenManager)) {
+            return $referralRedirection;
         }
 
         return parent::confirmedAction($request);
+    }
+
+    private function checkTokenSignupBonusCode(Request $request): void
+    {
+        $tokenSignUpBonus = $this->getSignUpBonusCode($request);
+
+        if (!$tokenSignUpBonus) {
+            return;
+        }
+
+        $token = $tokenSignUpBonus->getToken();
+        $this->addFlash('success', $this->translations->trans(
+            'api.tokens.token_sign_up_bonus.valid_code',
+            [
+                'amount' => $this->moneyWrapper->format($tokenSignUpBonus->getAmount(), false),
+                'tokenName' => $token->getName(),
+            ]
+        ));
+    }
+
+    private function processTokenSignupBonusCode(Request $request, User $user): void
+    {
+        $tokenSignUpBonus = $this->getSignUpBonusCode($request);
+
+        if (!$tokenSignUpBonus) {
+            return;
+        }
+
+        $bonus = new Bonus(
+            $user,
+            Bonus::PENDING_STATUS,
+            $tokenSignUpBonus->getAmount()->getAmount(),
+            Bonus::TOKEN_SIGN_UP_TYPE,
+            $tokenSignUpBonus->getToken()->getName()
+        );
+
+        $user->setBonus($bonus);
+        $this->em->persist($bonus);
+        $this->em->flush();
+    }
+
+    private function getSignUpBonusCode(Request $request): ?TokenSignupBonusCode
+    {
+        $bonusCode = $request->cookies->get('login-bonus');
+
+        if (!$bonusCode) {
+            return null;
+        }
+
+        $bonusCodeErrors = $this->validator->validate($bonusCode, new TokenSignupBonusCodeConstraint());
+
+        if (count($bonusCodeErrors) > 0) {
+            foreach ($bonusCodeErrors as $error) {
+                $this->addFlash('danger', $error->getMessage());
+            }
+
+            return null;
+        }
+
+        return $this->tokenSignUpBonusRepository->findByCode($bonusCode);
+    }
+
+    private function withdrawTokenSignupBonusCode(User $user, ?Bonus $bonus): void
+    {
+        if (!$bonus
+            || Bonus::PENDING_STATUS !== $bonus->getStatus()
+            || Bonus::TOKEN_SIGN_UP_TYPE !== $bonus->getType()
+        ) {
+            return;
+        }
+
+        $token = $this->tokenManager->findByName($bonus->getTradableName());
+
+        if (!$token) {
+            return;
+        }
+
+        $this->tokenSignUpBonusCodeManager->withdrawTokenSignupBonus(
+            $token,
+            $user,
+            $bonus->getQuantity()
+        );
+
+        $bonus->setStatus(Bonus::PENDING_CLAIM_STATUS);
+        $this->em->persist($bonus);
+        $this->em->flush();
+
+        $this->userActionLogger->info('user '.$user->getId().' withdraw token sign up bonus', [
+            'token' => $token->getId(),
+            'quantity' => $bonus->getQuantity(),
+        ]);
+
+        $this->addFlash(
+            'success',
+            $this->translations->trans(
+                'api.tokens.token_sign_up_bonus.success',
+                [
+                    'amount' =>  $this->moneyWrapper->format($bonus->getQuantity(), false),
+                    'tokenName' => $token->getName(),
+                ]
+            )
+        );
     }
 }

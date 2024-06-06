@@ -2,28 +2,48 @@
 
 namespace App\Controller;
 
-use App\Entity\Image;
+use App\Config\TradingConfig;
+use App\Exchange\Config\MarketPairsConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManager;
 use App\Manager\MarketStatusManagerInterface;
+use App\Manager\TokenPromotionManagerInterface;
+use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Symbols;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class TradingController extends Controller
 {
+    private const TRADING_COINS_TYPE = "coins";
+
+    private MarketStatusManagerInterface $marketStatusManager;
+    private MarketPairsConfig $marketPairsConfig;
+    private DisabledServicesConfig $disabledServicesConfig;
+    private TokenPromotionManagerInterface $tokenPromotionManager;
+
     public function __construct(
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        MarketStatusManagerInterface $marketStatusManager,
+        MarketPairsConfig $marketPairsConfig,
+        DisabledServicesConfig $disabledServicesConfig,
+        TokenPromotionManagerInterface $tokenPromotionManager
     ) {
         parent::__construct($normalizer);
+
+        $this->marketStatusManager = $marketStatusManager;
+        $this->marketPairsConfig = $marketPairsConfig;
+        $this->disabledServicesConfig = $disabledServicesConfig;
+        $this->tokenPromotionManager = $tokenPromotionManager;
     }
 
     /**
-     * @Route("/trading/{page}",
-     *     defaults={"page"="1"},
-     *     requirements={"page"="\d+"},
+     * @Route("/trade/{type}",
+     *     requirements={"type"="(coins|tokens)"},
      *     name="trading",
+     *     defaults={"type" = null},
      *     options={"expose"=true,
      *          "sitemap" = true,
      *          "2fa_progress"=false
@@ -31,46 +51,118 @@ class TradingController extends Controller
      * )
      */
     public function trading(
-        int $page,
+        ?string $type,
         CryptoManagerInterface $cryptoManager,
-        MarketStatusManagerInterface $marketStatusManager
+        TradingConfig $tradingConfig,
+        Request $request
     ): Response {
-        $btcCrypto = $cryptoManager->findBySymbol(Symbols::BTC);
-        $webCrypto = $cryptoManager->findBySymbol(Symbols::WEB);
+        if (null === $type) {
+            return $this->redirectToRoute('trading', ['type' => 'coins']);
+        }
 
-        $sort = MarketStatusManager::SORT_RANK;
-        $order = 'DESC';
-        $filter = MarketStatusManager::FILTER_DEPLOYED_ONLY_MINTME;
-        $tokensOnPage = (int)$this->getParameter('tokens_on_page');
+        $isCoinsTrading = self::TRADING_COINS_TYPE === $type;
 
-        $markets = $marketStatusManager->getMarketsInfo(
-            $tokensOnPage * ($page - 1),
-            $tokensOnPage,
-            'rank',
-            'DESC',
-            $filter,
-            null
-        );
+        $sort = $isCoinsTrading
+            ? MarketStatusManager::SORT_MONTH_VOLUME
+            : MarketStatusManager::SORT_RANK;
+        $order = $isCoinsTrading
+            ? 'DESC'
+            : 'ASC';
+        $page = $this->getPage($request);
+        $filters = [MarketStatusManager::buildDeployedOnlyFilter(Symbols::WEB)];
+        $crypto = Symbols::WEB;
+
+        $marketsOnFirstPage = $tradingConfig->getMarketsOnFirstPage();
+        $offset = ($page - 1) * $marketsOnFirstPage;
+
+        $lastPage = true;
+
+        if ($isCoinsTrading) {
+            $markets = $this->marketStatusManager->getPredefinedMarketStatuses();
+        } else {
+            $markets = $this->marketStatusManager->getFilteredMarketStatuses(
+                $offset,
+                $marketsOnFirstPage + 1,
+                $sort,
+                $order,
+                $filters,
+                null,
+                $crypto
+            );
+
+            if (count($markets) === $marketsOnFirstPage + 1) {
+                array_pop($markets);
+
+                $lastPage = false;
+            }
+
+            $promotedMarkets = $this->marketStatusManager->getFilteredPromotedMarketStatuses();
+
+            foreach ($promotedMarkets as $name => $market) {
+                $market = $this->normalize($market, ['Default', 'API']);
+                $promotedMarkets[$name] = $market;
+            }
+        }
 
         foreach ($markets as $name => $market) {
-            $market = $this->normalize($market, ['Default','API']);
+            $market = $this->normalize($market, ['Default', 'API']);
             $markets[$name] = $market;
         }
 
+        $totalPages = $this->getTotalPages(
+            $marketsOnFirstPage,
+            $filters[0],
+            $crypto
+        );
+
+        $cryptos = $cryptoManager->findAllIndexed('symbol');
+
+        $allDeployBlockchains = array_values(array_filter(
+            $this->disabledServicesConfig->getAllDeployBlockchains(),
+            static function ($symbol) use ($cryptos) {
+                return (bool)($cryptos[$symbol] ?? false);
+            }
+        ));
+
+        $tokenPromotions = $this->tokenPromotionManager->findActivePromotions();
+
         return $this->render('pages/trading.html.twig', [
-            'tokensCount' => $marketStatusManager->getMarketsCount(
-                MarketStatusManager::FILTER_DEPLOYED_ONLY_MINTME
+            'cryptos' => $this->normalize(array_values($cryptos)),
+            'tokensCount' => $this->marketStatusManager->getMarketsCount(
+                MarketStatusManager::FILTER_DEPLOYED_TOKEN
             ),
-            'btcImage' => $btcCrypto->getImage(),
-            'mintmeImage' => $webCrypto->getImage(),
-            'tokenImage' => Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL),
-            'page' => $page,
+            'totalPages' => $totalPages,
             'sort' => $sort,
             'order' => $order,
-            'filterForTokens'=> MarketStatusManager::FILTER_FOR_TOKENS,
+            'filterForTokens'=> $this->marketStatusManager->getFilterForTokens(),
+            'cryptoTopListMarketKeys' => $this->marketPairsConfig->getJoinedTopListPairs(),
             'markets' => $markets['markets'] ?? $markets,
-            'rows' => $marketStatusManager->getMarketsCount($filter),
-            'perPage' => $tokensOnPage,
+            'promotedMarkets' => empty($promotedMarkets) ? new \stdClass() : $promotedMarkets,
+            'page' => $page,
+            'lastPage' => $lastPage,
+            'tokensOnPage' => $marketsOnFirstPage,
+            'type' => $type,
+            'allDeployBlockchains' => $allDeployBlockchains,
+            'tokenPromotions' => $this->normalize($tokenPromotions, ['API_BASIC']),
         ]);
+    }
+
+    private function getPage(Request $request): int
+    {
+        $page = $request->query->get('page');
+
+        return is_numeric($page) && (int)$page > 0
+            ? (int)$page
+            : 1;
+    }
+
+    private function getTotalPages(
+        int $marketsOnFirstPage,
+        string $filter,
+        string $crypto
+    ): int {
+        $totalCount = $this->marketStatusManager->getMarketsCount($filter, $crypto);
+
+        return (int)ceil($totalCount / $marketsOnFirstPage);
     }
 }

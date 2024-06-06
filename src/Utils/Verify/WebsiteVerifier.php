@@ -3,6 +3,7 @@
 namespace App\Utils\Verify;
 
 use App\Communications\Factory\HttpClientFactoryInterface;
+use App\Services\TranslatorService\TranslatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,19 +26,34 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     /** @var string[]|bool[] */
     private $error = [];
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         HttpClientFactoryInterface $clientFactory,
         LoggerInterface $logger,
         int $timeoutSeconds,
-        string $proxy
+        string $proxy,
+        TranslatorInterface $translator
     ) {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->timeoutSeconds = $timeoutSeconds;
         $this->proxy = $proxy;
+        $this->translator = $translator;
     }
 
     public function verify(string $url, string $verificationToken): bool
+    {
+        foreach (self::URIS as $uri) {
+            if ($this->verifyCommon($url, $verificationToken, $uri)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function verifyCommon(string $url, string $verificationToken, string $uri): bool
     {
         $formatUrl = rtrim($url, '/').'/';
 
@@ -49,7 +65,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
                     'request.options' => ['proxy' => $this->proxy],
                 ]
             );
-            $response = $client->request('GET', self::URI);
+            $response = $client->request('GET', $uri);
         } catch (\Throwable $exception) {
             $this->selectError($exception->getCode());
             $this->logger->error($exception->getMessage());
@@ -66,13 +82,15 @@ class WebsiteVerifier implements WebsiteVerifierInterface
                 return false;
             }
 
-            $expectedPattern = '/('.self::PREFIX.': '.$verificationToken.')/';
+            $expectedPattern = '/^'.self::PREFIX.': '.$verificationToken.'$/';
 
             if (!preg_match($expectedPattern, $fileContent)) {
                 $this->selectError(self::INVALID_VERIFICATION_CODE);
 
                 return false;
             }
+
+            $this->error = [];
 
             return true;
         }
@@ -110,7 +128,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
             return false;
         }
 
-        $expectedPattern = '#('.preg_quote($message).')#';
+        $expectedPattern = '#('.preg_quote($message).'(?!/airdrop))#';
 
         if (!preg_match($expectedPattern, $fileContent)) {
             $this->selectError(self::INVALID_VERIFICATION_CODE);
@@ -125,28 +143,20 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     {
         if (Response::HTTP_NO_CONTENT === $code) {
             $this->setError(
-                'Your verification file is empty.',
-                'Bot checks to see if your verification file has the same filename and content as 
-                the file provided on the Verification page. If the file name or content does not match the 
-                HTML file provided, we won\'t be able to verify your site ownership. Please download the 
-                verification file, and upload it to the specified location without any modifications.',
+                $this->translator->trans('token.website.verification_file.file_empty.title'),
+                $this->translator->trans('token.website.verification_file.file_empty.details'),
                 false
             );
         } elseif (self::INVALID_VERIFICATION_CODE === $code) {
             $this->setError(
-                'Your verification file has the wrong content.',
-                'Bot checks to see if your verification file has the same filename and content as the 
-                file provided. If the file name or content does not match the HTML file provided, we won\'t
-                 be able to verify your site ownership. Please download the verification file, and upload it 
-                 to the specified location without any modifications.',
+                $this->translator->trans('token.website.verification_file.wrong_content.title'),
+                $this->translator->trans('token.website.verification_file.wrong_content.details'),
                 false
             );
         } else {
             $this->setError(
-                sprintf('Your verification file returns a HTTP status code of %s instead of 200(OK).', $code),
-                'If your server returns a HTTP status code other than 200(OK) for your HTML verification file,
-                 Bot will not be able to verify that it has the expected filename and content. More information about 
-                 HTTP status codes.'
+                $this->translator->trans('token.website.verification_file.http_status.title', ['%code%' => $code]),
+                $this->translator->trans('token.website.verification_file.http_status.details')
             );
         }
     }

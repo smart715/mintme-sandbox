@@ -2,35 +2,44 @@
 
 namespace App\Wallet\Deposit\Model;
 
+/** @codeCoverageIgnore */
 class DepositCallbackMessage
 {
-    /** @var int */
-    private $id;
+    private int $userId;
+    private array $hashes;
+    private string $amount;
+    private ?string $forwardedAmount;
+    private string $address;
 
-    /** @var string */
-    private $crypto;
-
-    /** @var string */
-    private $amount;
+    private string $asset;
+    private string $cryptoNetwork;
 
     private function __construct(
-        int $id,
-        string $crypto,
-        string $amount
+        int $userId,
+        array $hashes,
+        string $amount,
+        ?string $forwardedAmount,
+        string $address,
+        string $asset,
+        string $cryptoNetwork
     ) {
-        $this->id = $id;
-        $this->crypto = $crypto;
+        $this->userId = $userId;
+        $this->hashes = $hashes;
         $this->amount = $amount;
+        $this->forwardedAmount = $forwardedAmount;
+        $this->address = $address;
+        $this->asset = $asset;
+        $this->cryptoNetwork = $cryptoNetwork;
     }
 
     public function getUserId(): int
     {
-        return $this->id;
+        return $this->userId;
     }
 
-    public function getCrypto(): string
+    public function getHashes(): array
     {
-        return $this->crypto;
+        return $this->hashes;
     }
 
     public function getAmount(): string
@@ -38,30 +47,49 @@ class DepositCallbackMessage
         return $this->amount;
     }
 
+    public function getForwardedAmount(): ?string
+    {
+        return $this->forwardedAmount;
+    }
+
+    public function getAddress(): string
+    {
+        return $this->address;
+    }
+
+    public function getAsset(): string
+    {
+        return $this->asset;
+    }
+
+    public function getCryptoNetwork(): string
+    {
+        return $this->cryptoNetwork;
+    }
+
     public static function parse(array $data): self
     {
         return new self(
             $data['userId'],
-            $data['crypto'],
-            $data['amount']
-        );
-    }
-
-    public function getMessageWithIncrementedRetryCount(): self
-    {
-        return new self(
-            $this->id,
-            $this->crypto,
-            $this->amount
+            $data['hashes'],
+            $data['amount'],
+            $data['forwardedAmount'],
+            $data['address'],
+            $data['asset'],
+            $data['cryptoNetwork'],
         );
     }
 
     public function toArray(): array
     {
         return [
-            'id' => $this->getUserId(),
-            'crypto' => $this->getCrypto(),
+            'userId' => $this->getUserId(),
+            'hashes' => $this->getHashes(),
             'amount' => $this->getAmount(),
+            'forwardedAmount' => $this->forwardedAmount,
+            'address' => $this->getAddress(),
+            'asset' => $this->getAsset(),
+            'cryptoNetwork' => $this->getCryptoNetwork(),
         ];
     }
 }

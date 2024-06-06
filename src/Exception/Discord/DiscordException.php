@@ -4,7 +4,7 @@ namespace App\Exception\Discord;
 
 use GuzzleHttp\Command\Exception\CommandClientException;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class DiscordException extends \Exception
 {
     public function __construct(array $error, ?CommandClientException $previous)

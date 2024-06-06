@@ -5,26 +5,30 @@ namespace App\Tests\SmartContract;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
+use App\Config\LimitHistoryConfig;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Entity\Token\TokenDeploy;
 use App\Entity\User;
 use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\SmartContract\Config\Config;
+use App\Manager\WrappedCryptoTokenManagerInterface;
 use App\SmartContract\ContractHandler;
+use App\SmartContract\Model\AddTokenResult;
+use App\Utils\AssetType;
+use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\Symbols;
-use App\Wallet\Model\DepositInfo;
 use App\Wallet\Money\MoneyWrapperInterface;
-use App\Wallet\WalletInterface;
 use Money\Currencies;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class ContractHandlerTest extends TestCase
 {
@@ -40,7 +44,8 @@ class ContractHandlerTest extends TestCase
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                     'userId' => 1,
-                    'crypto' => '',
+                    'crypto' => 'WEB',
+                    'metadataUri' => null,
                 ]
             )
             ->willReturn($this->mockResponse(false, []));
@@ -51,10 +56,18 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
-        $handler->deploy($this->mockToken(true));
+        $deploy = (new TokenDeploy())
+            ->setToken($this->mockToken(true))
+            ->setCrypto($this->mockCrypto('WEB'));
+
+        $handler->deploy($deploy, true);
     }
 
     public function testDeployThrowExceptionIfTokenHasNoReleasePeriod(): void
@@ -69,12 +82,20 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $this->expectException(\Throwable::class);
 
-        $handler->deploy($this->mockToken(false));
+        $deploy = (new TokenDeploy())
+            ->setToken($this->mockToken(false))
+            ->setCrypto($this->mockCrypto('WEB'));
+
+        $handler->deploy($deploy, true);
     }
 
     public function testDeployThrowExceptionIfResponseError(): void
@@ -89,7 +110,8 @@ class ContractHandlerTest extends TestCase
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                     'userId' => 1,
-                    'crypto' => '',
+                    'crypto' => 'WEB',
+                    'metadataUri' => null,
                 ]
             )
             ->willReturn($this->mockResponse(true, []));
@@ -100,12 +122,100 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $this->expectException(\Throwable::class);
 
-        $handler->deploy($this->mockToken(true));
+        $deploy = (new TokenDeploy())
+            ->setToken($this->mockToken(true))
+            ->setCrypto($this->mockCrypto('WEB'));
+
+        $handler->deploy($deploy, true);
+    }
+
+    public function testAddToken(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'add_token',
+                [
+                    'name' => 'foo',
+                    'address' => '1',
+                    'crypto' => 'WEB',
+                    'minDeposit' => '1',
+                    'isCrypto' => false,
+                    'isPausable' => false,
+                ]
+            )
+            ->willReturn($this->mockResponse(false, [
+                'name' => 'foo',
+                'decimals' => 4,
+                'existed' => false,
+                'isPausable' => false,
+            ]));
+
+        $handler = new ContractHandler(
+            $rpc,
+            $this->mockLoggerInterface(),
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
+        );
+
+        $token = $this->mockToken(true, '1');
+
+        $this->assertEquals(
+            AddTokenResult::parse(['name' => 'foo', 'decimals' => 4, 'existed' => false, 'isPausable' => false]),
+            $handler->addToken($token, $this->mockCrypto('WEB'), '1', '1')
+        );
+    }
+
+    public function testAddTokenThrowExceptionIfResponseError(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'add_token',
+                [
+                    'name' => 'foo',
+                    'address' => '1',
+                    'crypto' => 'WEB',
+                    'minDeposit' => '1',
+                    'isCrypto' => false,
+                    'isPausable' => false,
+                ]
+            )
+            ->willReturn($this->mockResponse(true, []));
+
+        $handler = new ContractHandler(
+            $rpc,
+            $this->mockLoggerInterface(),
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
+        );
+
+        $token = $this->mockToken(true, '1');
+
+        $this->expectException(\Throwable::class);
+
+        $handler->addToken($token, $this->mockCrypto('WEB'), '1', '1');
     }
 
     public function testUpdateMintDestination(): void
@@ -116,6 +226,7 @@ class ContractHandlerTest extends TestCase
                 'update_mint_destination',
                 [
                     'name' => 'foo',
+                    'crypto' => 'WEB',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
                     'oldMintDestination' => '0x789',
@@ -128,7 +239,11 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $handler->updateMintDestination(
@@ -149,7 +264,11 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $this->expectException(\Throwable::class);
@@ -168,6 +287,7 @@ class ContractHandlerTest extends TestCase
                 'update_mint_destination',
                 [
                     'name' => 'foo',
+                    'crypto' => 'WEB',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
                     'oldMintDestination' => '0x789',
@@ -181,7 +301,11 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $this->expectException(\Throwable::class);
@@ -203,7 +327,7 @@ class ContractHandlerTest extends TestCase
                     'to' => '0x123',
                     'value' => '1',
                     'userId' => 1,
-                    'crypto' => '',
+                    'crypto' => 'WEB',
                     'tokenFee' => '1',
                     'tokenFeeCurrency' => 'TOK',
                 ]
@@ -215,14 +339,28 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
+
+        $crypto = $this->mockCrypto('WEB');
+        $token = $this->mockToken(true, '0x123', 'deployed');
+
+        $deploy = (new TokenDeploy())
+            ->setToken($token)
+            ->setCrypto($crypto);
+
+        $token->method('getDeployByCrypto')->willReturn($deploy);
 
         $handler->withdraw(
             $this->mockUser(1),
             new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'deployed'),
+            $token,
+            $crypto,
             new Money('1', new Currency(Symbols::TOK))
         );
     }
@@ -239,8 +377,17 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
+
+        $crypto = $this->mockCrypto('WEB');
+        $token = $this->mockToken(true, '0x123', 'not-deployed');
+
+        $token->method('getDeployByCrypto')->willReturn(null);
 
         $this->expectException(\Throwable::class);
 
@@ -248,7 +395,8 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'not-deployed'),
+            $token,
+            $crypto,
             new Money('1', new Currency(Symbols::WEB))
         );
     }
@@ -264,7 +412,7 @@ class ContractHandlerTest extends TestCase
                     'to' => '0x123',
                     'value' => '1',
                     'userId' => 1,
-                    'crypto' => '',
+                    'crypto' => 'WEB',
                     'tokenFee' => '1',
                     'tokenFeeCurrency' => 'TOK',
                 ]
@@ -276,8 +424,22 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
+
+
+        $crypto = $this->mockCrypto('WEB');
+        $token = $this->mockToken(true, '0x123', 'deployed');
+
+        $deploy = (new TokenDeploy())
+            ->setToken($token)
+            ->setCrypto($crypto);
+
+        $token->method('getDeployByCrypto')->willReturn($deploy);
 
         $this->expectException(\Throwable::class);
 
@@ -285,7 +447,8 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'deployed'),
+            $token,
+            $crypto,
             new Money('1', new Currency(Symbols::TOK))
         );
     }
@@ -298,15 +461,17 @@ class ContractHandlerTest extends TestCase
                 'get_transactions',
                 [
                     'userId' => 1,
+                    'asset' => AssetType::TOKEN,
                     "offset" => 0,
                     "limit" => 50,
+                    "fromTimestamp" => 1,
                 ]
             )->willReturn($this->mockResponse(false, [
                 [
                     'hash' => 'hash',
                     'from' => '0x123',
                     'to' => '0x456',
-                    'amount' => '2000000000000',
+                    'amount' => '1000000000000',
                     'timestamp' => 1564566334,
                     'token' => 'foo',
                     'status' => 'paid',
@@ -319,7 +484,7 @@ class ContractHandlerTest extends TestCase
                     'hash' => 'hash',
                     'from' => '0x123',
                     'to' => '0x456',
-                    'amount' => '2000000000000',
+                    'amount' => '1000000000000',
                     'timestamp' => 1564566334,
                     'token' => 'bar',
                     'status' => 'paid',
@@ -342,11 +507,14 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $cryptoManager,
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $result = $handler->getTransactions(
-            $this->mockWallet(),
             $this->mockUser(1),
             0,
             50
@@ -365,7 +533,7 @@ class ContractHandlerTest extends TestCase
             'hash',
             '0x123',
             '0x456',
-            '2000000000000',
+            '1000000000000',
             '1000000000000',
             'paid',
             'withdraw',
@@ -380,8 +548,10 @@ class ContractHandlerTest extends TestCase
                 'get_transactions',
                 [
                     'userId' => 1,
+                    'asset' => AssetType::TOKEN,
                     "offset" => 0,
                     "limit" => 50,
+                    "fromTimestamp" => 1,
                 ]
             )
             ->willReturn($this->mockResponse(true, []));
@@ -392,13 +562,16 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $this->expectException(FetchException::class);
 
         $handler->getTransactions(
-            $this->mockWallet(),
             $this->mockUser(1),
             0,
             50
@@ -412,7 +585,8 @@ class ContractHandlerTest extends TestCase
             ->expects($this->once())->method('send')->with(
                 'get_deposit_info',
                 [
-                    'tokenName' => 'AWESOME',
+                    'tokenName' => 'foo',
+                    'crypto' => 'WEB',
                 ]
             )->willReturn($this->mockResponse(false, ['fee' => '0', 'minDeposit' => '1000000000000']));
 
@@ -422,11 +596,15 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $expectedMinDeposit = new Money('1000000000000', new Currency(Symbols::TOK));
-        $result = $handler->getDepositInfo('AWESOME');
+        $result = $handler->getDepositInfo($this->mockToken(true), $this->mockCrypto('WEB'));
 
         $this->assertEquals($expectedMinDeposit, $result->getMinDeposit());
     }
@@ -448,7 +626,11 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockTokenConfig()
+            $this->mockTokenConfig(),
+            $this->mockLimitHistoryConfig(),
+            $this->mockWrappedCryptoTokenManager(),
+            $this->mockTokenNameConverter(),
+            $this->mockRouter()
         );
 
         $result = $handler->getDepositCredentials(
@@ -456,17 +638,6 @@ class ContractHandlerTest extends TestCase
         );
 
         $this->assertEquals($result, '0x123');
-    }
-
-    private function mockWallet(): WalletInterface
-    {
-        $wallet = $this->createMock(WalletInterface::class);
-        $depositInfo = $this->createMock(DepositInfo::class);
-
-        $depositInfo->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::TOK)));
-        $wallet->method('getDepositInfo')->willReturn($depositInfo);
-
-        return $wallet;
     }
 
     private function mockUser(int $id): User
@@ -501,11 +672,17 @@ class ContractHandlerTest extends TestCase
         string $status = 'not-deployed',
         string $mintDestination = '0x789'
     ): Token {
+        $deploy = $this->createMock(TokenDeploy::class);
+        $deploy->method('getAddress')->willReturn($address);
+
         $token = $this->createMock(Token::class);
+        $token->method('getMainDeploy')->willReturn($deploy);
         $token->method('getName')->willReturn('foo');
-        $token->method('getAddress')->willReturn($address);
+        $token->method('getSymbol')->willReturn('foo');
+        $token->method('getMoneySymbol')->willReturn(Symbols::TOK);
         $token->method('getDeploymentStatus')->willReturn($status);
         $token->method('getMintDestination')->willReturn($mintDestination);
+        $token->method('getCryptoSymbol')->willReturn('WEB');
 
         if (!$hasReleasePeriod) {
             $token->method('getLockIn')->willReturn(null);
@@ -521,14 +698,17 @@ class ContractHandlerTest extends TestCase
         $profile = $this->createMock(Profile::class);
         $profile->method('getUser')->willReturn($user);
         $token->method('getProfile')->willReturn($profile);
+        $token->method('setDecimals')->willReturn($token);
 
         return $token;
     }
 
-    private function mockCrypto(): Crypto
+    private function mockCrypto(string $symbol = 'WEB'): Crypto
     {
         $crypto = $this->createMock(Crypto::class);
         $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::TOK)));
+        $crypto->method('getSymbol')->willReturn($symbol);
+        $crypto->method('getMoneySymbol')->willReturn($symbol);
 
         return $crypto;
     }
@@ -549,8 +729,13 @@ class ContractHandlerTest extends TestCase
         return $this->createMock(LoggerInterface::class);
     }
 
-    /** @return MockObject|JsonRpcResponse */
-    private function mockResponse(bool $hasError, array $result = []): JsonRpcResponse
+
+    /**
+     * @param bool $hasError
+     * @param mixed $result
+     * @return JsonRpcResponse
+     */
+    private function mockResponse(bool $hasError, $result = []): JsonRpcResponse
     {
         $response = $this->createMock(JsonRpcResponse::class);
         $response->method('hasError')->willReturn($hasError);
@@ -587,8 +772,35 @@ class ContractHandlerTest extends TestCase
         return $tm;
     }
 
-    public function mockTokenConfig(): TokenConfig
+    private function mockTokenConfig(): TokenConfig
     {
         return $this->createMock(TokenConfig::class);
+    }
+
+    private function mockLimitHistoryConfig(): LimitHistoryConfig
+    {
+        $config = $this->createMock(LimitHistoryConfig::class);
+        $date = (new \DateTimeImmutable())->setTimestamp(1);
+
+        $config
+            ->method('getFromDate')
+            ->willReturn($date);
+
+        return $config;
+    }
+
+    private function mockWrappedCryptoTokenManager(): WrappedCryptoTokenManagerInterface
+    {
+        return $this->createMock(WrappedCryptoTokenManagerInterface::class);
+    }
+
+    private function mockRouter(): RouterInterface
+    {
+        return $this->createMock(RouterInterface::class);
+    }
+
+    private function mockTokenNameConverter(): TokenNameConverterInterface
+    {
+        return $this->createMock(TokenNameConverterInterface::class);
     }
 }

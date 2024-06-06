@@ -1,28 +1,25 @@
 {% extends 'mail/layout.html.twig' %}
 {% block content %}
-<div style="width:100%;max-width:600px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;display:inline-block;vertical-align:middle;">
-<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
-    <tr>
-        <td align="center" width="600" style="width:100%;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
-            <img alt="Description" src="{{ absolute_url(asset('build/images/Description.png')) }}" width="120" style="width:120px;height:auto;padding-right:1px;border:none;outline:0;text-align:center;text-decoration:none;color:#ffffff;-ms-interpolation-mode:bicubic;" />
-            <p style="Margin:0 0 12px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans %} hello {% endtrans %}
-            </p>
-            <p style="Margin:0 0 18px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;line-height:30px;color:#2199e8;">{{ username }}
-            </p>
-            <p style="Margin:0 0 12px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans with {'%tokenName%': tokenName} %} token_reminder.msg.description {% endtrans %}
-            </p>
-            <p style="Margin:0 0 18px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans %} token_reminder.msg.description.2 {% endtrans %},
-            </p>
-            <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans %} token_reminder.msg.description.to_do_that {% endtrans%}<a href="{{ absolute_url(path('token_create')) }}/{{ tokenName }}" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank"> {% trans %} token_reminder.msg.go_here {% endtrans %}</a> {% trans %} token_reminder.msg.click_edit {% endtrans %}.
-            </p>
-        </td>
-    </tr>
-</table>
-<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
-    <tr>
-        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:18px;height:18px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
-    </tr>
-</table>
-</div>
+    {{ parent() }}
+    <div class="box-table">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border" bgcolor="#ffffff">
+            <tr>
+                <td align="center" width="600" class="td-body" bgcolor="#ffffff">
+                    <img alt="Description" src="{{ absolute_url(asset('build/images/mail-description.png')) }}" width="120" class="img-build-v0" />
+                    <p class="p-hello">{% trans %} hello {% endtrans %} {{ nickname }}</p>
+                    <p class="p-second-line">{% trans with {'%tokenName%': tokenName} %} token_reminder.msg.description {% endtrans %}
+                    </p>
+                    <p class="p-third-line">{% trans %} token_reminder.msg.description.2 {% endtrans %},
+                    </p>
+                    <p class="p-second-line">{% trans %} token_reminder.msg.description.to_do_that {% endtrans%}<a href="{{ absolute_url(path('token_create')) }}/{{ tokenName }}" class="p-a-link" target="_blank"> {% trans %} token_reminder.msg.go_here {% endtrans %}</a> {% trans %} token_reminder.msg.click_edit {% endtrans %}.
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" class="prev-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
 {% endblock %}
-

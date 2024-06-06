@@ -5,6 +5,7 @@ namespace App\Wallet\Model;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class DepositInfo
 {
     /** @var Money */

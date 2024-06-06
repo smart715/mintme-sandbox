@@ -2,11 +2,14 @@
 
 namespace App\Controller\Dev\API\V2;
 
+use App\Config\HideFeaturesConfig;
+use App\Entity\Crypto;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -23,17 +26,20 @@ class SummaryController extends AbstractFOSRestController
     private MarketHandlerInterface $marketHandler;
     private MarketFactoryInterface $marketFactory;
     private RebrandingConverterInterface $rebrandingConverter;
+    private HideFeaturesConfig $hideFeaturesConfig;
 
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
-        RebrandingConverterInterface $rebrandingConverter
+        RebrandingConverterInterface $rebrandingConverter,
+        HideFeaturesConfig $hideFeaturesConfig
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketHandler = $marketHandler;
         $this->marketFactory = $marketFactory;
         $this->rebrandingConverter = $rebrandingConverter;
+        $this->hideFeaturesConfig = $hideFeaturesConfig;
     }
 
     /**
@@ -71,6 +77,17 @@ class SummaryController extends AbstractFOSRestController
         $limit = (int)$request->get('limit');
 
         $marketStatuses = $this->marketStatusManager->getCryptoAndDeployedMarketsInfo($offset, $limit);
+
+        $marketStatuses = array_filter($marketStatuses, function ($marketStatus) {
+            $isBaseEnabled = $this->hideFeaturesConfig->isCryptoEnabled($marketStatus->getCrypto()->getSymbol());
+            $quote = $marketStatus->getQuote();
+
+            if ($quote instanceof Crypto) {
+                return $isBaseEnabled && $this->hideFeaturesConfig->isCryptoEnabled($quote->getSymbol());
+            }
+
+            return $isBaseEnabled;
+        });
 
         return array_map(
             function ($marketStatus) {

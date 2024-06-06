@@ -2,9 +2,10 @@
 
 namespace App\Communications\AMQP;
 
+use App\Entity\User;
 use App\Exchange\Market;
 
 interface MarketAMQPInterface
 {
-    public function send(Market $market, int $retried = 0): void;
+    public function send(Market $market, ?User $user = null, int $retried = 0): void;
 }

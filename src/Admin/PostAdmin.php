@@ -2,9 +2,9 @@
 
 namespace App\Admin;
 
-use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\FormatterBundle\Form\Type\SimpleFormatterType;
 use Sonata\NewsBundle\Admin\PostAdmin as PostAdminBase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -64,7 +64,9 @@ class PostAdmin extends PostAdminBase
                 'required' => false,
                 'label' => 'ES Abstract',
             ])
-            ->add('esContent', CKEditorType::class, [
+            ->add('esContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
                 'attr' => ['rows' => 20],
                 'label' => 'ES Content (rich html)',
@@ -83,7 +85,9 @@ class PostAdmin extends PostAdminBase
                 'required' => false,
                 'label' => 'AR Abstract',
             ])
-            ->add('arContent', CKEditorType::class, [
+            ->add('arContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
                 'attr' => ['rows' => 20],
                 'label' => 'AR Content (rich html)',
@@ -102,7 +106,9 @@ class PostAdmin extends PostAdminBase
                 'required' => false,
                 'label' => 'FR Abstract',
             ])
-            ->add('frContent', CKEditorType::class, [
+            ->add('frContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
                 'attr' => ['rows' => 20],
                 'label' => 'FR Content (rich html)',
@@ -121,7 +127,9 @@ class PostAdmin extends PostAdminBase
                 'required' => false,
                 'label' => 'PL Abstract',
             ])
-            ->add('plContent', CKEditorType::class, [
+            ->add('plContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
                 'attr' => ['rows' => 20],
                 'label' => 'PL Content (rich html)',
@@ -140,7 +148,9 @@ class PostAdmin extends PostAdminBase
                 'required' => false,
                 'label' => 'PT Abstract',
             ])
-            ->add('ptContent', CKEditorType::class, [
+            ->add('ptContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
                 'attr' => ['rows' => 20],
                 'label' => 'PT Content (rich html)',
@@ -159,7 +169,9 @@ class PostAdmin extends PostAdminBase
                 'required' => false,
                 'label' => 'RU Abstract',
             ])
-            ->add('ruContent', CKEditorType::class, [
+            ->add('ruContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
                 'attr' => ['rows' => 20],
                 'label' => 'RU Content (rich html)',
@@ -178,12 +190,36 @@ class PostAdmin extends PostAdminBase
                 'required' => false,
                 'label' => 'UA Abstract',
             ])
-            ->add('uaContent', CKEditorType::class, [
+            ->add('uaContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
                 'attr' => ['rows' => 20],
                 'label' => 'UA Content (rich html)',
             ])
-            ->end();
+            ->end()
+            ->with('Deutsch', [
+                'class' => 'col-md-12',
+                'label' => 'Deutsch translation',
+            ])
+            ->add('deTitle', TextType::class, [
+                'label' => 'DE Title',
+                'required' => false,
+            ])
+            ->add('deAbstract', TextareaType::class, [
+                'attr' => ['rows' => 5],
+                'required' => false,
+                'label' => 'DE Abstract',
+            ])
+            ->add('deContent', SimpleFormatterType::class, [
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
+                'required' => false,
+                'attr' => ['rows' => 20],
+                'label' => 'DE Content (rich html)',
+            ])
+            ->end()
+        ;
     }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void

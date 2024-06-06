@@ -16,6 +16,7 @@ class MarketFetcher implements MarketFetcherInterface
     private const KLINE = 'market.kline';
     private const SUMMARY = 'market.summary';
     private const PENDING_ORDER_DETAIL_METHOD = 'order.pending_detail';
+    private const ANALYTICS_METHOD = 'market.analytics';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -68,13 +69,23 @@ class MarketFetcher implements MarketFetcherInterface
         }, $response->getResult());
     }
 
-    public function getUserExecutedHistory(int $userId, string $market, int $offset = 0, int $limit = 100): array
-    {
+    public function getUserExecutedHistory(
+        int $userId,
+        string $market,
+        int $offset = 0,
+        int $limit = 100,
+        int $startTimestamp = 0,
+        int $endTimestamp = 0,
+        bool $skipDonations = true
+    ): array {
         $response = $this->jsonRpc->send(self::USER_EXECUTED_HISTORY, [
             $userId + $this->config->getOffset(),
             $market,
             $offset,
             $limit,
+            $startTimestamp,
+            $endTimestamp,
+            $skipDonations,
         ]);
 
         if ($response->hasError()) {
@@ -114,7 +125,7 @@ class MarketFetcher implements MarketFetcherInterface
         ]);
 
         if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
+            throw new FetchException(($response->getError()['message'] ?? ''));
         }
 
         return array_map(function (array $order) {
@@ -161,6 +172,20 @@ class MarketFetcher implements MarketFetcherInterface
     public function getSummary(array $markets): array
     {
         $response = $this->jsonRpc->send(self::SUMMARY, $markets);
+
+        if ($response->hasError()) {
+            throw new FetchException($response->getError()['message'] ?? '');
+        }
+
+        return $response->getResult();
+    }
+
+    public function getMarketAnalytics(int $from, int $to): array
+    {
+        $response = $this->jsonRpc->send(self::ANALYTICS_METHOD, [
+            $from,
+            $to,
+        ]);
 
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');

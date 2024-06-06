@@ -6,6 +6,10 @@ use App\Entity\Voting\Option;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Option>
+ * @codeCoverageIgnore
+ */
 class VotingOptionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)

@@ -7,8 +7,10 @@ use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\MarketInfo;
+use App\Manager\MarketStatusManager;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -72,18 +74,26 @@ class MarketsController extends DevApiController
         $offset = (int)$request->get('offset');
         $limit = (int)$request->get('limit');
 
+        $predefinedMarkets = $this->marketManager->getPredefinedMarketStatuses();
+        $filteredMarkets = $this->marketManager->getFilteredMarketStatuses(
+            $offset,
+            $limit,
+            'monthVolume',
+            'DESC',
+            [MarketStatusManager::buildDeployedOnlyFilter(Symbols::MINTME)],
+            null
+        );
+
+        $markets = array_merge(
+            $predefinedMarkets,
+            $filteredMarkets
+        );
+
         return array_slice(
             array_map(function ($market) {
                 return $this->rebrandingConverter->convertMarketStatus($market);
             }, array_values(
-                $this->marketManager->getMarketsInfo(
-                    $offset,
-                    $limit,
-                    'monthVolume',
-                    'DESC',
-                    2,
-                    null
-                )
+                $markets
             )),
             0,
             $limit
@@ -127,7 +137,7 @@ class MarketsController extends DevApiController
         $convertedBase = $this->rebrandingConverter->reverseConvert(mb_strtolower($base));
         $convertedQuote = $this->rebrandingConverter->reverseConvert(mb_strtolower($quote));
 
-        $market = $this->marketFinder->find($convertedQuote, $convertedBase);
+        $market = $this->marketFinder->find($convertedQuote, $convertedBase, true);
 
         if (!$market) {
             throw new ApiNotFoundException('Market not found');

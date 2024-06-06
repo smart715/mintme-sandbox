@@ -20,10 +20,10 @@ fos_user:
         token_ttl: '%password_reset_expiration_time%'
         retry_ttl: '%password_reset_retry_time%'
     from_email:
-        address: "%env(MAILER_USER)%"
-        sender_name: "%env(MAILER_USER)%"
+        address: '%env(MAILER_USER)%'
+        sender_name: '%env(MAILER_NAME)%'
     service:
-        mailer: fos_user.mailer.twig_swift
+        mailer: app.mailer
         user_manager: App\Manager\UserManagerInterface
         email_canonicalizer: app.emailCanonicalizer
     group:

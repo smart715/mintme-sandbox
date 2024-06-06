@@ -7,7 +7,6 @@ use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Exchange\Config\Config;
 use App\Exchange\Donation\DonationFetcher;
-use App\Exchange\Donation\Model\CheckDonationResult;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -36,16 +35,16 @@ class DonationFetcherTest extends TestCase
             $this->expectException(FetchException::class);
         }
 
-        $checkDonationResult = $donationFetcher->checkDonation('TOK000000000123WEB', '25', '0.01', 2);
+        $checkDonationRawResult = $donationFetcher->checkDonation('TOK000000000123WEB', '25', '0.01', 2);
 
         $this->assertEquals(
             $expectedToReceive[0],
-            $checkDonationResult->getExpectedTokens()
+            $checkDonationRawResult->getExpectedTokens()
         );
 
         $this->assertEquals(
             $expectedToReceive[1],
-            $checkDonationResult->getTokensWorth()
+            $checkDonationRawResult->getTokensWorth()
         );
     }
 

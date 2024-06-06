@@ -3,10 +3,10 @@ import AOS from 'aos';
 import NewsImage from '../components/NewsImage';
 import store from '../storage';
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faTwitterSquare, faRedditSquare, faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
+import {faSquareXTwitter, faRedditSquare, faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 
-library.add(faTwitterSquare, faRedditSquare, faFacebookSquare);
+library.add(faSquareXTwitter, faRedditSquare, faFacebookSquare);
 
 if (document.getElementById('news')) {
     new Vue({

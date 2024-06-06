@@ -4,7 +4,7 @@ namespace App\Exception;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class RedirectException extends \Exception
 {
     private RedirectResponse $response;

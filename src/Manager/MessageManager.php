@@ -13,25 +13,17 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class MessageManager implements MessageManagerInterface
 {
-    /** @var EntityManagerInterface */
-    private $em;
+    private EntityManagerInterface $em;
+    private MessageRepository $repository;
+    private MessageMetadataRepository $metadataRepository;
 
-    /** @var MessageRepository */
-    private $repository;
-
-    /** @var MessageMetadataRepository */
-    private $metadataRepository;
-
-    public function __construct(EntityManagerInterface $em)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        MessageRepository $messageRepository,
+        MessageMetadataRepository $metadataRepository
+    ) {
         $this->em = $em;
-
-        /** @var MessageRepository $repository */
-        $repository = $em->getRepository(Message::class);
-        $this->repository = $repository;
-
-        /** @var MessageMetadataRepository $metadataRepository */
-        $metadataRepository = $em->getRepository(MessageMetadata::class);
+        $this->repository = $messageRepository;
         $this->metadataRepository = $metadataRepository;
     }
 
@@ -59,50 +51,19 @@ class MessageManager implements MessageManagerInterface
         $this->em->flush();
     }
 
-    public function getMessages(Thread $thread, int $limit, int $offset): array
+    public function getMessages(Thread $thread, User $participant, int $limit, int $offset): array
     {
-        return $this->repository->findBy(
-            [
-                'thread' => $thread->getId(),
-            ],
-            [
-                'id' => 'ASC',
-            ],
-            $limit,
-            $offset
-        );
+        return $this->repository->getMessages($thread, $participant, $limit, $offset);
     }
 
     public function getNewMessages(Thread $thread, int $lastMessageId): array
     {
-        $qb = $this->repository->createQueryBuilder('m');
-
-        return $qb->where('m.thread = :threadId')
-            ->andWhere('m.id > :lastId')
-            ->setParameter('threadId', $thread->getId())
-            ->setParameter('lastId', $lastMessageId)
-            ->getQuery()
-            ->getResult();
+        return $this->repository->getNewMessages($thread, $lastMessageId);
     }
 
     public function setRead(Thread $thread, User $participant): void
     {
-        $subQb = $this->em->createQueryBuilder()
-            ->select('m.id')
-            ->from(Message::class, 'm')
-            ->where('m.thread = :thread');
-
-        $qb = $this->em->createQueryBuilder();
-        $qb->update(MessageMetadata::class, 'md')
-            ->set('md.isRead', true)
-            ->where('md.participant = :participant')
-            ->andWhere(
-                $qb->expr()->in('md.message', $subQb->getDQL())
-            )
-            ->setParameter('participant', $participant)
-            ->setParameter('thread', $thread)
-            ->getQuery()
-            ->execute();
+        $this->repository->setRead($thread, $participant);
     }
 
     public function getUnreadCount(User $participant): int
@@ -111,5 +72,10 @@ class MessageManager implements MessageManagerInterface
             'participant' => $participant,
             'isRead' => false,
         ]);
+    }
+
+    public function setDeleteMessages(Thread $thread, User $participant): void
+    {
+        $this->repository->setDeleteMessages($thread, $participant);
     }
 }

@@ -4,27 +4,18 @@ namespace App\Manager;
 
 use App\Entity\ApiKey;
 use App\Repository\ApiKeyRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 class ApiKeyManager implements ApiKeyManagerInterface
 {
-    /** @var ApiKeyRepository */
-    private $repository;
+    private ApiKeyRepository $apiKeyRepository;
 
-    /** @var EntityManagerInterface */
-    private $ormAdapter;
-
-    public function __construct(EntityManagerInterface $ormAdapter)
+    public function __construct(ApiKeyRepository $apiKeyRepository)
     {
-        $this->ormAdapter = $ormAdapter;
-
-        /** @var ApiKeyRepository */
-        $repository = $this->ormAdapter->getRepository(ApiKey::class);
-        $this->repository = $repository;
+        $this->apiKeyRepository = $apiKeyRepository;
     }
 
     public function findApiKey(string $keyValue): ?ApiKey
     {
-        return $this->repository->findApiKey($keyValue);
+        return $this->apiKeyRepository->findApiKey($keyValue);
     }
 }

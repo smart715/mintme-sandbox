@@ -1,48 +1,361 @@
 @import 'variables'
 @import 'mixins'
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap')
+
+$opblock-bg-hover: $text-color-secondary
+$lock-btn-color: $text-color-primary-darker
+$prop-color-secondary: #606060
+$prop-format-color: #5B5B5B
+$response-error-color: #ef5324
+
+$light-grey: #dbdbdb
+/* stylelint-disable no-descending-specificity */
+
+@mixin gold-selection
+  color: $primary !important
+  -webkit-text-fill-color: $primary !important
+  background-color: $bg-secondary
+
+@mixin black-gold-selection
+  color: $bg-primary !important
+  -webkit-text-fill-color: $bg-primary !important
+
+@mixin white-gold-selection
+  color: $text-color-primary !important
+  -webkit-text-fill-color: $text-color-primary !important
 
 header::before
   content: none
 
-.text-monospaced
-  font-family: 'Consolas', sans-serif !important
+.page-header
+  color: $text-color-primary
+
+  &::selection
+    color: $text-color-primary !important
+    background-color: $primary !important
+
+.btn-link.seo-link
+  color: $link-color-highlight
+  font-weight: normal
+
+  &:hover
+    background-color: transparent
+    color: $link-color-highlight-hover
 
 .swagger-ui
-  .download-contents
-    width: auto
+  .opblock-body pre
+    background-color: $bg-primary-light
 
-  color: $dark-white
+    &::selection
+      @include black-gold-selection
 
-  .response-col_description span .response-col_description div div
-    @extend .text-monospaced
-    color: #3b4151
+  .model-title,
+  .responses-inner h4,
+  .responses-inner h5,
+  .parameters-col_description,
+  table thead tr th,
+  .parameter__name,
+  label
+    color: $text-color-primary !important
 
   .curl, .request-url pre, .response-col_description .markdown, .opblock-body pre span
-    @extend .text-monospaced
-    color: $dark-white !important
+    color: $text-color-primary !important
+
+  .opblock-tag,
+  label,
+  section.models h4,
+  section.models h5,
+  .errors-wrapper hgroup h4,
+  .opblock .opblock-section-header label,
+  .opblock .opblock-section-header h4,
+  .opblock .opblock-summary-method,
+  .tab li,
+  .scheme-container .schemes > label,
+  .loading-container .loading:after,
+  .btn,
+  .btn.cancel,
+  select,
+  .dialog-ux .modal-ux-content h6,
+  .dialog-ux .modal-ux-content h4,
+  .dialog-ux .modal-ux-header h3,
+  .parameter__name,
+  .topbar a,
+  .topbar .download-url-wrapper .download-url-button,
+  .info .title small pre,
+  .scopes h2,
+  .opblock-summary-path .nostyle,
+  .opblock .opblock-summary-description,
+  .opblock-description-wrapper p,
+  .opblock-tag-section h4,
+  .response-col_status,
+  table thead tr td,
+  .responses-inner h5,
+  .response-undocumented i,
+  .download-contents,
+  .dialog-ux .modal-ux-content p,
+  .dialog-ux .modal-ux-content .wrapper label,
+  .dialog-ux .modal-ux-content .wrapper input,
+  .markdown,
+  .markdown p,
+  .parameters-col_description,
+  .parameters-col_description input,
+  .parameters-col_name,
+  .model-title__text,
+  .model-title,
+  .model-box .model td .markdown,
+  .response-col_description > span
+    font-family: $poppins-font !important
+
+  .dialog-ux .modal-ux
+    background-color: $bg-primary
+    color: $text-color-primary
+    overflow: hidden
+    border-radius: $border-radius !important
+
+    .modal-ux-header
+      border-bottom: none
+      text-align: center
+      border-top-right-radius: $border-radius
+      border-top-left-radius: $border-radius
+      color: $text-color-secondary
+
+    .modal-ux-content h4,
+    .modal-ux-content p
+      color: $text-color-primary !important
+
+    .auth-btn-wrapper button:first-child
+      margin-right: 0.5rem !important
+
+    .auth-container
+      border-bottom: 1px solid $bg-primary-light
+
+    label
+      font-weight: 600
+
+    .wrapper
+      position: relative
+
+      label
+        position: absolute
+        padding-bottom: 0
+        left: 0.75rem
+        background-color: $bg-primary
+        user-select: none
+        line-height: 1
+        padding-left: 0.25rem
+        padding-right: 0.25rem
+        color: $primary !important
+
+      input
+        padding: 1.25rem 1rem
+
+    code
+      color: $primary
+      font-family: $poppins-font !important
+
+      &::selection
+        @include gold-selection
+
+  .response-undocumented i
+    font-size: 9px
+    color: $text-color-primary-darker
+
+    &::selection
+      @include white-gold-selection
+
+  .model-hint
+    font-size: 14px
+
+  select
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+ICAgIDxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMTMuNDE4IDcuODU5Yy4yNzEtLjI2OC43MDktLjI2OC45NzggMCAuMjcuMjY4LjI3Mi43MDEgMCAuOTY5bC0zLjkwOCAzLjgzYy0uMjcuMjY4LS43MDcuMjY4LS45NzkgMGwtMy45MDgtMy44M2MtLjI3LS4yNjctLjI3LS43MDEgMC0uOTY5LjI3MS0uMjY4LjcwOS0uMjY4Ljk3OCAwTDEwIDExbDMuNDE4LTMuMTQxeiIvPjwvc3ZnPg==)
+
+    option
+      background-color: #212121
+      color: $text-color-primary
+
+  .btn-group .btn:first-child
+    margin-right: 1rem
+
+  textarea
+    &:focus
+      border: 2px solid $primary
+
+    &.curl
+      background-color: $primary-dark !important
+      color: $text-color-primary !important
+      -webkit-text-fill-color: $text-color-primary !important
+
+      &:focus
+        border: 2px solid $primary
+
+      &::selection
+        @include black-gold-selection
+    
+    &.body-param__text
+      &::selection
+        @include black-gold-selection
+
+  .microlight span::selection, span.headerline::selection
+    color: $bg-primary !important
+    -webkit-text-fill-color: $bg-primary !important
+
+  .prop-type
+    color: $primary
+
+    &::selection
+      @include gold-selection
+
+  .download-contents
+    width: auto
+    right: 1.75rem
+    background-color: $primary
+    color: $text-color-primary
+
+    &:hover
+      background-color: $bg-secondary !important
+      color: $text-color-secondary !important
+
+  .loading-container
+    .loading
+      &:after
+        color: $text-color-primary
+      &:before
+        border: 2px solid rgba(150,150,150,.1)
+        border-top-color: rgba(255,255,255,.3)
+
+  .parameter__type, .tab li a
+    color: $link-color-highlight
+    
+    .prop-format::selection
+      color: $text-color-dark-primary
+    &::selection
+      @include gold-selection
+
+  .tab li a
+    text-decoration: underline
+
+    &:hover
+      color: $link-color-highlight-hover
+
+  .parameters label > span
+    font-weight: 400
+
+  .parameters
+    .model-box .markdown
+      font-size: 11px
+      font-weight: 500
+
+  .parameter__name.required
+    font-weight: 500
+    font-size: 15px
+
+    span, &:after
+      color: $red !important
+    &:after
+      left: -3px
+      font-weight: 500
+
+  .parameter__name
+    font-weight: 300
+    font-size: 15px
+
+  table thead tr td, table thead tr th
+    font-size: 14px
+
+  .model, table.model
+    color: $text-color-primary-darker
+
+  .model-toggle
+    transform: rotate(90deg) translateX(-2px)
+
+    &.collapsed
+      transform: rotate(0deg) translateY(-1px)
+    &:after
+      filter: invert(1)
+
+  .response-col_description > span
+    color: $response-error-color
+    &::selection
+      @include white-gold-selection
+  
+  .response-col_description__inner div.markdown
+    background-color: $bg-primary-light
+    font-weight: 500
+
+    p
+      font-weight: 500
 
   .curl
     -webkit-text-fill-color: $dark-white
 
+  .parameter__empty_value_toggle
+    display: flex
+    align-items: baseline
+    font-size: 12px
+    font-weight: 400
+
+    input[type="checkbox"]
+      height: 16px !important
+      margin-right: 8px
+      transform: translate(0px, 1px) !important
+
+      &:checked
+        background-color: $primary
+
+      &:disabled
+        background-color: #808080
+        border-color: #212121
+
   input::placeholder
-    color: $dark-white
-
-  .auth-wrapper
-    padding-right: 5px
-
-  .response-undocumented i, .parameters-col_name div, .body-param__text, .false td, .false td span span span
-    @extend .text-monospaced
+    color: $prop-format-color
+    font-weight: 500
 
   .scheme-container
     box-shadow: none
     background: none
+    margin: 0
+    padding: 1.5rem 0
 
   .arrow
     filter: invert(1)
 
   .wrapper
     .models
-      background: white
+      background: $bg-primary
+      color: $text-color-primary
+      border: none
+      padding-bottom: 0 !important
+      border-radius: $border-radius
+      overflow: hidden
+
+      h4
+        background-color: $primary
+        border-top-left-radius: $border-radius
+        border-top-right-radius: $border-radius
+        border-bottom: none !important
+        color: $text-color-primary
+        font-size: 24px
+        font-weight: 600
+        padding: 0.75rem !important
+
+        span::selection
+          @include gold-selection
+        &:hover
+          background-color: darken($primary, 5)
+
+        svg
+          fill: $text-color-primary
+      
+      .model-container
+        background-color: transparent
+        margin: 0 !important
+        border-bottom: 1px solid $bg-primary-light !important
+
+        &:last-child
+          border-bottom: none !important
+        .model-box
+          background-color: transparent
+          padding: 0.5rem 0.75rem
 
     @include media-breakpoint-down('sm')
       margin: 0 !important
@@ -52,17 +365,79 @@ header::before
         margin: 0
         padding: 0
 
-  .opblock-tag
-    background: $primary
+  .opblock-description-wrapper
+    padding: 15px 12px
+
+  .responses-inner
+    padding: 20px 12px
+  
+  .response .model-box
+    background-color: $bg-primary
+
+  h4.opblock-tag
     color: $dark-white
+    padding: 0.75rem !important
+
+    a span::selection
+      color: $text-color-primary
 
   .opblock-tag-section
-    background: $primary
-    padding: 10px 10px 0 10px
+    background: $bg-primary
+    border-radius: $border-radius
+    margin-bottom: 1rem
+
+    h4
+      background-color: transparent
+      border-bottom: none
+      padding: 0.75rem 0 !important
+      margin-bottom: 0 !important
+      font-weight: 600
+
+      @include media-breakpoint-down('md')
+        padding-right: 0.75rem !important
+
+      &:hover
+        transform: none !important
+
+    .opblock
+      padding: 0.5rem !important
+      margin-bottom: 0 !important
+      transition: background 100ms
+
+      &:hover
+        background-color: $opblock-bg-hover !important
+
+      &.opblock-get .opblock-summary-method
+        background-color: #3992D9 !important
+      
+      &.is-open
+        background-color: rgba(0, 0, 0, 0.1) !important
+        .opblock-summary
+          border: none !important
+      
+      .opblock-section-header h4,
+      p,
+      label,
+      .response-col_status,
+      .opblock-title,
+      .responses-header .response-col_description
+        color: $text-color-primary
+
+      .opblock-section-header
+        padding: 0.25rem 0.85rem
+        background-color: $bg-primary-light !important
+        border-radius: $border-radius
+
+        label
+          padding-bottom: 0
+
+      .responses-inner
+        padding-top: 0
 
   .opblock-summary-path
     .nostyle
-      @extend .text-monospaced
+      font-size: 14px
+      font-weight: 600
 
   .swagger-ui .info .description p
     color: $dark-white
@@ -76,21 +451,58 @@ header::before
   .response-col_status
     width: auto
 
-  .btn.authorize svg
-    fill: $dark-white
+  .responses-header
+    .response-col_description, .response-col_status
+      font-weight: 600
+      font-size: 13px
 
-  .authorization__btn.locked
-    opacity: .4
+  .authorization__btn
+    svg
+      fill: $lock-btn-color
+
+    &.unlocked
+      opacity: 1
+
+    &.locked
+      opacity: 0.4
+
+  .btn.authorize svg
+    fill: $text-color-primary
 
   .parameters-col_name
     width: auto
+    font-weight: 600
+
+  .execute-wrapper
+    padding-top: 0
+
+  th.parameters-col_description
+    font-weight: 600
 
   .parameters-col_description
     color: $black
     width: auto
 
+    .markdown p
+      margin-bottom: 0
+
+    input
+      font-size: 95%
+
+  .opblock-body
+    .model-box
+      td
+        font-weight: 600 !important
+
+
   .opblock-summary-description
     text-align: right
+
+  .parameter__in
+    color: $light-grey
+  
+  .parameter__empty_value_toggle.disabled
+    opacity: 0.5
 
   .modal-ux
     border: none !important
@@ -101,17 +513,56 @@ header::before
       background: $primary
 
       h3
-        color: $dark-white
+        color: $text-color-secondary
+        padding-left: 68px
 
       .close-modal
-        filter: invert(1)
+        svg
+          width: 28px
+          height: 28px
+
+          use
+            fill: $text-color-secondary
 
 #swagger-ui.api-platform
+  .tab li
+    border-right: 1px solid $bg-primary-light
+
   .wrapper
-    padding: 0 10px
+    padding: 0
+
+    & > .block
+      padding-left: 0
+      padding-right: 0
+
+    .opblock-tag-section
+      & > h4
+        padding: 0.75rem !important
+
+      div span:last-child .opblock
+        border-bottom: none !important
+        border-bottom-left-radius: $border-radius
+        border-bottom-right-radius: $border-radius
+
+  .opblock
+    background-color: transparent
+    box-shadow: none
+    border-bottom: 1px solid $bg-primary-light !important
+    padding-bottom: 0.5rem
+
+    .opblock-body
+      margin-top: 1rem
+
+    .opblock-summary-method
+      border-radius: $border-radius
+
+    .opblock-summary-path, .opblock-summary-description
+      color: $text-color-primary
 
   .opblock-tag:hover
-    background-color: rgba(0, 0, 0, .1)
+    background-color: $opblock-bg-hover !important
+    border-top-left-radius: $border-radius
+    border-top-right-radius: $border-radius
     color: $dark-white
 
   .information-container
@@ -123,10 +574,10 @@ header::before
       border-bottom: none
 
   .btn
-    color: $dark-white
-    background-color: $secondary !important
+    color: $text-color-primary
+    background-color: $primary !important
     border: none !important
-    border-radius: inherit
+    border-radius: $border-radius
 
     &:focus
       box-shadow: 0 0 0 0.2rem rgba(50, 88, 113, .5)
@@ -134,21 +585,22 @@ header::before
 
     @media (hover: hover)
       &:hover
-        color: $secondary !important
         background-color: $dark-white !important
-        border-color: $dark-white !important
     @media (hover: none)
       background-color: $primary
       border-color: $dark-white !important
 
     &:hover
-      background-color: $secondary-dark !important
-      color: $dark-white !important
+      background-color: $bg-secondary !important
+      color: $text-color-secondary !important
       border: none !important
 
   .auth-wrapper
     .btn
-      border: 1px solid $dark-white !important
+      border-radius: $border-radius
+      padding: 0.5rem 1.5rem
+      margin-right: 0
+
       &:hover
         color: $secondary !important
         background-color: $dark-white !important
@@ -161,6 +613,54 @@ header::before
         border: none !important
 
   select
+    font-weight: 600
     @include media-breakpoint-down('sm')
       width: 100%
       min-width: auto
+
+  .prop-format
+    color: $prop-format-color
+
+  .model-box
+    .model
+      td .markdown p
+        color: $text-color-primary-darker !important
+        font-weight: 500 !important
+
+      td:first-child span
+        color: $red !important
+
+      td .prop span:not(.prop-type)
+        color: $prop-color-secondary !important
+
+      td::selection, span:not(.model-title):not(.prop-type)::selection
+        color: $text-color-primary
+
+      .prop-format::selection
+        color: $text-color-dark-primary
+      
+      td .model-title__text
+        font-size: 15px
+        font-weight: 500
+
+  .model-hint
+    background-color: $bg-secondary
+    color: $text-color-secondary
+    font-weight: 500
+
+.text-danger::selection, .model .prop .prop-type::selection
+  @include gold-selection
+
+.request-url pre::selection, .parameter__in::selection, .model .model-title__text
+  @include white-gold-selection
+
+.model *:not(.model-title__text)::selection,
+.response-col_description__inner .markdown::selection,
+.response-col_description__inner .markdown *::selection
+  @include black-gold-selection
+
+.opblock-summary-method::selection
+  background-color: transparent
+  color: $text-color-primary
+
+/* stylelint-enable no-descending-specificity */

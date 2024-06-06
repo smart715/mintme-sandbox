@@ -3,41 +3,38 @@
 namespace App\Exchange;
 
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class Market
 {
-    /** @var TradebleInterface */
-    private $base;
+    private TradableInterface $base;
+    private TradableInterface $quote;
 
-    /** @var TradebleInterface */
-    private $quote;
-
-    public function __construct(TradebleInterface $base, TradebleInterface $quote)
+    public function __construct(TradableInterface $base, TradableInterface $quote)
     {
         $this->base = $base;
         $this->quote = $quote;
     }
 
     /** @Groups({"Default", "API", "dev"}) */
-    public function getBase(): TradebleInterface
+    public function getBase(): TradableInterface
     {
         return $this->base;
     }
 
-    public function setBase(TradebleInterface $base): void
+    public function setBase(TradableInterface $base): void
     {
         $this->base = $base;
     }
 
-    public function setQuote(TradebleInterface $quote): void
+    public function setQuote(TradableInterface $quote): void
     {
         $this->quote = $quote;
     }
 
     /** @Groups({"Default", "API", "dev"}) */
-    public function getQuote(): TradebleInterface
+    public function getQuote(): TradableInterface
     {
         return $this->quote;
     }

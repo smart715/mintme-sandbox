@@ -6,12 +6,14 @@ use App\Entity\DiscordRole;
 use App\Entity\Token\DiscordConfig;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Exception\Discord\MissingPermissionsException;
 use App\Exception\Discord\UnknownRoleException;
 use App\Manager\DiscordConfigManagerInterface;
 use App\Manager\DiscordManager;
 use App\Manager\DiscordManagerInterface;
 use App\Manager\DiscordRoleManagerInterface;
+use App\Manager\UserTokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Command\Exception\CommandClientException;
 use PHPUnit\Framework\TestCase;
@@ -21,6 +23,7 @@ use Psr\Log\LoggerInterface;
 use RestCord\DiscordClient;
 use RestCord\Interfaces\Guild;
 use RestCord\Model\Permissions\Role;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DiscordManagerTest extends TestCase
 {
@@ -364,6 +367,73 @@ class DiscordManagerTest extends TestCase
         $this->assertEquals('foo', $manageableRoles['1']->getName());
     }
 
+    public function testRemoveAllGuildMembersRole(): void
+    {
+        $token = $this->mockToken(1);
+        $role = $this->mockDiscordRole('testRole', 0, 1, 1);
+        $userTokenManagerMock = $this->createMock(UserTokenManagerInterface::class);
+
+        $userTokenManagerMock->method('getHoldersWithDiscord')->willReturn([
+            (new UserToken())->setToken($token)->setUser($this->mockUser(1)),
+            (new UserToken())->setToken($token)->setUser($this->mockUser(2)),
+        ]);
+
+        $discord = $this->createMock(DiscordClient::class);
+        $discord->guild = $this->createMock(\RestCord\Interfaces\Guild::class);
+        $discord->guild
+            ->expects($this->exactly(2))
+            ->method('removeGuildMemberRole')
+            ->withConsecutive([[
+                'guild.id' => 1,
+                'role.id' => 1,
+                'user.id' => 1,
+            ]], [[
+                'guild.id' => 1,
+                'role.id' => 1,
+                'user.id' => 2,
+            ]]);
+
+        $dm = $this->createDiscordManager($discord, null, null, null, null, null, $userTokenManagerMock);
+
+        $dm->removeAllGuildMembersRole($token, $role);
+    }
+
+    public function testUpdateRolesOfUsers(): void
+    {
+        $token = $this->mockToken(1);
+        $userTokenManagerMock = $this->createMock(UserTokenManagerInterface::class);
+
+        $userTokenManagerMock->method('getHoldersWithDiscord')->willReturn([
+            (new UserToken())->setToken($token)->setUser($this->mockUser(1)),
+            (new UserToken())->setToken($token)->setUser($this->mockUser(2)),
+        ]);
+
+        $dm = $this->getMockBuilder(DiscordManager::class)
+            ->setConstructorArgs([
+                $this->createMock(DiscordClient::class),
+                $this->createMock(DiscordClient::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(DiscordRoleManagerInterface::class),
+                $this->createMock(DiscordConfigManagerInterface::class),
+                $this->createMock(EntityManagerInterface::class),
+                $userTokenManagerMock,
+                $this->createMock(EventDispatcherInterface::class),
+                '',
+                '',
+            ])
+            ->onlyMethods(['updateRoleOfUser'])
+            ->getMock();
+
+        $dm->expects($this->exactly(2))->method('updateRoleOfUser')->with(
+            $this->anything(),
+            $token,
+            false,
+            true,
+        );
+
+        $dm->updateRolesOfUsers($token);
+    }
+
     /**
      * @param mixed $returnValue
      */
@@ -451,6 +521,8 @@ class DiscordManagerTest extends TestCase
         ?DiscordRoleManagerInterface $drm = null,
         ?DiscordConfigManagerInterface $dcm = null,
         ?EntityManagerInterface $em = null,
+        ?UserTokenManagerInterface $userTokenManager = null,
+        ?EventDispatcherInterface $eventDispatcher = null,
         string $publicKey = 'testPublicKey',
         string $clientId = 'testClientId'
     ): DiscordManagerInterface {
@@ -461,6 +533,8 @@ class DiscordManagerTest extends TestCase
             $drm ?? $this->createMock(DiscordRoleManagerInterface::class),
             $dcm ?? $this->createMock(DiscordConfigManagerInterface::class),
             $em ?? $this->createMock(EntityManagerInterface::class),
+            $userTokenManager ?? $this->createMock(UserTokenManagerInterface::class),
+            $eventDispatcher ??$this->createMock(EventDispatcherInterface::class),
             $publicKey,
             $clientId
         );

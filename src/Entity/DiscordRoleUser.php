@@ -8,10 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @codeCoverageIgnore
  * @ORM\Table(name="discord_role_user",
- *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="UQ_Discord_Role_User_User_Token",
- *             columns={"user_id", "token_id"}
- *         )
+ *     indexes={
+ *         @ORM\Index(name="FK_Discord_Role_User_Token", columns={"token_id"}),
+ *         @ORM\Index(name="FK_Discord_Role_User_Role", columns={"role_id"})
  *     }
  * )
  * @ORM\Entity
@@ -20,20 +19,20 @@ class DiscordRoleUser
 {
     /**
      * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
-     * @ORM\JoinColumn(name="token_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected Token $token;
-
-    /**
-     * @ORM\Id()
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="discordRoles")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected User $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\DiscordRole", inversedBy="discordRoles")
+     * @ORM\Id()
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
+     * @ORM\JoinColumn(name="token_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
+    protected Token $token;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\DiscordRole", inversedBy="users")
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected DiscordRole $discordRole;

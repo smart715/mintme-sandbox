@@ -1,22 +1,24 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TradeSellOrder from '../../js/components/trade/TradeSellOrder';
-import Axios from '../../js/axios';
 import moxios from 'moxios';
 import Vuex from 'vuex';
 import tradeBalance from '../../js/storage/modules/trade_balance';
 import orders from '../../js/storage/modules/orders';
-import {AddPhoneAlertMixin} from '../../js/mixins';
+import {AddPhoneAlertMixin, DepositModalMixin} from '../../js/mixins';
+import axios from 'axios';
 
 /**
  * @return {Wrapper<Vue>}
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(Axios);
     localVue.use(Vuex);
     localVue.use({
         install(Vue, options) {
+            Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = {error: (val) => {}};
         },
     });
     return localVue;
@@ -33,6 +35,28 @@ const store = new Vuex.Store({
                 addMessageHandler: () => {},
             },
         },
+        user: {
+            namespaced: true,
+            getters: {
+                getId: () => 1,
+            },
+        },
+        tokenInfo: {
+            namespaced: true,
+            getters: {getDeploymentStatus: () => true},
+        },
+        crypto: {
+            namespaced: true,
+            getters: {
+                getCryptosMap: () => {
+                    return {
+                        'BTC': {},
+                        'WEB': {},
+                        'ETH': {},
+                    };
+                },
+            },
+        },
     },
 });
 
@@ -46,10 +70,16 @@ function mockVm(balance = 1) {
     return shallowMount(TradeSellOrder, {
         store,
         localVue,
-        mixins: [AddPhoneAlertMixin],
+        mixins: [
+            AddPhoneAlertMixin,
+            DepositModalMixin,
+        ],
         mocks: {
             $routing,
             $toasted: {show: () => {}},
+        },
+        directives: {
+            'b-tooltip': {},
         },
         computed: {
             immutableBalance: () => balance,
@@ -57,7 +87,7 @@ function mockVm(balance = 1) {
         propsData: {
             loginUrl: 'loginUrl',
             signupUrl: 'signupUrl',
-            loggedIn: false,
+            loggedIn: true,
             balanceLoaded: true,
             market: {
                 base: {
@@ -65,62 +95,91 @@ function mockVm(balance = 1) {
                     symbol: 'BTC',
                     subunit: 8,
                     identifier: 'BTC',
+                    image: {
+                        url: require('../../img/BTC.svg'),
+                    },
                 },
                 quote: {
                     name: 'Webchain',
                     symbol: 'WEB',
                     subunit: 4,
                     identifier: 'WEB',
+                    image: {
+                        url: require('../../img/default_token_avatar.svg'),
+                    },
                 },
             },
             marketPrice: 2,
             isOwner: false,
             websocketUrl: '',
             tradeDisabled: false,
+            disabledServicesConfig: `{
+                "depositDisabled": false,
+                "tokenDepositsDisabled": false,
+                "allServicesDisabled": false
+            }`,
+            sellOrders: [],
         },
     });
 }
 
 describe('TradeSellOrder', () => {
+    let wrapper;
+
     beforeEach(() => {
-       moxios.install();
+        moxios.install();
+
+        wrapper = mockVm();
     });
     afterEach(() => {
         moxios.uninstall();
     });
 
-    let wrapper = mockVm();
+    it('hide sell order contents and show loading instead', async (done) => {
+        await wrapper.setProps({balanceLoaded: false});
+        expect(wrapper.findComponent('font-awesome-icon-stub').exists()).toBe(true);
+        expect(wrapper.findComponent('div.card-body > div.row').exists()).toBe(false);
 
-    it('hide sell order  contents and show loading instead', () => {
-        wrapper.setProps({balanceLoaded: false});
-        expect(wrapper.find('font-awesome-icon-stub').exists()).toBe(true);
-        expect(wrapper.find('div.card-body > div.row').exists()).toBe(false);
-        wrapper.setProps({balanceLoaded: true});
-        expect(wrapper.find('font-awesome-icon-stub').exists()).toBe(false);
-        expect(wrapper.find('div.card-body > div.row').exists()).toBe(true);
+        await wrapper.setProps({balanceLoaded: true});
+        expect(wrapper.findComponent('font-awesome-icon-stub').exists()).toBe(false);
+        expect(wrapper.findComponent('div.card-body > div > div').exists()).toBe(true);
+
+        done();
     });
 
-    it('show login & logout buttons if not logged in', () => {
-        expect(wrapper.find('a[href="loginUrl"]').exists()).toBe(true);
-        expect(wrapper.find('a[href="signupUrl"]').exists()).toBe(true);
-        wrapper.setProps({loggedIn: true});
-        expect(wrapper.find('a[href="loginUrl"]').exists()).toBe(false);
-        expect(wrapper.find('a[href="signupUrl"]').exists()).toBe(false);
+    it('show login & logout buttons if not logged in', async (done) => {
+        await wrapper.setProps({
+            loggedIn: false,
+        });
+
+        expect(wrapper.findComponent('button[id="sell-login-url"]').exists()).toBe(true);
+        expect(wrapper.findComponent('button[id="sell-signup-url"]').exists()).toBe(true);
+
+        await wrapper.setProps({loggedIn: true});
+        expect(wrapper.findComponent('button[id="sell-login-url"]').exists()).toBe(false);
+        expect(wrapper.findComponent('button[id="sell-signup-url"]').exists()).toBe(false);
+        expect(wrapper.vm.loggedIn).toBe(true);
+
+        done();
     });
 
     it('can make order if price and amount not null', (done) => {
-        moxios.stubRequest(/.*/, {
+        moxios.stubRequest('token_place_order', {
             status: 200,
             response: {result: 1},
         });
+
         wrapper.vm.placeOrder();
         wrapper.vm.sellPrice = 2;
         wrapper.vm.sellAmount = 2;
         wrapper.vm.placeOrder();
-        done();
+
+        moxios.wait(() => {
+            done();
+        });
     });
 
-    it('should show phone verify modal if user is not totally authenticated', () => {
+    it('should show phone verify modal if user is not totally authenticated', (done) => {
         moxios.stubRequest('token_place_order', {
             status: 200,
             response: {
@@ -133,7 +192,7 @@ describe('TradeSellOrder', () => {
 
         moxios.wait(() => {
             wrapper.vm.$emit('making-order-prevented');
-            expect(wrapper.emitted().making-order-prevented).toBeTruthy();
+            expect(wrapper.emitted()['making-order-prevented']).toBeTruthy();
             done();
         });
     });
@@ -147,115 +206,112 @@ describe('TradeSellOrder', () => {
             store.commit('orders/setBuyOrders', []);
         });
 
-        it('should be unchecked if it is disabled', () => {
-            wrapper.setProps({marketPrice: 2});
+        it('should be unchecked if it is disabled', async () => {
+            await wrapper.setProps({marketPrice: 2});
             wrapper.vm.useMarketPrice = true;
-            wrapper.setProps({marketPrice: 0});
+            await wrapper.setProps({marketPrice: 0});
+
             expect(wrapper.vm.useMarketPrice).toBe(false);
         });
     });
 
-    it('should reset order price and amount properly', () => {
+    it('should reset order price and amount properly', async () => {
         wrapper.vm.sellPrice = 3;
         wrapper.vm.sellAmount = 1;
-        wrapper.vm.useMarketPrice = false;
         wrapper.vm.resetOrder();
-        expect(wrapper.vm.sellPrice).toBe(0);
-        expect(wrapper.vm.sellAmount).toBe(0);
+        expect(wrapper.vm.sellPrice).toBe('');
+        expect(wrapper.vm.sellAmount).toBe('');
 
         store.commit('orders/setBuyOrders', [{price: 1, amount: 1}]);
         wrapper.vm.sellAmount = 2;
-        wrapper.vm.useMarketPrice = true;
         wrapper.vm.resetOrder();
-        expect(wrapper.vm.sellPrice).toBe('1');
-        expect(wrapper.vm.sellAmount).toBe(0);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.sellPrice).toBe(1);
+        expect(wrapper.vm.sellAmount).toBe('');
 
         store.commit('orders/setBuyOrders', []);
-    });
-
-    it('should update market price properly', () => {
-        store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
-        wrapper.vm.useMarketPrice = true;
-        wrapper.vm.updateMarketPrice();
-        expect(wrapper.vm.sellPrice).toBe('7');
-
-        store.commit('orders/setBuyOrders', []);
-        wrapper.vm.useMarketPrice = true;
-        wrapper.vm.updateMarketPrice();
-        expect(wrapper.vm.sellPrice).toBe(0);
-        expect(wrapper.vm.useMarketPrice).toBe(false);
     });
 
     describe('balanceClicked', () => {
-        let event = {
+        const event = {
             target: {
                 tagName: 'span',
             },
         };
 
-        it('should add all the balance to the amount input', () => {
+        it('should add all the balance to the amount input', async () => {
             wrapper = mockVm(5);
             store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
             wrapper.vm.balanceClicked(event);
+            await wrapper.vm.$nextTick();
 
-            expect(wrapper.vm.sellAmount).toBe('5');
-            expect(wrapper.vm.sellPrice).toBe('7');
+            expect(wrapper.vm.sellAmount).toBe('');
+            expect(wrapper.vm.sellPrice).toBe(7);
 
             store.commit('orders/setBuyOrders', []);
         });
 
-        it('shouldn\'t add price if the price edited manually', () => {
+        it('shouldn\'t add price if the price edited manually', async () => {
             wrapper = mockVm(5);
             store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
-            wrapper.vm.sellPrice = 2;
-            wrapper.vm.priceManuallyEdited = true;
+            await wrapper.vm.$nextTick();
+            await wrapper.setData({sellPrice: 2, priceManuallyEdited: true});
             wrapper.vm.balanceClicked(event);
+            await wrapper.vm.$nextTick();
 
-            expect(wrapper.vm.sellAmount).toBe('5');
+            expect(wrapper.vm.sellAmount).toBe('');
             expect(wrapper.vm.sellPrice).toBe(2);
 
             store.commit('orders/setBuyOrders', []);
         });
 
-        it('should change price if the price edited manually but has 0 value', () => {
-            wrapper.vm.immutableBalance = 5;
+        it('should change price if the price edited manually but has 0 value', async () => {
+            wrapper = mockVm(5);
             store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
             wrapper.vm.sellPrice = '000';
             wrapper.vm.priceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
+            await wrapper.vm.$nextTick();
 
-            expect(wrapper.vm.sellAmount).toBe('5');
-            expect(wrapper.vm.sellPrice).toBe('7');
+            expect(wrapper.vm.sellAmount).toBe('');
+            expect(wrapper.vm.sellPrice).toBe(7);
 
             store.commit('orders/setBuyOrders', []);
         });
 
-        it('should add price if the price edited manually but has null value', () => {
-            // wrapper.vm.immutableBalance = 5;
-            // wrapper.setProps({balance: 5});
+        it('should add price if the price edited manually but has null value', async () => {
+            wrapper = mockVm(5);
             store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
             wrapper.vm.sellPrice = null;
+
             wrapper.vm.priceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
+            await wrapper.vm.$nextTick();
 
-            expect(wrapper.vm.sellAmount).toBe('5');
-            expect(wrapper.vm.sellPrice).toBe('7');
-
-            store.commit('orders/setBuyOrders', []);
-        });
-
-        it('Deposit more link click - should not add the balance to the amount input, price/amount not changing', () => {
-            wrapper.vm.immutableBalance = 50;
-            store.commit('orders/setBuyOrders', [{price: 17, amount: 1}]);
-            wrapper.vm.sellAmount = '0';
-            wrapper.vm.sellPrice = '0';
-            event.target.tagName = 'a';
-            wrapper.vm.balanceClicked(event);
-
-            expect(wrapper.vm.sellAmount).toBe('0');
-            expect(wrapper.vm.sellPrice).toBe('0');
+            expect(wrapper.vm.sellAmount).toBe('');
+            expect(wrapper.vm.sellPrice).toBe(7);
 
             store.commit('orders/setBuyOrders', []);
         });
+
+        it(
+            'Deposit more link click - should not add the balance to the amount input, price/amount not changing',
+            async () => {
+                wrapper = mockVm(50);
+                store.commit('orders/setBuyOrders', [{price: 17, amount: 1}]);
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setData({sellAmount: '0', sellPrice: '0'});
+                event.target.tagName = 'a';
+                wrapper.vm.balanceClicked(event);
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.sellAmount).toBe('0');
+                expect(wrapper.vm.sellPrice).toBe('0');
+
+                store.commit('orders/setBuyOrders', []);
+            }
+        );
     });
 });

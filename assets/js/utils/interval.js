@@ -2,7 +2,7 @@ export default {
     intervals: new Set(),
 
     make(...args) {
-        let newInterval = setInterval(...args);
+        const newInterval = setInterval(...args);
         this.intervals.add(newInterval);
         return newInterval;
     },
@@ -13,7 +13,7 @@ export default {
     },
 
     clearAll() {
-        for (let id of this.intervals) {
+        for (const id of this.intervals) {
             this.clear(id);
         }
     },

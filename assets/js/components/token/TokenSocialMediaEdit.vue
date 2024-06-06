@@ -7,6 +7,13 @@
             :key="reRenderTokenWebsite"
             @saveWebsite="saveWebsite"
             @toggleEdit="toggleEdit"
+            class="mb-2"
+        />
+        <token-twitter-address
+            :address="currentTwitter"
+            :tokenName="tokenName"
+            @saveTwitter="saveTwitter"
+            class="mb-2"
         />
         <token-youtube-address
             :editable="editable"
@@ -14,6 +21,7 @@
             :client-id="youtubeClientId"
             :tokenName="tokenName"
             @saveYoutube="saveYoutube"
+            class="mb-2"
         />
         <token-facebook-address
             :address="currentFacebook"
@@ -21,6 +29,7 @@
             :editing="editingUrls"
             :tokenName="tokenName"
             @saveFacebook="saveFacebook"
+            class="mb-2"
         />
         <token-telegram-channel
             :currentTelegram="currentTelegram"
@@ -28,6 +37,7 @@
             :tokenName="tokenName"
             @saveTelegram="saveTelegram"
             @toggleEdit="toggleEdit"
+            class="mb-2"
         />
         <token-discord-channel
             :currentDiscord="currentDiscord"
@@ -35,6 +45,7 @@
             :tokenName="tokenName"
             @saveDiscord="saveDiscord"
             @toggleEdit="toggleEdit"
+            class="mb-2"
         />
     </div>
 </template>
@@ -45,6 +56,7 @@ import TokenFacebookAddress from './facebook/TokenFacebookAddress';
 import TokenTelegramChannel from './TokenTelegramChannel';
 import TokenWebsiteAddress from './website/TokenWebsiteAddress';
 import TokenYoutubeAddress from './youtube/TokenYoutubeAddress';
+import TokenTwitterAddress from './twitter/TokenTwitterAddress';
 
 export default {
     name: 'TokenSocialMediaEdit',
@@ -55,6 +67,7 @@ export default {
         facebookAppId: String,
         telegramUrl: String,
         websiteUrl: String,
+        twitterUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
         tokenName: String,
@@ -65,6 +78,7 @@ export default {
         TokenTelegramChannel,
         TokenYoutubeAddress,
         TokenWebsiteAddress,
+        TokenTwitterAddress,
     },
     data() {
         return {
@@ -73,6 +87,7 @@ export default {
             currentTelegram: this.telegramUrl,
             currentWebsite: this.websiteUrl,
             currentYoutube: this.youtubeChannelId,
+            currentTwitter: this.twitterUrl,
             editingDiscord: false,
             editingTelegram: false,
             editingUrls: false,
@@ -94,6 +109,10 @@ export default {
         saveFacebook: function(newFacebook) {
             this.currentFacebook = newFacebook;
             this.$emit('updated-facebook', newFacebook);
+        },
+        saveTwitter: function(newTwitter) {
+            this.currentTwitter = newTwitter;
+            this.$emit('updated-twitter', newTwitter);
         },
         saveTelegram: function(newTelegram) {
             this.currentTelegram = newTelegram;

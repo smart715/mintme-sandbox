@@ -6,8 +6,7 @@ use App\Exchange\Config\Config;
 
 class BalancesArrayFactory implements BalancesArrayFactoryInterface
 {
-    /** @var Config */
-    private $config;
+    private Config $config;
 
     public function __construct(Config $config)
     {
@@ -20,8 +19,7 @@ class BalancesArrayFactory implements BalancesArrayFactoryInterface
         $refactoredBalances = [];
 
         foreach ($balances as $balance) {
-            if (isset($balance[0]) && isset($balance[1])
-                && 0 < ($userId = (int)$balance[0] - $this->config->getOffset())) {
+            if (isset($balance[0], $balance[1]) && 0 < ($userId = (int)$balance[0] - $this->config->getOffset())) {
                 $refactoredBalances[$userId] = $balance[1];
             }
         }

@@ -2,6 +2,7 @@
 
 namespace App\Manager\Model;
 
+/** @codeCoverageIgnore */
 class EmailAuthResultModel
 {
     /** @var string|null */

@@ -1,0 +1,21 @@
+<token-voting-widget
+    token-avatar="{{ token.image.url }}"
+    token-name="{{ token.name }}"
+    :votings="{{ votings | json_encode }}"
+    :min-amount-propose="{{ votingProposalMinAmount }}"
+    :min-amount-vote="{{ minBalanceToVote }}"
+    :active-page="activeVotingTab"
+    {% if totalVotingCount is defined %}
+        :total-voting-count="{{ totalVotingCount }}"
+    {% endif %}
+    {% if voting is defined %}
+        :voting="{{ voting | json_encode }}"
+    {% endif %}
+    :logged-in="{{ loggedIn }}"
+    :is-owner="{{ isOwner }}"
+    :is-token-page="{{ isTokenPage ? 'true' : 'false' }}"
+    @mounted="votingWidgetLoaded = true"
+    @page-changed="votingPageChanged"
+    @voting-created="votingCreated"
+    @counter-refreshed="counterRefreshed"
+></token-voting-widget>

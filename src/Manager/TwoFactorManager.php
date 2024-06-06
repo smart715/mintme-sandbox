@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Entity\GoogleAuthenticatorEntry;
 use App\Entity\User;
+use App\Entity\ValidationCode\BackupValidationCode;
 use App\Repository\GoogleAuthenticatorEntryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PragmaRX\Random\Random;
@@ -76,5 +77,15 @@ class TwoFactorManager implements TwoFactorManagerInterface
         $repository = $this->entityManager->getRepository(GoogleAuthenticatorEntry::class);
 
         return $repository->getGoogleAuthenticator($userId);
+    }
+
+    public function initGoogleAuthEntry(User $user): void
+    {
+        $googleAuthEntry = $user->getGoogleAuthenticatorEntry();
+        $smsValidationCode = new BackupValidationCode($user->getProfile()->getPhoneNumber());
+        $smsValidationCode->setGoogleAuthEntry($googleAuthEntry);
+        $googleAuthEntry->setSMSCode($smsValidationCode);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
     }
 }

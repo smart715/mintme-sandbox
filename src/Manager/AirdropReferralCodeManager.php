@@ -6,12 +6,13 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropReferralCode;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 
 class AirdropReferralCodeManager implements AirdropReferralCodeManagerInterface
 {
     public EntityManagerInterface $entityManager;
-    public ObjectRepository $arcRepository;
+    /** @var EntityRepository<AirdropReferralCode> $entityManager */
+    public EntityRepository $arcRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager
@@ -43,8 +44,13 @@ class AirdropReferralCodeManager implements AirdropReferralCodeManagerInterface
         $hash = strtr($hash, '-_', '+/');
         $hash = str_pad($hash, 11, 'A', STR_PAD_LEFT);
         $bin = base64_decode($hash);
+        $decoded = unpack('J', $bin);
 
-        return unpack('J', $bin)[1];
+        if (!$decoded) {
+            throw new \Exception('Could not decode hash');
+        }
+
+        return $decoded[1];
     }
 
     public function decode(string $hash): ?AirdropReferralCode

@@ -10,7 +10,10 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Manager\DiscordRoleManager;
 use App\Manager\TokenManagerInterface;
 use App\Repository\DiscordRoleRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
@@ -67,15 +70,18 @@ class DiscordRoleManagerTest extends TestCase
     public function testRemoveRoles(): void
     {
         $roles = [];
+        $em = $this->createMock(EntityManagerInterface::class);
 
         for ($i = 0; $i < 5; $i++) {
             $roles[$i] = $this->createMock(DiscordRole::class);
         }
 
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())->method('toArray')->willReturn($roles);
         $token = $this->createMock(Token::class);
-        $token->method('getDiscordRoles')->willReturn($roles);
+        $persistentCollection = new PersistentCollection($em, $this->createMock(ClassMetadata::class), $collection);
+        $token->method('getDiscordRoles')->willReturn($persistentCollection);
 
-        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->exactly(5))->method('remove')->withConsecutive(...array_chunk($roles, 1));
         $em->expects($this->once())->method('flush');
 

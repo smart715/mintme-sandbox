@@ -11,11 +11,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class AirdropNormalizer implements NormalizerInterface
 {
-    /** @var ObjectNormalizer */
-    private $normalizer;
-
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
+    private ObjectNormalizer $normalizer;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         ObjectNormalizer $objectNormalizer,
@@ -25,12 +22,15 @@ class AirdropNormalizer implements NormalizerInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param Airdrop $object
+     */
     public function normalize($object, $format = null, array $context = array())
     {
         /** @var array $airdrop */
         $airdrop = $this->normalizer->normalize($object, $format, $context);
-
         $token = $this->tokenStorage->getToken();
         $user = $token
             ? $token->getUser()
@@ -44,6 +44,7 @@ class AirdropNormalizer implements NormalizerInterface
         $airdrop['actions'] = [];
         $airdrop['actionsData'] = [];
 
+        /** @var AirdropAction $action */
         foreach ($object->getActions() as $action) {
             $key = $map[$action->getType()];
 

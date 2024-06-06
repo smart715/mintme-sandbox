@@ -5,7 +5,7 @@ namespace App\Tests\EventSubscriber;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
@@ -13,14 +13,14 @@ use App\Events\WithdrawCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
-use App\Tests\MockMoneyWrapper;
+use App\Tests\Mocks\MockMoneyWrapper;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TransactionSubscriberTest extends TestCase
 {
@@ -30,7 +30,7 @@ class TransactionSubscriberTest extends TestCase
     public function testSendTransactionCompletedMailWithCrypto(): void
     {
         $subscriber = new TransactionSubscriber(
-            $this->mockMailer(),
+            $this->mockMailer(true),
             $this->mockMoneyWrapper(),
             $this->mockLogger(),
             $this->mockEntityManager(),
@@ -38,7 +38,7 @@ class TransactionSubscriberTest extends TestCase
         );
 
         $tradable = $this->createMock(Crypto::class);
-        $tradable->method('getSymbol')->willReturn('WEB');
+        $tradable->method('getMoneySymbol')->willReturn('WEB');
 
         $subscriber->sendTransactionCompletedMail(
             $this->mockTransactionCompletedEvent($tradable, '1')
@@ -50,7 +50,7 @@ class TransactionSubscriberTest extends TestCase
     public function testSendTransactionCompletedMailWithToken(): void
     {
         $subscriber = new TransactionSubscriber(
-            $this->mockMailer(),
+            $this->mockMailer(true),
             $this->mockMoneyWrapper(),
             $this->mockLogger(),
             $this->mockEntityManager(),
@@ -62,6 +62,7 @@ class TransactionSubscriberTest extends TestCase
         $profile = $this->createMock(Profile::class);
 
         $tradable->method('getProfile')->willReturn($profile);
+        $tradable->method('getMoneySymbol')->willReturn("WEB");
         $profile->method('getUser')->willReturn($user);
 
         $subscriber->sendTransactionCompletedMail(
@@ -92,7 +93,7 @@ class TransactionSubscriberTest extends TestCase
 
         $user->expects($this->exactly(2))->method('getId')->willReturn(1);
         $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
-        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn('0');
+        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn($this->mockMoney('0'));
         $tradable->expects($this->once())->method('setWithdrawn')->with('-1000');
         $profile->expects($this->once())->method('getUser')->willReturn($user);
 
@@ -133,7 +134,7 @@ class TransactionSubscriberTest extends TestCase
 
         $user->expects($this->exactly(2))->method('getId')->willReturn(1);
         $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
-        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn('0');
+        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn($this->mockMoney('0'));
         $tradable->expects($this->once())->method('setWithdrawn')->with($amountValue);
         $profile->expects($this->once())->method('getUser')->willReturn($user);
 
@@ -235,13 +236,19 @@ class TransactionSubscriberTest extends TestCase
         $this->assertTrue(true);
     }
 
-    private function mockMailer(): MailerInterface
+    private function mockMailer(bool $isMailSend = false): MailerInterface
     {
-        return $this->createMock(MailerInterface::class);
+        $mailer = $this->createMock(MailerInterface::class);
+        $mailer->expects($isMailSend ? $this->once() : $this->never())
+            ->method('sendTransactionCompletedMail');
+
+        return $mailer;
     }
 
-    private function mockTransactionCompletedEvent(TradebleInterface $tradable, string $amount): TransactionCompletedEvent
-    {
+    private function mockTransactionCompletedEvent(
+        TradableInterface $tradable,
+        string $amount
+    ): TransactionCompletedEvent {
         $user = $this->createMock(User::class);
 
         $event = $this->createMock(TransactionCompletedEvent::class);
@@ -264,6 +271,14 @@ class TransactionSubscriberTest extends TestCase
 
     private function mockUserNotificationManagerInterface(): UserNotificationManagerInterface
     {
-        return $this->createMock(UserNotificationManagerInterface::class);
+        $manager = $this->createMock(UserNotificationManagerInterface::class);
+        $manager->method('isNotificationAvailable')->willReturn(true);
+
+        return $manager;
+    }
+
+    private function mockMoney(string $amount, string $symbol = Symbols::TOK): Money
+    {
+        return new Money($amount, new Currency($symbol));
     }
 }

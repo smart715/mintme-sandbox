@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Entity\Token\Token;
 use App\Utils\Symbols;
 use App\Validator\Constraints\Between;
-use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,10 +16,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @codeCoverageIgnore
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
+ * @ORM\Table(
+ *     name="post",
+ *     indexes={
+ *         @ORM\Index(name="FK_Posts_Tokens", columns={"token_id"}),
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks()
  */
 class Post
 {
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_DELETED = 0;
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="integer")
@@ -29,9 +37,8 @@ class Post
     protected int $id;
 
     /**
-     * @ORM\Column(type="string", length=60000)
+     * @ORM\Column(type="text", length=60000, nullable=true)
      * @Assert\NotNull
-     * @NotEmptyWithoutBbcodes
      * @Assert\Length(
      *     min = 2,
      *     max = 1000,
@@ -40,12 +47,15 @@ class Post
     protected string $content = ''; // phpcs:ignore -- for some reason, if the variable has a type and default value, phpcs says it's not used (but it is)
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="datetime_immutable", options={"default": "CURRENT_TIMESTAMP"})
      */
     protected \DateTimeImmutable $createdAt;
 
     /**
-     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @ORM\Column(
+     *     type="datetime_immutable",
+     *     nullable=true,
+     * )
      */
     protected ?\DateTimeImmutable $updatedAt;
 
@@ -61,7 +71,7 @@ class Post
     protected string $amount = '0'; // phpcs:ignore
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", options={"default": ""}, nullable=true)
      * @Assert\NotBlank
      * @Assert\Length(
      *     min = 1,
@@ -71,7 +81,7 @@ class Post
     protected string $title = ''; // phpcs:ignore
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", options={"default": "0"}, nullable=true)
      */
     protected string $shareReward = '0'; // phpcs:ignore
 
@@ -81,24 +91,52 @@ class Post
     protected ?string $slug = null; // phpcs:ignore
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", fetch="EXTRA_LAZY")
+     * @ORM\Column(type="integer", options={"default": 0}, nullable=true)
+     */
+    protected int $likes = 0; // phpcs:ignore
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", fetch="EXTRA_LAZY", cascade={"remove"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      * @ORM\OrderBy({"likeCount" = "DESC"})
      */
     protected Collection $comments;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="rewardClaimedPosts", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="post_users_share_reward",
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\PostUserShareReward",
+     *     mappedBy="post",
+     *     cascade={"persist", "remove"},
+     *     orphanRemoval=true,
+     *     fetch="EXTRA_LAZY")
+     */
+    protected Collection $userShareRewards;
+
+    /**
+     * @ORM\Column(type="integer", nullable=false, options={"default": 1})
+     */
+    protected int $status = self::STATUS_ACTIVE; // phpcs:ignore
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="likedPosts", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="post_users_likes",
      *     joinColumns={@ORM\JoinColumn(name="post_id", referencedColumnName="id", onDelete="CASCADE")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id",  onDelete="CASCADE")}
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")}
      *     )
      */
-    protected Collection $rewardedUsers;
+    protected Collection $usersLiked;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Hashtag", inversedBy="posts", fetch="EXTRA_LAZY")
+     */
+    protected Collection $hashtags;
 
     public function __construct()
     {
         $this->comments = new ArrayCollection();
-        $this->rewardedUsers = new ArrayCollection();
+        $this->usersLiked = new ArrayCollection();
+        $this->userShareRewards = new ArrayCollection();
+        $this->hashtags = new ArrayCollection();
     }
 
     /**
@@ -225,6 +263,14 @@ class Post
     /**
      * @Groups({"Default", "API"})
      */
+    public function getLikes(): int
+    {
+        return $this->likes;
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getTitle(): string
     {
         return $this->title;
@@ -249,21 +295,50 @@ class Post
         return $this;
     }
 
-    public function addRewardedUser(User $user): self
+    public function addUserShareReward(PostUserShareReward $userShareReward): self
     {
-        $this->rewardedUsers->add($user);
+        if (!$this->userShareRewards->contains($userShareReward)) {
+            $this->userShareRewards->add($userShareReward);
+        }
 
         return $this;
     }
 
-    public function getRewardedUsers(): Collection
+    public function getUserShareRewards(): Collection
     {
-        return $this->getRewardedUsers();
+        return $this->userShareRewards;
     }
 
     public function isUserAlreadyRewarded(User $user): bool
     {
-        return $this->rewardedUsers->contains($user);
+        foreach ($this->userShareRewards as $userShareReward) {
+            if ($user === $userShareReward->getUser()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function addUserLike(User $user): self
+    {
+        $this->usersLiked->add($user);
+        $this->increaseLikes();
+
+        return $this;
+    }
+
+    public function removeUserLike(User $user): self
+    {
+        $this->usersLiked->removeElement($user);
+        $this->decreaseLikes();
+
+        return $this;
+    }
+
+    public function isUserAlreadyLiked(User $user): bool
+    {
+        return $this->usersLiked->contains($user);
     }
 
     /**
@@ -279,5 +354,49 @@ class Post
         $this->slug = $slug;
 
         return $this;
+    }
+
+    private function increaseLikes(): self
+    {
+        $this->likes++;
+
+        return $this;
+    }
+
+    private function decreaseLikes(): self
+    {
+        $this->likes--;
+
+        return $this;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function setHashtags(array $hashtags, bool $isEdit = false): self
+    {
+        $this->hashtags->clear();
+
+        foreach ($hashtags as $hashtag) {
+            if (!$isEdit) {
+                $hashtag->setUpdatedAt();
+            }
+
+            $this->hashtags->add($hashtag);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
     }
 }

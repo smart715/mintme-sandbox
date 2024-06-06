@@ -1,56 +1,106 @@
 @import '../variables'
 @import '../mixins'
 
-.trading-head
-  tr
-    th
-      outline: none
+$table-img-height: 22px
+$table-img-width: 22px
+$sorting-arrows-width: 5px
 
-.token-trading-title
-  height: 38px
-  @media(max-width: 480px)
-    height: 74px
-  @media(max-width: 393px)
-    height: 116px
+main
+  margin: 0
+  max-width: none !important
+  width: 100%
 
-  .chat-envelope
-    background: $secondary
+.menu-buy-dot
+  font-weight: bold
+  transform: rotate(90deg)
+  cursor: pointer
 
-  .div-container-avatar
-    background: $secondary
-    padding-left: 5px
-    padding-right: 17px
+  .dropdown-toggle:after
+    content: unset !important
 
-.dropdown-item:hover
-  background-color: darkgray
+  .dropdown-menu
+    transform: rotate(270deg) !important
+    text-align: center
+    min-width: 5em
+    margin-top: 0.9rem
 
-.market-down
-  color: #ff5b5b
+  .link_buy_coins
+    color: $text-color-darkest-secondary !important
 
-.market-up
-  color: #8fd88f
+  .dropdown-toggle
+    background-color: unset !important
+    color: $text-color-primary !important
 
-.market-border
-  border-right: 1px solid $ghost-light
-  @include media-breakpoint-down(md)
-    border: none
+#trading
+  margin: 0 auto
+  max-width: $page-content-width
+  width: 100%
 
-.coin-markets
-  .col-12
-    .crypto-pair
-      @media (max-width: 410px)
-        font-size: smaller
-      @media (max-width: 344px)
-        font-size: 9px
+  .vgt-responsive
+    overflow: visible
 
-.crypto-pair
-  font-size: 13px
+  .dropdown-toggle:after
+    vertical-align: 0.175em !important
 
-.market-data
-  font-size: smaller
-  width: 47%
-  @include media-breakpoint-down(md)
-    width: 40%
+  .promoted-tokens-slider-wrp
+    position: relative
+
+    .slider-arrows
+      position: absolute
+      top: 36%
+      left: 0
+      right: 0
+      display: flex
+      align-items: center
+      z-index: 1
+
+      .slider-arrow
+        position: absolute
+        background-color: transparent
+        border-radius: 50%
+        padding: 1rem
+        color: $primary
+        font-size: 2rem
+        height: 30px
+        width: 30px
+        display: flex
+        align-items: center
+        justify-content: center
+        border: none
+
+        &.arrow-left
+          left: -2rem
+
+          svg
+            margin-left: -6px
+
+        &.arrow-right
+          right: -2rem
+
+          svg
+            margin-right: -6px
+
+        @media (max-width: 1275px)
+          background-color: $bg-primary-dark
+
+          &.arrow-left
+              left: 0.5rem
+
+          &.arrow-right
+              right: 0.5rem
+
+    .slides-list
+      transition: transform 300ms
+
+    .slide
+      min-width: 120px
+      max-width: 120px
+
+      .slide-link:hover
+        color: $text-color-primary
+
+.z-index-tooltip
+  z-index: 1
 
 .market-change
   width: 20%
@@ -58,53 +108,442 @@
     width: 15%
     font-size: smaller
 
-.coin-markets
-  margin-right: 0
-  margin-left: 0
-  min-height: 74px
-  @include media-breakpoint-down(xs)
-    font-size: 13px
-
-.truncate-pair
-  white-space: nowrap
-  overflow: hidden
-  text-overflow: ellipsis
-  display: inline-block
-  max-width: 90%
-  vertical-align: middle
-
-.trading-table
-  overflow: auto
-
-  @media (min-width: 576px)
-    .table
-      thead
-        th:first-child
-          display: table-cell !important
-
-      tbody
-        tr
-          td:first-child
-            display: table-cell !important
-
-.trading-page-options
-  display: inline
-  width: 100%
-  @media (max-width: 387px)
-    display: inline-grid
-    margin-left: 8px
-
-    .market-filter
-      margin-top: 8px
-      padding-right: 0 !important
-
 .card-title
   padding-top: 1rem
 
-a.token-link:hover
-  span.token-link
-    text-decoration: underline !important
+.card-fixed-medium
+  .pair-cell-trading
+    max-width: 325px
+    min-width: 325px
 
-.pair-cell-trading
-  max-width: 260px
-  min-width: 260px
+.card-fixed-large
+  .truncated-token-link
+    width: 130px
+  .pair-cell-trading
+    max-width: 190px
+    min-width: 190px
+
+.chart-markets-xxl
+  @include media-breakpoint-up(xl)
+    flex: 0 0 20%
+    max-width: 20%
+
+.card-charts-markets
+  background-color: $bg-primary-dark
+  cursor: pointer
+
+  &:hover
+    background-color: $block-background-hover
+
+    a
+      color: $text-color-primary
+
+  .badge
+    padding-top: 0.7rem !important
+
+    &:not(.bg-success):not(.badge-danger)
+      background-color: $bg-primary-light !important
+
+  @include media-breakpoint-down(lg)
+    display: flex
+    align-items: center
+
+    .card-body
+      width: 40%
+
+  @include media-breakpoint-down(md)
+    .card-header
+      flex: 1
+
+      a > .row
+        flex-wrap: nowrap
+      .market-name
+        flex: auto
+      .market-badge
+        flex: 1 1 100%
+        display: flex
+        justify-content: right
+        max-width: none
+
+.spinner-trading
+  .card-size
+    width: 100%
+
+    @include media-breakpoint-up(lg)
+      height: 148px
+
+    @include media-breakpoint-down(lg)
+      height: 85px
+
+    @include media-breakpoint-down(md)
+      height: 60px
+
+.rounded-change
+  border-radius: $half-border-radius
+
+.svg-markets
+  width: 27px
+  color: $primary
+
+  &[src*=BNB]
+    width: 32px
+  &[src*=BTC], &[src*=ETH]
+    height: 30px
+
+.charts-markets
+  height: 50px
+
+.custom-badge-danger
+  background-color: red !important
+
+.description-background
+  height: 50%
+  background-color: $bg-primary-dark
+
+.img-top
+  position: absolute
+  top: -11%
+  bottom: 0
+  left: 0
+  right: 0
+  margin: auto
+
+.button-top
+  position: absolute
+  margin: auto
+  text-align: center
+  margin-top: 18%
+
+  .btn-not-focusable:focus
+      outline: none !important
+
+      &.bg-primary:not(:hover)
+        background-color: $primary !important
+
+
+.text-color-dark
+  color: $black
+
+.img-map
+  @include media-breakpoint-up(md)
+    height: 60vh
+    padding-left: 7%
+
+.text-paragraph-description
+  @include media-breakpoint-up(lg)
+    padding: 0 21% 0 0
+
+  @include media-breakpoint-down(md)
+    padding: 0 12%
+
+.text-title
+  @include font-scale(xl)
+
+.text-paragraph
+  @include font-scale(md)
+
+.position-static
+    position: static !important
+
+.button-secondary
+  background: $bg-primary-dark
+  color: $text-color-primary !important
+
+.sorting-arrows-spinner
+  width: 19px
+  float: none !important
+  display: inline-block
+
+.promoted-border
+  position: absolute
+  border: 1px solid $primary
+  left: -10px
+  right: -10px
+  border-radius: $half-border-radius
+  visibility: hidden
+  z-index: 1
+  pointer-events: none
+
+  @media (max-width: 1230px)
+    left: 1px
+    right: 1px
+
+  span
+    position: absolute
+    top: -8px
+    left: 1.8rem
+    background-color: $bg-primary
+    padding-left: 4px
+    padding-right: 4px
+    color: $primary
+    font-size: $font-size-sm
+    line-height: 1
+
+// make this rows empty and use as spacers
+.first-promoted, .last-promoted
+  td
+    height: 1rem
+    overflow: hidden
+    visibility: hidden
+    padding: 0 !important
+
+    *
+      display: none
+
+.data-table-trading
+  width: 100%
+  border-collapse: separate !important
+  border-spacing: 0 6px !important
+  background: none
+
+  .dropdown-menu
+    border-radius: $border-radius !important
+    top: -1px !important
+
+  th.rank-column
+    padding-right: 0
+    width: 0 !important
+
+  th > button, th .sorting-arrows
+    -webkit-appearance: none
+    -moz-appearance: none
+    appearance: none
+    background: transparent
+    border: none
+
+    &:focus
+      outline: none
+
+    &:after
+      @include button-sort-table(top)
+
+    &:before
+      @include button-sort-table(bottom)
+
+  th.rank-column > button
+    left: 0.75rem
+
+  td, th
+    white-space: nowrap!important
+    padding: 4px 1rem
+    border: 0 !important
+    text-align: left
+
+  td
+    background-color: $bg-primary-dark
+
+    img
+      width: $table-img-width
+      height: $table-img-height
+
+    @include media-breakpoint-down(md)
+      padding: 12px 1rem
+
+  td.pair-column
+    min-width: 100px
+
+    .pair-name-wrp
+      min-width: 200px
+      @include media-breakpoint-down(md)
+        min-width: 150px
+
+    .pair-name
+      position: absolute
+      max-width: 100%
+      text-overflow: ellipsis
+      overflow: hidden
+      left: 2rem
+      padding-right: 2rem
+
+    .avatar
+      width: $table-img-width
+
+  td.last-price-column,
+  td.menu-dot-column,
+  td.change-column,
+  td.holders-column,
+  td.volume-column,
+  td.marketcap-column,
+  td.combined-volume-cap-column,
+  td.rank-column
+    text-align: right
+
+  th.networks-column
+    text-align: center
+
+  td.networks-column
+    .not-deployed
+      opacity: 0.3
+
+    img
+      width: $table-img-height
+      height: $table-img-width
+      min-width: $table-img-height
+
+      &[src*=CRO]
+        width: 20px
+        height: 20px
+        min-width: 20px
+        margin-left: 3px
+
+  th.sort.holders-column
+    padding-right: 0.75rem
+    padding-left: 0
+
+  td.column-with-guide
+    padding-right: 2.5rem
+
+  th
+    background: $bg-primary-dark
+    color: $text-color-primary
+    font-weight: bold
+    vertical-align: middle
+    position: relative
+
+    &.sort > button, &.sort .sorting-arrows
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      cursor: pointer
+
+    &.sorting-asc > button, &.sorting-asc .sorting-arrows
+      &:after
+        border-bottom: $sorting-arrows-width solid $primary
+
+    &.sorting-desc > button, &.sorting-desc .sorting-arrows
+      &:before
+        border-top: $sorting-arrows-width solid $primary
+
+    &.sort .sorting-arrows
+      position: relative
+      width: auto
+      margin-right: 0.5rem
+      transform: translateY(-4px)
+
+    .dropdown-toggle
+      font-size: 14px
+      padding: 0.5rem
+      margin-top: 0.25rem
+      margin-bottom: 0.25rem
+      line-height: 1
+      z-index: 1
+
+    .guide-icon
+      font-size: 14px
+
+  th.marketcap-column,
+  th.volume-column,
+  th.combined-volume-cap-column,
+  th.sort.last-price-column,
+  th.sort.change-column,
+  th.sort.holders-column
+    text-align: right
+
+    & > span
+      float: right
+
+    & > button
+      opacity: 0
+
+    a[data-tippy]
+      transform: translateY(2px)
+
+  th.sort.pair-column
+    padding-left: 2.25rem
+    width: 30% !important
+
+    button
+      left: 0.75rem
+
+  th.trade-column
+    padding: 4px 1.75rem
+
+  th.trade-column, td.trade-column
+    text-align: center
+
+    @include media-breakpoint-down(md)
+      display: none !important
+
+    .btn
+      font-size: 14px
+      line-height: 1
+      padding-top: 0.5rem
+      padding-bottom: 0.5rem
+      margin-top: 0.25rem
+      margin-bottom: 0.25rem
+
+  tr:hover
+    td
+      background-color: $block-background-hover
+
+.d-custom-xl-table-cell
+  @media (min-width: 1100px)
+    display: table-cell !important
+
+.d-custom-xl-none
+  @media (min-width: 1100px)
+    display: none !important
+
+@include media-breakpoint-down(md)
+  $font-size: 13px
+
+  .spinner-trading > .row > .col-12
+    padding: 0 !important
+
+  .data-table-trading
+    th
+      font-size: $font-size
+      font-weight: 600
+
+      .dropdown
+        .dropdown-toggle, .dropdown-item
+          font-size: $font-size
+
+@include media-breakpoint-down(sm)
+  $font-size: 12px
+
+  .margin-spinners-sm
+    margin: 0
+
+  .img-map
+    padding-left: none
+    height: 40vh
+
+  .button-top
+    margin-top: 28%
+
+  .data-table-trading
+    th
+      font-size: $font-size
+      font-weight: 600
+
+      &.pair-column
+        padding-right: 0
+      &.last-price-column, &.menu-dot-column
+        padding-left: 0
+        padding-right: 0
+      &.combined-volume-cap-column
+        padding-left: 0
+        padding-right: 0.5rem
+
+      .dropdown
+        .dropdown-toggle, .dropdown-item
+          font-size: $font-size
+
+    td
+      font-size: $font-size
+      font-weight: 500
+
+      &.pair-column
+        .pair-name-wrp
+          min-width: auto
+        .pair-name
+          padding-right: 0
+
+      &.last-price-column, &.menu-dot-column
+        padding-right: 0
+
+.aside-div
+  z-index: 1

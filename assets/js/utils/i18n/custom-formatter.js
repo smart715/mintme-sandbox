@@ -16,7 +16,7 @@ export default class CustomFormatter {
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>');
 
-        if (typeof context === 'object') {
+        if ('object' === typeof context) {
             const matches = result.match(/(%([^%]|%%)*%)/g);
 
             if (matches) {

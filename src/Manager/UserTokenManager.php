@@ -20,6 +20,17 @@ class UserTokenManager implements UserTokenManagerInterface
         $this->repository = $repository;
     }
 
+    /** @inheritDoc */
+    public function findByUser(User $user): array
+    {
+        return $this->repository->findBy(
+            [
+                'user' => $user,
+                'isRemoved' => false,
+            ]
+        );
+    }
+
     public function findByUserToken(User $user, Token $token): ?UserToken
     {
         return $this->repository->findByUserToken(
@@ -28,24 +39,39 @@ class UserTokenManager implements UserTokenManagerInterface
         );
     }
 
-    public function updateRelation(User $user, Token $token, Money $balance): void
+    public function updateRelation(User $user, Token $token, Money $balance, bool $isReferral = false): void
     {
         $userToken = $this->findByUserToken($user, $token);
-        $isCreator = $user->getId() === $token->getProfile()->getUser()->getId();
 
-        if (!$userToken && ($isCreator || !$balance->isZero())) {
+        if (!$userToken) {
             $userToken = (new UserToken())
                 ->setToken($token)
-                ->setUser($user)
-                ->setIsHolder(!$balance->isZero());
-            $this->entityManager->persist($userToken);
+                ->setUser($user);
+
             $user->addToken($userToken);
             $this->entityManager->persist($user);
-            $this->entityManager->flush();
-        } elseif ($userToken) {
-            $userToken = $userToken->setIsHolder(!$balance->isZero());
-            $this->entityManager->persist($userToken);
-            $this->entityManager->flush();
         }
+
+        $userToken
+            ->setIsHolder(!$balance->isZero())
+            ->setIsReferral($isReferral);
+
+        if (!$token->isBlocked()) {
+            $userToken->setIsRemoved(false);
+        }
+
+        $this->entityManager->persist($userToken);
+        $this->entityManager->flush();
+    }
+
+    public function getUserOwnsCount(int $userId): int
+    {
+        return $this->repository->getUserOwnsCount($userId);
+    }
+
+    /** @inheritDoc */
+    public function getHoldersWithDiscord(Token $token): array
+    {
+        return $this->repository->findWithDiscordByToken($token);
     }
 }

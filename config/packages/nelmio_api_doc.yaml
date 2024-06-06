@@ -16,10 +16,10 @@ nelmio_api_doc:
                 name: X-API-KEY
                 in: header
             OAuthToken:
-                 type: apiKey
-                 description: 'Authorization: Bearer {token}'
-                 name: Authorization
-                 in: header
+                type: apiKey
+                description: 'Authorization: Bearer {token}'
+                name: Authorization
+                in: header
         sandbox:
             accept_type: 'application/json'
             body_format:
@@ -37,7 +37,7 @@ nelmio_api_doc:
     models:
         use_jms: false
         names:
-            - { alias: Сurrency,                type: App\Entity\TradebleInterface,             groups: [dev] }
+            - { alias: Currency,                type: App\Entity\TradableInterface,             groups: [dev] }
             - { alias: Market,                  type: App\Exchange\Market,                      groups: [dev] }
             - { alias: MarketStatus,            type: App\Entity\MarketStatus,                  groups: [dev] }
             - { alias: MarketStatusDetails,     type: App\Exchange\MarketInfo,                  groups: [dev] }

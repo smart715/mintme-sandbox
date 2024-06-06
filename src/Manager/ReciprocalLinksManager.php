@@ -8,12 +8,11 @@ use Doctrine\ORM\EntityRepository;
 
 class ReciprocalLinksManager implements ReciprocalLinksManagerInterface
 {
-    /** @var EntityRepository */
+    /** @var EntityRepository<ReciprocalLinks> $repository */
     private $repository;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        /** @var EntityRepository $repository */
         $repository = $entityManager->getRepository(ReciprocalLinks::class);
         $this->repository = $repository;
     }

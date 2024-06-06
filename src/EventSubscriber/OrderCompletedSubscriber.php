@@ -9,6 +9,7 @@ use App\Exchange\Order;
 use App\Mailer\MailerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NewBuyOrderNotificationStrategy;
 use App\Notifications\Strategy\NewInvestorNotificationStrategy;
 use App\Notifications\Strategy\NotificationContext;
 use App\Utils\NotificationTypes;
@@ -17,16 +18,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class OrderCompletedSubscriber implements EventSubscriberInterface
 {
 
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var MailerInterface */
-    private $mailer;
-
-    /** @var ScheduledNotificationManagerInterface */
-    private $scheduledNotificationManager;
-
-    /** @var UserNotificationManagerInterface */
+    private MarketHandlerInterface $marketHandler;
+    private MailerInterface $mailer;
+    private ScheduledNotificationManagerInterface $scheduledNotificationManager;
     private UserNotificationManagerInterface $userNotificationManager;
 
     public function __construct(
@@ -39,7 +33,6 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
         $this->mailer = $mailer;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->userNotificationManager = $userNotificationManager;
-        $this->mailer = $mailer;
     }
 
     public static function getSubscribedEvents(): array
@@ -66,17 +59,39 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
         $quote =  $order->getMarket()->getQuote();
 
         if ($quote instanceof Token) {
-            $makerTokens = $order->getMaker()->getProfile()->getUser()->getTokens();
-            $userProfile = $order->getMaker()->getProfile()->getNickname();
+            $makerTokens = $order->getMaker()->getTokens();
+            $userProfile = $order->getMaker()->getProfile();
             $userTokenCreator = $quote->getProfile()->getUser();
             $orderType = $order->getSide();
             $market = $order->getMarket();
             $tokenName = $quote->getName();
 
-            if (Order::BUY_SIDE === $orderType && !in_array($quote, $makerTokens, true)) {
+            if (Order::BUY_SIDE === $orderType &&
+                $userTokenCreator->getProfile() !== $userProfile &&
+                !$this->marketHandler->getAllPendingSellOrders($market)
+            ) {
+                $notificationType = NotificationTypes::NEW_BUY_ORDER;
+                $strategy = new NewBuyOrderNotificationStrategy(
+                    $userProfile,
+                    $order->getMarket(),
+                    $notificationType,
+                    $this->userNotificationManager,
+                    $this->mailer
+                );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($userTokenCreator);
+            }
+
+            if (!in_array($quote, $makerTokens, true) &&
+                $event->getLeft() &&
+                $event->getAmount() &&
+                $event->getLeft()->lessThan($event->getAmount())
+            ) {
                 $extraData = [
-                    'profile' => $userProfile,
+                    'profile' => $userProfile->getNickname(),
+                    'profileAvatarUrl' => $userProfile->getImage()->getUrl(),
                     'tokenName' => $tokenName,
+                    'marketSymbol' => $market->getBase()->getSymbol(),
                 ];
                 $notificationType = NotificationTypes::NEW_INVESTOR;
                 $strategy = new NewInvestorNotificationStrategy(

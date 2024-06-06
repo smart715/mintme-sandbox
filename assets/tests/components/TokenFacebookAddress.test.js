@@ -13,6 +13,8 @@ function mockVue() {
             Vue.prototype.$axios = {single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = {error: () => {}};
+            Vue.prototype.$toasted = {show: () => {}};
         },
     });
     return localVue;
@@ -34,7 +36,7 @@ describe('TokenFacebookAddress', () => {
                 address: '',
                 appId: 'foo id',
                 tokenName: 'foo token name',
-           },
+            },
         });
         expect(wrapper.vm.computedAddress).toBe('token.facebook.empty_address');
     });
@@ -81,7 +83,7 @@ describe('TokenFacebookAddress', () => {
             },
         });
         expect(wrapper.vm.selectedUrl).toBe('foo.com');
-        expect(wrapper.find('option').attributes('value')).toBe('foo.com');
+        expect(wrapper.findComponent('option').attributes('value')).toBe('foo.com');
         expect(wrapper.html().includes('foo name')).toBe(true);
     });
 
@@ -89,22 +91,18 @@ describe('TokenFacebookAddress', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenFacebookAddress, {
             localVue,
-            methods: {
-                notifySuccess: function(message) {
-                    return false;
-                },
-            },
             propsData: {
                 address: '',
                 appId: 'foo id',
                 tokenName: 'foo token name',
             },
         });
-        wrapper.vm.saveFacebookAddress();
 
         moxios.stubRequest('token_update', {
             status: 200,
         });
+
+        wrapper.vm.saveFacebookAddress();
 
         moxios.wait(() => {
             expect(wrapper.vm.showConfirmModal).toBe(false);
@@ -117,40 +115,34 @@ describe('TokenFacebookAddress', () => {
     it('call saveFacebookAddress() when savePage() is called', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             localVue: mockVue(),
-            methods: {
-                saveFacebookAddress: function() {
-                    wrapper.vm.$emit('savePageTest');
-                },
-            },
             propsData: {
                 address: '',
                 appId: 'foo id',
                 tokenName: 'foo token name',
             },
         });
+
+        const saveFacebookAddressSpy = jest.spyOn(wrapper.vm, 'saveFacebookAddress').mockImplementation(jest.fn());
         wrapper.vm.savePage();
 
-        expect(wrapper.emitted('savePageTest').length).toBe(1);
+        expect(saveFacebookAddressSpy).toHaveBeenCalled();
     });
 
     it('call saveFacebookAddress() when deleteAddress() is called', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             localVue: mockVue(),
-            methods: {
-                saveFacebookAddress: function() {
-                    wrapper.vm.$emit('deleteAddressTest');
-                },
-            },
             propsData: {
                 address: '',
                 appId: 'foo id',
                 tokenName: 'foo token name',
             },
         });
+
+        const saveFacebookAddressSpy = jest.spyOn(wrapper.vm, 'saveFacebookAddress').mockImplementation(jest.fn());
         wrapper.vm.selectedUrl = 'foo.com';
         wrapper.vm.deleteAddress();
 
         expect(wrapper.vm.selectedUrl).toBe('');
-        expect(wrapper.emitted('deleteAddressTest').length).toBe(1);
+        expect(saveFacebookAddressSpy).toHaveBeenCalled();
     });
 });

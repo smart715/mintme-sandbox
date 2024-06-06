@@ -9,8 +9,4 @@ interface RefererRequestHandlerInterface
     public function isRefererValid(string $pathInfo): bool;
 
     public function refererUrlsToSkip(): array;
-
-    public function noRedirectToMainPage(string $referer): bool;
-
-    public function refererRoutesForRedirectToMainPage(): array;
 }

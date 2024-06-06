@@ -4,21 +4,22 @@ namespace App\Communications;
 
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
+use App\Services\JwtService\JwtServiceInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class CoinifyCommunicator
 {
-    /** @var RestRpcInterface */
-    private $rpc;
-
-    /** @var int */
-    private $partnerId;
+    private RestRpcInterface $rpc;
+    private int $partnerId;
+    private JwtServiceInterface $jwtService;
 
     public function __construct(
         RestRpcInterface $rpc,
+        JwtServiceInterface $jwtService,
         int $partnerId
     ) {
         $this->rpc = $rpc;
+        $this->jwtService = $jwtService;
         $this->partnerId = $partnerId;
     }
 
@@ -40,6 +41,39 @@ class CoinifyCommunicator
                             'country' => 'US',
                         ],
                     ],
+                ],
+            ]
+        );
+
+        $response = json_decode($response, true);
+
+        if (isset($response['error']) && 'trader_exists' === $response['error']) {
+            return $this->getNewOfflineToken($user);
+        }
+
+        if (!isset($response['offlineToken'])) {
+            throw new ApiBadRequestException();
+        }
+
+        return $response['offlineToken'];
+    }
+
+    public function getNewOfflineToken(User $user): string
+    {
+        $bearerToken = $this->jwtService->createToken([
+            'email' => $user->getEmail(),
+        ]);
+
+        $response = $this->rpc->send(
+            'users/reset-offline-token',
+            Request::METHOD_POST,
+            [
+                'json' => [
+                    'partnerId' => $this->partnerId,
+                    'email' => $user->getEmail(),
+                ],
+                'headers' => [
+                    'Authorization' => "Bearer {$bearerToken}",
                 ],
             ]
         );

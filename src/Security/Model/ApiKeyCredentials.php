@@ -2,18 +2,21 @@
 
 namespace App\Security\Model;
 
+/** @codeCoverageIgnore */
 class ApiKeyCredentials implements ApiAuthCredentialsInterface
 {
-    /** @var string */
-    private $private;
+    private ?string $private;
+    private string $public;
+    private bool $privateRequired;
 
-    /** @var string */
-    private $public;
-
-    public function __construct(string $public, string $private)
-    {
+    public function __construct(
+        string $public,
+        ?string $private,
+        bool $privateRequired
+    ) {
         $this->public = $public;
         $this->private = $private;
+        $this->privateRequired = $privateRequired;
     }
 
     public function getPublic(): string
@@ -26,8 +29,13 @@ class ApiKeyCredentials implements ApiAuthCredentialsInterface
         return $this->public;
     }
 
-    public function getPrivate(): string
+    public function getPrivate(): ?string
     {
         return $this->private;
+    }
+
+    public function isPrivateRequired(): bool
+    {
+        return $this->privateRequired;
     }
 }

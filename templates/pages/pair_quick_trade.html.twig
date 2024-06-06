@@ -1,0 +1,26 @@
+<quick-trade
+    {% if displayOn is defined and displayOn == 'mobile' %}v-if="isMobileScreen"{% endif %}
+    {% if class is defined %}class="{{ class }}"{% endif %}
+    :logged-in="{{ loggedIn }}"
+    :login-recaptcha-sitekey="'{{ google_recaptcha_site_key }}'"
+    :reg-recaptcha-sitekey="'{{ reg_google_recaptcha_site_key }}'"
+    :params="{{ quick_trade_params | json_encode }}"
+    :min-amounts="{{ quick_trade_min_amounts | json_encode }}"
+    websocket-url="{{ global_websocket_url }}"
+    disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+    :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+    :is-mobile-screen="isMobileScreen"
+    :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+    :is-owner="{{ isOwner }}"
+    :is-user-blocked="{{ app.user.isBlocked|default(false) ? 'true' : 'false'}}"
+    :disabled-cryptos="{{ disabledBlockchain|json_encode }}"
+    {% if horizontal is defined %}is-horizontal{% endif %}
+    :tab="activeTab"
+    :is-trade-page="{{ tradePage is defined and tradePage ? 'true' : 'false' }}"
+    :trades-disabled="{{ isTokenPage
+        ? token.tradesDisabled ? 'true' : 'false'
+        : tradesDisabled ? 'true' : 'false'
+    }}"
+    @go-to-trade="goToTrade"
+></quick-trade>

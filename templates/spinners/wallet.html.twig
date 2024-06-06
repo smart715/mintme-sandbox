@@ -1,6 +1,6 @@
 <div class="tabs tabs-theme" v-if="false">
     <div>
-        <ul role="tablist" class="nav nav-tabs">
+        <ul role="tablist" class="nav nav-tabs p-3">
             <li role="presentation" class="nav-item">
                 <a
                     role="tab"
@@ -14,7 +14,7 @@
                     {% trans %} page.wallet.title {% endtrans%}
                 </a>
             </li>
-            <li role="presentation" class="nav-item">
+            <li role="presentation" class="nav-item ml-3">
                 <a
                     role="tab"
                     tabindex="-1"
@@ -28,7 +28,21 @@
                     {% trans %} page.wallet.trading_history {% endtrans %}
                 </a>
             </li>
-            <li role="presentation" class="nav-item">
+            <li role="presentation" class="nav-item ml-3">
+                <a
+                    role="tab"
+                    aria-selected="false"
+                    aria-setsize="4"
+                    aria-posinset="4"
+                    target="_self"
+                    href="{{ path('wallet', {tab: 'activity-history'}) }}"
+                    class="nav-link {% if tab|default and tab == 'promotion-history' %} active {% endif %}"
+                    tabindex="-1"
+                >
+                    {% trans %} page.wallet.promotion_history {% endtrans %}
+                </a>
+            </li>
+            <li role="presentation" class="nav-item ml-3">
                 <a
                     role="tab"
                     tabindex="-1"
@@ -42,7 +56,7 @@
                     {% trans %} page.wallet.dep_with {% endtrans%}
                 </a>
             </li>
-            <li role="presentation" class="nav-item">
+            <li role="presentation" class="nav-item ml-3">
                 <a
                     role="tab"
                     aria-selected="false"
@@ -56,24 +70,47 @@
                     {% trans %} page.wallet.active_orders {% endtrans %}
                 </a>
             </li>
+            <li role="presentation" class="nav-item ml-auto">
+                <a
+                    role="tab"
+                    aria-selected="false"
+                    aria-setsize="4"
+                    aria-posinset="4"
+                    target="_self"
+                    href="{{ app.request.headers.get('referer') }}"
+                    class="nav-link d-flex {% if tab|default and tab == 'active-orders' %} active {% endif %}"
+                    tabindex="-1"
+                >
+                    <div class="go-back-arrow"></div>
+                    <span class="text-uppercase ml-1">
+                        {% trans %} go_back {% endtrans %}
+                    </span>
+                </a>
+            </li>
         </ul>
     </div>
     <div class="tab-content">
         <div role="tabpanel" aria-hidden="false" class="tab-pane active" tabindex="-1">
             <div class="px-0 py-2">
-                <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-                    {% trans %} page.wallet.balance.spinner {% endtrans %}
+                <div class="table-header">
+                    <h3>
+                        {% trans %} page.wallet.coins.header {% endtrans %}
+                    </h3>
                 </div>
-                <div class="table-responsive">
+                <div>
                     <div class="p-5 text-center">
                         <div class="icon-loading"></div>
                     </div>
                 </div>
-                <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-                    {% trans %} page.wallet.tokens_own.spinner {% endtrans %}
+                <div class="table-header">
+                    <h3 class="table-header">
+                        {% trans %} page.wallet.tokens.header {% endtrans %}
+                    </h3>
                 </div>
-                <div class="p-5 text-center">
-                    <div class="icon-loading"></div>
+                <div>
+                    <div class="p-5 text-center">
+                        <div class="icon-loading"></div>
+                    </div>
                 </div>
             </div>
         </div>

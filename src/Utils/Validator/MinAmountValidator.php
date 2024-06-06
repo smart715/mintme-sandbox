@@ -4,21 +4,18 @@ namespace App\Utils\Validator;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
+use App\Utils\Converter\RebrandingConverter;
+use App\Utils\Symbols;
 
 class MinAmountValidator implements ValidatorInterface
 {
-    /** @var TradebleInterface|null */
-    private $tradable;
-
-    /** @var string */
-    private $amount;
-
-    /** @var string */
-    private $message;
+    private ?TradableInterface $tradable;
+    private string $amount;
+    private string $message;
 
     public function __construct(
-        TradebleInterface $tradable,
+        TradableInterface $tradable,
         string $amount
     ) {
         $this->tradable = $tradable;
@@ -35,8 +32,14 @@ class MinAmountValidator implements ValidatorInterface
             ? $this->getMinimal($unit)
             : 0;
 
+        $rebrandingConverter = new RebrandingConverter();
+
+        $currency = Symbols::WEB === $this->tradable->getSymbol()
+            ? $rebrandingConverter->convert($this->tradable->getSymbol())
+            : $this->tradable->getSymbol();
+
         $minAmountDecimal = rtrim(sprintf('%.18f', $min), '0');
-        $this->message = "Minimum amount is {$minAmountDecimal} {$this->tradable->getSymbol()}";
+        $this->message = "Minimum amount is {$minAmountDecimal} {$currency}";
 
         return (float)$this->amount >= $min;
     }
@@ -48,6 +51,6 @@ class MinAmountValidator implements ValidatorInterface
 
     private function getMinimal(int $unit): float
     {
-        return 1 / (int)str_pad('1', $unit + 1, '0');
+        return 1 / (int)str_pad('1', $unit, '0');
     }
 }

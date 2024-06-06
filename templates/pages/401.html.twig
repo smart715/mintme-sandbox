@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% trans %}page.error.401.title{% endtrans %} - {{ error_message | default('')}} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/error') }}
+{% endblock %}
+
+{% block bodyclass %}errorpage{% endblock %}
+
+{% block messageClass %}d-none{% endblock %}
+
+{% block content %}
+    <div class="container top-4 h-100">
+        <div class="row justify-content-center align-content-center text-center text-white h-100">
+            <div class="col-12 py-5">
+                <div class="error-code">401</div>
+                <p class="error-msg">
+                    {% trans %}page.error.401.body{% endtrans %},
+                    <a href="{{ path('homepage') }}" class="backlink">{% trans %}return_homepage_2{% endtrans %}</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/error') }}
+{% endblock %}

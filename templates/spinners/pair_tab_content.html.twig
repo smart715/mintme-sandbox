@@ -1,0 +1,25 @@
+{% set isVotingTab = tab == 'voting' or tab == 'create-voting' or tab == 'show-voting' %}
+
+{% if tab == 'trade' %}
+    {{ include("spinners/pair_trading.html.twig") }}
+{% elseif isVotingTab %}
+    <div v-if="!votingWidgetLoaded">
+        {% if tab == 'voting' %}
+            {% include 'spinners/voting_list.html.twig' with {'isToken': true, 'tokenName' : token.name} %}
+        {% endif %}
+        {% if tab == 'create-voting' %}
+            {% include 'spinners/voting_create.html.twig' with {'isToken': true, 'tokenName' : token.name} %}
+        {% endif %}
+        {% if tab == 'show-voting' %}
+            {% include 'spinners/voting_show.html.twig' with {'isToken': true, 'tokenName' : token.name} %}
+        {% endif %}
+    </div>
+{% elseif tab == 'post' %}
+    {% include 'spinners/pair_post.html.twig' %}
+{% elseif tab == 'posts' %}
+    {% include 'spinners/posts_list.html.twig' with {
+            'pagination' : true,
+            'hideWithVue' : false,
+        }
+    %}
+{% endif %}

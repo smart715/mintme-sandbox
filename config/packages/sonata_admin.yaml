@@ -8,6 +8,40 @@ sonata_admin:
             - { position: left, type: sonata.admin.block.admin_list }
 
         groups:
+            finance:
+                label: Finance
+                items:
+                    - route: show_balance
+                      label: Show balance
+                    - route: show_income
+                      label: Show income
+                icon: '<i class="fa fa-money"></i>'
+                roles: ['ROLE_FINANCIER']
+            profits:
+                label: Profits
+                items:
+                    - route: trading_profits
+                      label: Trading profits
+                    - route: services_profits
+                      label: Services profits
+                    - route: transactions_profits
+                      label: Transactions profits
+                    - route: referrals_profits
+                      label: Referrals profits
+                    - route: bots_profits
+                      label: Bots profits
+                    - route: profits_summary
+                      label: Profits summary
+                roles: ['ROLE_PROFIT_VIEWER']
+
+            viewonly:
+                label: View Only
+                items:
+                    - route: view_only
+                      label: View Only
+                    - route: check_email_address
+                      label: Check Email Address
+
             main.documents:
                 label: Main Documents
                 items:
@@ -53,6 +87,12 @@ sonata_admin:
                     - sonata.classification.admin.collection
                     - sonata.classification.admin.context
 
+            tos_pp.translations:
+                label: ToS and PP
+                items:
+                    - tos_pp.translations
+                icon: '<i class="fa fa-globe"></i>'
+
             translations:
                 label: Translations
                 items:
@@ -73,6 +113,7 @@ sonata_admin:
             - bundles/sonataformatter/markitup/sets/markdown/set.js
             - bundles/sonataformatter/markitup/sets/html/set.js
             - bundles/sonataformatter/markitup/sets/textile/set.js
+            - bundles/pixsortablebehavior/js/init.js
 
         extra_stylesheets:
             - bundles/sonataformatter/markitup/skins/sonata/style.css

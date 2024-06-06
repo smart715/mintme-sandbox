@@ -14,7 +14,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PendingWithdrawRepository")
- * @ORM\Table(name="pending_withdraw")
+ * @ORM\Table(
+ *     name="pending_withdraw",
+ *     indexes={
+ *         @ORM\Index(name="FK_321D93BB37423AA5", columns={"crypto_network_id"}),
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
@@ -24,63 +29,74 @@ class PendingWithdraw implements PendingWithdrawInterface
      * @ORM\Id()
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @var int
      */
     protected int $id;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      * @Groups({"API"})
-     * @var DateTimeImmutable
      */
     private DateTimeImmutable $date;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
      * @Groups({"API"})
-     * @var Crypto
      */
     private Crypto $crypto;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
+     * @Groups({"API"})
+     */
+    private Crypto $cryptoNetwork;
+
+    /**
      * @ORM\Column(type="string")
      * @Groups({"API"})
-     * @var string
      */
-    private $amount = '0';
+    private string $amount = '0'; // phpcs:ignore
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pendingWithdrawals")
-     * @var User
      */
     private User $user;
 
     /**
      * @Assert\NotBlank()
      * @ORM\Column(type="string")
-     * @var string
      */
-    private $address;
+    private string $address;
 
     /**
      * @ORM\Column(type="string")
-     * @var string
      */
     protected string $hash;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true, options={"default": "0"})
      */
-    private string $fee;
+    private string $fee = '0'; //phpcs:ignore
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private ?string $feeCurrency;
 
-    public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address, Money $fee)
-    {
+    public function __construct(
+        User $user,
+        Crypto $crypto,
+        Crypto $cryptoNetwork,
+        Amount $amount,
+        Address $address,
+        Money $fee
+    ) {
         $this->user = $user;
         $this->crypto = $crypto;
+        $this->cryptoNetwork = $cryptoNetwork;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
         $this->fee = $fee->getAmount();
+        $this->feeCurrency = $fee->getCurrency()->getCode();
     }
 
     public function getId(): int
@@ -96,6 +112,11 @@ class PendingWithdraw implements PendingWithdrawInterface
     public function getCrypto(): Crypto
     {
         return $this->crypto;
+    }
+
+    public function getCryptoNetwork(): Crypto
+    {
+        return $this->cryptoNetwork;
     }
 
     public function getAmount(): Amount
@@ -139,9 +160,25 @@ class PendingWithdraw implements PendingWithdrawInterface
 
     public function getFee(): Money
     {
-        return new Money(
-            $this->fee,
-            new Currency($this->crypto->getSymbol())
-        );
+        return new Money($this->fee, new Currency($this->feeCurrency));
+    }
+
+    public function getFeeCurrency(): ?string
+    {
+        return $this->feeCurrency;
+    }
+
+    public function setAmount(Money $amount): self
+    {
+        $this->amount = $amount->getAmount();
+
+        return $this;
+    }
+
+    public function setFee(Money $amount): self
+    {
+        $this->amount = $amount->getAmount();
+
+        return $this;
     }
 }

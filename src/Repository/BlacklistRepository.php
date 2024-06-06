@@ -2,16 +2,21 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use App\Entity\Blacklist\Blacklist;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class BlacklistRepository extends EntityRepository
+/**
+ * @extends ServiceEntityRepository<Blacklist>
+ * @codeCoverageIgnore
+ */
+class BlacklistRepository extends ServiceEntityRepository
 {
-    /** @codeCoverageIgnore
-     * @param string $value
-     * @param string $type
-     * @param bool $isSensitive
-     * @return bool
-     */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Blacklist::class);
+    }
+
     public function matchValue(string $value, string $type, bool $isSensitive = true): bool
     {
         $valCondition = $isSensitive ?
@@ -35,5 +40,15 @@ class BlacklistRepository extends EntityRepository
             ->setParameter('type', $type)
             ->getQuery()
             ->execute();
+    }
+
+    public function getValues(string $type): array
+    {
+        return array_column($this->createQueryBuilder('b')
+            ->select('b.value')
+            ->where('b.type = :type')
+            ->setParameter('type', $type)
+            ->getQuery()
+            ->getArrayResult(), 'value');
     }
 }

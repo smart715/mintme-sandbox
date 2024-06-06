@@ -1,92 +1,137 @@
+
 {% trans_default_domain 'FOSUserBundle' %}
-<form action="{{ path('login') }}" method="post" id="login">
+{% set captchaError = error and error.message == 'captcha_login' %}
+{% set isEmbedded = embedded is defined and embedded %}
+{% set formControlClass = isEmbedded ? '' : 'dark-form-control ' %}
+
+<form
+    action="{{ path('fos_user_security_check') }}"
+    method="post"
+    id="login"
+    @submit="showPassword"
+>
     {% if app.session.flashbag.peekAll() is not empty %}
         <div class="row">
-            {% for label, messages in app.flashes %}
-                {% for message in messages %}
-                    <div class="col">
-                        <div class="p-2 mb-2 bg-{{ label }} text-center text-white">{{ message }}</div>
-                    </div>
-                {% endfor %}
-            {% endfor %}
+            {% for label, messages in app.flashes %} {% for message in messages %}
+                <div class="col">
+                    <div class="p-2 mb-2 bg-{{ label }} text-center text-white">{{ message }}</div>
+                </div>
+            {% endfor %} {% endfor %}
         </div>
-    {% elseif error %}
+    {% elseif error and not captchaError %}
         <div class="row">
             <div class="col">
-            {% if error.message == 'User account is disabled.' %}
-                <div class="p-2 mb-2 bg-danger text-center text-white">
-                    {% trans %}security.login.locked{% endtrans %}
-                </div>
-            {% else %}
-                <div class="p-2 mb-2 bg-danger text-center text-white">
-                    {% trans %}error.credentials{% endtrans %}
-                </div>
-            {% endif %}
+                {% if error.message == 'User account is disabled.' %}
+                    <div class="p-2 mb-2 bg-danger text-center text-white rounded">
+                        {% trans %} security.login.blocked {% endtrans %}
+                    </div>
+                {% else %}
+                    <div class="p-2 mb-2 bg-danger text-center text-white rounded">
+                        {% trans %} error.credentials {% endtrans %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}
-    <div class="form-group row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-12  text-left">
-                    <label for="inputEmail" class="d-block label-featured">{% trans %}form.email{% endtrans %}</label>
-                </div>
-                <div class="col">
-                    <input type="email" name="_username"  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-12  text-left">
-                    <label for="inputPassword" class="d-block label-featured">
-                        {% trans %}security.login.password{% endtrans %}
-                    </label>
-                </div>
-                <div id="login-password" class="col">
-                    <input type="password" autocomplete="off" name="_password" required="required" id="inputPassword" class="form-control">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="login-form-captcha-container" class="form-group row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-12  text-left"></div>
-                <div class="col">
-                    {% if not form.vars.valid %}
-                        {% for error in form.vars.errors %}
-                            {% if not (error.cause.id is defined and 'captcha_login' is same as(error.cause.id)) %}
-                                <div class="py-2 mb-2 bg-danger text-white text-center">{{ error.message }}</div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                    {{ form_widget(form) }}
+    <div class="margin-text-input" id="login-password">
+        <div class="form-control-container {{ formControlClass }} mb-5">
+            <div
+                class="form-control-field"
+            >
+                <input
+                    type="email"
+                    name="_username"
+                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                    value="{{ last_username }}"
+                    required="required"
+                    id="inputEmail"
+                    class="form-control"
+                    autofocus
+                />
+                <div class="outline">
+                    <div class="left-outline"></div>
+                    <div class="label-outline">
+                        <label for='_username'>
+                            {% trans %} form.email {% endtrans %}
+                        </label>
+                    </div>
+                    <div class="right-outline"></div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="form-group row ">
-        <div class="col-md-12 text-left">
+        <div class="form-control-container {{ formControlClass }} mb-3 position-relative">
+            <span class="show-password" @click="togglePassword()" ref="eye-icon">
+                <i class="fas fa-eye"></i>
+            </span>
+            <div
+                class="form-control-field pr-3"
+                id="login-password"
+            >
+                <input
+                    type="password"
+                    autocomplete="current-password"
+                    name="_password"
+                    required="required"
+                    id="inputPassword"
+                    class="form-control"
+                    ref="password-input"
+                />
+                <div class="outline">
+                    <div class="left-outline"></div>
+                    <div class="label-outline">
+                        <label for='_password'>
+                            {% trans %} security.login.password {% endtrans %}
+                        </label>
+                    </div>
+                    <div class="right-outline"></div>
+                </div>
+            </div>
+        </div>
+        <div id="login-form-captcha-container" class="form-group mt-4">
+            {% if captchaError %}
+                <div class="py-2 mb-2 bg-danger text-white text-center rounded">
+                    {{ error.message|trans({}, 'messages') }}
+                </div>
+            {% endif %}
+            <div id="pending-captcha" class="py-2 mb-2 bg-danger text-white text-center rounded d-none">
+                {% trans from 'messages' %} pending_captcha {% endtrans %}
+            </div>
+            {{ form_row(form.recaptcha, { 'inline': false, 'class': 'borderless-form-control' }) }}
+        </div>
+        <div class="form-group mt-5 mb-4">
             <input
                 type="submit"
                 id="_submit"
                 name="_submit"
-                class="btn btn-primary rounded-0"
-                value="{% trans %}security.login.submit{% endtrans %}"
+                class="btn btn-primary btn-block py-3 button-large btn-enabled-focus-dark"
+                value="{% trans %} security.login.submit {% endtrans %}"
+            />
+        </div>
+        <div class="mt-2 mb-3">
+            <a
+                class="text-primary"
+                href="{{ path('fos_user_resetting_request') }}"
             >
-            <span class="px-2">or</span>
-            <a id="signup-button" href="{{ path('register') }}" class="btn-cancel px-0">
-                {% trans %}form.signup.submit{% endtrans %}
+                {% trans %} form.login.forgot {% endtrans %}
             </a>
         </div>
+        <div id="loginFormNewHereSignUp" class="mt-2 mb-3">
+            {% trans from 'FOSUserBundle' %} page.login.new_here {% endtrans %}
+            <a
+                id="signup-button"
+                class="text-primary"
+                href="{{ path('fos_user_registration_register') }}"
+            >
+                {% trans from 'FOSUserBundle' %} page.login.sign_up {% endtrans %}
+            </a>
+        </div>
+        {% if csrf_token %}
+            <input
+                type="hidden"
+                id="fos_user_registration_login_token"
+                name="_csrf_token"
+                value="{{ csrf_token }}"
+            />
+        {% endif %}
     </div>
-    <div class="text-left text-white">
-        <a href="{{ path('fos_user_resetting_request') }}">{% trans %}form.login.forgot{% endtrans %}</a>
-    </div>
-    {% if csrf_token %}
-        <input type="hidden" id="fos_user_registration_login__token" name="_csrf_token" value="{{ csrf_token }}" />
-    {% endif %}
 </form>

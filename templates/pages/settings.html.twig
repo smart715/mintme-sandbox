@@ -1,13 +1,22 @@
 {% extends 'base.html.twig' %}
 
+{% set isTwoFactor = twoFactorAuth ? 'true' : 'false' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/settings') }}
+{% endblock %}
+
 {% block title %}{% trans %}page.settings.title{% endtrans%} | mintMe{% endblock %}
 
 {% block content %}
     <div id="settings" class="container">
         <div class="row pt-4 justify-content-center">
-            <div class="card-two-divs-fixed-large pl-xl-0 col-md-6">
+            <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">{% trans %}page.settings.account.header{% endtrans %}</div>
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                        {% trans %}page.settings.password.header{% endtrans %}
+                    </div>
                     <div class="card-body m-0">
                         <div id="settings" class="account-settings">
                         {% if twoFactorAuth %}
@@ -15,6 +24,7 @@
                             <two-factor-modal
                                 :visible=twoFaVisible
                                 :twofa=true
+                                :loading=loading
                                 @close="twoFaVisible = false"
                                 @verify="doChangePassword"
                             >
@@ -22,46 +32,89 @@
                         {% else %}
                             {{ form_start(passwordForm) }}
                         {% endif %}
-                            <label for="app_user_change_password_current_password" class="d-block label-featured">
-                                {% trans %}form.change_password.current_password{% endtrans %}
-                            </label>
                             <template v-if="showErrorMessage">
-                                <div class="p-2 mb-2 bg-danger text-center text-white">The entered password is invalid.</div>
+                                <div class="p-2 mb-2 bg-danger text-center text-white">
+                                    {% trans %} page.settings.password.invalid {% endtrans %}
+                                </div>
                             </template>
-                            {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off', 'v-model': 'currentPassword'}}) }}
-                            <passwordmeter :password="password" @toggle-error="toggleError">
+                            {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'current-password', 'v-model': 'currentPassword'}}) }}
+                            <passwordmeter
+                                :password="password"
+                                :is-reset-password="true"
+                                :current-password="currentPassword"
+                                :show-current-password-error="showErrorMessage"
+                                @toggle-error="toggleError"
+                            >
                                 <span @click="togglePassword()" class="show-password">
                                     <font-awesome-icon icon="eye"></font-awesome-icon>
                                 </span>
-                                {{ form_row(passwordForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
+                                {{ form_row(passwordForm.plainPassword,
+                                    {
+                                        'class': 'input-password-settings',
+                                        'attr': {
+                                            'v-model': 'password',
+                                            'autocomplete' : 'new-password'
+                                        }
+                                    }
+                                ) }}
                                 <div class="pwdmeter" v-if="false"><meter max="5" value="0"></meter></div>
                             </passwordmeter>
-                            <button type="submit" :disabled="disabled" class="btn btn-primary">{% trans %}page.settings.account.submit{% endtrans %}</button>
+                            <button
+                                type="submit"
+                                :disabled="disabled"
+                                class="btn btn-primary"
+                            >
+                                {% trans %} page.settings.password.submit {% endtrans %}
+                            </button>
                             {{ form_end(passwordForm) }}
                         </div>
                     </div>
                 </div>
+                <div class="card card-featured mt-3">
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                        {% trans %}page.settings.change_email.header{% endtrans %}
+                    </div>
+                    <div class="card-body m-0">
+                        <button
+                            class="btn btn-primary btn-block"
+                            @click="showChangeEmailModal()"
+                        >
+                            {% trans %}page.settings.change_email{% endtrans %}
+                         </button>
+                    </div>
+                </div>
             </div>
-            <div class="card-two-divs-fixed-large pr-xl-0 pr-lg-3 col-md-6 pt-2 pt-md-0">
+            <div class="pr-lg-3 col-md-6 pt-2 pt-md-0">
                 <div class="card card-featured">
-                    <div class="card-header">{% trans %}page.settings.2fa.header{% endtrans %}</div>
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                        {% trans %}page.settings.2fa.header{% endtrans %}
+                    </div>
                     <div class="card-body m-0">
                         <div class="text-center">
-                            <p>{% trans %}page.settings.2fa.body{% endtrans %}</p>
+                            <p>
+                                {% if twoFactorAuth %}
+                                    {% trans %}page.settings.2fa.enabled_content{% endtrans %}
+                                {% else %}
+                                    {% trans %}page.settings.2fa.body{% endtrans %}
+                                {% endif %}
+                            </p>
                         </div>
-                        {% if twoFactorAuth %}
-                            <a href="{{ path('two_factor_auth') }}" class="btn btn-primary btn-block" role="button">
-                                {% trans %}page.settings.2fa.manage{% endtrans %}
-                            </a>
-                        {% else %}
-                            <a href="{{ path('two_factor_auth') }}" class="btn btn-primary btn-block" role="button">
+                        <button
+                            class="btn btn-primary btn-block"
+                            @click="goToTFA({{ needPhoneFor2fa ? 'true' : 'false' }}, {{ isTwoFactor }})"
+                        >
+                            {% if twoFactorAuth %}
+                                {% trans %}page.settings.2fa.disable{% endtrans %}
+                            {% else %}
                                 {% trans %}page.settings.2fa.enable{% endtrans %}
-                            </a>
-                        {% endif %}
+                            {% endif %}
+                        </button>
                     </div>
                 </div>
                 <div class="card card-featured mt-3">
-                    <div class="card-header">{% trans %}userNotification.config.title{% endtrans %}</div>
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                        {% trans %}userNotification.config.title{% endtrans %}
+                    </div>
                     <div class="card-body m-0">
                         <notifications-management-modal
                             :notification-config-modal-visible="notificationConfigModalVisible"
@@ -74,31 +127,48 @@
                         </button>
                     </div>
                 </div>
-                <div class="card card-featured mt-3">
-                    <div class="card-header">Add Discord</div>
-                    <div class="card-body m-0">
-                        {% if not isSignedInWithDiscord %}
-                            <a href="{{ discordAuthUrl }}" class="btn btn-primary btn-block" role="button">
-                                {% trans %}connect{% endtrans %}
-                            </a>
-                        {% else %}
-                            {{ form(disconnectDiscordForm) }}
-                        {% endif %}
+                {% if not viewOnly %}
+                    <div class="card card-featured mt-3">
+                        <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                            <span>
+                                {% trans %}userNotification.config.add_discord{% endtrans %}
+                            </span>
+                            <guide class="tooltip-center">
+                                <template slot="body">
+                                    {% trans %}userNotification.config.tooltip.add_discord{% endtrans %}
+                                </template>
+                            </guide>
+                        </div>
+                        <div class="card-body m-0">
+                            {% if not isSignedInWithDiscord %}
+                                <a href="{{ discordAuthUrl }}" class="btn btn-primary btn-block" role="button">
+                                    {% trans %}connect{% endtrans %}
+                                </a>
+                            {% else %}
+                                {{ form(disconnectDiscordForm) }}
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
         <div class="row justify-content-center">
             <div class="card-fixed-large m-3 pl-0">
                 <div class="card">
-                    <div class="card-header text-uppercase">{% trans %}page.settings.api.header{% endtrans %}</div>
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                        {% trans %}page.settings.api.header{% endtrans %}
+                    </div>
                     <div class="card-body m-0 pt-4">
                         <div class="text-center">
                             <div v-cloak>
                                 <api-keys class="mb-2" :api-keys="{{ keys | json_encode }}" v-cloak></api-keys>
                             </div>
                             <p>
-                                {% trans %}page.settings.api.body_1{% endtrans %} <a href="{{ path('nelmio_api_doc.swagger_ui') }}">{% trans %}page.settings.api.body_2{% endtrans %}</a> {% trans %}page.settings.api.body_3{% endtrans %}
+                                {% trans %}page.settings.api.body_1{% endtrans %}
+                                <a class="link highlight" href="{{ path('nelmio_api_doc.swagger_ui') }}">
+                                    {% trans %}page.settings.api.body_2{% endtrans %}
+                                </a>
+                                {% trans %}page.settings.api.body_3{% endtrans %}
                             </p>
                         </div>
                     </div>
@@ -106,20 +176,52 @@
             </div>
             <div class="card-fixed-large ml-3 mr-3 pl-0">
                 <div class="card">
-                    <div class="card-header">{% trans %}page.settings.oauth.header{% endtrans %}</div>
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                        {% trans %}page.settings.oauth.header{% endtrans %}
+                    </div>
                     <div class="card-body m-0 pt-4">
                         <div class="text-center">
-                            <div v-cloak>
-                                <api-clients class="mb-2" :api-clients="{{ clients | json_encode }}" v-cloak></api-clients>
+                            <div>
+                                <api-clients
+                                    class="mb-2"
+                                    :is-two-factor="{{ isTwoFactor }}"
+                                    :api-clients="{{ clients | json_encode }}"
+                                />
                             </div>
                             <p>
-                                {% trans %}page.settings.oauth.body_1{% endtrans %} <a href="{{ path('nelmio_api_doc.swagger_ui') }}">{% trans %}page.settings.oauth.body_2{% endtrans %}</a> {% trans %}page.settings.oauth.body_3{% endtrans %}
+                                {% trans %}page.settings.oauth.body_1{% endtrans %}
+                                <a class="link highlight" href="{{ path('nelmio_api_doc.swagger_ui') }}">
+                                    {% trans %}page.settings.oauth.body_2{% endtrans %}
+                                </a>
+                                {% trans %}page.settings.oauth.body_3{% endtrans %}
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <change-email-modal
+            :visible="changeEmailModalVisible"
+            @close="changeEmailModalVisible = false"
+            @email-changed="onEmailChanged"
+        ></change-email-modal>
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            :message="addPhoneModalMessage"
+            :no-close="true"
+            @close="addPhoneModalVisible = false"
+            @phone-verified="onPhoneVerified"
+        ></add-phone-alert-modal>
+        <confirm-modal
+            :visible="showDisconnectDiscordModal"
+            :close-on-confirm="true"
+            @confirm="confirmDisconnectDiscord"
+            @close="showDisconnectDiscordModal = false"
+        >
+            <p class="text-white modal-title mt-2 text-break">
+                {% trans %}discord.disconnect.confirm{% endtrans %}
+            </p>
+        </confirm-modal>
     </div>
 {% endblock %}
 {% block pagescripts %}

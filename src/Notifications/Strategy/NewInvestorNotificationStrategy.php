@@ -57,7 +57,11 @@ class NewInvestorNotificationStrategy implements NotificationStrategyInterface
             NotificationChannels::EMAIL
         )
         ) {
-            $this->mailer->sendNewInvestorMail($this->token, $this->extraData['profile']);
+            $this->mailer->sendNewInvestorMail(
+                $this->token,
+                $this->extraData['profile'],
+                $this->extraData['marketSymbol'] ?? null,
+            );
         }
     }
 }

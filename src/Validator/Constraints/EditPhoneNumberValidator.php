@@ -4,13 +4,13 @@ namespace App\Validator\Constraints;
 
 use App\Entity\User;
 use App\Manager\PhoneNumberManagerInterface;
+use App\Services\TranslatorService\TranslatorInterface;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EditPhoneNumberValidator extends ConstraintValidator
 {

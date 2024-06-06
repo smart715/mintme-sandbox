@@ -8,12 +8,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ImageRepository")
  * @ORM\Table(name="image")
+ * @codeCoverageIgnore
  */
 class Image
 {
     public const DEFAULT_NAME = '/media/default_profile.png';
     public const DEFAULT_PROFILE_IMAGE_URL = '/media/default_profile.png';
     public const DEFAULT_TOKEN_IMAGE_URL = '/media/default_token.png';
+    public const TOKEN_AVATARS_PATH = '/media/token_avatars';
 
     /**
      * @ORM\Id()
@@ -25,12 +27,10 @@ class Image
 
     /**
      * @ORM\Column(type="string")
-     * @var string
      */
-    private $fileName;
+    private string $fileName;
 
-    /** @var string */
-    private $url;
+    private ?string $url = null; // phpcs:ignore
 
     public static function defaultImage(string $url): self
     {

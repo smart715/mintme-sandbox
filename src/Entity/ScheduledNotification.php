@@ -2,12 +2,18 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ScheduledNotificationRepository")
- * @ORM\Table(name="scheduled_notifications")
+ * @ORM\Table(
+ *     name="scheduled_notifications",
+ *     indexes={
+ *         @ORM\Index(name="IDX_FK_shnotifications_users", columns={"user_id"})
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
@@ -31,6 +37,12 @@ class ScheduledNotification
      * @ORM\JoinColumn(nullable=false)
      */
     protected User $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
+     */
+    protected ?Token $token;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -73,6 +85,18 @@ class ScheduledNotification
     public function setUser(User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getToken(): ?Token
+    {
+        return $this->token;
+    }
+
+    public function setToken(Token $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }

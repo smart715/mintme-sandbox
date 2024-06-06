@@ -1,29 +1,117 @@
-{{ form_start(form, {'method': 'post', 'action': path('register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
-    {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'autofocus': 'autofocus'} }) }}
-    {% include 'form/nickname_field.html.twig' %}
-<div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center small">
-    {% trans from 'messages' %}page.profile.error.nickname.min{% endtrans %}
+{% set isEmbedded = embedded is defined and embedded %}
+{% set formControlClass = isEmbedded ? '' : 'dark-form-control ' %}
+
+{{ form_start(form,
+    {
+        'method': 'post',
+        'attr': {
+            'class': 'fos_user_registration_register text-dark',
+            'id': 'register'
+        }
+    }
+) }}
+<div class="container min-height-600">
+    {{ form_row(form.email,
+        {
+            'inline': false,
+            'class': formControlClass ~ 'mt-4',
+            'type': 'text',
+            'attr': {
+                'autofocus': 'autofocus'
+            },
+            'widgetAttr': {
+                'v-model.trim': '$v.email.$model',
+                'ref': 'email',
+            }
+        }
+    ) }}
+    <div class="container min-height-40">
+        <div v-cloak="$v.email" v-if="!$v.email.minLength" class="text-danger small">
+            {% trans from 'messages' %} page.profile.error.email.min {% endtrans %}
+        </div>
+        <div v-cloak="$v.email" v-if="!$v.email.helpers || !$v.email.length" class="text-danger small">
+            {% trans from 'messages' %} page.profile.error.email.type {% endtrans %}
+        </div>
+    </div>
+        {% include 'form/nickname_field.html.twig' with {'formControlClass' : formControlClass} %}
+    <div class="container min-height-50">
+        <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger small">
+            {% trans from 'messages' %} page.profile.error.nickname.min {% endtrans %}
+        </div>
+        <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger small">
+            {% trans from 'messages' %} page.profile.error.nickname.letters_numbers {% endtrans %}
+        </div>
+        <div
+            v-cloak="$v.nickname"
+            v-if="!$v.nickname.noBadWords"
+            v-text="nicknameBadWordMessage"
+            class="text-danger small"
+        ></div>
+    </div>
+    <div id="register-form-password-container" class="mt-4 position-relative">
+        <span class="show-password" @click="togglePassword()" ref="eye-icon">
+            <i class="fas fa-eye"></i>
+        </span>
+        {{ form_row(form.plainPassword,
+            {
+                'inline': false,
+                'class': formControlClass ~ 'mt-3',
+                'attr': {
+                    'v-model': 'password',
+                    'autocomplete': 'new-password',
+                    'ref': 'password-input',
+                }
+            }
+        ) }}
+        <passwordmeter :password="password" @toggle-error="toggleError"></passwordmeter>
+    </div>
+    <div id="register-form-captcha-container" class="pb-2">
+        <div id="pending-captcha" class="py-2 mb-2 bg-danger text-white text-center d-none">
+            {% trans %} pending_captcha {% endtrans %}
+        </div>
+        {{ form_row(form.recaptcha, { 'inline': false, 'class': 'borderless-form-control' }) }}
+    </div>
+    <div class="form-check pt-2">
+        <input id="registerPrivacyPolicy" v-model="termsCheckboxValue" class="form-check-input agree-check-input" type="checkbox" required />
+        <label class="form-check-label" for="registerPrivacyPolicy">
+            {% trans from 'FOSUserBundle' %} register.accepting {% endtrans %}
+            <a target="_blank" class="text-primary" href="{{ path('terms_of_service') }}">
+                {% trans from 'tos' %} terms_of_service {% endtrans %}
+            </a>
+            <span class="agree-label">
+                {% trans from 'messages' %} and {% endtrans %}
+            </span>
+            <a target="_blank" class="text-primary" href="{{ path('privacy_policy') }}">
+                {% trans from 'pp' %} privacy_policy {% endtrans %}
+            </a>
+        </label>
+    </div>
+    <div class="text-center pt-4">
+        <input
+            type="submit"
+            :disabled="btnDisabled"
+            class="btn btn-primary btn-block px-5 py-3 button-large btn-enabled-focus-dark"
+            value="{% trans from 'FOSUserBundle' %} form.signup.submit {% endtrans %}"
+        />
+    </div>
+    <div id="registerFormAlreadyRegistered" class="mt-3 mb-3 text-center">
+        {% trans from 'FOSUserBundle' %} page.register.already_registered {% endtrans %}
+        <a
+            class="text-primary"
+            href="{{ path('fos_user_security_login') }}"
+        >
+            {% trans from 'FOSUserBundle' %} page.register.log_in {% endtrans %}
+        </a>
+    </div>
+    {% if isEmbedded %}
+        <div class="d-flex align-items-center mt-3">
+            <a
+                id="login-button"
+                class="link text-primary"
+            >
+                {% trans from 'FOSUserBundle' %} security.login.submit {% endtrans %}
+            </a>
+        </div>
+    {% endif %}
 </div>
-<div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center small">
-    {% trans from 'messages' %}page.profile.error.nickname.letters_numbers{% endtrans %}
-</div>
-<div id="register-form-password-container">
-    <passwordmeter :password="password" @toggle-error="toggleError">
-                <span @click="togglePassword()" class="show-password">
-                    <font-awesome-icon icon="eye"></font-awesome-icon>
-                </span>
-        {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
-    </passwordmeter>
-</div>
-<div id="register-form-captcha-container" class="py-2">
-    {{ form_row(form.recaptcha, { 'inline': false }) }}
-</div>
-<div class="text-left">
-    <input type="submit" :disabled="disabled" class="btn btn-primary" value="{% trans from 'FOSUserBundle' %}form.signup.submit{% endtrans %}">
-    <span class="px-3">{% trans %}or{% endtrans %}</span>
-    <a class="btn-cancel px-0" id="login-button" href="{{ path('login') }}">{% trans from 'FOSUserBundle' %}form.login.submit{% endtrans %}</a>
-</div>
-<p class="text-left pt-3">
-    {% trans from 'FOSUserBundle' %}register.accepting{% endtrans %} <br><a target="_blank" href="{{ path('terms_of_service') }}">{% trans from 'messages' %}terms_of_service{% endtrans %}</a> {% trans from 'messages' %}and{% endtrans %} <a target="_blank" href="{{ path('privacy_policy') }}">{% trans from 'messages' %}privacy_policy{% endtrans %}</a>
-</p>
 {{ form_end(form) }}

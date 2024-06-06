@@ -1,0 +1,38 @@
+@import '../variables'
+
+.show-password
+  right: 30px
+
+.show-password-active
+  @extend .show-password
+
+.no-top
+  .custom-control-label
+    &:before
+      top: 0 !important
+    &:after
+      top: 2px !important
+
+.checkbox-dashed-onfocus
+  .custom-control-input:focus~.custom-control-label:before
+    border: 1px dashed $text-color-primary !important
+
+.advanced-modal
+  height: 276px
+  padding-right: 10px
+  overflow-y: auto
+
+.no-head-table
+  thead
+    tr
+      display: none
+
+.width-token-name
+  width: 104px
+  @media (min-width: 588px)
+    width: 400px
+
+.btn-link
+  &:hover
+    background-color: transparent !important
+    text-decoration: underline

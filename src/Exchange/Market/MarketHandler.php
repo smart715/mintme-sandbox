@@ -2,9 +2,11 @@
 
 namespace App\Exchange\Market;
 
+use App\Config\LimitHistoryConfig;
+use App\Entity\Crypto;
 use App\Entity\Donation;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Deal;
@@ -21,10 +23,16 @@ use App\Exchange\Trade\CheckTradeResult;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\DonationManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\SmartContract\ContractHandlerInterface;
+use App\Utils\AssetType;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
+use App\Wallet\Model\Transaction;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use DateInterval;
+use Doctrine\ORM\PersistentCollection;
 use Exception;
 use InvalidArgumentException;
 use Money\Money;
@@ -36,6 +44,9 @@ class MarketHandler implements MarketHandlerInterface
     public const BUY = 2;
     public const DAY_PERIOD = 86400;
     public const MONTH_PERIOD = 2592000;
+    public const PERIOD_TYPE_MONTH = 'month';
+    public const PERIOD_TYPE_WEEK = 'week';
+    public const PERIOD_TYPE_HALF_YEAR = 'half_year';
 
     private MarketFetcherInterface $marketFetcher;
     private MoneyWrapperInterface $moneyWrapper;
@@ -45,7 +56,9 @@ class MarketHandler implements MarketHandlerInterface
     private MarketFactoryInterface $marketFactory;
     private CryptoManagerInterface $cryptoManager;
     private BalanceHandlerInterface $balanceHandler;
+    private ContractHandlerInterface $contractHandler;
     private ParameterBagInterface $parameterBag;
+    private LimitHistoryConfig $limitHistoryConfig;
 
     public function __construct(
         MarketFetcherInterface $marketFetcher,
@@ -56,7 +69,9 @@ class MarketHandler implements MarketHandlerInterface
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
         BalanceHandlerInterface $balanceHandler,
-        ParameterBagInterface $parameterBag
+        ContractHandlerInterface $contractHandler,
+        ParameterBagInterface $parameterBag,
+        LimitHistoryConfig $limitHistoryConfig
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
@@ -67,10 +82,12 @@ class MarketHandler implements MarketHandlerInterface
         $this->cryptoManager = $cryptoManager;
         $this->balanceHandler = $balanceHandler;
         $this->parameterBag = $parameterBag;
+        $this->contractHandler = $contractHandler;
+        $this->limitHistoryConfig = $limitHistoryConfig;
     }
 
     /** {@inheritdoc} */
-    public function getExecutedOrder(Market $market, int $id, int $limit = 100): Order
+    public function getExecutedOrder(Market $market, int $id, int $limit = 100): ?Order
     {
         $orders = $this->getExecutedOrders($market, 0, $limit);
 
@@ -80,17 +97,17 @@ class MarketHandler implements MarketHandlerInterface
             }
         }
 
-        throw new Exception("Order not found");
+        return null;
     }
 
-    public function getPendingOrder(Market $market, int $id): Order
+    public function getPendingOrder(Market $market, int $id): ?Order
     {
         $order = $this->marketFetcher->getPendingOrder(
             $this->marketNameConverter->convert($market),
             $id
         );
 
-        return $this->parsePendingOrders([$order], $market)[0];
+        return $this->parsePendingOrders([$order], $market)[0] ?? null;
     }
 
     /** {@inheritdoc} */
@@ -107,19 +124,42 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
-    public function getAllPendingSellOrders(Market $market): array
+    /**
+     * @return Order[]
+     */
+    private function getAllPendingOrders(Market $market, int $side): array
     {
         $offset = 0;
         $limit = 100;
-        $paginatedOrders = [];
+        $orders = [];
 
         do {
-            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
-            $paginatedOrders[] = $moreOrders;
+            $moreOrders = self::BUY === $side
+                ? $this->getPendingBuyOrders($market, $offset, $limit)
+                : $this->getPendingSellOrders($market, $offset, $limit);
+
+            foreach ($moreOrders as $order) {
+                $id = $order->getId();
+
+                // In case of duplicates or order updated while looping
+                unset($orders[$id]);
+                $orders[$id] = $order;
+            }
+
             $offset += $limit;
         } while (count($moreOrders) >= $limit);
 
-        return array_merge([], ...$paginatedOrders);
+        return $orders;
+    }
+
+    public function getAllPendingBuyOrders(Market $market): array
+    {
+        return $this->getAllPendingOrders($market, self::BUY);
+    }
+
+    public function getAllPendingSellOrders(Market $market): array
+    {
+        return $this->getAllPendingOrders($market, self::SELL);
     }
 
     /** {@inheritdoc} */
@@ -161,30 +201,67 @@ class MarketHandler implements MarketHandlerInterface
         int $offset = 0,
         int $limit = 100,
         bool $reverseBaseQuote = false,
-        int $donationsOffset = 0
+        int $donationsOffset = 0,
+        int $fullDonationsOffset = 0
     ): array {
-        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote, $donationsOffset) {
-            return $this->parseDeals(
-                $this->marketFetcher->getUserExecutedHistory(
-                    $user->getId(),
-                    $this->marketNameConverter->convert($market),
-                    $offset - $donationsOffset,
-                    $limit
-                ),
-                $market,
-                $reverseBaseQuote
+        if (count($markets) > 1000) {
+            $userExecutedHistory = $this->batchGetUserHistory($user, $markets, $offset, $limit, $fullDonationsOffset);
+        } else {
+            $marketsStr = implode(
+                ',',
+                array_map(fn(Market $market) => $this->marketNameConverter->convert($market), $markets)
             );
-        }, $markets);
 
-        $donations = $this->donationsToDeals($this->donationManager->getAllUserRelated($user), $user);
-        $donations = array_slice($donations, $donationsOffset, count($donations) - $donationsOffset);
-        $deals = array_merge($marketDeals ? array_merge(...$marketDeals) : [], $donations);
+            $userExecutedHistory = $this->marketFetcher->getUserExecutedHistory(
+                $user->getId(),
+                $marketsStr,
+                $offset - $fullDonationsOffset,
+                $limit
+            );
+        }
+
+        $marketDeals = $this->parseDeals(
+            $userExecutedHistory,
+            $markets,
+            $reverseBaseQuote
+        );
+
+        $donations = $this->donationManager->getUserRelated($user, $donationsOffset, $limit);
+
+        $deals = array_merge(
+            $marketDeals,
+            $this->donationsToDeals($donations, $user)
+        );
 
         uasort($deals, static function (Deal $lDeal, Deal $rDeal) {
-            return $lDeal->getTimestamp() < $rDeal->getTimestamp();
+            return $rDeal->getTimestamp() - $lDeal->getTimestamp();
         });
 
         return array_slice($deals, 0, $limit);
+    }
+
+    private function batchGetUserHistory(User $user, array $markets, int $offset, int $limit, int $fullDonationsOffset): array
+    {
+        $marketHistory = [];
+        $marketsChunks = array_chunk($markets, 1000);
+
+        foreach ($marketsChunks as $marketsChunk) {
+            $marketsStr = implode(
+                ',',
+                array_map(fn(Market $market) => $this->marketNameConverter->convert($market), $marketsChunk)
+            );
+
+            $userExecutedHistory = $this->marketFetcher->getUserExecutedHistory(
+                $user->getId(),
+                $marketsStr,
+                $offset - $fullDonationsOffset,
+                $limit
+            );
+
+            $marketHistory = array_merge($marketHistory, $userExecutedHistory);
+        }
+
+        return $marketHistory;
     }
 
     /** {@inheritdoc} */
@@ -196,13 +273,32 @@ class MarketHandler implements MarketHandlerInterface
         bool $reverseBaseQuote = false
     ): array {
         $marketOrders = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote) {
-            return $this->parsePendingOrders(
-                $this->marketFetcher->getPendingOrdersByUser(
+            $ordersLimit = $offset + $limit;
+            $rawOrders = [];
+            $totalRequested = 0;
+
+            do {
+                $internalLimit = min($ordersLimit, 100);
+
+                $result = $this->marketFetcher->getPendingOrdersByUser(
                     $user->getId(),
                     $this->marketNameConverter->convert($market),
-                    $offset,
-                    $limit
-                ),
+                    $totalRequested,
+                    $internalLimit
+                );
+
+                if (0 === count($result)) {
+                    break;
+                }
+
+                $totalRequested += $internalLimit;
+                $ordersLimit -= $internalLimit;
+
+                $rawOrders = array_merge($rawOrders, $result);
+            } while ($ordersLimit > 0);
+
+            return $this->parsePendingOrders(
+                $rawOrders,
                 $market,
                 $reverseBaseQuote
             );
@@ -211,23 +307,19 @@ class MarketHandler implements MarketHandlerInterface
         $orders = $marketOrders ? array_merge(...$marketOrders) : [];
 
         uasort($orders, static function (Order $lOrder, Order $rOrder) {
-            return $lOrder->getTimestamp() > $rOrder->getTimestamp();
+            return $lOrder->getTimestamp() - $rOrder->getTimestamp();
         });
 
-        $orders = array_slice($orders, 0, $limit);
-
-        return $orders;
+        return array_slice($orders, $offset, $limit);
     }
 
-    public function getExpectedSellResult(Market $market, string $amount, string $fee): CheckTradeResult
+    public function getExpectedSellResult(Market $market, string $amount, string $feeRate): CheckTradeResult
     {
         $quote = $market->getQuote();
 
         $baseSymbol = $market->getBase()->getSymbol();
 
-        $quoteSymbol = $quote instanceof Token ?
-            Symbols::TOK :
-            $quote->getSymbol();
+        $quoteSymbol = $quote->getMoneySymbol();
 
         $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
 
@@ -271,12 +363,257 @@ class MarketHandler implements MarketHandlerInterface
         } while ($shouldContinue);
 
         if (!$amountToReceive->isZero()) {
-            $amountToReceive = $amountToReceive->subtract($amountToReceive->multiply($fee));
+            $amountToReceive = $amountToReceive->subtract($amountToReceive->multiply($feeRate));
         }
 
         return new CheckTradeResult($amountToReceive);
     }
 
+    public function getExpectedSellReversedResult(
+        Market $market,
+        string $amountToReceive,
+        string $feeRate
+    ): CheckTradeResult {
+        $quote = $market->getQuote();
+
+        $baseSymbol = $market->getBase()->getMoneySymbol();
+        $quoteSymbol = $quote->getMoneySymbol();
+
+        $baseLeft = $this->moneyWrapper->parse($amountToReceive, $baseSymbol);
+
+        $one = $this->moneyWrapper->parse('1', $baseSymbol);
+        $fee = $this->moneyWrapper->parse($feeRate, $baseSymbol);
+        $oneMinusFee = $one->subtract($fee);
+
+        $amount = $this->moneyWrapper->parse('0', $quoteSymbol);
+        $denominator = $this->moneyWrapper->format($oneMinusFee);
+        $baseLeft = $baseLeft->divide($denominator);
+
+        $offset = 0;
+        $limit = 100;
+
+        do {
+            $pendingBuyOrders = $this->getPendingBuyOrders($market, $offset, $limit);
+            $shouldContinue = count($pendingBuyOrders) >= $limit;
+            $offset += $limit;
+
+            foreach ($pendingBuyOrders as $bid) {
+                if ($baseLeft->isZero()) {
+                    $shouldContinue = false;
+
+                    break;
+                }
+
+                $price = $bid->getPrice();
+                $worth = $this->moneyWrapper->convertByRatio(
+                    $bid->getAmount(),
+                    $baseSymbol,
+                    $this->moneyWrapper->format($price)
+                );
+
+                if ($baseLeft->greaterThanOrEqual($worth)) {
+                    $amount = $amount->add($bid->getAmount());
+                    $baseLeft = $baseLeft->subtract($worth);
+                } else {
+                    $amountToAdd = $bid->getAmount()
+                        ->multiply($this->moneyWrapper->format($baseLeft))
+                        ->divide($this->moneyWrapper->format($worth));
+                    $amount = $amount->add($amountToAdd);
+                    $baseLeft = $baseLeft->subtract($baseLeft);
+                }
+            }
+        } while ($shouldContinue);
+
+        return new CheckTradeResult($amount, $baseLeft);
+    }
+
+    public function getExpectedBuyResult(Market $market, string $amount, string $feeRate): CheckTradeResult
+    {
+        $quote = $market->getQuote();
+
+        $baseSymbol = $market->getBase()->getSymbol();
+
+        $quoteSymbol = $quote->getSymbol();
+
+        $amountToReceive = $this->moneyWrapper->parse('0', $quoteSymbol);
+        $worth = $this->moneyWrapper->parse('0', $baseSymbol);
+
+        $baseLeft = $this->moneyWrapper->parse($amount, $baseSymbol);
+
+        if ($market->isTokenMarket() && !$baseLeft->isZero()) {
+            // When buying tokens, the fee is taken from the amount that the user spends (MINTME)
+            $baseLeft =  $baseLeft->subtract($baseLeft->multiply($feeRate));
+        }
+
+        $offset = 0;
+        $limit = 100;
+
+        do {
+            $pendingSellOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $shouldContinue = count($pendingSellOrders) >= $limit;
+            $offset += $limit;
+
+            foreach ($pendingSellOrders as $ask) {
+                if ($baseLeft->isZero()) {
+                    $shouldContinue = false;
+
+                    break;
+                }
+
+                $orderTotalPrice = $ask->getPrice()->multiply(
+                    $this->moneyWrapper->format($ask->getAmount())
+                );
+
+                if ($baseLeft->greaterThanOrEqual($orderTotalPrice)) {
+                    $quoteWorth = $ask->getAmount();
+
+                    $amountToReceive = $amountToReceive->add($quoteWorth);
+                    $worth = $worth->add($orderTotalPrice);
+                    $baseLeft = $baseLeft->subtract($orderTotalPrice);
+                } else {
+                    $amountCoefficient = $baseLeft->divide(
+                        $this->moneyWrapper->format($orderTotalPrice)
+                    );
+
+                    // Taking just a portion of the order based on the base left
+                    $quoteWorth = $ask->getAmount()->multiply(
+                        $this->moneyWrapper->format($amountCoefficient)
+                    );
+
+                    $amountToReceive = $amountToReceive->add($quoteWorth);
+                    $worth = $worth->add($baseLeft);
+                    $baseLeft = $baseLeft->subtract($baseLeft);
+                }
+            }
+        } while ($shouldContinue);
+
+        if (!$market->isTokenMarket() && !$amountToReceive->isZero()) {
+            // When buying in coin markets, the fee is taken from the amount that the user receives
+            $amountToReceive = $amountToReceive->subtract($amountToReceive->multiply($feeRate));
+        }
+
+        return new CheckTradeResult($amountToReceive, $worth);
+    }
+
+    public function getExpectedDonationReversedResult(
+        Market $market,
+        string $amountToReceive,
+        string $feeRate
+    ): CheckTradeResult {
+        /** @var Crypto $base */
+        $base = $market->getBase();
+        /** @var Token $quote */
+        $quote = $market->getQuote();
+
+        $useCryptoMarket = Symbols::WEB !== $base->getSymbol() && !$quote->containsExchangeCrypto($base);
+
+        if ($useCryptoMarket) {
+            $mintmeCurrency = $this->cryptoManager->findBySymbol(Symbols::WEB);
+            $market->setBase($mintmeCurrency);
+            $resultMintme = $this->getExpectedDonationReversedResult($market, $amountToReceive, $feeRate);
+            $market->setBase($base);
+            $market->setQuote($mintmeCurrency);
+            $mintmeAmount = $this->moneyWrapper->format($resultMintme->getExpectedAmount());
+            $resultCoin = $this->getExpectedBuyReversedResult($market, $mintmeAmount, "0");
+
+            return new CheckTradeResult($resultCoin->getExpectedAmount(), $resultMintme->getWorth());
+        }
+
+        $baseSymbol = $base->getMoneySymbol();
+        $quoteSymbol = $quote->getMoneySymbol();
+
+        $amountLeft = $this->moneyWrapper->parse($amountToReceive, $quoteSymbol);
+        $worth = $this->moneyWrapper->parse('0', $baseSymbol);
+
+        $offset = 0;
+        $limit = 100;
+
+        do {
+            $pendingSellOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $shouldContinue = count($pendingSellOrders) >= $limit;
+            $offset += $limit;
+
+            foreach ($pendingSellOrders as $ask) {
+                if ($amountLeft->isZero()) {
+                    $shouldContinue = false;
+
+                    break;
+                }
+
+                $amount = $amountLeft->lessThanOrEqual($ask->getAmount())
+                    ? $amountLeft
+                    : $ask->getAmount();
+                $price = $ask->getPrice();
+                $deal = $price->multiply($this->moneyWrapper->format($amount));
+                $fee = $deal->multiply($feeRate);
+                $worth = $worth->add($deal)->add($fee);
+
+                $amountLeft = $amountLeft->subtract($amount);
+            }
+        } while ($shouldContinue);
+
+        return new CheckTradeResult($worth, $amountLeft);
+    }
+
+    public function getExpectedBuyReversedResult(
+        Market $market,
+        string $amountToReceive,
+        string $feeRate
+    ): CheckTradeResult {
+        $quote = $market->getQuote();
+
+        $baseSymbol = $market->getBase()->getSymbol();
+
+        $quoteSymbol = $quote instanceof Token
+            ? Symbols::TOK
+            : $quote->getSymbol();
+
+        $amountLeft = $this->moneyWrapper->parse($amountToReceive, $quoteSymbol);
+
+        $one = $this->moneyWrapper->parse('1', $quoteSymbol);
+        $fee = $this->moneyWrapper->parse($feeRate, $quoteSymbol);
+        $oneMinusFee = $one->subtract($fee);
+        $denominator = $this->moneyWrapper->format($oneMinusFee);
+
+        if (!$market->isTokenMarket() && !$amountLeft->isZero()) {
+            $amountLeft = $amountLeft->divide($denominator);
+        }
+
+        $worth = $this->moneyWrapper->parse('0', $baseSymbol);
+
+        $offset = 0;
+        $limit = 100;
+
+        do {
+            $pendingSellOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $shouldContinue = count($pendingSellOrders) >= $limit;
+            $offset += $limit;
+
+            foreach ($pendingSellOrders as $ask) {
+                if ($amountLeft->isZero()) {
+                    $shouldContinue = false;
+
+                    break;
+                }
+
+                $amount = $amountLeft->lessThanOrEqual($ask->getAmount())
+                    ? $amountLeft
+                    : $ask->getAmount();
+
+                $price = $ask->getPrice();
+                $deal = $price->multiply($this->moneyWrapper->format($amount));
+                $worth = $worth->add($deal);
+
+                $amountLeft = $amountLeft->subtract($amount);
+            }
+        } while ($shouldContinue);
+
+        if ($market->isTokenMarket() && !$worth->isZero()) {
+            $worth = $worth->divide($denominator);
+        }
+
+        return new CheckTradeResult($worth, $amountLeft);
+    }
 
     /** {@inheritdoc} */
     public function getKLineStatDaily(Market $market): array
@@ -298,6 +635,50 @@ class MarketHandler implements MarketHandlerInterface
                 $this->moneyWrapper->parse($line[5], $this->getSymbol($market->getQuote())),
                 $this->moneyWrapper->parse($line[6], $this->getSymbol($market->getQuote())),
                 $market
+            );
+        }, $stats);
+    }
+
+    /** {@inheritdoc} */
+    public function getKLineStatByPeriod(Market $market, string $period): array
+    {
+        if (self::PERIOD_TYPE_WEEK === $period) {
+            $stats = $this->marketFetcher->getKLineStat(
+                $this->marketNameConverter->convert($market),
+                (new \DateTimeImmutable())->sub(new DateInterval('P7D'))->getTimestamp(),
+                (new \DateTimeImmutable())->getTimestamp(),
+                60 * 60 * 24
+            );
+        } elseif (self::PERIOD_TYPE_MONTH === $period) {
+            $stats = $this->marketFetcher->getKLineStat(
+                $this->marketNameConverter->convert($market),
+                (new \DateTimeImmutable())->sub(new DateInterval('P30D'))->getTimestamp(),
+                (new \DateTimeImmutable())->getTimestamp(),
+                60 * 60 * 24
+            );
+        } else {
+            $stats = $this->marketFetcher->getKLineStat(
+                $this->marketNameConverter->convert($market),
+                (new \DateTimeImmutable())->sub(new DateInterval('P6M'))->getTimestamp(),
+                (new \DateTimeImmutable())->getTimestamp(),
+                60 * 60 * 24
+            );
+        }
+
+        return array_map(function (array $line) use ($market) {
+            $lines = array_map(function ($l) use ($market) {
+                return $this->moneyWrapper->parse($l, $this->getSymbol($market->getQuote()));
+            }, array_slice($line, 1, 6));
+
+            return new LineStat(
+                (new \DateTimeImmutable())->setTimestamp($line[0]),
+                $lines[0],
+                $lines[1],
+                $lines[2],
+                $lines[3],
+                $lines[4],
+                $lines[5],
+                $market,
             );
         }, $stats);
     }
@@ -387,6 +768,14 @@ class MarketHandler implements MarketHandlerInterface
                 continue;
             }
 
+            $timestamp = isset($orderData['time'])
+                ? intval($orderData['time'])
+                : null;
+
+            if ($timestamp && $this->limitHistoryConfig->getFromDate()->getTimestamp() > $timestamp) {
+                continue;
+            }
+
             $orders[] = new Order(
                 $orderData['id'],
                 $user,
@@ -408,7 +797,7 @@ class MarketHandler implements MarketHandlerInterface
                     !empty($orderData['fee']) ? (string)$orderData['fee'] : '0',
                     $this->getSymbol($market->getQuote())
                 ),
-                isset($orderData['time']) ? intval($orderData['time']) : null
+                $timestamp
             );
         }
 
@@ -416,48 +805,97 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /**
-     * @param array $result
-     * @param Market $market
-     * @param bool $reverseBaseQuote
-     * @return Deal[]
+     * @inheritdoc
      */
-    private function parseDeals(array $result, Market $market, bool $reverseBaseQuote = false): array
-    {
-        if ($reverseBaseQuote) {
-            $market = BaseQuote::reverseMarket($market);
+    public function parseDeals(
+        array $result,
+        array $markets,
+        bool $reverseBaseQuote = false,
+        bool $limitedResult = true
+    ): array {
+        $parsedDeals = [];
+
+        foreach ($result as $dealData) {
+            $timestamp = (int)$dealData['time'];
+
+            if ($limitedResult && $this->limitHistoryConfig->getFromDate()->getTimestamp() > $timestamp) {
+                continue;
+            }
+
+            $market = null;
+
+            foreach ($markets as $m) {
+                if ($this->marketNameConverter->convert($m) === $dealData['market']) {
+                    $market = $m;
+
+                    break;
+                }
+            }
+
+            if ($reverseBaseQuote) {
+                $market = BaseQuote::reverseMarketInPlace($market);
+            }
+
+            $parsedDeals[] = $this->prepareDeal($dealData, $market, $timestamp);
         }
 
-        $deals = array_map(function (array $dealData) use ($market) {
-            return new Deal(
-                $dealData['id'],
-                (int)$dealData['time'],
-                $dealData['user'],
-                $dealData['side'],
-                $dealData['role'],
-                $this->moneyWrapper->parse(
-                    $dealData['amount'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $dealData['price'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $dealData['deal'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $dealData['fee'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $dealData['deal_order_id'],
-                $dealData['order_id'] ?? 0,
-                $market
-            );
-        }, $result);
+        return $parsedDeals;
+    }
 
-        // Filter deals and return not donation deals
-        return array_filter($deals, fn(Deal $deal) => 0 !== $deal->getOrderId() && 0 !== $deal->getDealOrderId());
+    /**
+     * @inheritdoc
+     */
+    public function parseDealsSingleMarket(
+        array $result,
+        Market $market,
+        bool $limitedResult = true
+    ): array {
+        $parsedDeals = [];
+
+        foreach ($result as $dealData) {
+            $timestamp = (int)$dealData['time'];
+
+            if ($limitedResult && $this->limitHistoryConfig->getFromDate()->getTimestamp() > $timestamp) {
+                continue;
+            }
+
+            $parsedDeals[] = $this->prepareDeal($dealData, $market, $timestamp);
+        }
+
+        return $parsedDeals;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    private function prepareDeal(array $dealData, Market $market, int $timestamp): Deal
+    {
+        return new Deal(
+            $dealData['id'],
+            $timestamp,
+            $dealData['user'],
+            $dealData['side'] ?? Order::ALL_SIDE,
+            $dealData['role'],
+            $this->moneyWrapper->parse(
+                $dealData['amount'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $this->moneyWrapper->parse(
+                $dealData['price'],
+                $this->getSymbol($market->getBase())
+            ),
+            $this->moneyWrapper->parse(
+                $dealData['deal'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $this->moneyWrapper->parse(
+                $dealData['fee'],
+                $this->getSymbol($market->getBase())
+            ),
+            $dealData['deal_order_id'],
+            $dealData['order_id'] ?? 0,
+            $market
+        );
     }
 
     /**
@@ -473,32 +911,44 @@ class MarketHandler implements MarketHandlerInterface
             }
 
             $isUserDonator = (int)$donation->getDonor()->getId() === $user->getId();
-            $amount = $isUserDonator
+
+            $amount = $isUserDonator || !$donation->getReceiverAmount()
                 ? $donation->getAmount()->subtract($donation->getFeeAmount())
-                : ($donation->getMintmeAmount()
-                    ? $donation->getMintmeAmount()->subtract($donation->getMintmeFeeAmount())
-                    : $donation->getAmount()->subtract($donation->getFeeAmount()));
+                : $donation->getReceiverAmount()->subtract($donation->getReceiverFeeAmount());
+
+            $fee = $isUserDonator
+                ? $donation->getFeeAmount()
+                : $donation->getReceiverFeeAmount() ?? $donation->getFeeAmount();
+
+            $currency = $this->cryptoManager->findBySymbol(
+                $isUserDonator
+                    ? $donation->getCurrency()
+                    : $donation->getReceiverCurrency()
+            );
+
+            if (!$currency) {
+                return null;
+            }
+
+            $market = $this->marketFactory->create(
+                $currency,
+                $donation->getToken()
+            );
 
             return new Deal(
                 0,
-                $donation->getCreatedAt()->getTimestamp(),
+                // +1s so it's ordered after crypto market deal
+                $donation->getCreatedAt()->getTimestamp() + 1,
                 (int)$donation->getDonor()->getId(),
                 $isUserDonator ? self::BUY : self::SELL,
                 $isUserDonator ? 2 : 1,
+                $donation->getTokenAmount(),
                 $amount,
                 $this->moneyWrapper->parse('0', $donation->getCurrency()),
-                $this->moneyWrapper->parse('0', $donation->getCurrency()),
-                $isUserDonator
-                    ? $donation->getFeeAmount()
-                    : $donation->getMintmeFeeAmount() ?? $donation->getFeeAmount(),
+                $fee,
                 0,
                 0,
-                $this->marketFactory->create(
-                    $this->cryptoManager->findBySymbol(
-                        !$isUserDonator && $donation->getMintmeAmount() ? Symbols::WEB : $donation->getCurrency()
-                    ),
-                    $donation->getToken()
-                )
+                $market
             );
         }, $donations);
 
@@ -526,7 +976,7 @@ class MarketHandler implements MarketHandlerInterface
         $quote = $market->getQuote();
         $soldOnMarket = $this->moneyWrapper->parse('0', $this->getSymbol($market->getBase()));
 
-        if ($quote instanceof Token && $quote->isControlledToken()) {
+        if ($quote instanceof Token && $quote->isCreatedOnMintmeSite()) {
             $soldOnMarket = $this->soldOnMarket($quote);
         }
 
@@ -597,6 +1047,7 @@ class MarketHandler implements MarketHandlerInterface
                 $this->getSymbol($market->getBase())
             ),
             $soldOnMarket,
+            $volumeDonation,
             $expires
         );
     }
@@ -622,7 +1073,7 @@ class MarketHandler implements MarketHandlerInterface
         return $this->getSummary([$market])[0];
     }
 
-    private function getSymbol(TradebleInterface $tradable): string
+    private function getSymbol(TradableInterface $tradable): string
     {
         return $tradable instanceof Token
             ? Symbols::TOK
@@ -632,7 +1083,7 @@ class MarketHandler implements MarketHandlerInterface
     /** {@inheritdoc} */
     public function getBuyDepth(Market $market): string
     {
-        $orders = $this->getAllPendingSellOrders($market);
+        $orders = $this->getAllPendingBuyOrders($market);
 
         $zeroDepth = $this->moneyWrapper->parse(
             '0',
@@ -650,19 +1101,34 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getSellOrdersSummary(Market $market): SellOrdersSummaryResult
+    public function getSellOrdersSummary(Market $market, ?User $user = null): SellOrdersSummaryResult
     {
         $offset = 0;
         $limit = 100;
         $paginatedOrders = [];
 
         do {
-            $pendingOrders = $this->marketFetcher->getPendingOrders(
-                $this->marketNameConverter->convert($market),
-                $offset,
-                $limit,
-                self::SELL
-            );
+            $pendingOrders = [];
+
+            if ($user) {
+                $pendingOrders = $this->marketFetcher->getPendingOrdersByUser(
+                    $user->getId(),
+                    $this->marketNameConverter->convert($market),
+                    $offset,
+                    $limit
+                );
+
+                $pendingOrders = array_filter($pendingOrders, function ($order) {
+                    return self::SELL === $order['side'];
+                });
+            } else {
+                $pendingOrders = $this->marketFetcher->getPendingOrders(
+                    $this->marketNameConverter->convert($market),
+                    $offset,
+                    $limit,
+                    self::SELL
+                );
+            }
 
             $moreOrders = $this->parsePendingOrders(
                 $pendingOrders,
@@ -814,9 +1280,22 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
+    public function getTokenSellOrdersSummary(Token $token, User $user): string
+    {
+        $markets = $this->marketFactory->createTokenMarkets($token);
+        $totalSellOrders = 0;
+
+        foreach ($markets as $market) {
+            $totalSellOrders += (float) $this->getSellOrdersSummary($market, $user)->getQuoteAmount();
+        }
+
+        return (string)$totalSellOrders;
+    }
+
+
     public function soldOnMarket(Token $token): Money
     {
-        if (!$token->isControlledToken()) {
+        if (!$token->isCreatedOnMintmeSite()) {
             return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
 
@@ -827,7 +1306,36 @@ class MarketHandler implements MarketHandlerInterface
 
         $balanceView = $this->balanceHandler->balance($token->getOwner(), $token);
 
-        return $init->subtract($balanceView->getAvailable())
-            ->subtract($balanceView->getFreeze());
+        $withdrawn = $token->getWithdrawn();
+
+        $pendingTokenWithdrawals = $token->isDeployed()
+            ? $token->getOwner()->getPendingTokenWithdrawals()
+            : null;
+
+        /** @var Transaction[]|null $pendingWithdrawalsOnBlockchain */
+        $pendingWithdrawalsOnBlockchain = $token->isDeployed()
+            ? $this->contractHandler->getPendingWithdrawals($token->getOwner(), AssetType::TOKEN)
+            : null;
+
+        if ($pendingTokenWithdrawals instanceof PersistentCollection) {
+            foreach ($pendingTokenWithdrawals->getValues() as $pending) {
+                if ($pending->getToken() == $token) {
+                    $withdrawn = $withdrawn->add($pending->getAmount()->getAmount());
+                }
+            }
+        }
+
+        if ($pendingWithdrawalsOnBlockchain) {
+            foreach ($pendingWithdrawalsOnBlockchain as $pending) {
+                if ($pending->getTradable() instanceof Token && $pending->getTradable() === $token) {
+                    $withdrawn = $withdrawn->add($pending->getAmount());
+                }
+            }
+        }
+
+        return $init
+            ->subtract($balanceView->getAvailable())
+            ->subtract($balanceView->getFreeze())
+            ->subtract($withdrawn);
     }
 }

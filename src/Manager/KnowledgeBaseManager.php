@@ -28,6 +28,11 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
         ]);
     }
 
+    public function getRelated(KnowledgeBase $kb): array
+    {
+        return $this->kbRepository->findKbRelated($kb);
+    }
+
     /**
      * @param KnowledgeBase[] $knowledgeBases
      * @return array

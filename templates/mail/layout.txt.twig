@@ -1,3 +1,5 @@
 {{ absolute_url('/') }}
 {% block content %}{% endblock %}
+{% trans %} mail.notification_settings_here_1 {% endtrans %}
+{% trans %} mail.notification_settings_here_2 {% endtrans %}
 {{ version }} | {% trans with {'%date%': "now"|date("Y")} %} rights_reserved {% endtrans %}

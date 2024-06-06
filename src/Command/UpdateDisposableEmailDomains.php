@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Communications\DisposableEmailCommunicatorInterface;
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,20 +16,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /* Cron job added to DB. */
 class UpdateDisposableEmailDomains extends Command
 {
-    /** @var BlacklistManagerInterface */
-    private $blacklistManager;
-
-    /** @var DisposableEmailCommunicatorInterface */
-    private $domainSynchronizer;
-
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var LockFactory */
-    private $lockFactory;
+    private BlacklistManagerInterface $blacklistManager;
+    private DisposableEmailCommunicatorInterface $domainSynchronizer;
+    private EntityManagerInterface $em;
+    private LoggerInterface $logger;
+    private LockFactory $lockFactory;
 
     public function __construct(
         LoggerInterface $logger,

@@ -4,7 +4,7 @@ namespace App\Exchange\Balance\Strategy;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -23,14 +23,14 @@ class PaymentCryptoStrategy implements BalanceStrategyInterface
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    /** @param Crypto $tradeble */
-    public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
+    /** @param Crypto $tradable */
+    public function deposit(User $user, TradableInterface $tradable, string $amount): void
     {
         $this->balanceHandler->deposit(
             $user,
-            $tradeble,
-            $this->moneyWrapper->parse($amount, $tradeble->getSymbol())
-                ->add($tradeble->getFee())
+            $tradable,
+            $this->moneyWrapper->parse($amount, $tradable->getSymbol())
+                ->add($tradable->getFee())
         );
     }
 }

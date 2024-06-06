@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+/** @codeCoverageIgnore */
 final class AirdropCampaignActions
 {
     public const TWITTER_MESSAGE = 'twitterMessage';
@@ -12,6 +13,7 @@ final class AirdropCampaignActions
     public const LINKEDIN_MESSAGE = 'linkedinMessage';
     public const YOUTUBE_SUBSCRIBE = 'youtubeSubscribe';
     public const POST_LINK = 'postLink';
+    public const VISIT_EXTERNAL_URL = 'visitExternalUrl';
 
     private function __construct()
     {
@@ -28,6 +30,7 @@ final class AirdropCampaignActions
             self::LINKEDIN_MESSAGE,
             self::YOUTUBE_SUBSCRIBE,
             self::POST_LINK,
+            self::VISIT_EXTERNAL_URL,
         ];
     }
 

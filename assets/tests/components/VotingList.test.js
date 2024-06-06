@@ -35,7 +35,9 @@ function createWrapper(props = {}, tradeBalanceGetters = {}) {
             tradeBalance: {
                 namespaced: true,
                 getters: {
-                    getQuoteBalance: () => 0,
+                    getQuoteFullBalance: () => 0,
+                    getBalances: () => ({}),
+                    isServiceUnavailable: () => false,
                     ...tradeBalanceGetters,
                 },
             },
@@ -50,6 +52,9 @@ function createWrapper(props = {}, tradeBalanceGetters = {}) {
             votingsProp: [],
             ...props,
         },
+        directives: {
+            'b-tooltip': {},
+        },
     });
 
     return wrapper;
@@ -62,20 +67,31 @@ describe('VotingList', () => {
         wrapper = createWrapper(
             {},
             {
-                getQuoteBalance: () => 1,
+                getQuoteFullBalance: () => 1,
             }
         );
         expect(wrapper.vm.disableNewBtn).toBe(false);
     });
 
+    it('Check if propositionTooltip returns the correct translation', async () => {
+        const wrapper = createWrapper();
+
+        await wrapper.setProps({isTokenPage: true});
+        expect(wrapper.vm.propositionTooltip).toBe('voting.tooltip.page_token.proposition');
+
+        await wrapper.setProps({isTokenPage: false});
+        expect(wrapper.vm.propositionTooltip).toBe('voting.tooltip.propositions');
+    });
+
     describe('goToCreate', () => {
         it('shouldn\'t emit go-to-create in case not has min value', () => {
-            let wrapper = createWrapper(
+            const wrapper = createWrapper(
                 {
                     minAmount: 2,
+                    loggedIn: true,
                 },
                 {
-                    getQuoteBalance: () => 1,
+                    getQuoteFullBalance: () => 1,
                 }
             );
             wrapper.vm.goToCreate();
@@ -83,12 +99,13 @@ describe('VotingList', () => {
         });
 
         it('should emit go-to-create in case not has at least min value', () => {
-            let wrapper = createWrapper(
+            const wrapper = createWrapper(
                 {
                     minAmount: 2,
+                    loggedIn: true,
                 },
                 {
-                    getQuoteBalance: () => 3,
+                    getQuoteFullBalance: () => 3,
                 }
             );
             wrapper.vm.goToCreate();

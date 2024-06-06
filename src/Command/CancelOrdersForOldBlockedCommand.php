@@ -7,8 +7,8 @@ use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use App\Repository\TokenRepository;
+use App\Repository\UserRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,20 +20,21 @@ class CancelOrdersForOldBlockedCommand extends Command
     protected static $defaultName = 'app:cancel-orders';
     private MarketFactoryInterface $marketFactory;
     private CryptoManagerInterface $cryptoManager;
-    private EntityRepository $userRepository;
-    private EntityRepository $tokenRepository;
+    private UserRepository $userRepository;
+    private TokenRepository $tokenRepository;
     private BlockTokenCommand $blockTokenCommand;
 
     public function __construct(
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
-        EntityManagerInterface $entityManager,
-        BlockTokenCommand $blockTokenCommand
+        TokenRepository $tokenRepository,
+        BlockTokenCommand $blockTokenCommand,
+        UserRepository $userRepository
     ) {
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
-        $this->userRepository = $entityManager->getRepository(User::class);
-        $this->tokenRepository = $entityManager->getRepository(Token::class);
+        $this->userRepository = $userRepository;
+        $this->tokenRepository = $tokenRepository;
         $this->blockTokenCommand = $blockTokenCommand;
         parent::__construct();
     }

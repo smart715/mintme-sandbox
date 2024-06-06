@@ -4,7 +4,7 @@ namespace App\Utils\Verify;
 
 interface WebsiteVerifierInterface
 {
-    public const URI = 'mintme.html';
+    public const URIS = ['mintme.html', 'mintme.htm', 'mintme'];
     public const PREFIX = 'mintme-site-verification';
 
     public function verify(string $url, string $verificationToken): bool;

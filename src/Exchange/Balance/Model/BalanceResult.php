@@ -6,56 +6,41 @@ use Money\Currency;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-class BalanceResult
+class BalanceResult extends CryptoBalanceResult
 {
     /**
-     * @var Money
      * @Groups({"Default", "API", "dev"})
      */
-    private $available;
+    private Money $bonus;
 
-    /**
-     * @var Money
-     * @Groups({"Default", "API", "dev"})
-     */
-    private $freeze;
-
-    /** @var Money */
-    private $referral;
-
-    /** @var bool */
-    private $isFailed = false;
-
-    private function __construct(Money $available, Money $freeze, Money $referral)
+    private function __construct(Money $available, Money $freeze, Money $referral, ?Money $bonus = null)
     {
-        $this->available = $available;
-        $this->freeze = $freeze;
-        $this->referral = $referral;
+        parent::__construct($available, $freeze, $referral);
+        $this->bonus = $bonus ?? new Money(0, $available->getCurrency());
     }
 
-    public function getAvailable(): Money
+    public function getFullAvailable(): Money
     {
-        return $this->available;
+        return $this->getAvailable()->add($this->getBonus());
     }
 
-    public function getFreeze(): Money
+    public function getBonus(): Money
     {
-        return $this->freeze;
+        return $this->bonus;
     }
 
-    public function getReferral(): Money
+    public function setBonus(Money $bonus): void
     {
-        return $this->referral;
+        $this->bonus = $bonus;
     }
 
-    public function isFailed(): bool
-    {
-        return $this->isFailed;
-    }
-
-    public static function success(Money $available, Money $freeze, Money $referral): self
-    {
-        return new self($available, $freeze, $referral);
+    public static function success(
+        Money $available,
+        Money $freeze,
+        Money $referral,
+        ?Money $bonus = null
+    ): self {
+        return new self($available, $freeze, $referral, $bonus);
     }
 
     public static function fail(string $symbol): self

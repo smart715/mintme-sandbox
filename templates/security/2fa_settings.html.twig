@@ -1,9 +1,9 @@
-<div class="container">
-    <div class="row  pt-4 justify-content-center">
+<div class="container" id="check_code">
+    <div class="row pt-4 justify-content-center">
         <div class="col-lg-6 col-md-8">
             <div class="card">
                 {% if not isTwoFactor %}
-                    <div class="card-header">
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
                         {% trans %}page.settings_2fa.header{% endtrans %}
                     </div>
                     <div class="card-body">
@@ -36,7 +36,7 @@
                                             <label>{% trans %}page.settings_2fa.body.key{% endtrans %}</label>
                                         </div>
                                         <div class="col-12">
-                                            <p class="form-control m-0 text-white">
+                                            <p class="form-control text-white">
                                                 {{ twoFactorKey }}
                                             </p>
                                         </div>
@@ -56,37 +56,56 @@
                         </div>
                     </div>
                 {% else %}
-                    <div class="card-header">
+                <div class="text-left">
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
                         {% trans %}page.settings_2fa.body.disable{% endtrans %}
                     </div>
                     <div class="card-body pb-0">
-                        {% trans with {'%url_backup_codes%': path('generate_backup_codes')} %}page.settings_2fa.body.generate_codes_1{% endtrans %}
+                        {% trans with {'%action%': '@click="downloadCodes"'} %}
+                            page.settings_2fa.body.generate_codes_1
+                        {% endtrans %}
                     </div>
+                </div>
                 {% endif %}
 
                 <div class="text-center card-body">
                     <div class="row">
                         <div class="col-12">
                             {% block formBody %}
-                                    {{ form_start(form) }}
-                                        <div class="form-group">
-                                            <div class="clearfix">
-                                                {{ form_label(form.code, '', { 'label_attr': { 'class': isTwoFactor ? 'float-left' : '' } }) }}
-                                            </div>
-                                            {{ form_errors(form.code) }}
-                                            {{ form_widget(form.code) }}
+                                    {{ form_start(form, {'attr': {'id': 'form_code'}}) }}
+                                        {{ form_errors(form.code) }}
+                                        <div class="clearfix text-left">
+                                            {{ form_label(form.code, '') }}
                                         </div>
-                                        <div class="form-group">
-                                            <button type="submit" id="_submit" name="submit" class="btn btn-primary">
+                                        {{ include("spinners/verify_code_inputs.html.twig", {hide_send_code: true}) }}
+                                        <verify-code
+                                            :disabled="loading"
+                                            @code-entered="onVerifyCodeEntered"
+                                        ></verify-code>
+                                        <div class="form-group mt-3">
+                                            <button
+                                                v-show="!loading"
+                                                type="submit"
+                                                id="_submit"
+                                                name="_submit"
+                                                class="btn btn-primary"
+                                            >
                                                 {% trans %}2fa_modal.submit{% endtrans %}
                                             </button>
+                                            <div v-cloak v-show="loading" class="icon-loading"></div>
                                             {% if isTwoFactor %}
-                                                <a href="{{path('settings')}}" class="btn btn-primary ml-2">
+                                                <a
+                                                    v-show="!loading"
+                                                    href="{{path('settings')}}"
+                                                    class="btn btn-primary ml-2"
+                                                >
                                                     {% trans %}2fa_modal.cancel{% endtrans %}
                                                 </a>
                                             {% endif %}
                                         </div>
-                                    {{ form_end(form) }}
+                                        <input type="hidden" name="two_factor[code]" ref="code_input" />
+                                        {{ form_widget(form._token) }}
+                                    {{ form_end(form, {'render_rest': false}) }}
                             {% endblock %}
                         </div>
                     </div>

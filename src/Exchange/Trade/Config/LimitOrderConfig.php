@@ -2,28 +2,34 @@
 
 namespace App\Exchange\Trade\Config;
 
+use App\Exchange\Market;
+
 /** @codeCoverageIgnore */
 class LimitOrderConfig
 {
-    /** @var float */
-    private $takerFeeRate;
+    private array $feeRates;
 
-    /** @var float */
-    private $makerFeeRate;
-
-    public function __construct(float $takerFeeRate, float $makerFeeRate)
+    public function __construct(array $feeRates)
     {
-        $this->takerFeeRate = $takerFeeRate;
-        $this->makerFeeRate = $makerFeeRate;
+        $this->feeRates = $feeRates;
     }
 
-    public function getTakerFeeRate(): float
+    public function getFeeTokenRate(): string
     {
-        return $this->takerFeeRate;
+        return (string)$this->feeRates['token'];
     }
 
-    public function getMakerFeeRate(): float
+    public function getFeeCryptoRate(): string
     {
-        return $this->makerFeeRate;
+        return (string)$this->feeRates['coin'];
+    }
+
+    public function getFeeRateByMarket(Market $market): string
+    {
+        if ($market->isTokenMarket()) {
+            return $this->getFeeTokenRate();
+        }
+
+        return $this->getFeeCryptoRate();
     }
 }

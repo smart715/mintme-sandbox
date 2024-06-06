@@ -1,48 +1,56 @@
 <template>
-    <div class="card h-100">
-        <div class="card-header">
-            <slot name="title">{{ $t('voting.create') }}</slot>
-        </div>
-        <div class="card-body">
-            <div class="form-group">
-                <label for="title">
-                    {{ $t('voting.form.title') }}
-                </label>
-                <input class="form-control form-control-lg w-100"
-                       :class="{ 'is-invalid' : invalidTitle }"
-                       id="title"
-                       name="title"
-                       type="text"
-                       v-model="title"
-                >
-                <div class="invalid-feedback">
-                    {{ invalidTitleMessage }}
+    <div class="row ml-0 mr-0">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="m-4">
+                    <m-input
+                        id="title"
+                        name="title"
+                        :label="$t('voting.form.title')"
+                        :invalid="invalidTitle"
+                        v-model="title"
+                        input-tab-index="1"
+                    >
+                        <template v-slot:errors>
+                            <div v-if="invalidTitle">
+                                {{ invalidTitleMessage }}
+                            </div>
+                        </template>
+                    </m-input>
+
+                    <counted-textarea
+                        ref="input"
+                        :invalid="invalidDescription"
+                        :value="description"
+                        textarea-tab-index="1"
+                        editable
+                        @input="onDescriptionChange"
+                        @change="onDescriptionChange"
+                    >
+                        <template v-slot:label>
+                            <span class="label-bg-primary-dark">
+                                {{ $t('voting.form.description') }}
+                            </span>
+                        </template>
+                        <template v-slot:errors>
+                            <div v-if="invalidDescription">
+                                {{ invalidDescriptionMessage }}
+                            </div>
+                        </template>
+                    </counted-textarea>
+
+                    <div class="mt-2 position-relative form-group row m-0">
+                        <label class="text-primary label-top label pr-1 pl-1 pt-0 pb-0 mb-1">
+                            {{ $t('voting.form.end_date') }}
+                        </label>
+                        <date-picker
+                            class="col-sm-6 input-label p-3 input-size"
+                            v-model="endDate"
+                            :config="endDateOptions"
+                            tabindex="1"
+                        />
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>
-                    {{ $t('voting.form.description') }}
-                </label>
-                <bbcode-help class="float-right mt-2" placement="right" />
-                <bbcode-editor class="form-control w-100"
-                   :class="{ 'is-invalid' : invalidDescription }"
-                   :value="description"
-                   @change="onDescriptionChange"
-                   @input="onDescriptionChange"
-                   ref="input"
-                />
-                <div class="invalid-feedback"
-                     :class="{ 'd-block' : invalidDescription }"
-                >
-                    {{ invalidDescriptionMessage }}
-                </div>
-            </div>
-            <div class="form-group">
-                <label>{{ $t('voting.form.end_date') }}</label>
-                <date-picker
-                    v-model="endDate"
-                    :config="endDateOptions">
-                </date-picker>
             </div>
         </div>
     </div>
@@ -51,12 +59,17 @@
 <script>
 import moment from 'moment';
 import DatePicker from '../DatePicker';
-import BbcodeEditor from '../bbcode/BbcodeEditor';
-import BbcodeHelp from '../bbcode/BbcodeHelp';
-import {CheckInputMixin, NotificationMixin} from '../../mixins';
+import {CountedTextarea, MInput} from '../UI';
+import {
+    CheckInputMixin,
+    NotificationMixin,
+    ClearInputMixin,
+    NoBadWordsMixin,
+} from '../../mixins';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {requiredBBCText, GENERAL} from '../../utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
+
 const minTitleLength = 5;
 const maxTitleLength = 100;
 const minDescriptionLength = 100;
@@ -67,11 +80,13 @@ export default {
     mixins: [
         CheckInputMixin,
         NotificationMixin,
+        ClearInputMixin,
+        NoBadWordsMixin,
     ],
     components: {
         DatePicker,
-        BbcodeEditor,
-        BbcodeHelp,
+        CountedTextarea,
+        MInput,
     },
     data() {
         return {
@@ -80,6 +95,8 @@ export default {
                 useCurrent: false,
                 minDate: moment().add(1, 'hour').toDate(),
             },
+            titleBadWordMessage: '',
+            descriptionBadWordMessage: '',
         };
     },
     computed: {
@@ -93,6 +110,7 @@ export default {
                 return this.getTitle;
             },
             set: function(val) {
+                this.titleBadWordMessage = '';
                 this.setTitle(val);
             },
         },
@@ -101,6 +119,7 @@ export default {
                 return this.getDescription;
             },
             set: function(val) {
+                this.descriptionBadWordMessage = '';
                 this.setDescription(val);
             },
         },
@@ -113,7 +132,7 @@ export default {
             },
         },
         invalidTitle() {
-            return this.$v.title.$invalid && this.title.length > 0;
+            return this.$v.title.$invalid && 0 < this.title.length;
         },
         invalidTitleMessage() {
             if (!this.$v.title.required) {
@@ -128,10 +147,14 @@ export default {
                 return this.$t('form.validation.title.max', {length: maxTitleLength});
             }
 
+            if (!this.$v.title.noBadWords) {
+                return this.titleBadWordMessage;
+            }
+
             return '';
         },
         invalidDescription() {
-            return this.$v.description.$invalid && this.description.length > 0;
+            return this.$v.description.$invalid && 0 < this.description.length;
         },
         invalidDescriptionMessage() {
             if (!this.$v.description.required) {
@@ -142,6 +165,9 @@ export default {
             }
             if (!this.$v.description.maxLength) {
                 return this.$t('form.validation.description.max', {length: maxDescriptionLength});
+            }
+            if (!this.$v.description.noBadWords) {
+                return this.descriptionBadWordMessage;
             }
 
             return '';
@@ -172,11 +198,23 @@ export default {
                 required: requiredBBCText,
                 minLength: minLength(minDescriptionLength),
                 maxLength: maxLength(maxDescriptionLength),
+                noBadWords: () => {
+                    if (window.location.pathname === this.$routing.generate('create_voting')) {
+                        return this.noBadWordsValidator('description', 'descriptionBadWordMessage');
+                    }
+                    return true;
+                },
             },
             title: {
                 required: (val) => required(val.trim()),
                 minLength: minLength(minTitleLength),
                 maxLength: maxLength(maxTitleLength),
+                noBadWords: () => {
+                    if (window.location.pathname === this.$routing.generate('create_voting')) {
+                        return this.noBadWordsValidator('title', 'titleBadWordMessage');
+                    }
+                    return true;
+                },
             },
         };
     },

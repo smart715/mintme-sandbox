@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+/** @codeCoverageIgnore */
 class ImageRepository extends EntityRepository
 {
 

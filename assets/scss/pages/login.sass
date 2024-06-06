@@ -1,0 +1,32 @@
+@import '../variables'
+@import '../mixins'
+
+body
+  overflow-x: hidden
+  background-image: url('../../img/login_page_bg.webp')
+  background-position: center
+  background-repeat: no-repeat
+
+.margin-text-input
+  margin-top: 50px
+
+.h-divider
+  height: 0.3rem
+  border-radius: $h-divider-size
+  width: 30%
+  margin: 0
+  background-color: $primary
+
+.login-container
+  width: 30%
+  border-radius: $form-radius
+  background-color: $bg-secondary
+
+  .show-password-active
+    color: $primary
+
+.button-large
+  border-radius: $half-border-radius !important
+  color: $text-color-primary !important
+  text-transform: uppercase
+  font-weight: bold

@@ -12,4 +12,5 @@ interface TwoFactorManagerInterface
     public function getGoogleAuthEntry(int $userId): GoogleAuthenticatorEntry;
     public function generateSecretCode(): string;
     public function generateBackupCodes(): array;
+    public function initGoogleAuthEntry(User $user): void;
 }

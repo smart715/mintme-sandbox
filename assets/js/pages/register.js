@@ -1,4 +1,4 @@
-import '../../scss/pages/sign_up_landing.sass';
+import '../../scss/pages/register.sass';
 import Register from '../components/Register';
 
 new Vue({

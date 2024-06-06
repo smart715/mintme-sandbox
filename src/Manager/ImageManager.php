@@ -64,7 +64,10 @@ class ImageManager implements ImageManagerInterface
         return Uuid::uuid1()->toString() . '.' . $ext;
     }
 
-    protected function saveFile(string $filePath, string $content): void
+    /**
+     * @param string|false $content
+    */
+    protected function saveFile(string $filePath, $content): void
     {
         if (false === @file_put_contents($filePath, $content)) {
             throw new \Exception('The image could not be saved');

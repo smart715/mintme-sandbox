@@ -13,6 +13,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
     private LoggerInterface $logger;
 
     private KernelInterface $kernel;
+    
+    public string $createServiceScript;
+    public string $deleteServiceScript;
 
     public function __construct(
         LoggerInterface $logger,
@@ -27,7 +30,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
-        $process =  new Process(['sudo', 'create-branch.sh', $branch]);
+        $process =  new Process(['sudo', $this->createServiceScript, $branch]);
 
         try {
             $this->setMaintenanceMode('block');
@@ -48,7 +51,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
-        $process = new Process(['sudo', 'delete-branch.sh', $branch]);
+        $process = new Process(['sudo', $this->deleteServiceScript, $branch]);
 
         try {
             $this->setMaintenanceMode('block');

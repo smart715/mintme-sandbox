@@ -1,7 +1,6 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{username}}
+{% trans %}hello{% endtrans %} {{ nickname }}
 {% trans with {'%url%':url, '%title%':title }%}token_marketing_tips.msg{% endtrans %}
 {% endblock %}
 

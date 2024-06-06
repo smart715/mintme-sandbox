@@ -1,0 +1,108 @@
+{% extends 'admin/custom_layout.html.twig' %}
+
+{% set label = 'page.profits.referrals.title' | trans %}
+
+{% block sonata_head_title %}
+    {% spaceless %}
+        {{ label }} | mintMe
+    {% endspaceless %}
+{% endblock %}
+
+{% block logo %}
+    {% spaceless %}
+        <a class="logo" href="{{ path('sonata_admin_dashboard') }}">
+            <img src="{{ asset('build/images/logo.png') }}" alt="imp-logo">
+        </a>
+    {% endspaceless %}
+{% endblock %}
+
+{% block content %}
+    <form class="form-inline" action="{{ path('referrals_profits') }}" method="GET">
+        <div class="form-group">
+            <label for="start_date">{% trans %} mintme.api.finance.start_date {% endtrans %}:</label>
+            <input type="text"  id="start_date" name="start_date" value="{{ startDate }}" required>
+        </div>
+        <div class="form-group">
+            <label for="end_date">{% trans %} mintme.api.finance.end_date {% endtrans %}:</label>
+            <input type="text" id="end_date" name="end_date" value="{{ endDate }}" required>
+        </div>
+        <button type="submit" class="btn btn-default">{% trans %} mintme.api.finance.filter {% endtrans %}</button>
+    </form>
+    <br>
+    <h2> {% trans %} mintme.api.profit.token_referral_table {% endtrans %} </h2>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+            <tr class="sonata-ba-list-field-header">
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.symbol {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.count {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.loss {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.loss_usd {% endtrans %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for referralProfit in tokenReferralProfits %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ referralProfit.symbol }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ referralProfit.count }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ referralProfit.profit | toMoney(8, false, true) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ referralProfit.profitInUsd | toMoney(8, false, true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <h2> {% trans %} mintme.api.profit.donation_referral_table {% endtrans %} </h2>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+            <tr class="sonata-ba-list-field-header">
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.symbol {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.count {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.loss {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.loss_usd {% endtrans %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for referralProfit in donationFeeReferralProfits %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ referralProfit.symbol }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ referralProfit.count }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ referralProfit.profit | toMoney(8, false, true) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ referralProfit.profitInUsd | toMoney(8, false, true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

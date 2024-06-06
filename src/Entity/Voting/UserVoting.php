@@ -12,11 +12,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserVotingRepository")
  * @ORM\Table(
  *     name="user_voting",
  *     uniqueConstraints={@UniqueConstraint(name="user_voting_index", columns={"user_id", "voting_id"})}
  *     )
+ * @codeCoverageIgnore
  */
 class UserVoting
 {
@@ -42,7 +43,7 @@ class UserVoting
     /**
      * @ORM\ManyToOne(
      *     targetEntity="App\Entity\Voting\Voting",
-     *     inversedBy="userVotes",
+     *     inversedBy="userVotings",
      *     cascade={"persist", "remove"}
      * )
      * @ORM\JoinColumn(name="voting_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
@@ -52,7 +53,7 @@ class UserVoting
     /**
      * @ORM\ManyToOne(
      *     targetEntity="App\Entity\User",
-     *     cascade={"persist", "remove"}
+     *     cascade={"persist"}
      * )
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
@@ -78,7 +79,7 @@ class UserVoting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getAmountMoney(): Money
     {
@@ -112,7 +113,7 @@ class UserVoting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getOption(): Option
     {
@@ -127,7 +128,7 @@ class UserVoting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getUser(): User
     {

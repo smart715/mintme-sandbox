@@ -1,0 +1,267 @@
+@import '../variables'
+@import '../mixins'
+@import '../date-picker'
+@import 'dw_modal.sass'
+
+.bounty-reward-dropdown
+  button
+    transform: rotate(90deg)
+    color: $primary
+
+    &:hover
+      background: none !important
+
+    &:focus
+      outline: none !important
+
+  .bounty-reward-dropdown-menu
+    div.bounty-reward-dropdown-item
+      &:hover
+        background: $dropdown-link-bg-hover
+
+.image-uploader
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  z-index: 100
+  width: 100%
+  height: 100%
+  opacity: 0
+  background-color: rgba(0,0,0,0.5)
+
+#token-settings
+  .nav.nav-tabs
+    width: 100%
+    flex-wrap: nowrap
+    overflow-x: auto
+    overflow-y: hidden
+    -webkit-overflow-scrolling: touch
+    -ms-overflow-style: -ms-autohiding-scrollbar
+
+    &::-webkit-scrollbar
+      display: none
+
+  .cover-image-wrapper
+    background-color: #E8E8E8
+    max-height: 198px
+    min-height: 198px
+
+    .image-uploader
+      opacity: 1
+      color: #B0B0B0
+      background-color: transparent
+
+    svg
+      margin-top: -2px
+      height: 18px
+      width: 18px
+      margin-right: 8px
+
+  .pencil-icon
+    margin-bottom: 4px
+  .delete-icon
+    margin-bottom: 3px
+
+  .card-header
+    div::selection
+      color: $primary
+      background-color: $bg-secondary
+
+  .card-title
+    img
+      margin-bottom: .25rem !important
+
+  .token-markets-edit
+    .coin-avatar
+      width: auto
+
+    .market-toggle
+      border-radius: $border-radius
+      transition: all $micro-transition-speed
+      cursor: pointer
+
+      &:hover
+        background-color: lighten($bg-primary, 5)
+      &.not-collapsed
+        background-color: transparent
+
+        button
+          visibility: hidden
+
+    .market-item
+      border-radius: $border-radius
+      background-color: $bg-primary
+
+      .market-toggle
+        color: $primary
+      &:not(.is-opened) .market-toggle
+        color: $text-color-primary
+
+        .coin-avatar img
+          filter: grayscale(1) contrast(5)
+
+  .menu-backdrop
+    position: absolute
+    height: 100%
+    width: 100%
+    left: 0
+    top: 0
+    background-color: rgba(0, 0, 0, 0.5)
+    z-index: 1
+
+    @include media-breakpoint-up(md)
+      visibility: collapse
+
+  .settings-nav-wrp
+    transition: left $fast-transition-speed
+
+    @include media-breakpoint-up(md)
+      margin-top: 0 !important
+
+    @include media-breakpoint-down(sm)
+      position: fixed
+      left: -100%
+      padding-left: 0px
+      width: 400px
+      max-width: 80%
+      top: 0px
+      height: 100%
+      z-index: 2000
+
+      & > .card
+        border-radius: 0 !important
+        height: 100%
+
+    &.opened
+      left: 0
+
+  .settings-header-icon
+    font-size: 24px
+    margin-left: 1rem
+
+    &.with-dropdown
+      margin-bottom: -10px
+
+  .settings-header-icon-spacer
+    border-right: 1px solid $bg-primary-light
+    height: 30px
+
+    &.with-dropdown
+      margin-bottom: -10px
+
+  .token-settings-sidenav
+    list-style: none
+    font-weight: 600
+    margin: 0
+    padding: 0
+
+    .caret-opened
+      transform: rotate(180deg)
+
+    ul
+      list-style: none
+      margin: 0
+      padding: 0
+
+      a
+        padding-left: 3.5rem !important
+
+    li
+      a:hover, a.nav-active
+        background-color: $bg-primary-darker
+        color: $primary
+    svg
+      font-size: 18px
+
+.reward-td-price
+  min-width: 110px
+  padding-right: 1.2rem
+
+  @media (max-width: 767px)
+    min-width: 80px
+    padding: 0
+
+.rewards-table, .manage-table
+  min-width: 500px
+  td
+    @media (max-width: 767px)
+      padding: 0.25rem!important
+
+.application-actions
+  min-width: 150px
+
+.token-settings-title
+  span:nth-child(2)
+    color: $text-color-primary
+    font-size: 1.5rem
+
+.token-dropdown-menu
+  ::after
+    color: $text-color-primary
+    right: 0.7rem !important
+    top: 1.1rem !important
+
+  .dropdown
+    .dropdown-menu
+      background-color: $bg-primary-dark
+
+      .dropdown-item
+        padding: 0.1rem 1rem
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+
+    .dropdown-toggle
+      padding: 0.4rem !important
+
+.token-dropdown-item
+  display: flex
+  width: 250px
+  @media (max-width: 500px)
+    width: 150px
+
+.reward-td-title
+  display: -webkit-box
+  -webkit-line-clamp: 1
+  -webkit-box-orient: vertical
+  overflow: hidden
+
+.reward-td-title:hover
+  @media (hover: none)
+    .truncatable
+      display: none
+
+.close-icon
+  &:hover
+    color: lighten($bg-danger-input, 5) !important
+
+.summary-modal
+  max-width: 700px!important
+
+
+.link-primary-underscored
+  color: $primary !important
+  border-bottom: 1px solid $primary
+
+  &::selection
+    background-color: $bg-secondary
+
+  &:hover
+    color: $primary-highlight !important
+    border-bottom: 1px solid $primary-highlight
+
+.tooltip-website
+  font-size: $small-font-size
+  width: auto !important
+  height: auto !important
+  max-width: 30rem
+  word-break: break-all
+  margin-left: 5rem
+
+  @media (min-width: 768px)
+    margin: 0
+
+.discord-role
+  background-color: $bg-primary-darker
+  border-radius: $border-radius

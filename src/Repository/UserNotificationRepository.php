@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/** @codeCoverageIgnore */
 class UserNotificationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -15,6 +16,7 @@ class UserNotificationRepository extends ServiceEntityRepository
         parent::__construct($registry, UserNotification::class);
     }
 
+    /** @return UserNotification[] */
     public function findUserNotifications(User $user, ?int $notificationLimit): ?array
     {
         $actualDate = new DateTimeImmutable();

@@ -8,15 +8,16 @@ use App\Form\DataTransformer\XSSProtectionTransformer;
 use App\Form\DataTransformer\ZipCodeTransformer;
 use App\Form\Type\BbcodeEditorType;
 use App\Form\Type\NicknameType;
+use App\Services\TranslatorService\TranslatorInterface;
+use App\Validator\Constraints\NoBadWords;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class ProfileType extends AbstractType
 {
     /** @var TranslatorInterface */
@@ -51,9 +52,16 @@ class ProfileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nickname', NicknameType::class)
+            ->add('nickname', NicknameType::class, [
+                'required' => true,
+                'attr' => [
+                    'maxlength' => 30,
+                    'minlength' => 2,
+                ],
+            ])
             ->add('firstName', TextType::class, [
                 'label' => $this->translator->trans('page.profile.form.first_name'),
+                'required' => false,
                 'attr' => [
                     'maxlength' => 30,
                 ],
@@ -76,14 +84,20 @@ class ProfileType extends AbstractType
                 'attr' => [
                     'maxlength' => 500,
                 ],
+                'constraints' => [
+                    new NoBadWords(),
+                ],
             ])
             ->add('anonymous', CheckboxType::class, [
                 'label' => $this->translator->trans('page.profile.form.trade_anonymously'),
                 'required' => false,
                 'attr' => [
-                  'class' => 'custom-control-input',
+                  'class' => 'custom-control-input custom-control-input-dark',
+                  'tabindex' => '0',
                 ],
-                'label_attr' => ['class' => 'custom-control-label'],
+                'label_attr' => [
+                    'class' => 'custom-control-label',
+                ],
             ])
             ->add('phoneNumber', PhoneNumberType::class, [
                 'required' => $options['had_phone_number'],

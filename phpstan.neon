@@ -18,18 +18,20 @@ parameters:
     tmpDir: "%rootDir%/../../../phpstan"
 
     symfony:
-        container_xml_path: %rootDir%/../../../var/cache/dev/srcApp_KernelDevDebugContainer.xml
+        containerXmlPath: %rootDir%/../../../var/cache/dev/srcApp_KernelDevDebugContainer.xml
 
-    excludes_analyse:
+    doctrine:
+        objectManagerLoader: %rootDir%/../../../tests/object-manager.php
+
+    excludePaths:
         - "%rootDir%/../../../src/Migrations/*"
         - "%rootDir%/../../../src/Validator/Constraints/*"
+        - "%rootDir%/../../../src/Repository/TranslationRepository.php"
         - "%rootDir%/../../../tests/Command/UpdateDisposableEmailDomainsTest.php"
         - "%rootDir%/../../../tests/Command/Blacklist/SynchronizeTokenBlacklistTest.php"
 
     bootstrapFiles:
-        - vendor/bin/.phpunit/phpunit-8.3-0/vendor/autoload.php
+        - vendor/bin/.phpunit/phpunit-8.5-0/vendor/autoload.php
 
     ignoreErrors:
         - '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
-        - '#Method (.*)Repository\(\) should return (.*)Repository but returns (.*).#'
-        - '#Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface::section\(\)\.#'

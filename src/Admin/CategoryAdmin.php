@@ -5,7 +5,10 @@ namespace App\Admin;
 use App\Entity\Classification\Context;
 use Sonata\ClassificationBundle\Admin\CategoryAdmin as Admin;
 
-/** @codeCoverageIgnore */
+/**
+ * @codeCoverageIgnore
+ * @phpstan-ignore-next-line marked as final class
+ */
 class CategoryAdmin extends Admin
 {
 

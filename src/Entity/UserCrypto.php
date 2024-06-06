@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserCryptoRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(
  *     name="user_cryptos",
@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  * )
  * @codeCoverageIgnore
  */
-class UserCrypto implements UserTradebleInterface
+class UserCrypto implements UserTradableInterface
 {
     public function __construct(User $user, Crypto $crypto)
     {

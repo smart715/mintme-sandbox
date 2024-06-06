@@ -2,7 +2,9 @@
 
 namespace App\Form\Type;
 
+use App\Services\TranslatorService\TranslatorInterface;
 use App\Validator\Constraints\IsNotBlacklisted;
+use App\Validator\Constraints\NoBadWords;
 use App\Validator\Constraints\UniqueNickname;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -10,8 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
+/** @codeCoverageIgnore */
 class NicknameType extends AbstractType
 {
     /** @var TranslatorInterface */
@@ -47,6 +49,7 @@ class NicknameType extends AbstractType
                 new Regex([
                    'pattern' => '/^[\p{L}\d]+$/u',
                 ]),
+                new NoBadWords(),
             ],
         ]);
     }

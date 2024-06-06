@@ -1,0 +1,386 @@
+@import '../variables'
+@import '~bootstrap/scss/mixins/breakpoints'
+
+$road-line-width: 2px
+$check-point-width: 1.2rem
+$check-point-width-last: 1.5rem
+$left-step: -8%
+$up-step: 0.6rem
+
+$scale-amount: 1.1
+
+@function check-point-element-left-step($element-width)
+  $result: calc(#{$left-step} - #{$element-width} / 2)
+  @return $result
+
+
+@function check-point-element-up-step($element-height)
+  $result: calc(#{$up-step} - #{$element-height} / 2)
+  @return $result
+
+body
+  background-image: none
+
+main
+  max-width: none !important
+  justify-content: center
+
+#coin
+  margin: 0
+
+  a
+    font-size: 1.45rem
+    line-height: 2.75rem
+    color: $text-color-primary
+    font-weight: 400
+    border-radius: $border-radius-large
+    background: $bg-primary-light
+    max-width: 12rem
+    width: 100%
+    text-align: center
+
+  a:hover
+    font-weight: 700
+    color: $text-color-secondary
+    background: $primary
+
+  .section-header
+    color: $text-color-primary
+    font-size: $font-size-xxl
+    font-weight: 600
+
+    @include media-breakpoint-down(sm)
+      font-size: $font-size-xl !important
+
+    span
+      color: $primary
+      &::selection
+        color: $primary
+        background-color: $bg-secondary
+
+  .mintme-logo-container
+    a
+      max-width: 500px
+      max-height: none !important
+
+  .trade-logos
+    max-width: 700px
+    margin: 0 auto
+
+    img
+      max-height: 38px
+
+  a.logo
+    background: transparent
+
+    img
+      transition: all 300ms ease-in-out
+
+    &:hover
+      background: transparent
+
+      img
+        background: transparent
+        transform: scale($scale-amount)
+
+  .tradable
+    background-color: $bg-primary-darker
+    .tradable-header
+      color: $text-color-primary
+
+    .logo
+      max-height: 70px
+
+  .main-section
+    max-width: $page-content-width
+
+    .coin-processor
+      max-width: 600px
+
+    .header
+      color: $text-color-primary
+      line-height: inherit !important
+
+    @include media-breakpoint-down(lg)
+      .col-12
+        max-height: 50vh
+
+      .header
+        text-align: center
+
+    @include media-breakpoint-up(lg)
+      .header
+        font-size: 52px
+        line-height: 75px !important
+
+        .d-block
+          span
+            font-size: 60px
+          span.text-size-secondary
+            font-size: $font-size-xxl !important
+
+    @include media-breakpoint-between(md, lg)
+      .header
+        font-size: $font-size-xxl
+
+        .d-block
+          span
+            font-size: $font-size-xxxl
+          span.text-size-secondary
+            font-size: $font-size-xxl !important
+
+    @include media-breakpoint-between(xs, md)
+      .header
+        font-size: $font-size-xl
+
+        .d-block
+          span
+            font-size: $font-size-xxl
+          span.text-size-secondary
+            font-size: $font-size-xl !important
+
+    @include media-breakpoint-down(xs)
+      .header
+        font-size: $font-size-md
+
+        .d-block
+          span
+            font-size: $font-size-sl
+          span.text-size-secondary
+            font-size: $font-size-md !important
+
+  .what-are-mintme
+    background: $bg-primary
+
+    .mintme-coin-laptop
+      max-width: 640px
+
+    .what-are-mintme-text
+      max-width: 600px
+      font-size: $font-size-md
+      line-height: 2rem
+      color: $text-color-primary-dark
+
+      .what-are-mintme-header
+        color: $text-color-primary
+
+        span
+          display: block
+
+  .monetization
+    background: $bg-secondary
+
+    .mintme-coin-monetization-illustration
+      max-width: 640px
+
+    .monetization-text
+      max-width: 600px
+      font-size: $font-size-md
+      line-height: 2rem
+      color: $bg-primary-dark
+
+      .monetization-header
+        color: $bg-primary
+
+        span
+          display: block
+
+      .coinimp-link
+        border-radius: $border-radius-large
+        background-color: $primary
+        font-size: $font-size-sl
+        color: $text-color-dark-secondary
+        font-weight: 700
+        width: auto
+        max-width: 20rem
+
+      .coinimp-link:hover
+        color: $primary
+        background-color: $bg-primary-light
+
+  .intro
+    background: $bg-primary-light
+    align-items: center
+
+    .dotted-map
+      background-image: url('../../img/mintme-coin-dotted-map.webp')
+      background-position: top left
+      background-repeat: no-repeat
+      max-width: $page-content-width-wider
+      align-items: center
+
+      .row
+        min-height: 500px
+
+        .mintme-logo
+          max-width: 500px
+
+        .text
+          font-size: $font-size-sl
+          line-height: 1.85rem
+          color: $text-color-primary-dark
+          font-weight: 400
+          text-align: right
+          max-width: 600px
+
+          @include media-breakpoint-up(xl)
+            text-align: right
+
+          @include media-breakpoint-down(lg)
+            text-align: center
+
+          @include media-breakpoint-down(xs)
+            font-size: $font-size-md !important
+
+    .numbers
+      max-width: $page-content-width
+
+      .number
+        background: $bg-primary
+        color: $text-color-primary
+        font-size: $font-size-sl
+        max-width: 270px
+        height: 150px
+        border-radius: $border-radius
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+
+        .text-primary
+          font-weight: 600
+          font-size: $font-size-xxl
+
+          @include media-breakpoint-down(xs)
+            font-size: $font-size-xl !important
+  .key-facts
+    background: $bg-secondary
+    position: relative
+    overflow: hidden
+
+    .first-dots
+      position: absolute
+      top: -193px
+      left: -570px
+
+    .second-dots
+      position: absolute
+      top: 300px
+      left: calc(100% - 181px)
+      transform: rotate(15deg)
+
+    .third-dots
+      position: absolute
+      top: 55%
+      left: -580px
+      transform: rotate(10deg)
+
+    @include media-breakpoint-down(md)
+      .first-dots
+        opacity: 0
+
+      .second-dots
+        opacity: 0
+
+      .third-dots
+        opacity: 0
+
+    .key-facts-content
+      max-width: $page-content-width
+
+      .key-facts-header
+        color: $bg-primary
+
+        span
+          display: block
+
+      .body
+        .key-fact
+          font-size: $font-size-sm
+          color: $text-color-primary-darkest
+
+          img
+            width: 100%
+            max-width: 355px
+
+          .key-fact-header
+            font-size: $font-size-md
+            color: $bg-primary-dark
+            font-weight: 600
+
+          .key-fact-text
+            max-width: 450px
+
+  .mintme-link
+    color: $text-color-dark-secondary
+    background-color: $primary
+    border-radius: $border-radius-large
+    font-weight: 700
+    font-size: $font-size-sl
+    width: auto
+    max-width: 20rem
+
+  .mintme-link:hover
+    @extend .mintme-link
+    color: $bg-primary-dark
+    background-color: $bg-secondary
+
+  .roadmap
+    background: $bg-primary
+
+    .container
+      max-width: $page-content-width-narrower
+
+      .timeline
+        width: 80%
+
+
+        @include media-breakpoint-up(md)
+          width: 68% !important
+
+          .col-12
+            margin-left: 2em
+
+            &:last-of-type
+              min-height: auto
+
+            &:after, &:before
+              content: ""
+              position: absolute
+              background: $primary
+
+            &:before
+              z-index: 1
+              width: $check-point-width
+              height: $check-point-width
+              border-radius: 50%
+              top: check-point-element-up-step($check-point-width)
+              left: check-point-element-left-step($check-point-width)
+              opacity: 0
+              transition: background-color .3s, width .3s, left .3s
+
+            &:after
+              height: 0
+              width: $road-line-width
+              left: check-point-element-left-step($road-line-width)
+              top: calc($check-point-width / 2)
+              transition: height linear .7s, left .3s
+
+            &:last-of-type:after
+              height: 0 !important
+
+            &.road-active-before, &.road-active
+              &:before
+                opacity: 1
+
+            &.enter
+              &.road-active:after
+                height: 100%
+
+            &.road-endpoint
+              &:before
+                top: check-point-element-up-step($check-point-width-last)
+                left: check-point-element-left-step($check-point-width-last)
+                width: $check-point-width-last
+                height: $check-point-width-last
+                background: $primary

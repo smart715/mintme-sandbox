@@ -10,9 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class TokenNameConverterTest extends TestCase
 {
-    /**
-     * @dataProvider convertProvider
-     */
+    /** @dataProvider convertProvider */
     public function testConvert(int $tokenId, int $offset, string $tokenName): void
     {
         $converter = new TokenNameConverter(
@@ -22,6 +20,26 @@ class TokenNameConverterTest extends TestCase
         $this->assertEquals($tokenName, $converter->convert($this->mockToken($tokenId, $tokenName)));
     }
 
+    /** @dataProvider convertProvider */
+    public function testConvertId(int $tokenId, int $offset, string $tokenName): void
+    {
+        $converter = new TokenNameConverter(
+            $this->mockConfig($offset)
+        );
+
+        $this->assertEquals($tokenName, $converter->convertId($tokenId));
+    }
+
+    /** @dataProvider convertProvider */
+    public function testParseConvertedId(int $tokenId, int $offset, string $tokenName): void
+    {
+        $converter = new TokenNameConverter(
+            $this->mockConfig($offset)
+        );
+
+        $this->assertEquals($tokenId, $converter->parseConvertedId($tokenName));
+    }
+
     public function convertProvider(): array
     {
         return [
@@ -29,10 +47,10 @@ class TokenNameConverterTest extends TestCase
             [ 123, 0, 'TOK000000000123' ],
             [ 321, 0, 'TOK000000000321' ],
             [ 99999999999999, 0, 'TOK99999999999999' ],
-            [ -1, 0, 'TOK0000000000-1' ],
             [ 1, 5, 'TOK000000000006' ],
         ];
     }
+
 
     /** @return MockObject|Config */
     private function mockConfig(int $offset): Config

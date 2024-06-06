@@ -1,127 +1,51 @@
-version: "2.2"
+version: "3.8"
 services:
   # APP
   panel:
-    build: .
+    image: gitlab.abchosting.org:5050/abc-hosting/prog-selflearning/mintme-sandbox:composer-2
     depends_on:
       - db
       - rabbitmq
-      - withdraw
-      - deposit
-      - deploytok
+      - mintme-gateway
       - btc
+      - mailhog
     networks:
       - middleend
       - backward
     volumes:
       - .:/var/www/html/panel
-      - .docker/panel.env:/var/www/html/panel/.env
-      - .docker/parameters.yaml:/var/www/html/panel/config/parameters.yaml
+      - .docker/panel/.env:/var/www/html/panel/.env
+      - .docker/panel/parameters.yaml:/var/www/html/panel/config/parameters.yaml
 
-  withdraw:
-    build: .docker/withdraw
+  mintme-gateway:
+    image: gitlab.abchosting.org:5050/abc-hosting/cryptocurrencies/mintme/mintme-gateway:v2.10.0
     depends_on:
       - db
       - rabbitmq
-      - electrum
-      - webchaind
-    networks:
-      - middleend
-    volumes:
-      - .docker/withdraw:/var/www/html/withdraw
-      - .docker/withdraw.conf.yaml:/var/www/html/withdraw/config/config.yaml
-
-  deposit:
-    build: .docker/deposit
+    environment:
+      NODE_ENV: development
+      DB_HOST: db
+      DB_NAME: mintme_gateway
+      SERVER_HOST: "0.0.0.0"
+      SERVER_PORT: 4001
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    extra_hosts:
+      - "node:172.8.0.254"
+      - "cryptonode:172.8.0.253"
     ports:
-      - 3000:3000
-    depends_on:
-      - db
-      - webchaind
-      - electrum
-      - rabbitmq
-      - webchain-cli
-    volumes:
-      - .docker/deposit:/src
-      - .docker/deposit.conf.yaml:/src/config/default.yaml
-      - .docker/deposit.env:/src/.env
-    networks:
-      - middleend
-
-  deploytok:
-    build: .docker/tokdeploy/contract-gateway
-    ports:
-      - 3001:3001
-    depends_on:
-      - db
-      - webchaind
-      - rabbitmq
-      - webchain-cli
-    volumes:
-      - .docker/tokdeploy/contract-gateway:/src
-      - .docker/tokdeploy.yaml:/src/config/default.yaml
-      - .docker/tokdeploy.env:/src/.env
-      - webchaind_root:/src/webchain_root
-    networks:
-      - middleend
-
-  webchain-cli:
-    image: lukaszmatczak/webchain-cli
-    networks:
-      - middleend
-    ports:
-      - 1920:1920
-    volumes:
-      # Replace next paths with actuals on your system
-      - .docker/default/WEB:/data
-
-  webchaind:
-    build: .docker/webchaind
-    cpus: 0.30
-    ports:
-      - 39573:39573 # debug
-    networks:
-      - middleend
-    volumes:
-      # Replace next paths with actuals on your system
-      - .docker/default/WEB/password.txt:/data/password
-      - .docker/default/WEB/account.json:/root/.webchain/morden/keystore/9139413fe7247da35ae0797f9270271ba758d248
-      - webchaind_root:/root/.webchain/morden
-
-  openethereum:
-    image: parity/parity:v2.5.12-stable
-    volumes:
-      - .docker/default/ETH/:/root/eth/
-    ports:
-      - 8545:8545
-      - 8080:8080
-    command:
-      --light
-      --chain=ropsten
-      --jsonrpc-interface=all
-      --jsonrpc-cors=all
-      --jsonrpc-apis=web3,eth,pubsub,net,parity,parity_pubsub,traces,rpc,secretstore,parity_accounts,personal
-      --unlock=0xc26dcee6092beb24b42ebd789f82bb6f8d63387c
-      --password /root/eth/pass
-      --base-path /root/eth
-    working_dir: /home/openethereum
-    user: root
-    mem_limit: 2gb
-    cpuset: '0,3'
+      - 4001:4001
     networks:
       - middleend
 
   nginx:
-    image: nginx:latest
+    image: nginx:1.23.1-alpine
     ports:
       - 80:80
       - 443:443
       - 16614:16614
-      - 8000:8000 # php-withdraw debug
       - 8008:8008
     depends_on:
       - panel
-      - withdraw
       - btc
     networks:
       - middleend
@@ -129,11 +53,10 @@ services:
     volumes:
       - .docker/nginx:/etc/nginx/conf.d
       - .:/var/www/html/panel
-      - .docker/withdraw:/var/www/html/withdraw
     command: [nginx-debug, '-g', 'daemon off;']
 
   db:
-    image: mariadb
+    image: mariadb:10.9.2
     environment:
       MYSQL_ROOT_PASSWORD: root
     ports:
@@ -142,42 +65,24 @@ services:
       - middleend
       - backend
     volumes:
-      - .docker/sql:/docker-entrypoint-initdb.d
-      - .docker/my.cnf:/etc/mysql/my.cnf
-      - mariadb-data:/var/lib/mysql
+      - .docker/db/init:/docker-entrypoint-initdb.d
+      - .docker/db/my.cnf:/etc/mysql/my.cnf
 
   rabbitmq:
-    build: .docker/rabbitmq
+    image: gitlab.abchosting.org:5050/abc-hosting/cryptocurrencies/mintme/panel/rabbitmq
     ports:
       - 15672:15672
       - 5672:5672
     networks:
       - middleend
     volumes:
-      - .docker/rabbitmq-guest.conf:/etc/rabbitmq/rabbitmq.config
-
-  electrum:
-    build:
-      context: https://github.com/22116/docker-electrum-daemon.git
-      args:
-        ELECTRUM_VERSION: 3.3.6
-        ELECTRUM_USER: electrum
-        ELECTRUM_PASSWORD: changeme
-    environment:
-      TESTNET: 1
-    ports:
-      - 7777:7777 # debug
-    networks:
-      - middleend
-    volumes:
-      # Replace the next path with actual on your system
-      - .docker/default/BTC/wallet_btc_testnet:/data/default_wallet
+      - .docker/rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
 
   # VIABTC
   btc:
     privileged: true
     container_name: btc-service
-    build: .docker/viabtc/btc/
+    image: gitlab.abchosting.org:5050/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server:new-backend-dev
     ports:
       - 127.0.0.1:17416:7416
       - 127.0.0.1:17316:7316
@@ -189,12 +94,12 @@ services:
       - 127.0.0.1:18091:8091
       - 127.0.0.1:18364:8364
     volumes:
-      - .docker/viabtc/btc/btc/matchengine/config.json:/btc/matchengine/config.json
-      - .docker/viabtc/btc/btc/accesshttp/config.json:/btc/accesshttp/config.json
-      - .docker/viabtc/btc/btc/marketprice/config.json:/btc/marketprice/config.json
-      - .docker/viabtc/btc/btc/accessws/config.json:/btc/accessws/config.json
-      - .docker/viabtc/btc/btc/alertcenter/config.json:/btc/alertcenter/config.json
-      - .docker/viabtc/btc/btc/readhistory/config.json:/btc/readhistory/config.json
+      - .docker/viabtc/btc/configs/matchengine/config.json:/btc/matchengine/config.json
+      - .docker/viabtc/btc/configs/accesshttp/config.json:/btc/accesshttp/config.json
+      - .docker/viabtc/btc/configs/marketprice/config.json:/btc/marketprice/config.json
+      - .docker/viabtc/btc/configs/accessws/config.json:/btc/accessws/config.json
+      - .docker/viabtc/btc/configs/alertcenter/config.json:/btc/alertcenter/config.json
+      - .docker/viabtc/btc/configs/readhistory/config.json:/btc/readhistory/config.json
     depends_on:
       - db
       - mq
@@ -206,18 +111,18 @@ services:
 
   redis_master:
     container_name: btc-redis-master
-    build: .docker/redis
+    image: redis:4.0.6-alpine
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
     ports:
       - 16379:6379
     networks:
       - backend
     volumes:
-      - .docker/redis.conf:/usr/local/etc/redis/redis.conf
+      - .docker/redis.master.conf:/usr/local/etc/redis/redis.conf
 
   redis_sentinel:
     container_name: btc-redis-sentinel
-    build: .docker/viabtc/redis
-    image: redis-sentinel
+    image: gitlab.abchosting.org:5050/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server/redis_sentinel
     environment:
       - MASTER_NAME=mymaster
       - QUORUM=1
@@ -231,15 +136,15 @@ services:
 
   zookeeper:
     container_name: btc-zookeeper
-    image: wurstmeister/zookeeper
+    image: zookeeper:3.4.13
     ports:
-      - 12181:2181
+      - 2181:2181
     networks:
       - backend
 
   mq:
     container_name: btc-kafka
-    image: wurstmeister/kafka
+    image: wurstmeister/kafka:2.13-2.8.1
     restart: on-failure
     ports:
       - 19092:9092
@@ -250,12 +155,30 @@ services:
     # Remove on Windows
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
     networks:
       - backend
 
-volumes:
-  webchaind_root:
-  mariadb-data:
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    restart: always
+    entrypoint: ["/bin/sh", "-c", "MailHog &>/dev/null"]
+    ports:
+      - 8025:8025
+      - 1025:1025
+    networks:
+      - middleend
+
+  mercure:
+    image: dunglas/mercure:v0.14.1
+    environment:
+        - MERCURE_PUBLISHER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
+        - MERCURE_SUBSCRIBER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
+        - SERVER_NAME=":80"
+    command: caddy run -config /etc/caddy/Caddyfile.dev
+    networks:
+      - middleend
 
 networks:
   backward:

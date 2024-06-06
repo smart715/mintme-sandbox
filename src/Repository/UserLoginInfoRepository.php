@@ -7,6 +7,7 @@ use App\Entity\UserLoginInfo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/** @codeCoverageIgnore */
 class UserLoginInfoRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)

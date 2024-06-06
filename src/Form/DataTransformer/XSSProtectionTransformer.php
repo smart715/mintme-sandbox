@@ -29,11 +29,13 @@ class XSSProtectionTransformer implements DataTransformerInterface
         $urls = [];
         $countOfIndex = count($indexes);
         
-        for ($i = 0; $i < $countOfIndex; $i+=2) {
-            $url = substr($value, (int)$indexes[$i] + 3, (int)$indexes[$i+1] - 2 - strlen($value)) ;
-            $urls[] = $url;
+        if ($countOfIndex > 1) {
+            for ($i = 0; $i < $countOfIndex; $i+=2) {
+                $url = substr($value, (int)$indexes[$i] + 3, (int)$indexes[$i+1] - 2 - strlen($value));
+                $urls[] = $url;
+            }
         }
-    
+
         foreach ($urls as $url) {
             $value = str_replace('[yt]'.$url.'[/yt]', '[yt]'.$this->extractIdentifierOfVideo($url).'[/yt]', $value);
         }

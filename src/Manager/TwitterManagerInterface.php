@@ -11,11 +11,11 @@ interface TwitterManagerInterface
      * @throws InvalidTwitterTokenException
      * @throws \Throwable
      */
-    public function sendTweet(User $user, string $message): self;
+    public function sendTweet(?User $user, string $message): self;
 
     /**
      * @throws InvalidTwitterTokenException
      * @throws \Throwable
      */
-    public function retweet(User $user, string $tweetId): self;
+    public function retweet(?User $user, string $tweetId): self;
 }

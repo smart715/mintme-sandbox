@@ -2,21 +2,25 @@
 
 namespace App\Controller\Dev\API\V2\User;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandler;
+use App\Exchange\Balance\Factory\BalanceView;
+use App\Exchange\Balance\Factory\BalanceViewFactory;
 use App\Exchange\Balance\Model\BalanceResult;
+use App\Exchange\Balance\Model\CryptoBalanceResult;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Converter\TokenNameConverter;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use Money\Currency;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,6 +59,8 @@ class WalletController extends AbstractFOSRestController
      *     )
      * )
      * @SWG\Response(response="400", description="Bad request")
+     * @SWG\Response(response="401", description="Unauthorized")
+     * @SWG\Response(response="503", description="Service unavailable")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -85,19 +91,25 @@ class WalletController extends AbstractFOSRestController
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
-    public function getBalances(BalanceHandler $balanceHandler): array
-    {
+    public function getBalances(
+        BalanceHandler $balanceHandler,
+        BalanceViewFactory $balanceViewFactory
+    ): array {
         /** @var User $user */
         $user = $this->getUser();
 
-        $tradebles = array_merge($this->cryptoManager->findAll(), $user->getTokens());
+        $tradables = array_merge($this->cryptoManager->findAll(), $user->getTokens());
 
         $balances = $balanceHandler->balances(
             $user,
-            $tradebles
-        )->getAll();
+            $tradables
+        );
 
-        return $this->rebrandBalancesKeys($balances, $tradebles);
+        $balancesView = $balanceViewFactory->create($tradables, $balances, $user);
+        $rebrandedBalances = $this->rebrandBalancesKeys($balances->getAll(), $tradables);
+        $rebrandedBalancesView = $this->rebrandBalancesKeys($balancesView, $tradables);
+
+        return $this->updateBalances($rebrandedBalances, $rebrandedBalancesView);
     }
 
     /**
@@ -151,7 +163,7 @@ class WalletController extends AbstractFOSRestController
      * Withdraw to specific address
      *
      * @Rest\View()
-     * @Rest\Post("/withdraw")
+     * @Rest\Post("/withdraw", defaults={"_private_key_required"=true})
      * @Rest\RequestParam(name="currency", allowBlank=false)
      * @Rest\RequestParam(
      *     name="amount",
@@ -160,6 +172,12 @@ class WalletController extends AbstractFOSRestController
      * @Rest\RequestParam(
      *     name="address",
      *     allowBlank=false,
+     *     requirements="^[a-zA-Z0-9]+$"
+     * )
+     * @Rest\RequestParam(
+     *     name="network",
+     *     allowBlank=true,
+     *     nullable=true,
      *     requirements="^[a-zA-Z0-9]+$"
      * )
      * @SWG\Parameter(
@@ -173,6 +191,7 @@ class WalletController extends AbstractFOSRestController
      *          @SWG\Property(property="currency", type="string", example="MINTME", description="currency to withdraw"),
      *          @SWG\Property(property="amount", type="string", example="12.33", description="Amount to withdraw"),
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
+     *          @SWG\Property(property="network", type="string", example="", description="Network where to withdraw to.<br>Only required for tokens, MINTME and USDC"),
      *      )
      * ),
      * @SWG\Response(response="201", description="Returns success message")
@@ -196,22 +215,23 @@ class WalletController extends AbstractFOSRestController
                 'currency' => $request->get('currency'),
                 'amount' => $request->get('amount'),
                 'address' => $request->get('address'),
+                'network' => $request->get('network'),
             ]
         );
     }
 
     /**
-     * @param BalanceResult[] $balances
-     * @param TradebleInterface[] $tradebles
+     * @param array $balances
+     * @param TradableInterface[] $tradables
      * @return array
      */
-    private function rebrandBalancesKeys(array $balances, array $tradebles): array
+    private function rebrandBalancesKeys(array $balances, array $tradables): array
     {
         $tokenSymbolMap = [];
 
-        foreach ($tradebles as $tradeble) {
-            if ($tradeble instanceof Token) {
-                $tokenSymbolMap[$this->tokenNameConverter->convert($tradeble)] = $tradeble->getSymbol();
+        foreach ($tradables as $tradable) {
+            if ($tradable instanceof Token) {
+                $tokenSymbolMap[$this->tokenNameConverter->convert($tradable)] = $tradable->getSymbol();
             }
         }
 
@@ -226,5 +246,30 @@ class WalletController extends AbstractFOSRestController
         }
 
         return $rebrandedBalancesKeys;
+    }
+
+    /**
+     * @param BalanceResult[] $balances
+     * @param BalanceView[] $balancesView
+     * @return array
+     */
+    private function updateBalances(array $balances, array $balancesView): array
+    {
+        foreach ($balancesView as $key => $balanceView) {
+            $balances[$key] = Symbols::TOK !== $balanceView->getAvailable()->getCurrency()->getCode()
+                ? CryptoBalanceResult::success(
+                    $balanceView->getAvailable(),
+                    $balanceView->getFrozen() ?? $balances[$key]->getFreeze(),
+                    $balances[$key]->getReferral(),
+                )
+                : BalanceResult::success(
+                    $balanceView->getAvailable(),
+                    $balanceView->getFrozen() ?? $balances[$key]->getFreeze(),
+                    $balances[$key]->getReferral(),
+                    $balanceView->getBonus(),
+                );
+        }
+
+        return $balances;
     }
 }

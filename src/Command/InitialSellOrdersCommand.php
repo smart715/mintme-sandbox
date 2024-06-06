@@ -78,17 +78,21 @@ class InitialSellOrdersCommand extends Command
         /** @var ConsoleOutputInterface $output */
         $section = $output->section();
 
-        $progressBar = new ProgressBar($section, count($tokens));
-        $progressBar->start();
+        $progressBar = $this->startProgressBar($section, $tokens);
 
         foreach ($tokens as $token) {
             if (!$token->isDeployed() &&
                 !$token->isBlocked() &&
-                $token->isControlledToken() &&
+                $token->isCreatedOnMintmeSite() &&
                 $this->tokenHasEnoughAmount($token) &&
                 $this->noUserActiveSellOrder($token->getProfile()->getUser(), $token)
             ) {
-                $this->ordersFactory->createInitOrders($token);
+                $this->ordersFactory->createInitOrders(
+                    $token,
+                    (string)OrdersFactory::INIT_TOKEN_PRICE,
+                    null,
+                    (string)OrdersFactory::INIT_TOKENS_AMOUNT
+                );
                 $initOrdersFactoryCount++;
             }
 
@@ -99,6 +103,14 @@ class InitialSellOrdersCommand extends Command
         $io->success('Processed '.count($tokens).' tokens. Created init orders for '.$initOrdersFactoryCount.' tokens.');
 
         return 0;
+    }
+
+    protected function startProgressBar(ConsoleSectionOutput $section, array $tokens): ProgressBar
+    {
+        $progressBar = new ProgressBar($section, count($tokens));
+        $progressBar->start();
+
+        return $progressBar;
     }
 
     private function tokenHasEnoughAmount(Token $token): bool
@@ -115,7 +127,7 @@ class InitialSellOrdersCommand extends Command
     private function noUserActiveSellOrder(User $user, Token $token): bool
     {
         $market = $this->marketFactory->create(
-            $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol()),
+            $this->cryptoManager->findBySymbol(Symbols::WEB),
             $token
         );
 

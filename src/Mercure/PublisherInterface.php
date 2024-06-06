@@ -8,5 +8,5 @@ interface PublisherInterface
      * @param string $topic
      * @param mixed $payload
      */
-    public function publish(string $topic, $payload): void;
+    public function publish(string $topic, $payload, bool $private = false): void;
 }

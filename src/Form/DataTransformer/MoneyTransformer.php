@@ -10,11 +10,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class MoneyTransformer implements DataTransformerInterface
 {
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
 
-    /** @var string */
-    private $symbol;
+    private ?string $symbol;
 
     public function __construct(MoneyWrapperInterface $moneyWrapper)
     {

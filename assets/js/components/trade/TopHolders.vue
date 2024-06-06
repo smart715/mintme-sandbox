@@ -1,95 +1,157 @@
 <template>
-    <div class="card h-100 top-holders">
-        <div class="card-header">
-            {{ $t('trade.top_holders.header') }}
+    <div v-if="!shouldFold" class="card p-2">
+        <div class="d-flex justify-content-between">
+            <span
+                class="font-size-3 font-weight-semibold header-highlighting"
+                v-html="$t('trade.top_holders.header')"
+            >
+            </span>
+            <guide class="tooltip-center font-size-tooltip">
+                <template slot="body">
+                    <span v-html="$t('trade.top_holders.tooltip.header', translationsContext)" />
+                </template>
+            </guide>
         </div>
-        <div v-if="loaded && hasTraders" class="card-body p-0">
+        <div v-if="serviceUnavailable" class="card-body h-100 d-flex align-items-center justify-content-center">
+            <span class="text-center py-4">
+                {{ this.$t('toasted.error.service_unavailable_short') }}
+            </span>
+        </div>
+        <div v-else-if="hasTraders" class="card-body p-0 pt-3">
             <div class="table-responsive">
                 <b-table
                     ref="table"
-                    :items="holders"
+                    :items="holdersToShow"
                     :fields="fields"
                 >
                     <template v-slot:cell(trader)="row">
-                        <elastic-text :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
+                        <elastic-text
+                            :value="row.value"
+                            :img="row.item.traderAvatar"
+                            :frame="row.item.wreath"
+                            :url="row.item.url"
+                        />
                     </template>
                 </b-table>
             </div>
+            <div class="d-flex justify-content-center my-2">
+                <m-button
+                    v-if="holders.length > 5"
+                    type="secondary-rounded"
+                    @click="isListOpened=!isListOpened"
+                >
+                    {{ isListOpened
+                           ? $t('token.row_tables.show_less')
+                           : $t('token.row_tables.show_more')
+                    }}
+                </m-button>
+            </div>
         </div>
         <div v-else class="card-body h-100 d-flex align-items-center justify-content-center">
-            <span v-if="loaded" class="text-center py-4">
+            <span class="text-center py-4">
                 {{ $t('trade.top_holders.no_holders') }}
             </span>
-            <span v-else class="py-4">
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-            </span>
+        </div>
+    </div>
+    <div v-else class="card">
+        <div class="card-body">
+            <div class="text-center">
+                <b-link @click="isFolded = false">
+                    <span
+                        v-html="$t('show', {thing: $t('trade.top_holders.header')})"
+                        class="font-size-3 font-weight-semibold header-highlighting"
+                    >
+                    </span>
+                </b-link>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {BTable} from 'bootstrap-vue';
-import {formatMoney} from '../../utils';
-import {FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin} from '../../mixins';
+import {BTable, BLink} from 'bootstrap-vue';
+import {formatMoney, generateCoinAvatarHtml, getRankWreathSrcByRank} from '../../utils';
+import {FiltersMixin, NotificationMixin, WebSocketMixin} from '../../mixins';
 import ElasticText from '../ElasticText';
-
-library.add(faCircleNotch);
+import {MButton} from '../UI';
+import Guide from '../Guide';
+import {RANK_WREATHS} from '../../utils/constants';
 
 export default {
     name: 'TopHolders',
-    mixins: [FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin],
+    mixins: [FiltersMixin, NotificationMixin, WebSocketMixin],
     components: {
+        Guide,
         BTable,
+        BLink,
         ElasticText,
-        FontAwesomeIcon,
+        MButton,
     },
     props: {
         tokenName: String,
+        tokenAvatar: String,
         tradersProp: {
             type: Array,
             default: () => null,
         },
+        isMobileScreen: Boolean,
+        serviceUnavailable: Boolean,
     },
     data() {
         return {
-            traders: this.tradersProp,
+            traders: this.tradersProp ?? [],
+            isListOpened: false,
             fields: [
                 {
                     key: 'trader',
                     label: this.$t('trade.top_holders.trader'),
+                    thClass: 'pl-3',
+                    tdClass: 'pl-3',
                 },
                 {
                     key: 'amount',
                     label: this.$t('trade.top_holders.amount'),
                     formatter: formatMoney,
+                    thClass: 'pr-3 text-right',
+                    tdClass: 'pr-3 text-right',
                 },
             ],
+            isFolded: true,
         };
     },
     computed: {
-        loaded: function() {
-            return null !== this.traders;
-        },
         hasTraders: function() {
-            return this.traders.length > 0;
+            return 0 < this.traders.length;
         },
         holders: function() {
             return this.traders.map((row) => {
+                const wreath = RANK_WREATHS[row.rank];
+
                 return {
                     trader: row.user.profile.nickname,
                     traderAvatar: row.user.profile.image.avatar_small,
                     url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
                     amount: Math.round(row.balance),
+                    wreath: wreath ? getRankWreathSrcByRank(row.rank) : null,
                 };
             });
+        },
+        holdersToShow: function() {
+            return this.isListOpened || 5 > this.holders.length ? this.holders : this.holders.slice(0, 5);
+        },
+        shouldFold: function() {
+            return this.isMobileScreen && this.isFolded;
+        },
+        translationsContext: function() {
+            return {
+                tokenName: this.tokenName,
+                tokenAvatar: generateCoinAvatarHtml({image: this.tokenAvatar, isUserToken: true}),
+            };
         },
     },
     methods: {
         scrollDown: function() {
-            let parentDiv = this.$refs.table.$el.tBodies[0];
+            const parentDiv = this.$refs.table.$el.tBodies[0];
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
         getTraders: function() {
@@ -101,24 +163,18 @@ export default {
                         this.traders = data;
                         resolve(data);
                     })
-                    .catch((err) => reject(
-                        this.sendLogs('error', 'Can not get top holders', err)
-                    ));
+                    .catch((err) => {
+                        reject(this.$logger.error('Can not get top holders', err));
+                    });
             });
         },
     },
     mounted: function() {
-        if (!this.traders) {
-            this.getTraders();
-        }
-
-        this.getTraders().then(() => {
-            this.addMessageHandler((response) => {
-                if ('deals.update' === response.method) {
-                    this.getTraders();
-                }
-            }, 'update-top-holders', 'TopHolders');
-        });
+        this.addMessageHandler((response) => {
+            if ('deals.update' === response.method) {
+                this.getTraders();
+            }
+        }, 'update-top-holders', 'TopHolders');
     },
 };
 </script>

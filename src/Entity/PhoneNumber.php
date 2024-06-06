@@ -2,9 +2,17 @@
 
 namespace App\Entity;
 
+use App\Entity\ValidationCode\MailValidationCodeTrait;
+use App\Entity\ValidationCode\SmsValidationCodeTrait;
+use App\Entity\ValidationCode\ValidationCodeOwner;
+use App\Entity\ValidationCode\ValidationCodeOwnerInterface;
 use App\Utils\RandomNumber;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 
 /**
@@ -13,9 +21,11 @@ use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumbe
  * @ORM\Table(name="phone_number")
  * @ORM\HasLifecycleCallbacks()
  */
-class PhoneNumber
+class PhoneNumber extends ValidationCodeOwner implements ValidationCodeOwnerInterface
 {
-    public const CODE_LENGTH = 6;
+    
+    use SmsValidationCodeTrait;
+    use MailValidationCodeTrait;
 
     /**
      * @ORM\Id()
@@ -36,14 +46,10 @@ class PhoneNumber
     private \libphonenumber\PhoneNumber $phoneNumber;
 
     /**
-     * @ORM\Column(type="string", length=RandomNumber::CODE_LENGTH, nullable=true)
+     * @ORM\Column(type="phone_number", unique=false, nullable=true)
+     * @AssertPhoneNumber(type="mobile")
      */
-    private ?string $verificationCode;
-
-    /**
-     * @ORM\Column(type="datetime_immutable", nullable=true)
-     */
-    private ?DateTimeImmutable $sendCodeDate = null; // phpcs:ignore
+    private ?\libphonenumber\PhoneNumber $temPhoneNumber;
 
     /**
      * @ORM\Column(type="boolean")
@@ -58,37 +64,28 @@ class PhoneNumber
     /**
      * @ORM\Column(type="integer")
      */
-    private int $dailyAttempts = 0; // phpcs:ignore
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private int $weeklyAttempts = 0; // phpcs:ignore
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private int $monthlyAttempts = 0; // phpcs:ignore
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private int $totalAttempts = 0; // phpcs:ignore
-
-    /**
-     * @ORM\Column(type="datetime_immutable", nullable=true)
-     */
-    private ?DateTimeImmutable $attemptsDate = null; // phpcs:ignore
-
-    /**
-     * @ORM\Column(type="integer")
-     */
     private int $editAttempts = 0; // phpcs:ignore
 
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
      */
     private ?DateTimeImmutable $editDate = null; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private ?string $provider = null; // phpcs:ignore
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\ValidationCode\ValidationCode",
+     *     mappedBy="phoneNumber",
+     *     indexBy="phone_number_id",
+     *     cascade={"persist", "remove"}
+     * )
+     * @var ArrayCollection|PersistentCollection
+     */
+    protected Collection $validationCode;
 
     public function getProfile(): Profile
     {
@@ -114,14 +111,14 @@ class PhoneNumber
         return $this;
     }
 
-    public function getVerificationCode(): ?string
+    public function getTemPhoneNumber(): ?\libphonenumber\PhoneNumber
     {
-        return $this->verificationCode;
+        return $this->temPhoneNumber;
     }
 
-    public function setVerificationCode(?string $code): self
+    public function setTemPhoneNumber(?\libphonenumber\PhoneNumber $temPhoneNumber): self
     {
-        $this->verificationCode = $code;
+        $this->temPhoneNumber = $temPhoneNumber;
 
         return $this;
     }
@@ -157,66 +154,6 @@ class PhoneNumber
         return $this;
     }
 
-    public function getDailyAttempts(): int
-    {
-        return $this->dailyAttempts;
-    }
-
-    public function setDailyAttempts(int $dailyAttempts): self
-    {
-        $this->dailyAttempts = $dailyAttempts;
-
-        return $this;
-    }
-
-    public function getWeeklyAttempts(): int
-    {
-        return $this->weeklyAttempts;
-    }
-
-    public function setWeeklyAttempts(int $weeklyAttempts): self
-    {
-        $this->weeklyAttempts = $weeklyAttempts;
-
-        return $this;
-    }
-
-    public function getMonthlyAttempts(): int
-    {
-        return $this->monthlyAttempts;
-    }
-
-    public function setMonthlyAttempts(int $monthlyAttempts): self
-    {
-        $this->monthlyAttempts = $monthlyAttempts;
-
-        return $this;
-    }
-
-    public function getTotalAttempts(): int
-    {
-        return $this->totalAttempts;
-    }
-
-    public function setTotalAttempts(int $totalAttempts): self
-    {
-        $this->totalAttempts = $totalAttempts;
-
-        return $this;
-    }
-
-    public function getAttemptsDate(): ?DateTimeImmutable
-    {
-        return $this->attemptsDate;
-    }
-
-    public function setAttemptsDate(?DateTimeImmutable $attemptsDate = null): self
-    {
-        $this->attemptsDate = $attemptsDate ?? new DateTimeImmutable();
-
-        return $this;
-    }
-
     public function getEditAttempts(): int
     {
         return $this->editAttempts;
@@ -241,14 +178,14 @@ class PhoneNumber
         return $this;
     }
 
-    public function getSendCodeDate(): ?DateTimeImmutable
+    public function getProvider(): ?string
     {
-        return $this->sendCodeDate;
+        return $this->provider;
     }
 
-    public function setSendCodeDate(?DateTimeImmutable $sendCodeDate): self
+    public function setProvider(?string $provider): self
     {
-        $this->sendCodeDate = $sendCodeDate;
+        $this->provider = $provider;
 
         return $this;
     }

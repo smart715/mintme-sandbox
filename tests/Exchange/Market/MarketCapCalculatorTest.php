@@ -17,6 +17,7 @@ use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class MarketCapCalculatorTest extends TestCase
 {
@@ -48,6 +49,7 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockMoneyWrapper(0),
             $this->mockRpc(),
             $this->mockCryptoRatesFetcher(),
+            $this->createMock(LoggerInterface::class),
             0
         );
 
@@ -78,6 +80,7 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockMoneyWrapper(0),
             $this->mockRpc(),
             $this->mockCryptoRatesFetcher(),
+            $this->createMock(LoggerInterface::class),
             0
         );
 
@@ -128,6 +131,7 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockMoneyWrapper(0),
             $this->mockRpc(),
             $this->mockCryptoRatesFetcher(),
+            $this->createMock(LoggerInterface::class),
             0
         );
 
@@ -158,6 +162,7 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockMoneyWrapper(0),
             $this->mockRpc(),
             $this->mockCryptoRatesFetcher(),
+            $this->createMock(LoggerInterface::class),
             0
         );
 
@@ -187,6 +192,7 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockMoneyWrapper(0),
             $this->mockRpc(),
             $this->mockCryptoRatesFetcher(),
+            $this->createMock(LoggerInterface::class),
             0
         );
 
@@ -218,6 +224,7 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockMoneyWrapper(0),
             $this->mockRpc(),
             $this->mockCryptoRatesFetcher(),
+            $this->createMock(LoggerInterface::class),
             100
         );
 

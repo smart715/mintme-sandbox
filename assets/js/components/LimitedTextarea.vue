@@ -1,17 +1,19 @@
 <template>
     <div>
-    <textarea
-        :name="name"
-        class="form-control"
-        @keydown="onKeyDown"
-        :title="tooltipMessage"
-        v-tippy="tooltipOptions"
-        @mousemove="hideTooltip"
-        v-model="internalValue">
-    </textarea>
-        <div
-            class="left small characters-used"
+        <textarea
+            :name="name"
+            :rows="rows"
+            :cols="cols"
+            class="form-control"
+            :title="tooltipMessage"
+            v-tippy="tooltipOptions"
+            v-model="internalValue"
+            @keydown="onKeyDown"
+            @mousemove="hideTooltip"
+            @focus="$emit('focus', $event)"
         >
+        </textarea>
+        <div class="left small characters-used">
             {{ $t('form.token.characters_used') }} {{ internalValue.length }} ({{ $t('form.token.min') }} {{ limit }})
         </div>
     </div>
@@ -29,6 +31,14 @@ export default {
         value: {
             type: String,
             default: '',
+        },
+        rows: {
+            type: String,
+            default: '5',
+        },
+        cols: {
+            type: String,
+            default: '30',
         },
         limit: {
             type: String,
@@ -69,7 +79,7 @@ export default {
     methods: {
         onKeyDown(e) {
             if (this.internalValue.length >= parseInt(this.max)) {
-                if (e.keyCode >= 48 && e.keyCode <= 90) {
+                if (48 <= e.keyCode && 90 >= e.keyCode) {
                     this.showTooltip(e);
                     e.preventDefault();
                     return;
@@ -79,12 +89,12 @@ export default {
             }
         },
         showTooltip(e) {
-            if (typeof e.target != 'undefined' && typeof e.target._tippy != 'undefined') {
+            if ('undefined' != typeof e.target && 'undefined' != typeof e.target._tippy) {
                 e.target._tippy.show();
             }
         },
         hideTooltip(e) {
-            if (typeof e.target != 'undefined' && typeof e.target._tippy != 'undefined') {
+            if ('undefined' != typeof e.target && 'undefined' != typeof e.target._tippy) {
                 e.target._tippy.hide();
             }
         },

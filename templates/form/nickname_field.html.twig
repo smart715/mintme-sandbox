@@ -1,17 +1,14 @@
-{{ form_label(form.nickname) }}
-<guide>
-    <template slot="header">
-        {% trans %}nickname_field.header{% endtrans %}
-    </template>
-    <template slot="body">
-        {% trans %}nickname_field.body{% endtrans %}
-    </template>
-</guide>
-{{ form_errors(form.nickname) }}
-{{ form_widget(form.nickname, {'attr':
-    {
-        'v-model.trim': '$v.nickname.$model',
-        'ref': 'nickname'
-    }
-}) }}
-{{ form_help(form.nickname) }}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('pages/login') }}
+{% endblock %}
+<div class="relative-container mt-4">
+    {{ form_row(form.nickname,
+        {
+            'class': (formControlClass is defined ? formControlClass : '') ~ 'mt-3',
+            'widgetAttr': {
+                'v-model.trim': '$v.nickname.$model',
+                'ref': 'nickname',
+            } 
+        }
+    ) }}
+</div>

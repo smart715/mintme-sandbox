@@ -8,8 +8,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 abstract class Controller extends AbstractController
 {
-    /** @var NormalizerInterface */
-    private $normalizer;
+    private NormalizerInterface $normalizer;
 
     public function __construct(NormalizerInterface $normalizer)
     {
@@ -21,7 +20,7 @@ abstract class Controller extends AbstractController
      * @param array $groups
      * @return array|string|int|float|bool|\ArrayObject|null
      */
-    protected function normalize($object, array $groups = ['Default'])
+    protected function normalize($object, array $groups = ['Default', 'API'])
     {
         return $this->normalizer->normalize($object, null, [
             'groups' => $groups,

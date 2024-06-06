@@ -17,4 +17,17 @@ class FriendlyUrlConverter implements FriendlyUrlConverterInterface
 
         return $url;
     }
+
+    public function generateKey(string $url): string
+    {
+        $urltolower = substr(strtolower(trim($url)), 1);
+
+        $filter = array_search('/', str_split($urltolower));
+
+        if (!$filter) {
+            return $urltolower;
+        }
+
+        return substr($urltolower, 0, $filter);
+    }
 }

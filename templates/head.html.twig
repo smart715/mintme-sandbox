@@ -1,3 +1,8 @@
+{% set languages = global_translation_flags | keys %}
+{% set pathInfoWithoutLocale = 'en' == app.request.locale
+    ? app.request.pathInfo
+    : app.request.pathInfo|replace({('/' ~ app.request.locale): ''})
+%}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, target-densityDpi=device-dpi" />
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -7,6 +12,17 @@
 {% if viabtc_offset != 0 %}
     <meta name="X-USER-OFFSET" content="{{ viabtc_offset }}">
 {% endif %}
+{% for language in languages -%}
+    {% set localePath = 'en' == language  ? '' : '/' ~ language %}
+    <link
+        rel="alternate"
+        {% if 'en' == language %}
+            x-default
+        {% endif %}
+        href="{{ app.request.scheme ~ '://' ~ app.request.host ~ localePath ~ pathInfoWithoutLocale }}"
+        hreflang="{{ language }}"
+    />
+{% endfor %}
 <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('build/images/apple-icon-57x57.png') }}">
 <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('build/images/apple-icon-60x60.png') }}">
 <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('build/images/apple-icon-72x72.png') }}">
@@ -16,15 +32,14 @@
 <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('build/images/apple-icon-144x144.png') }}">
 <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('build/images/apple-icon-152x152.png') }}">
 <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('build/images/apple-icon-180x180.png') }}">
-<link rel="icon" type="image/png" sizes="192x192"  href="{{ asset('build/images/android-icon-192x192.png') }}">
-<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('build/images/favicon-32x32.png') }}">
-<link rel="icon" type="image/png" sizes="96x96" href="{{ asset('build/images/favicon-96x96.png') }}">
-<link rel="icon" type="image/png" sizes="16x16" href="{{ asset('build/images/favicon-16x16.png') }}">
-<link rel="manifest" href="/manifest.json">
+<link rel="shortcut icon" type="image/png" sizes="192x192"  href="{{ asset('build/images/android-icon-192x192.png') }}">
+<link rel="shortcut icon" type="image/png" sizes="32x32" href="{{ asset('build/images/favicon-32x32.png') }}">
+<link rel="shortcut icon" type="image/png" sizes="96x96" href="{{ asset('build/images/favicon-96x96.png') }}">
+<link rel="shortcut icon" type="image/png" sizes="16x16" href="{{ asset('build/images/favicon-16x16.png') }}">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
 <meta name="theme-color" content="#ffffff">
-<link rel="manifest" href="{{ asset('manifest.json') }}">
+<link rel="manifest" type="application/json" href="{{ asset('manifest.json') }}">
 
 <meta name="theme-color" content="#141C29">
 
@@ -32,7 +47,7 @@
 <meta property="og:site_name" content="Mintme">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ app.request.uri }}">
-<meta property="og:image" content="{{ metaImage | default(asset('build/images/view-logo.png')) | absolute_url }}">
+<meta property="og:image" content="{{ metaImage | default(asset('build/images/ogImage.png')) | absolute_url }}">
 <meta
     property="og:image:alt"
     content="{{ metaImageAlt | default('Mintme logo. Create your own token, monetize yourself!') }}"
@@ -41,20 +56,3 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="{{ app.request.uri }}">
 <meta name="twitter:creator" content="Mintme">
-
-<style>
-    @font-face {
-        font-family: 'ConcordBold';
-        src: url({{ asset('build/fonts/Concord-Bold.ttf') }}) format('truetype');
-    }
-
-    @font-face {
-        font-family: 'Concord';
-        src: url({{ asset('build/fonts/Concord.otf') }}) format('opentype');
-    }
-
-    body {
-        background-color: #0c1a29;
-    }
-</style>
-

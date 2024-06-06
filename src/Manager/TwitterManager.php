@@ -7,21 +7,25 @@ use App\Entity\User;
 use App\Exception\InvalidTwitterTokenException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class TwitterManager implements TwitterManagerInterface
 {
     public const TWITTER_INVALID_TOKEN_ERROR = 89;
     public const TWEET_ALREADY_RETWEETED = 327;
 
+    private SessionInterface $session;
     private TwitterOAuth $twitter;
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
 
     public function __construct(
+        SessionInterface $session,
         TwitterOAuth $twitter,
         LoggerInterface $logger,
         EntityManagerInterface $entityManager
     ) {
+        $this->session = $session;
         $this->twitter = $twitter;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
@@ -31,13 +35,19 @@ class TwitterManager implements TwitterManagerInterface
      * @throws InvalidTwitterTokenException
      * @throws \Throwable
      */
-    public function sendTweet(User $user, string $message): self
+    public function sendTweet(?User $user, string $message): self
     {
-        $this->checkSignedInWithTwitter($user)->authorizeUser($user);
+        if ($user) {
+            $this->checkSignedInWithTwitter($user)->authorizeUser($user);
+        } else {
+            $this->authorizeGuest();
+        }
 
         try {
+            $this->twitter->setApiVersion('2');
+
             /** @var object $response */
-            $response = $this->twitter->post('statuses/update', ['status' => $message]);
+            $response = $this->twitter->post('tweets', ['text' => $message], true);
         } catch (\Throwable $e) {
             $this->logger->error("Failed to post message on twitter: {$e->getMessage()}");
 
@@ -53,9 +63,13 @@ class TwitterManager implements TwitterManagerInterface
      * @throws InvalidTwitterTokenException
      * @throws \Throwable
      */
-    public function retweet(User $user, string $tweetId): self
+    public function retweet(?User $user, string $tweetId): self
     {
-        $this->checkSignedInWithTwitter($user)->authorizeUser($user);
+        if ($user) {
+            $this->checkSignedInWithTwitter($user)->authorizeUser($user);
+        } else {
+            $this->authorizeGuest();
+        }
 
         try {
             /** @var object $response */
@@ -92,22 +106,38 @@ class TwitterManager implements TwitterManagerInterface
 
         return $this;
     }
+    
+    /**
+     * @throws InvalidTwitterTokenException
+     */
+    private function authorizeGuest(): void
+    {
+        $oauthToken = $this->session->get('twitter_oauth_token');
+        $oauthTokenSecret = $this->session->get('twitter_oauth_token_secret');
+
+        if (!$oauthToken || !$oauthTokenSecret) {
+            throw new InvalidTwitterTokenException();
+        }
+
+        $this->twitter->setOauthToken(
+            $oauthToken,
+            $oauthTokenSecret,
+        );
+    }
 
     /**
      * @throws InvalidTwitterTokenException
      * @throws \Exception
      */
-    private function errorHandler(User $user, object $response): void
+    private function errorHandler(?User $user, object $response): void
     {
         /** @var array $errors */
-        $errors = $response->errors ?? []; // @phpstan-ignore-line
+        $errors = $response->errors ?? [];
 
         if (count($errors) > 0) {
             switch ($errors[0]->code) {
                 case self::TWITTER_INVALID_TOKEN_ERROR: // expired or invalid access token
-                    $user->setTwitterAccessToken(null)->setTwitterAccessTokenSecret(null);
-                    $this->entityManager->persist($user);
-                    $this->entityManager->flush();
+                    $this->checkUser($user);
 
                     throw new InvalidTwitterTokenException();
                 case self::TWEET_ALREADY_RETWEETED:
@@ -117,6 +147,18 @@ class TwitterManager implements TwitterManagerInterface
             $this->logger->error("Failed to post message on twitter: {$errors[0]->message}");
 
             throw new \Exception($errors[0]->message);
+        }
+    }
+
+    private function checkUser(?User $user): void
+    {
+        if ($user) {
+            $user->setTwitterAccessToken(null)->setTwitterAccessTokenSecret(null);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        } else {
+            $this->session->remove('twitter_oauth_token');
+            $this->session->remove('twitter_oauth_token_secret');
         }
     }
 }

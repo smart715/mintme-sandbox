@@ -3,4 +3,15 @@ mercure:
     hubs:
         default:
             url: '%env(MERCURE_PUBLISH_URL)%'
-            jwt: '%env(MERCURE_JWT_TOKEN)%'
+            jwt:
+                secret: '%env(MERCURE_JWT_SECRET)%'
+                provider: 'App\Mercure\JwtProvider'
+                publish: '%mercure_default_publish_topics%'
+                subscribe: '%mercure_default_subscribe_topics%'
+        public:
+            url: '%env(MERCURE_PUBLIC_URL)%'
+            public_url: '/'
+            jwt:
+                secret: '%env(MERCURE_JWT_SECRET)%'
+                publish: '%mercure_public_publish_topics%'
+                subscribe: '%mercure_public_subscribe_topics%'

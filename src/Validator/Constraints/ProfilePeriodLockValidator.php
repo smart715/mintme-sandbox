@@ -29,6 +29,7 @@ class ProfilePeriodLockValidator extends ConstraintValidator
         $profile = $this->context->getObject();
 
         if (null === $profile ||
+            null === $value ||
             !$this->isPropertyChanged($profile, $value) ||
             null === $profile->getNameChangedDate() ||
             $profile->getNameChangedDate()->getTimestamp() < $this->dateTime->now()->getTimestamp()) {

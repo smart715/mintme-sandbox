@@ -2,25 +2,17 @@
 
 namespace App\Wallet\Withdraw\Communicator\Model;
 
+/** @codeCoverageIgnore */
 class WithdrawCallbackMessage
 {
-    /** @var int */
-    private $id;
-
-    /** @var string */
-    private $status;
-
-    /** @var string */
-    private $transactionHash;
-
-    /** @var int */
-    private $retries;
-
-    /** @var string */
-    private $crypto;
-
-    /** @var string */
-    private $amount;
+    private int $id;
+    private string $status;
+    private string $transactionHash;
+    private int $retries;
+    private string $crypto;
+    private string $amount;
+    private string $address;
+    private string $cryptoNetwork;
 
     private function __construct(
         int $id,
@@ -28,7 +20,9 @@ class WithdrawCallbackMessage
         string $transactionHash,
         int $retries,
         string $crypto,
-        string $amount
+        string $amount,
+        string $address,
+        string $cryptoNetwork
     ) {
         $this->id = $id;
         $this->status = $status;
@@ -36,6 +30,8 @@ class WithdrawCallbackMessage
         $this->retries = $retries;
         $this->crypto = $crypto;
         $this->amount = $amount;
+        $this->address = $address;
+        $this->cryptoNetwork = $cryptoNetwork;
     }
 
     public function getUserId(): int
@@ -68,6 +64,16 @@ class WithdrawCallbackMessage
         return $this->amount;
     }
 
+    public function getAddress(): string
+    {
+        return $this->address;
+    }
+
+    public function getCryptoNetwork(): string
+    {
+        return $this->cryptoNetwork;
+    }
+
     public static function parse(array $data): self
     {
         return new self(
@@ -76,7 +82,9 @@ class WithdrawCallbackMessage
             $data['tx_hash'],
             $data['retries'] ?? 0,
             $data['crypto'],
-            $data['amount']
+            $data['amount'],
+            $data['address'] ?? '',
+            $data['cryptoNetwork'] ?? ''
         );
     }
 
@@ -88,7 +96,9 @@ class WithdrawCallbackMessage
             $this->transactionHash,
             $this->retries + 1,
             $this->crypto,
-            $this->amount
+            $this->amount,
+            $this->address,
+            $this->cryptoNetwork
         );
     }
 
@@ -101,6 +111,8 @@ class WithdrawCallbackMessage
             'retries' => $this->getRetriesCount(),
             'crypto' => $this->getCrypto(),
             'amount' => $this->getAmount(),
+            'address' => $this->getAddress(),
+            'cryptoNetwork' => $this->getCryptoNetwork(),
         ];
     }
 }

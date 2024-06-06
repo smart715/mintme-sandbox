@@ -18,42 +18,81 @@
                                 {{ form_start(form) }}
                                 <div class="pb-3">
                                     <p>
-                                        {% trans %}phone_confirmation.msg{% endtrans %}
+                                        {% trans %}phone_confirmation.mail_code{% endtrans %}
                                     </p>
-                                    {{ form_label(form.verificationCode) }}
-                                    {{ form_errors(form.verificationCode) }}
+                                    {{ form_label(form.smsCode) }}
+                                    {{ form_errors(form.smsCode) }}
                                     <div class="d-flex flex-column">
-                                        {{ form_widget(form.verificationCode, {'attr':
-                                            {
-                                                'v-model.trim': '$v.code.$model',
-                                                'ref': 'code'
-                                            }})
-                                        }}
+                                        {{ include("spinners/verify_code_inputs.html.twig") }}
+                                        <verify-code
+                                            :disabled="isFormSending"
+                                            @code-entered="onSmsCodeEntered"
+                                        ></verify-code>
+                                        <input
+                                            type="hidden"
+                                            name="phone_verification[smsCode]"
+                                            ref="sms_code"
+                                        />
                                         <span
                                             v-cloak
-                                            ref="resendCode"
-                                            class="btn-cancel px-0 c-pointer"
-                                            :class="{'btn-disabled': resendCodeDisabled}"
-                                            data-failed-attempts="{{ failedAttempts }}"
-                                            data-limit-reached="{{ limitReached }}"
-                                            data-errors-count="{{ form.verificationCode.vars.errors | length }}"
-                                            @click="sendVerificationCode"
+                                            ref="resendSmsCode"
+                                            data-failed-attempts="{{ form.smsCode.vars.failedAttempts }}"
+                                            data-limit-reached="{{ form.smsCode.vars.limitReached }}"
+                                            data-errors-count="{{ form.smsCode.vars.errors | length }}"
+                                            class="btn-cancel text-left px-0 my-1 c-pointer d-flex align-items-center"
+                                            :class="resendSmsCodeSpanClass"
+                                            @click="requestSmsCode"
                                         >
-                                            {% trans %}phone_confirmation.send_code_again{% endtrans %}
+                                            <span v-text="resendSmsCodeText"></span>
+                                            <div
+                                                v-if="isRequestingSmsCode"
+                                                class="spinner-border spinner-border-sm ml-2"
+                                                role="status"
+                                            ></div>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="pb-3">
+                                    {{ form_label(form.mailCode) }}
+                                    {{ form_errors(form.mailCode) }}
+                                    <div class="d-flex flex-column">
+                                        {{ include("spinners/verify_code_inputs.html.twig") }}
+                                        <verify-code
+                                            :disabled="isFormSending"
+                                            @code-entered="onMailCodeEntered"
+                                        ></verify-code>
+                                        <input
+                                            type="hidden"
+                                            name="phone_verification[mailCode]"
+                                            ref="mail_code"
+                                        />
+                                        <span
+                                            v-cloak
+                                            ref="resendMailCode"
+                                            data-failed-attempts="{{ form.mailCode.vars.failedAttempts }}"
+                                            data-limit-reached="{{ form.mailCode.vars.limitReached }}"
+                                            data-errors-count="{{ form.mailCode.vars.errors | length }}"
+                                            class="btn-cancel text-left px-0 my-1 c-pointer d-flex align-items-center"
+                                            :class="resendMailCodeSpanClass"
+                                            @click="requestMailCode"
+                                        >
+                                            <span v-text="resendMailCodeText"></span>
+                                            <div
+                                                v-if="isRequestingMailCode"
+                                                class="spinner-border spinner-border-sm ml-2"
+                                                role="status"
+                                            ></div>
                                         </span>
                                     </div>
                                 </div>
                                 <div class="pb-1">
-                                    <div v-cloak="$v.code" v-if="!$v.code.minLength || !$v.code.maxLength || !$v.code.helpers" class="text-danger text-center">
-                                        {% trans %}phone_confirmation.incorrect_code{% endtrans %}
+                                    {{ form_row(form.submit, {'disabled':'disabled'}) }}
+                                    <div class="text-center">
+                                        <font-awesome-icon icon="circle-notch" id="loading" spin class="loading-spinner d-none" fixed-width></font-awesome-icon>
                                     </div>
-                                    {{ form_row(form.submit, {
-                                        'attr': {
-                                            ':disabled': 'disableSave'
-                                        }
-                                    }) }}
                                 </div>
-                                {{ form_end(form) }}
+                                {{ form_widget(form._token) }}
+                                {{ form_end(form, {'render_rest' : false}) }}
                             {% endblock %}
                             <input type="hidden" ref="sendCode" value="{{ sendCode }}"/>
                         </div>

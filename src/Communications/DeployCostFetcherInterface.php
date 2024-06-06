@@ -8,16 +8,17 @@ use Money\Money;
 interface DeployCostFetcherInterface
 {
     /**
-     * @throws FetchException
+     * @param string $symbol
      * @return Money
+     * @throws FetchException
      */
-    public function getDeployCost(string $symbol): Money;
+    public function getCost(string $symbol): Money;
 
     /**
      * @throws FetchException
      * @return array
      */
-    public function getDeployCosts(): array;
+    public function getCosts(): array;
 
     public function getDeployCostReferralReward(string $symbol): Money;
 }

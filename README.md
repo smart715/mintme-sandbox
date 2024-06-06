@@ -1,18 +1,18 @@
 Mintme - cryptocurrency exchange market && token creator
 ========================================================
 
-This is the main mintme project, representing a user panel, where each user can create his own token and start trading it or buy other user tokens.  
+This is the main mintme project, representing a user panel, where each user can create his own token and start trading it or buy other user tokens. User can create posts, chat with another users, deploy his token on blockchain. Also, this project allows users to generate api keys and user our api, which allows user to create orders, withdraw funds, get trading history etc .
 Each user have his own `trade` page, where he can create buy/sell orders for his own token. He can check all existing tokens via `trading` 
 page and check trade page of each token. Also user have `wallet` page where he can get credentials for deposit BTC or MINTME or withdraw it, user also can check active orders, trading & deposit/withdraw history.
 Panel also provides News page & Knowledge Base.
 
+Backend written on php, symfony framework. Frontend written on js, vuejs framework. Panel communicates with another our services via http json rpc requests and rabbitmq  
+
 It fetches and updates user tokens data via 
 [viabtc](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server). 
 Also it communicates with 
-[withdraw](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/coinimp-payment) 
-and 
-[deposit](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/mintme-deposit-gateway) 
-gateways to perform money operaions.
+[gateway](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/mintme-gateway) 
+gateways to perform blockchain operaions.
 
 The panel has configurable taker/maker fees and default token quantity parameters. You can also change cryptocurrency withdraw fee in `crypto` table.
 
@@ -22,22 +22,18 @@ The panel has configurable taker/maker fees and default token quantity parameter
 
 This section is for production installation only, if you want to install for development, go to [Development installation](#development-installation).
 
-* [php](https://secure.php.net/downloads.php) 7.2.2+ with following extensions (mysqli, pdo, pdo_mysql, zip, bcmath, pcntl, sockets, gd, xml) and composer
+* [php](https://secure.php.net/downloads.php) 7.2.2+ with following extensions (mysqli, pdo, pdo_mysql, zip, bcmath, pcntl, sockets, gd, xml, gmp) and composer
 * a webserver (you can use [symfony's](https://packagist.org/packages/symfony/web-server-bundle) from dev composer dependencies)
-* [nodejs](https://nodejs.org/) 8+, npm 5.6+
+* [nodejs](https://nodejs.org/) 10+, npm 7.5+
 * [mysql](https://www.mysql.com/downloads/) 5.6 or compatible DBMS
 
 The MintMe panel web interface can start without the next services, but they are required for the full functional:
 
-Service|Purpose
----|---
-mail server|Sending emails: e.g. for completing the registration or changing user's email, and for Contact Us form requests
-[rabbitmq](https://www.rabbitmq.com/download.html)|Communication between this project and deposit-gateway, widthderaw and token-contract
-[webchaind](https://github.com/webchain-network/webchaind)|webchain demon for deposit-gateway and token-contract 
-[token-contact](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/token-contract)|smart contracts for MintMe tokens
-[viabtc](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server)| Fork of https://github.com/viabtc/viabtc_exchange_server. ViaBTC Exchange Server is a trading backend with high-speed performance, designed for cryptocurrency exchanges. Backend for trading internal user tokens.
-[deposit-gateway](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/mintme-deposit-gateway)| Handles deposits of cryptocurrencies (MINTME coin and BTC) for the Mintme panel
-[withdraw(coinimp-payment)](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/coinimp-payment)|Perform payouts and also for `app:wallet:balance` CLI command
+| Service                                                                                                     | Purpose                                                                                                                                                                                                             |
+|-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| mail server                                                                                                 | Sending emails: e.g. for completing the registration or changing user's email, and for Contact Us form requests                                                        
+| [viabtc](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server)          | Fork of https://github.com/viabtc/viabtc_exchange_server. ViaBTC Exchange Server is a trading backend with high-speed performance, designed for cryptocurrency exchanges. Backend for trading internal user tokens. 
+| [gateway](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/mintme-gateway)| Handles any blockchain operation like Smart Contract methods for tokens, deposits, widthdrawals.|
 
 ## Installation
 
@@ -79,11 +75,40 @@ to listen for token deploy
 ```
 php bin/console rabbitmq:consumer contract_update &
 ```
-to listen for updating mintDestination
+to listen for token contract updates (mint destination and releases)
+```
+php bin/console rabbitmq:consumer email &
+```
+to listen for email notifications
 
 # Development installation
 
 Read about how to install MintMe for local development in Docker in [Procedures for developers - Docker](https://redmine.abchosting.org/projects/mintme/wiki/Procedures_for_developers#Docker).
+
+# Developing with local docker mintme-gateway
+
+In order to sync a local docker mintme-gateway and docker panel (for gateway development and hot-reload),
+you need to stop your panel's mintme-gateway container and start the external one:
+
+```bash
+# Stop your panel's mintme-gateway
+docker-compose stop mintme-gateway
+
+# Go to mintme-gateway project directory (git clone it)
+# Install dependencies locally
+make install
+# Run mintme-gateway container
+make run-standalone
+```
+
+Keep in mind that the external docker gateway will depend on panel's services (db, rabbitmq)
+
+This configuration will connect your docker panel and docker gateway, and you will be able develop in mintme-gateway
+while testing with panel
+
+# Local mailer dispatching
+
+We use [mailhog](https://github.com/mailhog/MailHog) to catch all outcoming emails. Open [http://localhost:8025](http://localhost:8025) to see message content.
 
 # Contribution
 
@@ -106,7 +131,3 @@ syntax_correction         |perform corrections for phpcs linting rules
 syntax_correction_assets  |perform corrections for js linting rules
 syntax_correction_assets  |perform corrections for js linting rules
 correct                   |run all correction commands above
-
-# Younes Tests
-- Test merge request
-- Test pushing new commit before merging the last merge request 

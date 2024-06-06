@@ -4,10 +4,13 @@ namespace App\Consumers;
 
 use App\Communications\AMQP\MarketAMQPInterface;
 use App\Consumers\Helpers\DBConnection;
+use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\TopHolderManagerInterface;
+use App\Manager\UserManagerInterface;
 use App\Utils\LockFactory;
 use App\Wallet\Model\MarketCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,6 +31,8 @@ class MarketConsumer implements ConsumerInterface
     private MarketAMQPInterface $marketProducer;
     private EntityManagerInterface $em;
     private LockFactory $lockFactory;
+    private TopHolderManagerInterface $topHolderManager;
+    private UserManagerInterface $userManager;
 
     public function __construct(
         LoggerInterface $logger,
@@ -36,7 +41,9 @@ class MarketConsumer implements ConsumerInterface
         TokenManagerInterface $tokenManager,
         MarketAMQPInterface $marketProducer,
         EntityManagerInterface $em,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        TopHolderManagerInterface $topHolderManager,
+        UserManagerInterface $userManager
     ) {
         $this->logger = $logger;
         $this->statusManager = $statusManager;
@@ -45,6 +52,8 @@ class MarketConsumer implements ConsumerInterface
         $this->marketProducer = $marketProducer;
         $this->em = $em;
         $this->lockFactory = $lockFactory;
+        $this->topHolderManager = $topHolderManager;
+        $this->userManager = $userManager;
     }
 
     public function execute(AMQPMessage $msg): bool
@@ -58,7 +67,7 @@ class MarketConsumer implements ConsumerInterface
         }
 
         /** @var string $body */
-        $body = $msg->body ?? '';
+        $body = $msg->body;
 
         $this->logger->info("[market-consumer] Received new message: {$body}");
 
@@ -69,6 +78,8 @@ class MarketConsumer implements ConsumerInterface
 
             return true;
         }
+
+        $this->em->clear();
 
         $base = $this->cryptoManager->findBySymbol($clbResult->getBase())
             ?? $this->tokenManager->findByName($clbResult->getBase());
@@ -92,6 +103,9 @@ class MarketConsumer implements ConsumerInterface
         }
 
         $market = new Market($base, $quote);
+        $user = $clbResult->getUserId()
+            ? $this->userManager->find($clbResult->getUserId())
+            : null;
 
         try {
             $this->statusManager->updateMarketStatus($market);
@@ -102,7 +116,17 @@ class MarketConsumer implements ConsumerInterface
 
             if (!$exception instanceof InvalidArgumentException
                 && $clbResult->getRetried() < self::NUMBER_OF_RETRIES) {
-                $this->marketProducer->send($market, $clbResult->incrementRetries());
+                $this->marketProducer->send($market, $user, $clbResult->incrementRetries());
+            }
+        }
+
+        if ($quote instanceof Token && $user && $this->topHolderManager->shouldUpdateTopHolders($user, $quote)) {
+            try {
+                $this->topHolderManager->updateTopHolders($quote);
+            } catch (\Throwable $exception) {
+                $this->logger->error(
+                    "[market-consumer] Can not update TopHolders. Reason: {$exception->getMessage()}"
+                );
             }
         }
 

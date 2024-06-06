@@ -5,10 +5,18 @@ namespace App\EventSubscriber;
 use App\Entity\KnowledgeBase\KnowledgeBase;
 use App\Entity\News\Post;
 use App\Entity\Profile;
+use App\Entity\Token\Token;
+use App\Entity\Voting\Voting;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Repository\KnowledgeBase\KnowledgeBaseRepository;
+use App\Repository\News\PostRepository;
+use App\Repository\ProfileRepository;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Service\UrlContainerInterface;
 use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
@@ -20,33 +28,46 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class SitemapSubscriber implements EventSubscriberInterface
 {
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
+    private const API_AREAS = ["v1", "v2"];
 
-    /** @var EntityManagerInterface  */
-    private $entityManager;
+    private UrlGeneratorInterface $urlGenerator;
 
-    /** @var TokenManagerInterface  */
-    private $tokenRepository;
+    private EntityManagerInterface $entityManager;
 
-    /** @var MarketFactoryInterface  */
-    private $marketFactory;
+    private TokenManagerInterface $tokenRepository;
 
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
+    private MarketFactoryInterface $marketFactory;
+
+    private RebrandingConverterInterface $rebrandingConverter;
+
+    private CryptoManagerInterface $cryptoManager;
+
+    private PostRepository $postRepository;
+
+    private KnowledgeBaseRepository $knowledgeBaseRepository;
+
+    private ProfileRepository $profileRepository;
 
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenRepository,
         MarketFactoryInterface $marketFactory,
-        RebrandingConverterInterface $rebrandingConverter
+        RebrandingConverterInterface $rebrandingConverter,
+        CryptoManagerInterface $cryptoManager,
+        PostRepository $postRepository,
+        KnowledgeBaseRepository $knowledgeBaseRepository,
+        ProfileRepository $profileRepository
     ) {
         $this->urlGenerator = $urlGenerator;
         $this->entityManager = $entityManager;
         $this->tokenRepository = $tokenRepository;
         $this->marketFactory = $marketFactory;
         $this->rebrandingConverter = $rebrandingConverter;
+        $this->cryptoManager = $cryptoManager;
+        $this->postRepository = $postRepository;
+        $this->knowledgeBaseRepository = $knowledgeBaseRepository;
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -67,6 +88,8 @@ class SitemapSubscriber implements EventSubscriberInterface
         $this->registerProfilesUrls($event->getUrlContainer());
         $this->registerTokensUrls($event->getUrlContainer());
         $this->registerMarketsUrls($event->getUrlContainer());
+        $this->registerVotingsUrls($event->getUrlContainer());
+        $this->registerAPIUrls($event->getUrlContainer());
     }
 
     private function registerDefaultUrls(UrlContainerInterface $urls): void
@@ -87,10 +110,7 @@ class SitemapSubscriber implements EventSubscriberInterface
         foreach ($lastUrls as $url) {
             $urls->addUrl(
                 new UrlConcrete(
-                    $url,
-                    new \DateTime(),
-                    UrlConcrete::CHANGEFREQ_DAILY,
-                    1
+                    $url
                 ),
                 'default'
             );
@@ -99,54 +119,49 @@ class SitemapSubscriber implements EventSubscriberInterface
 
     private function registerNewsUrls(UrlContainerInterface $urls): void
     {
-        $newsRepository = $this->entityManager->getRepository(Post::class);
+        $iterable = $this->postRepository->createQueryBuilder('p')->getQuery()->iterate();
 
-        $news = $newsRepository->findAll();
-
-        /** @var Post $new */
-        foreach ($news as $new) {
+        $this->batchProcessingDecorator(function (Post $post) use ($urls): void {
             $urls->addUrl(
                 new UrlConcrete(
                     $this->urlGenerator->generate(
                         'sonata_news_view',
-                        ['permalink' => $new->getSlug()],
+                        ['permalink' => $post->getSlug()],
                         UrlGeneratorInterface::ABSOLUTE_URL
-                    )
+                    ),
                 ),
                 'news'
             );
-        }
+        }, $iterable);
     }
 
     private function registerKBUrls(UrlContainerInterface $urls): void
     {
-        $kbRepository = $this->entityManager->getRepository(KnowledgeBase::class);
+        $iterable = $this->knowledgeBaseRepository->createQueryBuilder('kb')->getQuery()->iterate();
 
-        /** @var KnowledgeBase[] $kbs */
-        $kbs = $kbRepository->findAll();
-
-        foreach ($kbs as $kb) {
+        $this->batchProcessingDecorator(function (KnowledgeBase $kb) use ($urls): void {
             $urls->addUrl(
                 new UrlConcrete(
                     $this->urlGenerator->generate(
                         'kb_show',
                         ['url' => $kb->getUrl()],
                         UrlGeneratorInterface::ABSOLUTE_URL
-                    )
+                    ),
                 ),
                 'help'
             );
-        }
+        }, $iterable);
     }
 
     private function registerProfilesUrls(UrlContainerInterface $urls): void
     {
-        $profilesRepository = $this->entityManager->getRepository(Profile::class);
+        $iterable = $this->profileRepository->createQueryBuilder('p')
+            ->leftJoin('p.user', 'u')
+            ->where('u.isBlocked = false')
+            ->getQuery()
+            ->iterate();
 
-        $profiles = $profilesRepository->findAll();
-
-        /** @var Profile $profile */
-        foreach ($profiles as $profile) {
+        $this->batchProcessingDecorator(function (Profile $profile) use ($urls): void {
             $urls->addUrl(
                 new UrlConcrete(
                     $this->urlGenerator->generate(
@@ -157,24 +172,66 @@ class SitemapSubscriber implements EventSubscriberInterface
                 ),
                 'profiles'
             );
+        }, $iterable);
+    }
+
+    private function batchProcessingDecorator(callable $callback, IterableResult $iterable): void
+    {
+        $counter = 0;
+
+        while (false !== ($entity = $iterable->next())) {
+            $callback($entity[0]);
+
+            $counter++;
+
+            if (0 === $counter % 100) {
+                $this->entityManager->clear();
+            }
         }
     }
 
     private function registerTokensUrls(UrlContainerInterface $urls): void
     {
-        $tokens = $this->tokenRepository->findAll();
+        $queryBuilder = $this->tokenRepository->getRepository()
+            ->createQueryBuilder('token')
+            ->distinct()
+            ->leftJoin('token.deploys', 'deploys')
+            ->where('token.deployed = true AND token.isBlocked = false')
+            ->getQuery();
+        $iterable = $queryBuilder->iterate();
 
-        foreach ($tokens as $token) {
+        while (false !== ($entity = $iterable->next())) {
+            /** @var Token $token */
+            $token = $entity[0];
             $urls->addUrl(
                 new UrlConcrete(
                     $this->urlGenerator->generate(
-                        'token_show',
+                        'token_show_intro',
                         ['name' => $token->getName()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     )
                 ),
                 'tokens'
             );
+
+            $votings = $token->getVotings();
+
+            foreach ($votings as $voting) {
+                /** @var Voting $voting */
+                $urls->addUrl(
+                    new UrlConcrete(
+                        $this->urlGenerator->generate(
+                            'token_show_voting',
+                            ['name' => $token->getName(), 'slug' => $voting->getSlug()],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
+                        $voting->getCreatedAt()
+                    ),
+                    'token-votings'
+                );
+            }
+
+            $this->entityManager->clear();
         }
     }
 
@@ -197,6 +254,42 @@ class SitemapSubscriber implements EventSubscriberInterface
                     ) //$market->getBase()  $market->getQuote()
                 ),
                 'markets'
+            );
+        }
+    }
+
+    private function registerVotingsUrls(UrlContainerInterface $urls): void
+    {
+        $mintme = $this->cryptoManager->findBySymbol(Symbols::WEB);
+
+        foreach ($mintme->getVotings() as $voting) {
+            /** @var Voting $voting */
+            $urls->addUrl(
+                new UrlConcrete(
+                    $this->urlGenerator->generate(
+                        'show_voting',
+                        ['slug' => $voting->getSlug()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                    $voting->getCreatedAt()
+                ),
+                'votings'
+            );
+        }
+    }
+
+    private function registerAPIUrls(UrlContainerInterface $urls): void
+    {
+        foreach (self::API_AREAS as $area) {
+            $urls->addUrl(
+                new UrlConcrete(
+                    $this->urlGenerator->generate(
+                        'app.swagger_ui',
+                        ['area' => $area],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )
+                ),
+                'api'
             );
         }
     }

@@ -4,39 +4,40 @@
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Username login/email">
                 <b>{{ $t('info_bar.login.title') }}</b>  {{ username || 'guest' }}
             </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Token name">
-                <b>{{ $t('info_bar.token.title') }}</b> {{ infoData.tokenName || '-' }}
-            </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="MintMe balance">
-                <b>{{ $t('info_bar.mintme.title') }}</b> {{ mintmeBalance }}
-            </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Etherium balance">
-                <b>{{ $t('info_bar.eth.title') }}</b> {{ ethBalance }}
-            </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="USD Coin balance">
-                <b>{{ $t('info_bar.usdc.title') }}</b> {{ usdcBalance }}
-            </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
-                <b>{{ $t('info_bar.btc.title') }}</b> {{ btcBalance }}
-            </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
-                <b>{{ $t('info_bar.bnb.title') }}</b> {{ bnbBalance }}
-            </span>
+            <template v-if="!!username">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Token name">
+                    <b>{{ $t('info_bar.token.title') }}</b> {{ infoData.tokenName || '-' }}
+                </span>
+
+                <span
+                    v-for="balance in balanceArray"
+                    :key="balance.cryptoSymbol"
+                    class="pr-2 pr-sm-5"
+                    v-b-tooltip.hover
+                    :title="balance.fullname | rebranding"
+                >
+                    <b>{{ balance.cryptoSymbol | rebranding }}:</b>
+                    {{ balance.available | toMoney(balance.subunit) }}
+                </span>
+            </template>
             <span v-if="authCode" class="pr-2 pr-sm-5" v-b-tooltip.hover title="Current email verification code">
                 <b>{{ $t('info_bar.code.title') }}</b> {{ authCode }}
             </span>
-            <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">{{ $t('info_bar.toggle.title') }}</b-button>
+            <b-button v-b-toggle.collapse-infobar class="btn-sm float-right mr-5 toggle-btn">
+                {{ $t('info_bar.toggle.title') }}
+            </b-button>
             <b-button
                 v-if="'dev' !== environment"
                 @click="manageBackendService"
                 class="btn-sm float-right mr-4 toggle-btn"
-                :disabled="null === backendServiceStatus || managingBackendService || (!isIssueBranch && backendServiceStatus)"
+                :disabled="manageBackendDisabled"
             >
                 <font-awesome-icon
                     v-if="managingBackendService"
                     icon="circle-notch"
+                    class="loading-spinner"
                     spin
-                    class="loading-spinner" fixed-width
+                    fixed-width
                 />
                 {{ getButtonName }}
             </b-button>
@@ -44,43 +45,41 @@
                 <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
             </div>
         </div>
-        <b-collapse visible id="collapse-3">
+        <b-collapse visible id="collapse-infobar">
             <div class="p-2">
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.panel')">
-                    <b>Pg:</b> {{ infoData.panelBranch }}
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.branch.panel')">
+                    <b>Panel:</b> {{ infoData.panelBranch }}
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.deposit')">
-                    <b>Dg:</b> {{ infoData.depositBranch }}
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.branch.gateway')">
+                    <b>Gateway:</b> {{ infoData.gatewayBranch }}
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.contract')">
-                    <b>Cg:</b> {{ infoData.contractBranch }}
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.status.gateway')">
+                    <b>Gs:</b>
+                    <span :class="getStatusService(infoData.isGatewayActive)"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.withdraw')">
-                    <b>Wg:</b> {{ infoData.withdrawBranch }}
-                </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.contract')">
-                    <b>Tcg:</b>
-                    <span :class="[infoData.isTokenContractActive ? 'circle-info-on' : 'circle-info-off']"/>
-                </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.deposit')">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.status.deposit')">
                     <b>Dcg:</b>
-                    <span :class="[infoData.consumersInfo.deposit ? 'circle-info-on' : 'circle-info-off']"/>
+                    <span :class="getStatusService(infoData.consumersInfo.deposit)"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.withdraw')">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.status.withdraw')">
                     <b>Wcg:</b>
-                    <span :class="[infoData.consumersInfo.payment ? 'circle-info-on' : 'circle-info-off']"/>
+                    <span :class="getStatusService(infoData.consumersInfo.payment)"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.market')">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.status.market')">
                     <b>Mcg:</b>
-                    <span :class="[infoData.consumersInfo.market ? 'circle-info-on' : 'circle-info-off']"/>
+                    <span :class="getStatusService(infoData.consumersInfo.market)"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.deploy')">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.status.deploy')">
                     <b>Dtcg:</b>
-                    <span :class="[infoData.consumersInfo.deploy ? 'circle-info-on' : 'circle-info-off']"/>
+                    <span :class="getStatusService(infoData.consumersInfo.deploy)"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of token-contract-update consumer">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.status.token_contract_update')">
                     <b>Tcuc:</b>
-                    <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
+                    <span :class="getStatusService(infoData.consumersInfo['contract-update'])"/>
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="$t('info_bar.status.email_consumer')">
+                    <b>EC:</b>
+                    <span :class="getStatusService(infoData.consumersInfo['panel-email'])"/>
                 </span>
             </div>
         </b-collapse>
@@ -91,8 +90,8 @@
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch, faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import Decimal from 'decimal.js';
 import {BButton, BCollapse, VBTooltip, VBToggle} from 'bootstrap-vue';
+import {MoneyFilterMixin, RebrandingFilterMixin} from '../mixins';
 
 library.add(faCircleNotch, faTimesCircle);
 
@@ -103,6 +102,10 @@ export default {
         BCollapse,
         FontAwesomeIcon,
     },
+    mixins: [
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+    ],
     directives: {
         'b-tooltip': VBTooltip,
         'b-toggle': VBToggle,
@@ -118,25 +121,19 @@ export default {
             infoData: {
                 tokenName: '-',
                 panelBranch: '-',
-                depositBranch: '-',
-                contractBranch: '-',
-                withdrawBranch: '-',
+                gatewayBranch: '-',
                 consumersInfo: {
                     'deposit': null,
                     'payment': null,
                     'market': null,
                     'contract-update': null,
+                    'panel-email': null,
                 },
-                isTokenContractActive: false,
+                isGatewayActive: false,
             },
             backendServiceStatus: null,
             managingBackendService: false,
-            balance: {
-                WEB: null,
-                BTC: null,
-                ETH: null,
-                USDC: null,
-            },
+            balances: {},
             interval: null,
         };
     },
@@ -154,6 +151,14 @@ export default {
         }
     },
     computed: {
+        balanceArray: function() {
+            return Object.values(this.balances);
+        },
+        manageBackendDisabled: function() {
+            return null === this.backendServiceStatus ||
+                this.managingBackendService ||
+                (!this.isIssueBranch && this.backendServiceStatus);
+        },
         isIssueBranch: function() {
             return ('-' === this.infoData.panelBranch || !this.infoData.panelBranch.match('^v[0-9]+$'));
         },
@@ -166,25 +171,15 @@ export default {
                 return this.$t('info_bar.backend_service.delete');
             }
         },
-        mintmeBalance: function() {
-            return this.balance.WEB ? new Decimal(this.balance.WEB.available).toFixed(8) : '-';
-        },
-        ethBalance: function() {
-            return this.balance.ETH ? new Decimal(this.balance.ETH.available).toFixed(8) : '-';
-        },
-        btcBalance: function() {
-            return this.balance.BTC ? new Decimal(this.balance.BTC.available).toFixed(this.balance.BTC.subunit) : '-';
-        },
-        usdcBalance: function() {
-          return this.balance.USDC ? new Decimal(this.balance.USDC.available).toFixed(this.balance.USDC.subunit) : '-';
-        },
-        bnbBalance: function() {
-            return this.balance.BNB ? new Decimal(this.balance.BNB.available).toFixed(this.balance.BNB.subunit) : '-';
-        },
     },
     methods: {
+        getStatusService: function(service) {
+            return (this.backendServiceStatus || 'dev' === this.environment) && service ?
+                'circle-info-on' :
+                'circle-info-off';
+        },
         manageBackendService: function() {
-           !this.backendServiceStatus ?
+            !this.backendServiceStatus ?
                 this.createBackendServices() :
                 this.deleteBackendServices();
         },
@@ -217,7 +212,7 @@ export default {
         fetchBalance: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
-                    this.balance = res.data.predefined;
+                    this.balances = res.data.predefined;
                 });
         },
         close: function() {
@@ -236,14 +231,14 @@ export default {
 @import '../../scss/variables';
 
 #info-panel {
-    background-color: #01579B;
+    background-color: $infobar-bg;
     line-height: 18px;
 }
 
 .circle-info {
     height: 10px;
     width: 10px;
-    background-color: $grey-light;
+    background-color: $infobar-circle-bg;
     border-radius: 50%;
     display: inline-block;
 }

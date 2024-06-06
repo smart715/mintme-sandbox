@@ -63,7 +63,8 @@ class WalletControllerFix extends WebTestCase
         $token = $this->em->getRepository(Token::class)->findOneBy([
             'name' => $tokName,
         ]);
-        $token->setAddress('0xaa');
+
+        $token->getMainDeploy()->setAddress('0xaa');
         $this->em->persist($token);
         $this->em->flush();
 

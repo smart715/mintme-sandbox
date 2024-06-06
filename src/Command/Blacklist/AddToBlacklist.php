@@ -2,7 +2,7 @@
 
 namespace App\Command\Blacklist;
 
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,6 +16,8 @@ class AddToBlacklist extends Command
         Blacklist::TOKEN,
         Blacklist::EMAIL,
         Blacklist::AIRDROP_DOMAIN,
+        Blacklist::SMS_CLICKATELL_PROVIDER,
+        Blacklist::SMS_D7_PROVIDER,
     ];
 
     private BlacklistManagerInterface $blacklistManager;

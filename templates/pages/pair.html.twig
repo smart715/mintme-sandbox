@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-
 {% if isTokenPage and token.image is not null %}
     {% set metaImage = token.image.url | imagine_filter('avatar_large') %}
 {% endif %}
@@ -8,8 +7,8 @@
     {% set metaTitle = 'Information about ' ~ token.name ~ ' token | mintMe' %}
     {% set metaImageAlt = 'Information about ' ~ token.name ~ ' token | mintMe' %}
 {% else %}
-    {% set metaTitle = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
-    {% set metaImageAlt = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
+    {% set metaTitle = currentMarket.quote.symbol|rebranding ~ '/' ~  currentMarket.base.symbol|rebranding ~ ' | mintMe' %}
+    {% set metaImageAlt = currentMarket.quote.symbol|rebranding ~ '/' ~ currentMarket.base.symbol|rebranding ~ ' | mintMe' %}
 {% endif %}
 
 {% block metaDescription %}
@@ -22,7 +21,21 @@
 {% endblock %}
 
 {% block title %}
-    {% if token|default %} {% trans with {'%name%': token.name}%}page.pair.title_info{% endtrans %}{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
+    {% if token|default %}
+        {% if tab == 'intro' %}
+            {% trans with {'%name%': token.name, '%description%': truncatedTokenDescription} %}page.pair.title_info{% endtrans %}
+        {% elseif tab == 'trade' %}
+            {% trans with {'%name%': token.name} %} page.pair.title_market_tab {% endtrans %}
+        {% elseif (tab == 'posts') %}
+            {% trans with {'%name%': token.name} %}page.pair.title_posts{% endtrans %}
+        {% elseif (tab == 'post') %}
+            {% trans with {'%postTitle%': post.title, '%tokenName%': token.name} %}page.pair.title_post{% endtrans %}
+        {% elseif (tab == 'voting') or (tab == 'create-voting') or (tab == 'show-voting') %}
+            {% trans with {'%name%': token.name} %}page.pair.title_voting{% endtrans %}
+        {% endif %}
+    {% else %}
+        {{ currentMarket.quote.symbol|rebranding }}/{{ currentMarket.base.symbol|rebranding }}
+    {% endif %}
 {% endblock %}
 
 {% block stylesheets %}
@@ -31,426 +44,423 @@
 {% endblock %}
 
 {% block content %}
+{% set isAirdropReferral = isAirdropReferral is defined and isAirdropReferral ? 'true' : 'false' %}
 {% set isOwner = isOwner ? 'true' : 'false' %}
+{% set viewOnly = viewOnly ? 'true' : 'false' %}
 {% set loggedIn = app.user ? 'true' : 'false' %}
 {% set isMintmeToken = isTokenPage and token.isMintmeToken ? 'true' : 'false' %}
-{% set isControlledToken = isTokenPage and token.isControlledToken ? 'true' : 'false' %}
-{% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
+{% set isCreatedOnMintmeSite = isTokenPage and token.isCreatedOnMintmeSite ? 'true' : 'false' %}
+{% set showFinalizedRewardModal = showFinalizedRewardModal is defined and showFinalizedRewardModal ? 'true' : 'false' %}
+{% set showSummaryRewardModal = showSummaryRewardModal is defined and showSummaryRewardModal ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
 {% set showAirdropModal = showAirdropModal is defined and showAirdropModal ? 'true' : 'false' %}
-
-<div id="token" class="container">
-    {{ include('spinners/pair.html.twig') }}
-
-    <balance-init
-            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
-            websocket-url="{{ global_websocket_url }}"
-            hash="{{ hash }}"
-            :market="{{ market | json_encode }}"
-            :logged-in="{{ loggedIn }}"
-            :is-owner="{{ isOwner }}"
-            :precision="{{ precision }}"
-    >
-    </balance-init>
-
-    {% if isTokenPage %}
-    <div class="row justify-content-center pair-container">
-        <div class="col-md-10 d-flex justify-content-between">
-            <token-avatar
-                ref="tokenAvatar"
-                class="ml-2"
-                :is-owner="{{ isOwner }}"
-                :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
-                :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
-                :is-mintme-token="getIsMintmeToken({{ isMintmeToken }})"
-                :is-controlled-token="{{ isControlledToken }}"
-                :market="{{ market | json_encode }}"
-                :token-crypto="getTokenCrypto({{ tokenCrypto | json_encode }})"
-                :precision="{{ precision }}"
-                :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                websocket-url="{{ global_websocket_url }}"
-                release-address="{{ token.mintDestination }}"
-                facebook-app-id="{{ global_facebook_app_id }}"
-                youtube-client-id="{{ global_youtube_client_id }}"
-                :showSuccess="{{ showSuccessAlert ? 'true' : 'false' }}"
-                :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
-                :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
-                :airdrop-params="{{ airdrop_params | json_encode }}"
-                @token-deploy-pending="setTokenPending"
-                @updated-website="websiteUpdated"
-                @updated-facebook="facebookUpdated"
-                @updated-youtube="youtubeUpdated"
-                @updated-discord="discordUpdated"
-                @updated-telegram="telegramUpdated"
-                image="{{token.image is null or token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
-                profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
-                profile-name="{{ profile.firstName }}"
-                profile-lastname="{{ profile.lastname }}"
-                profile-description="{{ profile.description }}"
-                profile-anonymously="{{ profile.anonymous }}"
-                :token-description="tokenDescription"
-                token-name="{{ market.quote.name }}"
-                :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
-                :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
-                :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
-                :show-token-edit-modal="{{ showTokenEditModal ? 'true' : 'false' }}"
-                disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                :token-delete-sold-limit="{{ tokenDeleteSoldLimit }}"
-                current-locale="{{ currentLocale }}"
-                :token-deployed-date="tokenDeployedDate || (tokenDeployedDate = {{ token.deployedDate | json_encode}})"
-                :token-tx-hash-address="tokenTxHashAddress || (tokenTxHashAddress = {{ token.txHash | json_encode }})"
-                mintme-explorer-url="{{ global_mintme_explorer_url }}"
-                eth-explorer-url="{{ global_eth_explorer_url }}"
-                bnb-explorer-url="{{ global_bnb_explorer_url }}"
-                :service-unavailable="{{ serviceUnavailable ? 'true' : 'false' }}"
-                discord-auth-url="{{ discordAuthUrl }}"
-            ></token-avatar>
-            <token-social-media-icons
-                youtube-client-id="{{ global_youtube_client_id }}"
-                facebook-app-id="{{ global_facebook_app_id }}"
-                token-name="{{ market.quote.name }}"
-                token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
-                :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
-                :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
-                :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
-                :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
-                :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
-            />
+{% set route = app.request.get('_route') %}
+{% set isVotingTab = tab == 'voting' or tab == 'create-voting' or tab == 'show-voting' %}
+{% set isIntroTab = tab != 'trade' and not isVotingTab %}
+{% set isTradeTab = tab == 'trade' %}
+{% set tokenAvatarUrl = token is not defined or token.image is null or token.image.url == '/media/default_token.png'
+                        ? asset('build/images/default_token_avatar.svg')
+                        : token.image.url | imagine_filter('avatar_large')
+%}
+{% set tokenCoverUrl = token is not defined or token.coverImage is null
+                        ? asset('build/images/token-cover-default.webp')
+                        : token.coverImage.url
+%}
+{% set tabsWithSidebar = ['post', 'posts', 'intro'] %}
+{% set tabHasSidebar = tab in tabsWithSidebar %}
+<div
+    id="token"
+    class="{{ isTokenPage ? 'token-page' : 'crypto-page mx-auto' }}"
+>
+    {% if showAirdropCampaign is defined and showAirdropCampaign %}
+        <div v-if="!isAirdropComponentLoaded" class="airdrop-container card col-12 mt-3 px-0">
+            <div class="d-flex align-items-center justify-content-center py-2 airdrop-loading-container">
+                <div class="spinner-border spinner-border-sm my-1" role="status"></div>
+            </div>
         </div>
-    </div>
     {% endif %}
-
-    <div class="row mt-1 justify-content-center">
-        <div class="col-md-10" v-cloak>
-            <b-tabs
-                no-key-nav
-                @input="tabUpdated"
-                :lazy="true"
-                nav-wrapper-class="tabs-wrapper"
-                class="tabs-theme transparent {% if not isTokenPage %} parent-trade-tab {% endif %}"
-                v-model="tabIndex"
-            >
-                <div class="row">
-                    <quick-trade
-                        class="col-12 mb-3"
-                        :market="{{ market | json_encode }}"
-                        :logged-in="{{ loggedIn }}"
-                        :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
-                        :params="{{ quick_trade_params | json_encode }}"
-                        websocket-url="{{ global_websocket_url }}"
-                        disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                        profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
-                        :is-token="{{ isTokenPage ? 'true' : 'false' }}"
-                        {% if isTokenPage %}
-                            :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                        {% endif %}
-                    >
-                    </quick-trade>
-                </div>
-                <token-ongoing-airdrop-campaign
-                    v-if="{{ showAirdropCampaign }}"
-                    :logged-in="{{ loggedIn }}"
-                    :is-owner="{{ isOwner }}"
-                    :token-name="'{{ token.name | default }}'"
-                    :user-already-claimed="{{ userAlreadyClaimed }}"
-                    login-url="{{ absolute_url(path('fos_user_security_login')) }}"
-                    signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
-                    youtube-client-id="{{ global_youtube_client_id }}"
-                    current-locale="{{ currentLocale }}"
-                    :show-airdrop-modal="{{ showAirdropModal }}"
-                    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
-                    :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
-                ></token-ongoing-airdrop-campaign>
+    <token-ongoing-airdrop-campaign
+        v-if="{{ showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' }}"
+        :logged-in="{{ loggedIn }}"
+        :is-owner="{{ isOwner }}"
+        :view-only="{{ viewOnly }}"
+        :token-name="'{{ token.name | default }}'"
+        token-avatar="{{ tokenAvatarUrl }}"
+        :user-already-claimed="{{ userAlreadyClaimed }}"
+        login-url="{{ absolute_url(path('fos_user_security_login')) }}"
+        signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
+        youtube-client-id="{{ global_youtube_client_id }}"
+        linkedin-app-id="{{ global_linkedin_app_id }}"
+        current-locale="{{ currentLocale }}"
+        :show-airdrop-modal="{{ showAirdropModal }}"
+        profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+        :login-recaptcha-sitekey="'{{ google_recaptcha_site_key }}'"
+        :reg-recaptcha-sitekey="'{{ reg_google_recaptcha_site_key }}'"
+        @mounted="isAirdropComponentLoaded = true"
+        :is-airdrop-referral="{{ isAirdropReferral }}"
+    ></token-ongoing-airdrop-campaign>
+    <div class="main-content">
+        <div class="main-column flex-fill">
+            <input type="hidden" id="tab-name" value="{{ tab }}" />
+            <input type="hidden" id="tabs-with-sidebar" value="{{ tabsWithSidebar|json_encode }}" />
+            <market-init
+                market-index="{{ currentMarket.base.symbol }}"
+                :markets="{{ markets | json_encode }}"
+            ></market-init>
+            <balance-init
+                :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                websocket-url="{{ global_websocket_url }}"
+                hash="{{ hash }}"
+                :logged-in="{{ loggedIn }}"
+                :is-owner="{{ isOwner }}"
+                :view-only="{{ viewOnly }}"
+                :precision="{{ precision }}"
+            ></balance-init>
+            <crypto-init :cryptos="{{ enabledCryptos|json_encode }}"></crypto-init>
+            {% if isTokenPage %}
+                <posts-init
+                    :post-rewards-collectable-days="{{ postRewardsCollectableDays }}"
+                    :comment-tip-cost="{{ commentTipCost }}"
+                    :comment-tip-min-amount="{{ commentTipMinAmount }}"
+                    :comment-tip-max-amount="{{ commentTipMaxAmount }}"
+                    :is-authorized-for-reward="{{ isAuthorizedForReward ? 'true' : 'false' }}"
+                ></posts-init>
+            {% endif %}
+            <div class="pair-container px-3">
                 {% if isTokenPage %}
-                    <b-tab
-                        title="{% trans %}page.pair.tab.introduction{% endtrans %}"
-                        title-link-class="token-intro-tab-link"
-                        {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
-                        {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
-                    >
-                        <div class="row">
-                            {% if showDescription %}
-                                <token-introduction-description
-                                    class="col-12 mb-3"
-                                    name="{{ token.name }}"
-                                    :description="tokenDescription"
+                    <div class="token-info mt-3">
+                        <div class="cover-image-wrapper position-relative d-flex justify-content-center w-100
+                            overflow-hidden">
+                                <token-cover-image
+                                    entry-point
                                     :editable="{{ isOwner }}"
-                                    @updated="descriptionUpdated"
-                                ></token-introduction-description>
-                            {% endif %}
+                                    token-name="{{ mintmeMarket.quote.name }}"
+                                    init-image="{{ tokenCoverUrl }}"
+                                    tabindex="1"
+                                />
                         </div>
-                        <div class="row token-info-container position-relative">
-                            <posts class="col-12 col-lg-7 pr-lg-1"
-                                :posts="posts || (posts = {{ posts | json_encode }})"
-                                @update-post="updatePost($event)"
-                                :max="3"
-                                token-name="{{ token.name }}"
-                                token-page
-                                :show-edit="{{ isOwner }}"
-                                @go-to-posts="goToPosts"
-                                @delete-post="deletePost"
-                                @go-to-trade="goToTrade"
-                                :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                @go-to-post="goToPost"
-                            >
-                                <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
-                            </posts>
-                            <top-holders
-                                class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
-                                {% if topHolders %}
-                                :traders-prop="{{ topHolders | json_encode }}"
-                                {% endif %}
-                                :token-name="{{ market.quote.symbol | json_encode }}"
-                                websocket-url="{{ global_websocket_url }}"
-                            >
-                            </top-holders>
-                        </div>
-                        <div class="row">
-                            <token-introduction-statistics
-                                :is-controlled-token="{{ isControlledToken }}"
-                                class="col-12 mt-3"
-                                :market="{{ market | json_encode }}"
-                                :editable="{{ isOwner }}"
-                                release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
-                                twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
-                                token-created="{{ token.getCreated().format('d M Y') }}"
-                                :precision="{{ precision }}"
-                                :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
-                                websocket-url="{{ global_websocket_url }}"
-                                :holders-prop="{{ token.getHoldersCount }}"
-                            >
-                            </token-introduction-statistics>
-                        </div>
-                    </b-tab>
-                {% endif %}
-                {% if isTokenPage %}
-                    <b-tab
-                        title="{% trans %}page.pair.posts_title{% endtrans %}"
-                        title-link-class="token-posts-tab-link"
-                        {% if isTokenPage %} title-item-class="trade-post" {% endif %}
-                        {% if tab == 'posts' %} {{ 'active' }} {% endif %}
-                    >
-                        <div class="container-fluid">
-                            {% if is_granted('edit', token) %}
-                                <div class="row mb-3 justify-content-center">
-                                    <create-post class="col-12 col-md-10 col-lg-8"
-                                         token-name="{{ token.name }}"
-                                         :subunit="{{ tokenSubunit }}"
-                                        @update-posts="updatePosts"
+                        <div class="token-info-bar d-flex py-2 flex-wrap flex-md-nowrap">
+                            <div class="d-flex align-items-center token-avatar-name">
+                                <div class="token-avatar position-relative mx-3">
+                                    <token-avatar
+                                        :is-owner="{{isOwner}}"
+                                        token-name="{{ mintmeMarket.quote.name }}"
+                                        :image="currentTokenAvatar || '{{ tokenAvatarUrl }}'"
+                                        profile-image-url="{{ profile.image.url | imagine_filter('avatar_large') }}"
+                                        profile-nickname="{{ profile.nickname }}"
                                     />
                                 </div>
-                            {% endif %}
-                            <div class="row justify-content-center">
-                                <posts class="col-12 col-md-10 col-lg-8"
-                                    :posts="posts || (posts = {{posts | json_encode}})"
-                                    @update-post="updatePost($event)"
-                                    :show-edit="{{ isOwner }}"
-                                    @delete-post="deletePost"
-                                    @go-to-trade="goToTrade"
-                                    :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                    @go-to-post="goToPost"
-                                />
-                            </div>
-                        </div>
-                    </b-tab>
-                {% endif %}
-                {% if showTrade %}
-                    <b-tab
-                        title="{% trans %}page.pair.tab.trade{% endtrans %}"
-                        title-link-class="token-trade-tab-link"
-                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
-                        {% if tab == 'trade' %} {{ 'active' }} {% endif %}
-                    >
-                        <trade
-                            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
-                            :is-controlled-token="{{ isControlledToken }}"
-                            websocket-url="{{ global_websocket_url }}"
-                            hash="{{ hash }}"
-                            login-url="{{ path('fos_user_security_login') }}"
-                            signup-url="{{ path('fos_user_registration_register') }}"
-                            :market="{{ market | json_encode }}"
-                            :logged-in="{{ loggedIn }}"
-                            :is-owner="{{ isOwner }}"
-                            :precision="{{ precision }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}"
-                            mintme-supply-url="{{ mintme_supply }}"
-                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
-                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                            {% if isTokenPage %}
-                                :taker-fee="{{ taker_fee }}"
-                            {% endif %}
-                            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
-                        >
-                        </trade>
-                    </b-tab>
-                {% endif %}
-                {% if isTokenPage %}
-                    <b-tab
-                        title="Post"
-                        title-item-class="d-none"
-                        {% if tab == 'post' %} {{ 'active' }} {% endif %}
-                    >
-                        <div class="row justify-content-center">
-                            <div class="col-12 col-md-10 col-lg-8">
-                                <div class="card h-100 single-post-page">
-                                    <div class="card-body posts">
-                                        <post
-                                            :post="singlePost || (singlePost = {{ post | json_encode }})"
-                                            @update-post="singlePost = $event"
-                                            :show-edit="{{ isOwner }}"
-                                            :logged-in="{{ loggedIn }}"
-                                            @delete-post="deleteSinglePost"
-                                            @go-to-trade="goToTrade"
-                                            single-page
-                                        ></post>
-                                        {% if post %}
-                                            {% if post.content %}
-                                            <comments
-                                                :comments="comments || (comments = {{ comments | json_encode }})"
-                                                @update-comment="updateComment($event)"
-                                                :logged-in="{{ loggedIn }}"
-                                                @delete-comment="deleteComment"
-                                                @new-comment="newComment"
-                                                @cancel="goToPosts"
-                                                :post="singlePost ? singlePost : {{ post | json_encode }}"
-                                            ></comments>
-                                            {% endif %}
-                                        {% endif %}
-                                    </div>
+                                <div v-if="false" class="text-truncate">
+                                    <h1 class="h2 text-white" >
+                                        {{ mintmeMarket.quote.name | u.truncate(18) }}
+                                    </h1>
                                 </div>
-                            </div>
-                        </div>
-                    </b-tab>
-                    <b-tab
-                        title="{% trans %}voting.voting{% endtrans %}"
-                        title-link-class="token-voting-tab-link"
-                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
-                        {% if tab == 'voting' %} {{ 'active' }} {% endif %}
-                    >
-                        <voting-list
-                            token-name-prop="{{ token.name }}"
-                            :votings-prop="{{ votings | json_encode }}"
-                            :min-amount="{{ dMMinAmount }}"
-                            @go-to-create="goToCreateVoting"
-                            @go-to-show="goToShowVoting"
-                        >
-                        </voting-list>
-                    </b-tab>
-                    <b-tab
-                        title="create-voting"
-                        title-item-class="d-none"
-                        {% if tab == 'create-voting' %} {{ 'active' }} {% endif %}
-                    >
-                        <voting-create
-                            token-name-prop="{{ token.name }}"
-                            :votings-prop="{{ votings | json_encode }}"
-                        >
-                        </voting-create>
-                    </b-tab>
-                    <b-tab
-                        title="show-voting"
-                        title-item-class="d-none"
-                        {% if tab == 'show-voting' %} {{ 'active' }} {% endif %}
-                    >
-                        <voting-show
-                            token-name-prop="{{ token.name }}"
-                            :votings-prop="{{ votings | json_encode }}"
-                            {% if voting is defined %}
-                            :voting-prop="{{ voting | json_encode }}"
-                            {% endif %}
-                        >
-                        </voting-show>
-                    </b-tab>
-                {% endif %}
-                <template slot="tabs-end">
-                    {% if isTokenPage %}
-                        <li class="nav-item ml-auto my-2 my-lg-0">
-                            <div class="d-flex align-items-center h-100">
-                                <envelope
-                                    :logged-in="{{ loggedIn }}"
+                                <token-name
+                                    :tab-index="tabIndex"
+                                    name="{{ mintmeMarket.quote.name }}"
+                                >
+                                </token-name>
+                                <token-general-information
+                                    class="mr-2"
+                                    ref="tokenAvatar"
                                     :is-owner="{{ isOwner }}"
-                                    :dm-min-amount="{{ dMMinAmount }}"
-                                    token-name="{{ token.name }}"
-                                ></envelope>
-                                <div class="div-container-avatar">
-                                    <a
-                                        href="{{ path('profile') }}/{{ profile.nickname }}"
-                                    >
-                                        <avatar
-                                            class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
-                                            size="small"
-                                            type="profile"
-                                            image="{{ profile.image.url | imagine_filter('avatar_small') }}"
-                                        ></avatar>
-                                    </a>
-                                </div>
+                                    :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                                    :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+                                    :market="{{ mintmeMarket | json_encode }}"
+                                    profile-name="{{ profile.firstName }}"
+                                    profile-lastname="{{ profile.lastname }}"
+                                    profile-description="{{ profile.description }}"
+                                    profile-anonymously="{{ profile.anonymous }}"
+                                    :token-description="tokenDescription"
+                                    token-name="{{ mintmeMarket.quote.name }}"
+                                    :token-facebook="{{ token.facebookUrl|json_encode }}"
+                                    :token-youtube="{{ token.youtubeChannelId|json_encode }}"
+                                    :token-website="{{ token.websiteUrl|json_encode }}"
+                                    :token-delete-sold-limit="{{ tokenDeleteSoldLimit }}"
+                                    minimum-order="{{ global_minimum_order_usd }}"
+                                    :token-deploys="{{ deploys | json_encode }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    :view-only="{{ viewOnly }}"
+                                    :logged-in="{{ loggedIn }}"
+                                ></token-general-information>
                             </div>
-                        </li>
-                    {% endif %}
-                    {% if not isTokenPage %}
-                        <li class="nav-item-token">
-                            <div class="nav-link-token">
-                                <div class="truncate-token">
-                                    {% if(market.quote.name | rebranding is same as(mintme_coin)) %}
-                                        <a href="{{ mintme_coin_link }}" target="_blank">
-                                            <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
-                                                {{ market.quote.name | rebranding }}
-                                            </span>
-                                        </a>
-                                    {%else%}
-                                        <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
-                                            {{ market.quote.name | rebranding }}
-                                        </span>
+                            <div class="flex-fill d-flex mt-2">
+                                <div class="flex-fill d-flex justify-content-end mx-2">
+                                    {% if deploys|length > 0 %}
+                                        <div class="mw-100">
+                                                <token-contract-addresses></token-contract-addresses>
+                                        </div>
                                     {% endif %}
                                 </div>
+                                <div class="d-flex align-items-center justify-content-end p-0">
+                                    <token-exchange-price
+                                        class="mr-4"
+                                        websocket-url="{{ global_websocket_url }}"
+                                        :market="{{ mintmeMarket | json_encode }}"
+                                        :markets-highest-price="{{ marketsHighestPrice | json_encode }}"
+                                        :service-unavailable="{{ tokenHighestPriceServiceUnavailable ? 'true' : 'false' }}"
+                                        :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                                    ></token-exchange-price>
+                                </div>
                             </div>
-                        </li>
+                        </div>
+                        <div class="token-nav d-flex align-items-center justify-content-center p-2 flex-wrap">
+                            <div class="mw-100 flex-fill order-2 order-md-1">
+                                <nav class="navbar navbar-expand">
+                                    <ul class="navbar-nav font-size-2 d-flex align-items-center">
+                                        <li class="nav-item py-1 pr-4">
+                                            <a
+                                               href="{{ path('token_show', {name: token.name}) }}"
+                                               class="{{ isIntroTab ? 'active' : '' }}"
+                                               :class="getTabLinkClass('intro')"
+                                               @click.prevent="changeTab('intro')"
+                                            >
+                                                {{ 'page.pair.tab.introduction'|trans }}
+                                            </a>
+                                        </li>
+                                        <li class="nav-item py-1 pl-2 pr-4">
+                                            <a
+                                                href="{{ path('token_show', {name: token.name, tab: 'trade'}) }}"
+                                                class="{{ isTradeTab ? 'active' : '' }}"
+                                                :class="getTabLinkClass('trade')"
+                                                @click.prevent="changeTab('trade')"
+                                            >
+                                                {{ 'page.pair.tab.market'|trans }}
+                                            </a>
+                                        </li>
+                                        <li class="nav-item py-1 pl-2 pr-4">
+                                            <a
+                                                href="{{ path('token_list_voting', {name: token.name}) }}"
+                                                class="d-flex align-items-center {{ isVotingTab ? 'active' : '' }}"
+                                                :class="getTabLinkClass('voting')"
+                                                @click.prevent="changeTab('voting')"
+                                            >
+                                                {{ 'voting.voting'|trans }}
+                                                <div class="mr-2">
+                                                    <fetchable-counter
+                                                        ref="votingCounter"
+                                                        class="mb-2"
+                                                        url-data="{{ absolute_url(path('voting_count', {'tokenName': token.name})) }}"
+                                                        :block="true"
+                                                        :icon="false"
+                                                    ></fetchable-counter>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        {% if isOwner is same as('true') %}
+                                            <li class="nav-item">
+                                                <a
+                                                    href="{{ path('token_settings', {tokenName: token.name}) }}"
+                                                    class="btn btn-secondary font-size-2 whitespace-nowrap"
+                                                >
+                                                    <font-awesome-icon icon="cog" class="mr-2"></font-awesome-icon>
+                                                    {{ 'navbar.token_settings'|trans }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="position-relative mx-2 order-1">
+                                {% if token.websiteUrl %}
+                                    <a
+                                        class="btn btn-secondary btn-social font-size-3 my-2 mx-1"
+                                        href="{{ token.websiteUrl }}"
+                                        v-b-tooltip="'{{ 'token.social_media.tooltip_website'|trans }}'"
+                                    >
+                                        <font-awesome-icon icon="user"></font-awesome-icon>
+                                    </a>
+                                {% endif %}
+                                {% if token.facebookUrl %}
+                                    <a
+                                        class="btn btn-secondary btn-social font-size-3 my-2 mx-1"
+                                        href="{{ token.facebookUrl }}"
+                                        v-b-tooltip="'{{ 'token.social_media.tooltip'|trans }}'"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'facebook-f']"></font-awesome-icon>
+                                    </a>
+                                {% endif %}
+                                {% if token.youtubeChannelId %}
+                                    <a
+                                        class="btn btn-secondary btn-social font-size-3 my-2 mx-1"
+                                        href="{{ 'https://www.youtube.com/channel/' ~ token.youtubeChannelId }}"
+                                        v-b-tooltip="'{{ 'token.social_media.tooltip'|trans }}'"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'youtube']"></font-awesome-icon>
+                                    </a>
+                                {% endif %}
+                                {% if token.telegramUrl %}
+                                    <a class="btn btn-secondary btn-social font-size-3 my-2 mx-1" href="{{ token.telegramUrl }}">
+                                        <font-awesome-icon :icon="['fab', 'telegram-plane']"></font-awesome-icon>
+                                    </a>
+                                {% endif %}
+                                {% if token.discordUrl %}
+                                    <a class="btn btn-secondary btn-social font-size-3 my-2 mx-1" href="{{ token.discordUrl }}">
+                                        <font-awesome-icon :icon="['fab', 'discord']"></font-awesome-icon>
+                                    </a>
+                                {% endif %}
+                                {% if token.twitterUrl %}
+                                    <a
+                                        class="btn btn-secondary btn-social font-size-3 my-2 mx-1"
+                                        href="{{ token.twitterUrl }}"
+                                        v-b-tooltip="'{{ 'token.social_media.tooltip'|trans }}'"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'x-twitter']"></font-awesome-icon>
+                                    </a>
+                                {% endif %}
+                                <token-share
+                                    token-name="{{ mintmeMarket.quote.name }}"
+                                    token-url="{{ absolute_url(path('token_show', {'name': mintmeMarket.quote.name, 'tab': 'intro'})) }}"
+                                ></token-share>
+                                <token-direct-message
+                                    class="mx-1 my-2 d-inline-block"
+                                    :logged-in="{{ loggedIn }}"
+                                    :is-owner="{{ isOwner }}"
+                                    :is-mobile-screen="isMobileScreen"
+                                    :dm-min-amount="{{ dMMinAmount }}"
+                                    :login-recaptcha-sitekey="'{{ google_recaptcha_site_key }}'"
+                                    :reg-recaptcha-sitekey="'{{ reg_google_recaptcha_site_key }}'"
+                                    token-name="{{ token.name }}"
+                                ></token-direct-message>
+                                {% if isTokenPage %}
+                                    <token-follow-button
+                                        class="d-inline-block"
+                                        :follower-prop="{{ follower | json_encode}}"
+                                        :is-owner="{{ isOwner }}"
+                                        token-name="{{ token.name }}"
+                                        mercure-hub-url="{{ mercure_hub_url }}"
+                                    ></token-follow-button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content">
+                        <div class="row m-0 mt-4 flex-wrap flex-lg-nowrap">
+                            <div class="flex-fill mw-100 w-50">
+                                {{ include("spinners/pair_tab_content.html.twig") }}
+                                <div v-if="'trade' === activeTab">
+                                    {{ include("pages/pair_trading.html.twig") }}
+                                </div>
+                                <div v-else-if="'voting' === activeTab">
+                                    {{ include("pages/pair_voting.html.twig") }}
+                                </div>
+                                <div v-else-if="'post' === activeTab">
+                                    {{ include("pages/pair_post.html.twig") }}
+                                </div>
+                                <div v-else-if="'posts' === activeTab"></div>
+                                <div v-else class="{{ tab != 'intro' ? 'd-none' : ''}}" :class="'d-block'">
+                                    {{ include("pages/pair_introduction.html.twig") }}
+                                </div>
+                            </div>
+                            {% if tabHasSidebar %}
+                                <div v-if="false" class="col-lg-4 pl-lg-3 pr-0 pl-0 hide-xlg">
+                                    {{ include("spinners/pair_right_column.html.twig") }}
+                                </div>
+                            {% endif %}
+                            <div
+                                v-cloak
+                                v-if="!isWideScreen && tabHasSidebar"
+                                class="col-lg-4 pl-lg-3 pr-0 pl-0 hide-xlg"
+                            >
+                                <div class="sticky-bar">
+                                    {% include 'pages/pair_right_column.html.twig' with {'spinner': false} %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    {{ include("pages/pair_coin.html.twig") }}
+                {% endif %}
+                <div class="d-none">
+                    {% if token|default %}
+                        <input
+                            type="hidden"
+                            v-model="tokenDescription"
+                            :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}"
+                        />
+                        <input
+                            type="hidden"
+                            v-model="tokenName"
+                            :set-value="tokenName = tokenName || {{ mintmeMarket.quote.name | json_encode }}"
+                        />
+                        <input
+                            type="hidden"
+                            v-model="cryptoSymbol"
+                            :set-value="cryptoSymbol = cryptoSymbol || {{ currentMarket.base.symbol | json_encode }}"
+                        />
+                        <input
+                            type="hidden"
+                            v-model="showDeployedOnBoard"
+                            :set-value="
+                                showDeployedOnBoard = null !== showDeployedOnBoard
+                                ? showDeployedOnBoard
+                                : {{
+                                    isOwner is same as ('true') and token.showDeployedModal
+                                    ? 'true'
+                                    : 'false'
+                                }}"
+                        />
+                        <input id="posts-data" type="hidden" value="{{ posts | json_encode }}" />
+                        <input id="rewards-data" type="hidden" value="{{ rewards | json_encode }}" />
+                        <input id="bounties-data" type="hidden" value="{{ bounties | json_encode }}" />
+                        <input
+                            type="hidden"
+                            v-model="ownDeployedTokens"
+                            :set-value="ownDeployedTokens = ownDeployedTokens || {{ ownDeployedTokens | json_encode }}"
+                        />
                     {% endif %}
-                    <div class="clearfix"></div>
-                </template>
-            </b-tabs>
+                </div>
+                <token-deployed-modal
+                    v-if="showDeployedOnBoard"
+                    :visible="showDeployedOnBoard"
+                    token-name="{{ currentMarket.quote.name }}"
+                    @close="closeDeployedModal()"
+                ></token-deployed-modal>
+                {% if showCreatedModal and isOwner is same as('true') %}
+                    <token-created-modal
+                        :visible="showCreatedModal"
+                        token-name="{{ currentMarket.quote.name }}"
+                        @close="showCreatedModal = false"
+                    ></token-created-modal>
+                {% endif %}
+            </div>
         </div>
-        {% if token|default %}
-            <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}" />
-            <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
-            <input
-                    type="hidden"
-                    v-model="showDeployedOnBoard"
-                    :set-value="showDeployedOnBoard = null !== showDeployedOnBoard
-                        ? showDeployedOnBoard
-                        : {{ isOwner is same as ('true') and token.showDeployedModal ? 'true' : 'false' }}" />
+        {% if isTokenPage %}
+            <div
+                v-if="isWideScreen"
+                class="mt-3 second-column hide-lg"
+            >
+                <div class="sticky-bar">
+                    {{ include("pages/pair_right_column.html.twig") }}
+                </div>
+            </div>
         {% endif %}
-
     </div>
-    <token-deployed-modal
-        v-if="showDeployedOnBoard"
-        :visible="showDeployedOnBoard"
-        token-name="{{ market.quote.name }}"
-        @close="closeDeployedModal()"
-    ></token-deployed-modal>
-    {% if showCreatedModal and isOwner is same as('true') %}
-        <token-created-modal
-            :visible="showCreatedModal"
-            token-name="{{ market.quote.name }}"
-            @close="showCreatedModal = false"
-        ></token-created-modal>
-    {% endif %}
 </div>
 
-<input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
+<input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': currentMarket.quote.name}) }}">
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="https://apis.google.com/js/platform.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: '{{ firebase_twitter_api_key }}',
+            authDomain: '{{ firebase_twitter_auth_domain }}',
+            projectId: '{{ firebase_twitter_project_id }}',
+            storageBucket: '{{ firebase_twitter_storage_bucket }}',
+            messagingSenderId: '{{ firebase_twitter_messaging_sender_id }}',
+            appId: '{{ firebase_twitter_app_id }}',
+            measurementId: '{{ firebase_twitter_measurement_id }}',
+        };
+    </script>
+    <script defer src="https://apis.google.com/js/platform.js"></script>
+    <script defer src="https://apis.google.com/js/api.js"></script>
     {% if not app.user %}
         <script defer src="https://www.google.com/recaptcha/api.js"></script>
     {% endif %}
     {{ encore_entry_script_tags('pages/pair') }}
-    <script defer>
+    <script>
         window.fbAsyncInit = () => {
             FB.init({
                 appId: '{{ global_facebook_app_id }}',

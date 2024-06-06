@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  *     )
  * @codeCoverageIgnore
  */
-class UserToken implements UserTradebleInterface
+class UserToken implements UserTradableInterface
 {
     /**
      * @ORM\Id
@@ -34,9 +34,9 @@ class UserToken implements UserTradebleInterface
     protected $user;
 
     /**
-     * @ORM\Column(type="boolean", nullable=false)
+     * @ORM\Column(type="boolean", options={"default": true})
      */
-    protected bool $isHolder;
+    protected bool $isHolder = true; // phpcs:ignore
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="users")
@@ -50,6 +50,16 @@ class UserToken implements UserTradebleInterface
      * @var DateTimeImmutable|null
      */
     protected $created;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default" : false})
+     */
+    protected bool $isReferral = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default" : false})
+     */
+    protected bool $isRemoved = false; // phpcs:ignore
 
     public function getId(): int
     {
@@ -101,6 +111,30 @@ class UserToken implements UserTradebleInterface
     public function setIsHolder(bool $isHolder): self
     {
         $this->isHolder = $isHolder;
+
+        return $this;
+    }
+
+    public function isReferral(): bool
+    {
+        return $this->isReferral;
+    }
+
+    public function setIsReferral(bool $isReferral): self
+    {
+        $this->isReferral = $isReferral;
+
+        return $this;
+    }
+
+    public function isRemoved(): bool
+    {
+        return $this->isRemoved;
+    }
+
+    public function setIsRemoved(bool $isRemoved): self
+    {
+        $this->isRemoved = $isRemoved;
 
         return $this;
     }

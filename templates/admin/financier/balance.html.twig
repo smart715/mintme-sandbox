@@ -1,0 +1,93 @@
+{% extends 'admin/custom_layout.html.twig' %}
+
+{% set label = 'page.finance.balance.title' | trans %}
+
+{% block sonata_head_title %}
+    {% spaceless %}
+        {{ label }} | mintMe
+    {% endspaceless %}
+{% endblock %}
+
+{% block logo %}
+    {% spaceless %}
+        <a class="logo" href="{{ path('sonata_admin_dashboard') }}">
+            <img src="{{ asset('build/images/logo.png') }}" alt="imp-logo">
+        </a>
+    {% endspaceless %}
+{% endblock %}
+
+{% block sonata_breadcrumb %}
+    {% include 'admin/financier/breadcrumb.html.twig' with {label: label} %}
+{% endblock sonata_breadcrumb %}
+
+{% block content %}
+    <form class="form-inline" action="{{ path('show_balance') }}" method="GET">
+        <div class="form-group">
+            <label for="crypto">{% trans %} mintme.api.finance.crypto {% endtrans %}:</label>
+            <input type="text" class="form-control" id="crypto" name="crypto">
+        </div>
+        <button type="submit" class="btn btn-default">{% trans %} mintme.api.finance.filter {% endtrans %}</button>
+    </form>
+    <br>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+            <tr class="sonata-ba-list-field-header">
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.time{% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.crypto{% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.blockchain_balance{% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.users_balance{% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.difference{% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.withdraw_fee_to_pay{% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.difference_include_fee{% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}mintme.api.finance.cold_wallet{% endtrans %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for balance in balances %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-text">
+                    {{ balance.timestamp }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ balance.crypto }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ balance.blockChainBalance | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ balance.usersBalance | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ balance.difference | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ balance.withdrawFeeToPay | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ balance.differenceFeeColdWallet | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ balance.coldWalletBalance | toMoney(8) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

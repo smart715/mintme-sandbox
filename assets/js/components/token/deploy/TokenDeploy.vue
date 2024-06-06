@@ -6,185 +6,275 @@
                     v-if="visible"
                     class="text-left"
                 >
-                    <p>
-                        {{ $t('token.deploy.final_step') }}
-                    </p>
-                    <p v-if="isSelectedMintme" class="bg-info px-2">
-                        {{ $t('token.deploy.frozen') }}
-                    </p>
-                    <p class="bg-info px-2">
-                        {{ $t('token.deploy.irreversible') }}
-                    </p>
-                    <p>
-                        {{ $t('token.deploy.select_blockchain') }}
-                    </p>
-                    <b-dropdown
-                        :text="selectedNode"
-                        variant="primary"
-                    >
-                        <b-dropdown-item
-                            v-for="currency in currencies"
-                            :key="currency"
-                            :value="currency"
-                            @click="onSelect(currency)"
-                        >
-                            {{ currency | rebranding | bnbToBsc }}
-                        </b-dropdown-item>
-                    </b-dropdown>
-                    <p class="mt-5">
-                        {{ $t('token.deploy.current_balance') }}
-                        {{ balance | toMoney(precision) | formatMoney }}
-                        {{ selectedCurrencyRebranded }}
-                        <br>
-                        <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
-                    </p>
-                    <p>
-                        {{ $t('token.deploy.cost') }}
-                        {{ cost | toMoney(precision) | formatMoney }}
-                        {{ selectedCurrencyRebranded }}
-                    </p>
-                    <div class="pt-3">
-                        <button
-                            class="btn btn-primary"
-                            :disabled="btnDisabled"
-                            @click="deploy"
-                        >
-                            <span :class="{'text-muted': isDeploymentDisabled}">
-                                {{ $t('token.deploy.deploy_to_blockchain') }}
-                            </span>
-                        </button>
+                    <div class="alert-block warning p-3 mb-3 d-flex align-items-center">
+                        <font-awesome-icon icon="exclamation-triangle" class="text-primary mr-3"/>
+                        <div>
+                            <p
+                                v-if="isSelectedMintme"
+                                class="m-0"
+                                v-html="$t('token.deploy.frozen', translationsContext)"
+                            >
+                            </p>
+                            <p
+                                v-html="$t('token.deploy.irreversible')"
+                                class="m-0"
+                            ></p>
+                        </div>
                     </div>
+                    <template v-if="noBlockchainAvailable">
+                        <p>
+                            {{ $t('token.deploy.disabled') }}
+                        </p>
+                    </template>
+                    <template v-else>
+                        <template v-if="singleBlockchainAvailable">
+                            <p>
+                                {{ $t('token.deploy.to_blockchain') }}
+                                <coin-avatar
+                                    :symbol="availableCurrencies[0]"
+                                    :is-crypto="true"
+                                />
+                                {{ blockchainContext.blockchainName }}
+                            </p>
+                        </template>
+                        <template v-else>
+                            <m-dropdown
+                                :label="$t('token.deploy.select_blockchain')"
+                                :text="selectedNode"
+                                type="primary"
+                            >
+                                <template v-slot:button-content>
+                                    <div class="d-flex align-items-center flex-fill">
+                                        <coin-avatar
+                                            :is-crypto="true"
+                                            :symbol="selectedCurrency"
+                                            class="mr-1"
+                                        />
+                                        <span class="text-truncate">
+                                            {{ selectedNode }}
+                                        </span>
+                                    </div>
+                                </template>
+                                <m-dropdown-item
+                                    v-for="currency in availableCurrencies"
+                                    :key="currency"
+                                    :value="currency"
+                                    :active="selectedCurrency === currency"
+                                    :invalid="costExceeds"
+                                    @click="onSelect(currency)"
+                                >
+                                    <div class="row pl-2">
+                                        <coin-avatar
+                                            :is-crypto="true"
+                                            :symbol="currency"
+                                            class="col-1 d-flex justify-content-center align-items-center"
+                                        />
+                                        <span class="col ml-n3">
+                                            {{ getBlockchainShortName(currency) }}
+                                        </span>
+                                    </div>
+                                </m-dropdown-item>
+                                <template v-slot:errors>
+                                    <span v-if="costExceeds">
+                                        {{ $t('token.deploy.insufficient_funds') }}
+                                    </span>
+                                </template>
+                            </m-dropdown>
+                        </template>
+                        <div>
+                            {{ $t('token.deploy.current_balance') }}
+                            <span class="text-primary">
+                                {{ balance | formatMoney }}
+                                <coin-avatar
+                                    :is-crypto="true"
+                                    :symbol="moneySymbol"
+                                />
+                                {{ selectedCurrencyRebranded }}
+                            </span>
+                        </div>
+                        <div>
+                            <span
+                                :class="getDepositDisabledClasses(moneySymbol)"
+                                @click="openDepositModal(moneySymbol)"
+                            >
+                                {{ $t('token.deploy.add_more_funds') }}
+                            </span>
+                        </div>
+                        <div>
+                            {{ $t('token.deploy.cost') }}
+                            <span class="text-primary">
+                                {{ cost | formatMoney }}
+                                <coin-avatar
+                                    :is-crypto="true"
+                                    :symbol="moneySymbol"
+                                />
+                                {{ selectedCurrencyRebranded }}
+                            </span>
+                        </div>
+                        <div class="pt-3">
+                            <m-button
+                                type="primary"
+                                :disabled="btnDisabled"
+                                @click="deploy"
+                            >
+                                <span :class="{'text-muted': isDeploymentDisabled}">
+                                    {{ $t('token.deploy.deploy_to_blockchain') }}
+                                </span>
+                            </m-button>
+                            <div class="text-danger small py-1" v-if="!isBlockchainAvailable">
+                                {{ $t('blockchain_unavailable', translationsContext) }}
+                            </div>
+                        </div>
+                    </template>
                 </div>
-                <div
-                    v-else
-                    class="text-center"
-                >
-                    <font-awesome-icon
-                        icon="circle-notch"
-                        spin
-                        class="loading-spinner"
-                        fixed-width
-                    />
+                <div v-else class="text-center pt-4" >
+                    <span v-if="isServiceUnavailable">
+                        {{ this.$t('toasted.error.service_unavailable_short') }}
+                    </span>
+                    <div v-else class="spinner-border spinner-border-sm" role="status"></div>
                 </div>
             </template>
             <div
                 v-else-if="showPending"
                 class="text-left"
             >
-                <p class="bg-info m-0 py-1 px-3">
-                    <font-awesome-icon
-                        icon="circle-notch"
-                        spin
-                        class="loading-spinner"
-                        fixed-width
-                    />
+                <div class="p-3 d-flex flex-column align-items-center">
+                    <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
                     {{ $t('token.deploy.pending') }}
-                </p>
-            </div>
-            <div
-                v-else-if="deployed"
-                class="text-left"
-            >
-                <p class="bg-info m-0 py-1 px-3">
-                    {{ $t('token.deploy.deployed') }}
-                </p>
-                <br>
-                <a v-if="isDeployed" :href="showContractUrl" target="_blank">
-                    {{ $t('token.deploy.deployed.contract_created', {tokenDeployedDate: deployedDate}) }}
-                </a>
+                </div>
             </div>
         </template>
         <div
             v-else
-            class="text-left"
+            class="m-0 py-5 px-2 text-muted text-center"
         >
-            <p class="bg-info m-0 py-1 px-3">
-                {{ $t('token.deploy.edit_release_period') }}
-            </p>
+            {{ $t('token.deploy.edit_release_period_1') }}
+            <span
+                class="highlight link c-pointer"
+                @click="$emit('click-release-period')"
+            >
+                {{ $t('token.deploy.edit_release_period_2') }}
+            </span>
+            {{ $t('token.deploy.edit_release_period_3') }}
         </div>
+        <deposit-modal
+            v-if="null !== selectedCurrency"
+            :visible="showDepositModal"
+            :currency="selectedCurrency"
+            :is-token="isTokenModal"
+            :is-created-on-mintme-site="isCreatedOnMintmeSite"
+            :is-owner="isOwner"
+            :token-networks="currentTokenNetworks"
+            :crypto-networks="currentCryptoNetworks"
+            :subunit="currentSubunit"
+            :no-close="false"
+            :add-phone-alert-visible="addPhoneAlertVisible"
+            :deposit-add-phone-modal-visible="depositAddPhoneModalVisible"
+            @close-confirm-modal="closeConfirmModal"
+            @phone-alert-confirm="onPhoneAlertConfirm(selectedCurrency)"
+            @close-add-phone-modal="closeAddPhoneModal"
+            @deposit-phone-verified="onDepositPhoneVerified"
+            @close="closeDepositModal"
+        />
     </div>
 </template>
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {faCircleNotch, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {BDropdown, BDropdownItem} from 'bootstrap-vue';
-import {toMoney, formatMoney} from '../../../utils';
+import {toMoney, formatMoney, generateCoinAvatarHtml} from '../../../utils';
 import {
     WebSocketMixin,
     NotificationMixin,
-    LoggerMixin,
-    RebrandingFilterMixin,
-    BnbToBscFilterMixin,
+    BlockchainShortNameMixin,
+    DepositModalMixin,
 } from '../../../mixins';
 import Decimal from 'decimal.js';
 import {
     tokenDeploymentStatus,
+    HTTP_INTERNAL_SERVER_ERROR,
+    MINTME,
     webSymbol,
-    ethSymbol,
-    bnbSymbol,
-    GENERAL,
 } from '../../../utils/constants';
-import moment from 'moment';
+import {mapActions, mapGetters, mapState} from 'vuex';
+import {MButton, MDropdown, MDropdownItem} from '../../UI';
+import CoinAvatar from '../../CoinAvatar';
+import DepositModal from '../../modal/DepositModal';
 
-library.add(faCircleNotch);
+library.add(faCircleNotch, faExclamationTriangle);
 
 export default {
     name: 'TokenDeploy',
     components: {
         FontAwesomeIcon,
-        BDropdown,
-        BDropdownItem,
+        MButton,
+        MDropdown,
+        MDropdownItem,
+        DepositModal,
+        CoinAvatar,
     },
     mixins: [
         WebSocketMixin,
         NotificationMixin,
-        LoggerMixin,
-        RebrandingFilterMixin,
-        BnbToBscFilterMixin,
+        BlockchainShortNameMixin,
+        DepositModalMixin,
     ],
     props: {
-        hasReleasePeriod: Boolean,
         isOwner: Boolean,
         name: String,
-        precision: Number,
         statusProp: String,
         disabledServicesConfig: String,
-        currentLocale: String,
-        tokenDeployedDate: {
-            type: Object,
-            default: null,
-        },
-        tokenTxHashAddress: {
-            type: String,
-            default: null,
-        },
-        mintmeExplorerUrl: String,
-        ethExplorerUrl: String,
-        bnbExplorerUrl: String,
         tokenCrypto: Object,
-        isControlledToken: Boolean,
+        isCreatedOnMintmeSite: Boolean,
     },
     data() {
         return {
-            balances: null,
             deploying: false,
             status: this.statusProp,
             costs: null,
-            selectedCurrency: webSymbol,
-            currencies: [
-                webSymbol,
-                ethSymbol,
-                bnbSymbol,
-            ],
+            selectedCurrency: null,
+            serviceUnavailable: false,
         };
     },
     computed: {
-        isDeploymentDisabled: function() {
-            let services = JSON.parse(this.disabledServicesConfig);
+        ...mapState('tokenSettings', {
+            hasReleasePeriod: (state) => state.hasReleasePeriod,
+        }),
+        ...mapGetters('tradeBalance', {
+            balances: 'getBalances',
+            tradeServiceUnavailable: 'isServiceUnavailable',
+        }),
+        ...mapGetters('crypto', {
+            cryptosMap: 'getCryptosMap',
+        }),
+        isServiceUnavailable: function() {
+            return this.tradeServiceUnavailable || this.serviceUnavailable;
+        },
+        availableCurrencies: function() {
+            const availableDeploys = Object.keys(this.services.blockchainDeployStatus).map((symbol) => {
+                return symbol == MINTME.symbol ? webSymbol : symbol;
+            }).filter((symbol) => this.cryptosMap[symbol]);
 
-            return services.allServicesDisabled || services.deployDisabled;
+            return availableDeploys.filter((symbol) => this.blockchainDeployStatus(symbol));
+        },
+        noBlockchainAvailable: function() {
+            return 0 === this.availableCurrencies.length;
+        },
+        singleBlockchainAvailable: function() {
+            return 1 === this.availableCurrencies.length;
+        },
+        blockchainContext: function() {
+            if (this.singleBlockchainAvailable) {
+                return {
+                    blockchainName: this.getBlockchainShortName(this.availableCurrencies[0]),
+                };
+            }
+
+            return null;
+        },
+        isDeploymentDisabled: function() {
+            return this.services.allServicesDisabled || this.services.deployDisabled || this.noBlockchainAvailable;
         },
         notDeployed: function() {
             return tokenDeploymentStatus.notDeployed === this.status;
@@ -199,64 +289,87 @@ export default {
             return this.isOwner && this.pending;
         },
         btnDisabled: function() {
-            return this.costExceed || this.deploying;
+            return this.costExceeds || this.deploying || !this.isBlockchainAvailable;
         },
         visible: function() {
-            return null !== this.costs || null !== this.balances;
+            return null !== this.costs && null !== this.balances;
         },
         cost: function() {
-            return this.costs ? this.costs[this.selectedCurrency] || 0 : 0;
+            return toMoney(
+                this.costs
+                    ? this.costs[this.selectedCurrency] || 0
+                    : 0,
+                this.cryptosMap[this.selectedCurrency].subunit
+            );
         },
-        costExceed: function() {
+        costExceeds: function() {
             return new Decimal(this.cost).greaterThan(this.balance);
         },
-        deployedDate: function() {
-            return moment(this.tokenDeployedDate.date).format(GENERAL.dateFormat);
-        },
         isDeployed: function() {
-            return this.deployed && this.isOwner && this.isControlledToken && this.tokenDeployedDate;
-        },
-        showContractUrl: function() {
-            return this.contractUrls[this.tokenCrypto.symbol];
-        },
-        contractUrls: function() {
-            return {
-                WEB: this.getTxUrl(this.mintmeExplorerUrl, this.tokenTxHashAddress),
-                ETH: this.getTxUrl(this.ethExplorerUrl, this.tokenTxHashAddress),
-                BNB: this.getTxUrl(this.bnbExplorerUrl, this.tokenTxHashAddress),
-            };
+            return this.deployed && this.isOwner && this.isCreatedOnMintmeSite;
         },
         isSelectedMintme: function() {
             return webSymbol === this.selectedCurrency;
         },
         selectedCurrencyRebranded: function() {
-            return this.rebrandingFunc(this.selectedCurrency);
+            return this.rebrandingFunc(this.moneySymbol);
         },
         selectedNode: function() {
-            return this.bnbToBscFunc(this.selectedCurrencyRebranded);
+            return this.getBlockchainShortName(this.selectedCurrency);
         },
         balance: function() {
-            return this.balances ? this.balances[this.selectedCurrency] || 0 : 0;
+            const balance = this.balances
+                ? this.balances[this.moneySymbol].available
+                : 0;
+
+            const bonus = this.balances
+                ? this.balances[this.moneySymbol].bonus
+                : 0;
+
+            return toMoney(
+                new Decimal(balance).add(bonus).toString(),
+                this.cryptosMap[this.moneySymbol].subunit
+            );
+        },
+        services: function() {
+            return JSON.parse(this.disabledServicesConfig);
+        },
+        translationsContext: function() {
+            return {
+                mintmeBlock: generateCoinAvatarHtml({symbol: MINTME.symbol, isCrypto: true}),
+                blockchainName: this.$t(`dynamic.blockchain_${this.selectedCurrency}_name`),
+            };
+        },
+        isBlockchainAvailable: function() {
+            return this.cryptosMap[this.selectedCurrency]?.blockchainAvailable ?? false;
+        },
+        moneySymbol: function() {
+            return this.cryptosMap[this.selectedCurrency].moneySymbol;
         },
     },
     methods: {
-        fetchBalances: function() {
-            this.$axios.retry.get(this.$routing.generate('token_deploy_balances', {
-                name: this.name,
-            }))
-            .then(({data}) => {
-                this.costs = data.costs;
-                this.balances = [];
-                this.currencies.forEach((symbol) => this.balances[symbol] = data.balances[symbol].available);
-            }).catch((err) => {
-                this.sendLogs('error', 'Can not get token deploy balances', err);
-            });
+        ...mapActions('crypto', ['updateCrypto']),
+        fetchCosts: async function() {
+            try {
+                const request = await this.$axios.single.get(this.$routing.generate('token_deploy_costs'));
+
+                this.costs = request.data;
+            } catch (err) {
+                if (HTTP_INTERNAL_SERVER_ERROR === err.response.status && err.response.data.error) {
+                    this.notifyError(err.response.data.error);
+                } else {
+                    this.notifyError(this.$t('toasted.error.try_reload'));
+                }
+
+                this.serviceUnavailable = true;
+                this.$logger.error('Can not get token deploy costs', err);
+            }
         },
         deploy: function() {
             if (this.isDeploymentDisabled) {
-              this.notifyError(this.$t('toasted.error.deployment_disabled'));
+                this.notifyError(this.$t('toasted.error.deployment_disabled'));
 
-              return;
+                return;
             }
 
             if (this.deploying) {
@@ -268,52 +381,53 @@ export default {
                 this.$routing.generate('token_deploy', {name: this.name}),
                 {currency: this.selectedCurrency}
             )
-            .then(() => {
-                this.status = tokenDeploymentStatus.pending;
-                this.$emit('pending');
-                this.notifySuccess(this.$t('toasted.success.deploy_pending'));
-            })
-            .catch(({response}) => {
-                if (!response) {
-                    this.notifyError(this.$t('toasted.error.network'));
-                    this.sendLogs('error', 'Token deploy network error', response);
-                } else if (response.data.message) {
-                    this.notifyError(response.data.message);
-                    this.sendLogs('error', 'Error of deploying token', response);
-                } else {
-                    this.notifyError(this.$t('toasted.error.try_later'));
-                    this.sendLogs('error', 'An error has occurred, please try again later', response);
-                }
-            })
-            .then(() => this.deploying = false);
+                .then(() => {
+                    this.status = tokenDeploymentStatus.pending;
+                    this.$emit('pending', this.selectedCurrency);
+                    this.notifySuccess(this.$t('toasted.success.deploy_pending'));
+                    this.removeDeployTokenNotification();
+                })
+                .catch(({response}) => {
+                    if (!response) {
+                        this.notifyError(this.$t('toasted.error.network'));
+                        this.$logger.error('Token deploy network error', response);
+                    } else if (response.data.message) {
+                        this.notifyError(response.data.message);
+                        this.$logger.error('Error of deploying token', response);
+                    } else {
+                        this.notifyError(this.$t('toasted.error.try_later'));
+                        this.$logger.error('Error of deploying token', response);
+                    }
+                })
+                .then(() => this.deploying = false);
         },
         onSelect: function(newCurrency) {
             this.selectedCurrency = newCurrency;
         },
-        getTxUrl: function(url, hash) {
-            return url.concat('/tx/' + hash);
+        blockchainDeployStatus: function(symbol) {
+            return this.services.blockchainDeployStatus[this.rebrandingFunc(symbol)];
+        },
+        initializeSelectedCurrency: function() {
+            this.selectedCurrency = this.availableCurrencies[0]
+                ? this.availableCurrencies[0]
+                : null;
+        },
+        removeDeployTokenNotification: function() {
+            const deployTokenNotification = document.getElementById('deploy-token-notification');
+
+            if (deployTokenNotification) {
+                deployTokenNotification.remove();
+            }
         },
     },
     mounted() {
-        if (this.currentLocale) {
-            moment.locale(this.currentLocale);
-        }
-
         if (this.notDeployed && this.isOwner) {
-            this.fetchBalances();
-            this.addMessageHandler((response) => {
-                if ('asset.update' === response.method) {
-                    this.currencies.forEach((symbol) => {
-                        if (response.params[0].hasOwnProperty(symbol)) {
-                            this.balances[symbol] = response.params[0][symbol].available;
-                        }
-                    });
-                }
-            }, 'trade-buy-order-asset', 'TokenDeploy');
+            this.fetchCosts();
         } else {
             this.costs = [];
-            this.balances = [];
         }
+
+        this.initializeSelectedCurrency();
     },
     filters: {
         toMoney: function(val, precision) {
@@ -321,6 +435,23 @@ export default {
         },
         formatMoney: function(val) {
             return formatMoney(val);
+        },
+    },
+    watch: {
+        statusProp: function() {
+            this.status = this.statusProp;
+        },
+        selectedCurrency: function() {
+            if (!this.selectedCurrency) {
+                return;
+            }
+
+            try {
+                this.updateCrypto(this.selectedCurrency);
+            } catch (err) {
+                this.notifyError(this.$t('toasted.error.try_later'));
+                this.$logger.error(`Could not fetch crypto info for ${this.selectedCurrency}`, response);
+            }
         },
     },
 };

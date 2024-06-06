@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+/** @codeCoverageIgnore */
 class DateTime implements DateTimeInterface
 {
     public function now(): \DateTimeImmutable

@@ -46,6 +46,12 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
     private Token $token;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
+     * @Groups({"API"})
+     */
+    private Crypto $crypto;
+
+    /**
      * @ORM\Column(type="string")
      * @Groups({"API"})
      * @var string
@@ -53,7 +59,7 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
     private $amount = '0';
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pendingWithdrawals")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pendingTokenWithdrawals")
      * @var User
      */
     private User $user;
@@ -72,19 +78,26 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
     protected string $hash;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true, options={"default": "0"})
      */
-    private string $fee;
+    private string $fee = '0'; //phpcs:ignore
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true, options={"default": Symbols::TOK})
      */
-    private string $feeCurrency;
+    private string $feeCurrency = Symbols::TOK; //phpcs:ignore
 
-    public function __construct(User $user, Token $token, Amount $amount, Address $address, Money $fee)
-    {
+    public function __construct(
+        User $user,
+        Token $token,
+        Crypto $crypto,
+        Amount $amount,
+        Address $address,
+        Money $fee
+    ) {
         $this->user = $user;
         $this->token = $token;
+        $this->crypto = $crypto;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
         $this->fee = $fee->getAmount();
@@ -136,6 +149,16 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         return $this->getToken()->getSymbol();
     }
 
+    public function getCrypto(): Crypto
+    {
+        return $this->crypto;
+    }
+
+    public function getCryptoNetwork(): Crypto
+    {
+        return $this->getCrypto();
+    }
+
     /** @ORM\PrePersist() */
     public function init(): self
     {
@@ -151,5 +174,12 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
             $this->fee,
             new Currency($this->feeCurrency ?: Symbols::TOK)
         );
+    }
+
+    public function setFee(Money $money): self
+    {
+        $this->fee = $money->getAmount();
+
+        return $this;
     }
 }

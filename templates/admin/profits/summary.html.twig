@@ -1,0 +1,84 @@
+{% extends 'admin/custom_layout.html.twig' %}
+
+{% set label = 'page.profits.summary.title' | trans %}
+
+{% block sonata_head_title %}
+    {% spaceless %}
+        {{ label }} | mintMe
+    {% endspaceless %}
+{% endblock %}
+
+{% block logo %}
+    {% spaceless %}
+        <a class="logo" href="{{ path('sonata_admin_dashboard') }}">
+            <img src="{{ asset('build/images/logo.png') }}" alt="imp-logo">
+        </a>
+    {% endspaceless %}
+{% endblock %}
+
+{% block content %}
+    <form class="form-inline" action="{{ path('profits_summary') }}" method="GET">
+        <div class="form-group">
+            <label for="start_date">{% trans %} mintme.api.finance.start_date {% endtrans %}:</label>
+            <input type="text"  id="start_date" name="start_date" value="{{ startDate }}" required>
+        </div>
+        <div class="form-group">
+            <label for="end_date">{% trans %} mintme.api.finance.end_date {% endtrans %}:</label>
+            <input type="text" id="end_date" name="end_date" value="{{ endDate }}" required>
+        </div>
+        <div class="form-group">
+            <label for="with_mintme">{% trans %} mintme.api.profit.with_mintme {% endtrans %}:</label>
+            <input
+                type="checkbox"
+                id="with_mintme"
+                name="with_mintme"
+                class="form-control"
+                {% if withMintMe %} checked {% endif %}
+            >
+        </div>
+        <div class="form-group">
+            <label for="with_tracked_accounts">{% trans %} mintme.api.profit.with_tracked_accounts {% endtrans %}:</label>
+            <input
+                type="checkbox"
+                id="with_tracked_accounts"
+                name="with_tracked_accounts"
+                class="form-control"
+                {% if withTrackedAccounts %} checked {% endif %}
+            >
+        </div>
+        <button type="submit" class="btn btn-default">{% trans %} mintme.api.finance.filter {% endtrans %}</button>
+    </form>
+    <br>
+    <h2> {% trans %} mintme.api.profit.summary_table {% endtrans %} </h2>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+        <tr class="sonata-ba-list-field-header">
+            <th class="sonata-ba-list-field-header-text">
+                {% trans %} category {% endtrans %}
+            </th>
+            <th class="sonata-ba-list-field-header-text">
+                {% trans %} mintme.api.profit.count {% endtrans %}
+            </th>
+            <th class="sonata-ba-list-field-header-text">
+                {% trans %} mintme.api.profit.profit_usd {% endtrans %}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for category, profitSummary in profitsSummary %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ category }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ profitSummary.count ? profitSummary.count : '-' }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ profitSummary.profitInUsd | toMoney(2, false, true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

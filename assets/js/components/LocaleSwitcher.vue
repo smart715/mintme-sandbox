@@ -1,26 +1,26 @@
 <template>
     <div
-        class="dropup language-switcher d-inline"
+        class="dropdown language-switcher d-inline"
         :class="{ 'show': showLangMenu }"
         v-on-clickaway="hideLangMenu"
     >
         <button
-            class="btn dropdown-toggle"
+            class="btn btn-link dropdown-toggle"
             type="button"
             aria-haspopup="true"
             :aria-expanded="showLangMenu"
-            @click="showLangMenu = true"
+            @click="toggleMenu"
         >
-            <span :class="currentLocaleClass"></span> {{ currentLocaleLabel }}
+            <span v-if="showFlagInSelect" :class="currentLocaleClass"></span> {{ currentLocaleLabel }}
         </button>
         <div
-            class="dropdown-menu lang-menu"
-            :class="{ 'show': showLangMenu }"
+            class="dropdown-menu lang-menu lg-hide"
+            :class="{ 'show': showLangMenu, 'dropdown-menu-right': hideElements }"
             aria-labelledby="dropdownLangMenuButton"
         >
             <a v-for="locale in flagsWithLocales" v-bind:key="locale.flag" class="dropdown-item"
                @click="changeLocale(locale.locale)">
-                <span :class="'flag-icon flag-icon-'+locale.flag"></span> {{ locale.label }}
+                <span :class="'flag-icon mr-2 flag-icon-'+locale.flag"></span> {{ locale.label }}
             </a>
         </div>
     </div>
@@ -28,7 +28,13 @@
 
 <script>
 import {directive as onClickaway} from 'vue-clickaway';
-import {HTTP_OK} from '../utils/constants';
+import {HTTP_OK, ScreenMediaSize} from '../utils/constants';
+import {getScreenMediaSize} from '../utils';
+
+export const SWITCH_MODE = {
+    click: 'click',
+    hover: 'hover',
+};
 
 export default {
     name: 'LocaleSwitcher',
@@ -38,6 +44,15 @@ export default {
     props: {
         currentLocale: String,
         flags: String,
+        mode: {
+            type: String,
+            default: SWITCH_MODE.click,
+        },
+        showFlagInSelect: {
+            type: Boolean,
+            default: true,
+        },
+        hideElements: Boolean,
     },
     data() {
         return {
@@ -47,16 +62,16 @@ export default {
     },
     computed: {
         flagNames: function() {
-          return JSON.parse(this.flags);
+            return JSON.parse(this.flags);
         },
         flagsWithLocales: function() {
-            let locales = Object.keys(this.flagNames);
+            const locales = Object.keys(this.flagNames);
 
             return locales.map((loc) => {
                 return {
-                  locale: loc,
-                  flag: this.flagNames[loc].flag,
-                  label: this.flagNames[loc].label,
+                    locale: loc,
+                    flag: this.flagNames[loc].flag,
+                    label: this.flagNames[loc].label,
                 };
             });
         },
@@ -75,11 +90,11 @@ export default {
                 .then((response) => {
                     if (response.status === HTTP_OK) {
                         let hrefWithLocale = '';
-                        let href = location.href;
+                        const href = location.href;
 
                         if (this.engLocale === this.currentLocale && this.engLocale !== locale ) {
-                            let origin = location.origin;
-                            hrefWithLocale = href.replace(origin, origin+'/'+locale);
+                            const origin = location.origin;
+                            hrefWithLocale = href.replace(origin, `${origin}/${locale}`);
                         } else if (this.engLocale !== this.currentLocale && this.engLocale === locale) {
                             hrefWithLocale = href.replace(this.currentLocale + '/', '');
                         } else {
@@ -96,6 +111,14 @@ export default {
         },
         hideLangMenu: function() {
             this.showLangMenu = false;
+        },
+        toggleMenu: function() {
+            if (this.mode === SWITCH_MODE.hover && getScreenMediaSize() > ScreenMediaSize.MD) {
+                return;
+            }
+
+            this.showLangMenu = !this.showLangMenu;
+            this.showCoinDropdown = false;
         },
     },
 };

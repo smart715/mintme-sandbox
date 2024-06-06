@@ -27,6 +27,10 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         usort($traderBalanceViews, function (TraderBalanceView $a, TraderBalanceView $b) {
             return -((float)$a->getBalance() <=> (float)$b->getBalance());
         });
+        
+        foreach ($traderBalanceViews as $key => $balanceView) {
+            $balanceView->setRank(++$key);
+        }
 
         return array_slice($traderBalanceViews, 0, $limit);
     }

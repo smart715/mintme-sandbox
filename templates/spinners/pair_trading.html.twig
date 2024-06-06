@@ -1,0 +1,244 @@
+{% if is_granted('trading') %}
+    <div v-if="false" class="container-fluid px-0">
+        <div class="card card-yellow mt-4 hide-xlg">
+            <div class="d-flex align-items-center justify-content-center qt-card-horizontal-spinner">
+                <div class="spinner-border spinner-border-sm my-1" role="status"></div>
+            </div>
+        </div>
+        {% if isTokenPage and markets|length > 1 and new_markets_enabled %}
+            <ul class="nav nav-tabs trading-tabs my-3">
+                {% for market in markets %}
+                    <li class="nav nav-item font-size-2">
+                        <a
+                            class="btn mx-2 btn-{{ market.base.symbol == currentMarket.base.symbol ? 'primary' : 'secondary'}}"
+                        >
+                            {{ market.base.symbol | rebranding }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="row">
+            <div class="col mx-3">
+                <div class="card-body py-0">
+                    <div class="row justify-content-between mb-2">
+                        <div class="card px-3 py-2 my-2 font-weight-semibold text-center">
+                            <div class="d-flex align-items-center">
+                                <span>{{ 'trade.chart.last_price.header'|trans }}</span>
+                            </div>
+                            <div class="text-primary">
+                                <span class="icon-loading"></span>
+                            </div>
+                        </div>
+                        <div class="card px-3 py-2 my-2 font-weight-semibold text-center">
+                            <div class="d-flex align-items-center">
+                                <span>{{ 'trade.chart.change.header'|trans }}</span>
+                            </div>
+                            <div class="text-primary">
+                                <span class="icon-loading"></span>
+                            </div>
+                        </div>
+                        <div class="card px-3 py-2 my-2 font-weight-semibold text-center">
+                            <div class="d-flex align-items-center">
+                                <span>{{ 'trade.chart.volume_token.header'|trans }}</span>
+                            </div>
+                            <div class="text-primary">
+                                <span class="icon-loading"></span>
+                            </div>
+                        </div>
+                        <div class="card px-3 py-2 my-2 font-weight-semibold text-center">
+                            <div class="d-flex align-items-center">
+                                <span>{{ 'trade.chart.volume_crypto.header'|trans }}</span>
+                            </div>
+                            <div class="text-primary">
+                                <span class="icon-loading"></span>
+                            </div>
+                        </div>
+                        <div class="card px-3 py-2 my-2 font-weight-semibold text-center">
+                            <div class="d-flex align-items-center">
+                                <span>{{ 'trade.chart.buy_depth'|trans }} </span>
+                            </div>
+                            <div class="text-primary">
+                                <span class="icon-loading"></span>
+                            </div>
+                        </div>
+                        {% if not isTokenPage %}
+                        <div class="card px-3 py-2 my-2 font-weight-semibold text-center">
+                            <div class="d-flex align-items-center">
+                                <span>{{ 'trade.chart.market_cap'|trans }} </span>
+                            </div>
+                            <div class="text-primary">
+                                <span class="icon-loading"></span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if not isTokenPage %}
+                        <div class="card px-3 py-2 my-2 font-weight-semibold text-center">
+                            <div class="d-flex align-items-center">
+                                <span>{{ 'trade.chart.market_cap'|trans }} </span>
+                            </div>
+                            <div class="text-primary">
+                                <span class="icon-loading"></span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="row card">
+                        <div class="col">
+                            <div class="m-2 ve-candle-container d-flex justify-content-center align-items-center">
+                                <div class="icon-loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row trade-orders m-0">
+            <div class="col-12 col-lg-6 pr-lg-2 mt-3">
+                <div class="h-100">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <div class="font-size-3 font-weight-semibold header-highlighting">
+                                {% trans %}trade.buy_order.header{% endtrans %}
+                            </div>
+                            <span class="card-header-icon">
+                                <div class="d-inline">
+                                    <a data-tippy="">
+                                        <div class="icon-tooltip"></div>
+                                    </a>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="p-5 text-center">
+                                <div class="icon-loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 pl-lg-2 mt-3">
+                <div class="h-100">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <div class="font-size-3 font-weight-semibold header-highlighting">
+                                {% trans %}trade.sell_order.header{% endtrans %}
+                            </div>
+                            <span class="card-header-icon">
+                                <div class="d-inline">
+                                    <a data-tippy="">
+                                        <div class="icon-tooltip"></div>
+                                    </a>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="p-5 text-center">
+                                <div class="icon-loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row m-0">
+            <div class="container-fluid p-0 m-0">
+                <div class="row p-0 m-0">
+                    <div class="col-12 col-xl-6 pr-xl-2 mt-3">
+                        <div class="h-100">
+                            <div class="card h-100">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <div class="font-size-3 font-weight-semibold header-highlighting">
+                                        {% trans %}trade.buy_orders.header{% endtrans %}
+                                    </div>
+                                    <span class="card-header-icon">
+                                        {% trans %}trade.buy_orders.header_total{% endtrans%}
+                                        <div class="icon-loading"></div>
+                                        {% trans %}mintme{% endtrans %}
+                                        <div class="d-inline">
+                                            <a data-tippy="">
+                                                <div class="icon-tooltip"></div>
+                                            </a>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive fixed-head-table mb-0">
+                                        <div>
+                                            <div class="text-center p-5">
+                                                <div class="icon-loading"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-6 pl-xl-2 mt-3">
+                        <div class="h-100">
+                            <div class="card h-100">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <div class="font-size-3 font-weight-semibold header-highlighting">
+                                        {% trans %}trade.sell_orders.header{% endtrans %}
+                                    </div>
+                                    <span class="card-header-icon">
+                                        {% trans %}trade.sell_orders.header_total{% endtrans %}
+                                        <div class="icon-loading"></div>
+                                        <span>
+                                            {{ token.name }}
+                                        </span>
+                                        <div class="d-inline">
+                                            <a data-tippy="">
+                                                <div class="icon-tooltip"></div>
+                                            </a>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive fixed-head-table mb-0">
+                                        <div>
+                                            <div class="text-center p-5">
+                                                <div class="icon-loading"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3 m-0">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <div class="font-size-3 font-weight-semibold header-highlighting">
+                            {% trans %}trade.history.header{% endtrans %}
+                        </div>
+                        <span class="card-header-icon">
+                            <div class="d-inline">
+                                <a data-tippy="">
+                                    <div class="icon-tooltip"></div>
+                                </a>
+                            </div>
+                        </span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive fixed-head-table mb-0">
+                            <div>
+                                <div class="text-center p-5">
+                                    <div class="icon-loading"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="h1 text-center pt-5 mt-5">
+        {% trans %}trade.page.disabled{% endtrans %}
+    </div>
+{% endif %}

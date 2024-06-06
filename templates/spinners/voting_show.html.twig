@@ -1,71 +1,79 @@
 {% if voting is defined %}
-<div class="row" v-if="false">
-    <div class="col-sm-12 col-lg-7 mt-3">
-        <div class="card mt-3">
-            <div class="card-header">{{ voting.title }}</div>
-            <div class="card-body">
-                <div>
-                    <p class="bbcode-content">
-                        {{ voting.description | bbcode | raw }}
-                    </p>
+<div class="row">
+    <div class="col-md-12 mt-3 text-break">
+        <h2>{{ voting.title }}</h2>
+        <p>
+            <span class="text-primary">
+                {% trans %}voting.form.start_date{% endtrans %}
+            </span> {{ voting.createdAt | date('m.d.Y H:m:s') }} |
+            <span class="text-primary">
+                {% trans %}voting.form.end_date{% endtrans %}
+            </span>
+                {{ voting.endDate | date('m.d.Y H:m:s') }} |
+            <span class="text-primary">
+                {% trans %}voting.form.created_by{% endtrans %}
+            </span>
+            <a href="{{ path('profile', {nickname: voting.creatorProfile.nickname}) }}">
+                {{ voting.creatorProfile.nickname }}
+            </a>
+        </p>
+    </div>
+    {% if not voting.closed %}
+        <div class="col-md-4">
+            <div class="card container-items-vote mb-4">
+                <div class="m-3">
+                    <ul class="list-group text-justify">
+                        {% for option in voting.options %}
+                        <li class="mb-3 c-pointer list-group-item item-vote">
+                            {{ option.title }}
+                        </li>
+                        {% endfor %}
+                        <button disabled="disabled" class="btn btn-primary btn-lg btn-block">
+                            {% trans %}voting.vote{% endtrans %}
+                        </button>
+                    </ul>
                 </div>
             </div>
         </div>
-        {% if not voting.closed %}
-            <div class="card mt-3">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        {% trans %}voting.vote{% endtrans %}
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-column">
-                        {% for option in voting.options %}
-                            <div class="d-flex align-items-center m-2 p-2 bg-primary c-pointer">
-                                <div class="flex-1 text-center">{{ option.title }}</div>
-                            </div>
-                        {% endfor %}
-                        <button disabled="disabled" class="btn btn-primary m-2">
-                            {% trans %}voting.vote{% endtrans %}
-                        </button>
-                    </div>
-                </div>
+    {% endif %}
+    <div class="col-md-8 mb-3">
+        <div class="card">
+            <div class="m-3">
+                <p class="bbcode-content">
+                    {{ voting.description | raw }}
+                </p>
             </div>
-        {% endif %}
+        </div>
         <div class="card mt-3">
-            <div class="card-header">
-                {% trans %}voting.votes{% endtrans %}
-            </div>
-            <div class="card-body">
-                <div class="d-flex flex-column">
-                    {{ include('spinners/spinner.html.twig') }}
+            <div class="card-header mt-3">
+                <div class="d-flex justify-content-between">
+                    <h3 class="text-white">
+                        {% trans %}voting.votes{% endtrans %}
+                    </h3>
                 </div>
+            </div>
+        </div>
+        <div class="card-body d-flex justify-content-center">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only">{% trans %} loading {% endtrans %}</span>
             </div>
         </div>
     </div>
-    <div class="col-sm-12 col-lg-5 mt-3">
-        <div class="card mt-3">
-            <div class="card-header">
-                {% trans %}voting.information{% endtrans %}
-            </div>
-            <div class="card-body">
-                {% trans %}voting.form.start_date{% endtrans %}: {{ voting.createdAt | date('m.d.Y H:m:s') }} <br>
-                {% trans %}voting.form.end_date{% endtrans %}: {{ voting.endDate | date('m.d.Y H:m:s') }} <br>
-                {% trans %}voting.form.created_by{% endtrans %}:
-                <a href="{{ path('profile', {nickname: voting.creatorProfile.nickname}) }}">
-                    {{ voting.creatorProfile.nickname }}
-                </a>
-            </div>
-        </div>
-        <div class="card mt-3">
-            <div class="card-header">
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-header m-3">
                 <div class="d-flex justify-content-between">
-                    {% trans %}voting.current_results{% endtrans %}
+                    <h3 name="title" class="text-white">
+                        {% trans %}voting.current{% endtrans %}
+                        <span class="text-primary">
+                            {% trans %}voting.current.results{% endtrans %}
+                        </span>
+                    </h3>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="d-flex flex-column">
-                    {{ include('spinners/spinner.html.twig') }}
+            <div class="card-body d-flex justify-content-center">
+                <div class="spinner-border text-light" role="status">
+                    <span class="sr-only">{% trans %} loading {% endtrans %}</span>
                 </div>
             </div>
         </div>

@@ -5,7 +5,7 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end', '!donation', '!unsubscribe']
+            channels: ['!cron', '!rabbitmq', '!exchange', '!user_action', '!front_end', '!donation', '!unsubscribe', '!withdraw']
         console:
             type: console
             process_psr_3_messages: false
@@ -36,11 +36,6 @@ monolog:
             path: "php://stderr"
             level: warning
             channels: ['rabbitmq']
-        payments:
-            type: stream
-            path: "%kernel.logs_dir%/payments.log"
-            level: debug
-            channels: ['payments']
         exchange:
             type: stream
             path: "%kernel.logs_dir%/exchange.log"
@@ -69,3 +64,9 @@ monolog:
             level: info
             channels: ['unsubscribe']
             formatter: monolog.formatter.unsubscribe
+        withdraw:
+            type: stream
+            path: "%kernel.logs_dir%/withdraws.log"
+            level: info
+            channels: ['withdraw']
+            formatter: monolog.formatter.withdraw

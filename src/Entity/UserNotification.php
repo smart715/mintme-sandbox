@@ -8,11 +8,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserNotificationRepository")
- * @ORM\Table(name="user_notifications")
+ * @ORM\Table(
+ *     name="user_notifications",
+ *     indexes={
+ *         @ORM\Index(name="IDX_FK_unotifications_users", columns={"user_id"}),
+ *         @ORM\Index(name="IDX_NOTIFICATION_DATE", columns={"date"})
+ *
+ *   }
+ * )
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class UserNotification
+class UserNotification implements NotificationInterface
 {
     /**
      * @ORM\Id()
@@ -41,10 +48,6 @@ class UserNotification
      */
     protected User $user;
 
-    /**
-     * @ORM\Column(type="boolean")
-     * @var Bool
-     */
     private bool $viewed;
 
     /**
@@ -64,7 +67,7 @@ class UserNotification
     /**
      * @Groups({"default", "API"})
      */
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -106,7 +109,7 @@ class UserNotification
     /**
      * @Groups({"default", "API"})
      */
-    public function getViewed(): ?bool
+    public function getViewed(): bool
     {
         return $this->viewed;
     }

@@ -3,31 +3,38 @@
 namespace App\Repository;
 
 use App\Entity\Profile;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\UserBundle\Model\UserInterface;
 
-class ProfileRepository extends EntityRepository
+/**
+ * @extends ServiceEntityRepository<Profile>
+ * @codeCoverageIgnore
+ */
+class ProfileRepository extends ServiceEntityRepository
 {
-    /** @codeCoverageIgnore */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Profile::class);
+    }
+
     public function getProfileByUser(UserInterface $user): ?Profile
     {
         return $this->findOneBy(['user' => $user->getId()]);
     }
 
-    /** @codeCoverageIgnore */
     public function getProfileById(int $id): ?Profile
     {
         return $this->findOneBy(['id' => $id]);
     }
 
-    /** @codeCoverageIgnore */
     public function getProfileByNickname(string $nickname): ?Profile
     {
         return $this->findOneBy(['nickname' => $nickname]);
     }
 
-    /** @codeCoverageIgnore */
-    public function findAllProfileWithEmptyDescriptionAndNotAnonymous(int $numberOfReminder = 14): ?array
+    /** @return Profile[] */
+    public function findAllProfileWithEmptyDescriptionAndNotAnonymous(int $numberOfReminder = 14): array
     {
         $query = $this->createQueryBuilder('p')
             ->innerJoin('p.user', 'u', 'p.user = u.id')

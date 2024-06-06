@@ -7,27 +7,29 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ * @codeCoverageIgnore
  */
 class DiscordConfig
 {
     /**
      * @ORM\Id
      * @ORM\OneToOne(targetEntity="Token", inversedBy="discordConfig")
+     * @ORM\JoinColumn(name="token_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private Token $token;
 
     /**
-     * @ORM\Column(type="bigint", nullable=true, options={"default"=null})
+     * @ORM\Column(type="bigint", nullable=true, unique=true, options={"default"=null})
      */
     private ?int $guildId = null; // phpcs:ignore
 
     /**
-     * @ORM\Column(type="boolean", nullable=false, options={"default"=false})
+     * @ORM\Column(type="boolean", nullable=true, options={"default"=false})
      */
     private bool $specialRolesEnabled = false; // phpcs:ignore
 
     /**
-     * @ORM\Column(type="boolean", nullable=false, options={"default"=false})
+     * @ORM\Column(type="boolean", nullable=true, options={"default"=false})
      */
     private bool $enabled = false; // phpcs:ignore
 

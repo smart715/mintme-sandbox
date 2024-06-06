@@ -1,56 +1,72 @@
 import Passwordmeter from './PasswordMeter';
 import Guide from './Guide';
-import {minLength} from 'vuelidate/lib/validators';
-import {nickname} from '../utils/constants';
+import {required, minLength} from 'vuelidate/lib/validators';
+import {nickname, email, emailLength} from '../utils/constants';
 import i18n from '../utils/i18n/i18n';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEye} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faEye);
+import {NoBadWordsMixin, OpenPageMixin, TogglePassword} from '../mixins';
 
 export default {
     i18n,
     components: {
         Passwordmeter,
         Guide,
-        FontAwesomeIcon,
     },
+    mixins: [
+        OpenPageMixin,
+        NoBadWordsMixin,
+        TogglePassword,
+    ],
     data() {
         return {
             nickname: '',
+            email: '',
             password: '',
             disabled: false,
             passwordInput: null,
-            isPass: true,
+            isPassVisible: true,
             eyeIcon: null,
+            nicknameBadWordMessage: '',
+            emailBadWordMessage: '',
+            termsCheckboxValue: false,
         };
+    },
+    computed: {
+        btnDisabled() {
+            return this.disabled || this.$v.$invalid;
+        },
     },
     methods: {
         toggleError: function(val) {
             this.disabled = val;
         },
-        togglePassword: function() {
-            if (this.isPass) {
-                this.passwordInput.type = 'text';
-                this.eyeIcon.className = 'show-password-active';
-                this.isPass = false;
-            } else {
-                this.passwordInput.type = 'password';
-                this.eyeIcon.className = 'show-password';
-                this.isPass = true;
-            }
-        },
     },
     mounted() {
-        this.passwordInput = document.getElementById('fos_user_registration_form_plainPassword');
-        this.eyeIcon = document.querySelector('.show-password');
+        this.passwordInput = this.$refs['password-input'];
+        this.eyeIcon = this.$refs['eye-icon'];
         this.nickname = this.$refs.nickname.getAttribute('value');
+        this.email = this.$refs.email.getAttribute('value');
     },
-    validations: {
-        nickname: {
-            helpers: nickname,
-            minLength: minLength(2),
-        },
+    validations() {
+        return {
+            nickname: {
+                required,
+                helpers: nickname,
+                minLength: minLength(2),
+                noBadWords: () => this.noBadWordsValidator('nickname', 'nicknameBadWordMessage'),
+            },
+            email: {
+                required,
+                helpers: email,
+                length: emailLength,
+                minLength: minLength(2),
+                noBadWords: () => this.noBadWordsValidator('email', 'emailBadWordMessage'),
+            },
+            password: {
+                required,
+            },
+            termsCheckboxValue: {
+                checked: () => this.termsCheckboxValue,
+            },
+        };
     },
 };

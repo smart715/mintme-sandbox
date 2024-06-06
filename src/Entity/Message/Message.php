@@ -3,12 +3,13 @@
 namespace App\Entity\Message;
 
 use App\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\MessageRepository")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
@@ -18,9 +19,8 @@ class Message
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\ManyToOne(
@@ -29,22 +29,19 @@ class Message
      *     cascade={"all"}
      *     )
      * @ORM\JoinColumn(nullable=false)
-     * @var Thread
      */
-    private $thread;
+    private Thread $thread;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(nullable=false)
-     * @var User
      */
-    private $sender;
+    private User $sender;
 
     /**
      * @ORM\Column(type="text", length=500, nullable=false)
-     * @var string
      */
-    private $body;
+    private string $body;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Message\MessageMetadata", mappedBy="message", cascade={"all"})
@@ -54,9 +51,13 @@ class Message
 
     /**
      * @ORM\Column(type="datetime_immutable")
-     * @var \DateTimeImmutable
      */
-    private $createdAt;
+    private \DateTimeImmutable $createdAt;
+
+    public function __construct()
+    {
+        $this->metadata = new ArrayCollection();
+    }
 
     /** @ORM\PrePersist() */
     public function setCreatedAt(): self
@@ -115,10 +116,10 @@ class Message
     {
         return $this->thread;
     }
-    
+
     public function addMetadata(MessageMetadata $metadata): self
     {
-        $this->metadata[] = $metadata;
+        $this->metadata->add($metadata);
 
         return $this;
     }

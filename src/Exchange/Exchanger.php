@@ -3,63 +3,46 @@
 namespace App\Exchange;
 
 use App\Communications\AMQP\MarketAMQPInterface;
+use App\Communications\Exception\FetchException;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Factory\BalanceView;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\TokenManagerInterface;
+use App\Services\TranslatorService\TranslatorInterface;
 use App\Utils\Symbols;
 use App\Utils\ValidatorFactoryInterface;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 class Exchanger implements ExchangerInterface
 {
-    /** @var TraderInterface */
-    private $trader;
-
-    /** @var MoneyWrapperInterface */
-    private $mw;
-
-    /** @var MarketAMQPInterface */
-    private $mp;
-
-    /** @var BalanceHandlerInterface */
-    private $bh;
-
-    /** @var BalanceViewFactoryInterface */
-    private $bvf;
-
-    /** @var UserActionLogger */
-    private $logger;
-
-    /** @var ParameterBagInterface */
-    private $bag;
-
-    /** @var MarketHandlerInterface */
-    private $mh;
-
-    /** @var TokenManagerInterface */
-    private $tm;
-
-    /** @var ValidatorFactoryInterface */
-    private $vf;
-
-    /** @var TranslatorInterface */
-    private $translator;
+    private TraderInterface $trader;
+    private MoneyWrapperInterface $mw;
+    private MarketAMQPInterface $mp;
+    private BalanceHandlerInterface $bh;
+    private BalanceViewFactoryInterface $bvf;
+    private UserActionLogger $logger;
+    private ParameterBagInterface $bag;
+    private MarketHandlerInterface $mh;
+    private TokenManagerInterface $tm;
+    private ValidatorFactoryInterface $vf;
+    private TranslatorInterface $translator;
+    private LimitOrderConfig $limitOrderConfig;
 
     public function __construct(
         TraderInterface $trader,
@@ -72,7 +55,8 @@ class Exchanger implements ExchangerInterface
         MarketHandlerInterface $marketHandler,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        LimitOrderConfig $limitOrderConfig
     ) {
         $this->trader = $trader;
         $this->mw = $moneyWrapper;
@@ -85,6 +69,7 @@ class Exchanger implements ExchangerInterface
         $this->tm = $tokenManager;
         $this->vf = $validatorFactory;
         $this->translator = $translator;
+        $this->limitOrderConfig = $limitOrderConfig;
     }
 
     public function cancelOrder(Market $market, Order $order): TradeResult
@@ -100,7 +85,7 @@ class Exchanger implements ExchangerInterface
         }
 
         $this->logger->info(
-            sprintf('Cancel %s order', 'sell'),
+            sprintf('Cancel %s order', Order::BUY_SIDE === $order->getSide() ? 'buy' : 'sell'),
             [
                 'base' => $market->getBase()->getSymbol(),
                 'quote' => $market->getQuote()->getSymbol(),
@@ -131,23 +116,9 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-        $minOrderValidator = $this->vf->createOrderValidator(
-            $market,
-            $priceInput,
-            $amountInput
-        );
-
-        if (!$minOrderValidator->validate()) {
-            return new TradeResult(
-                TradeResult::SMALL_AMOUNT,
-                $this->translator,
-                $minOrderValidator->getMessage()
-            );
-        }
-
         $price = $this->mw->parse(
             $this->parseAmount($priceInput, $market, true),
-            $this->getSymbol($market->getQuote())
+            $this->getSymbol($market->getBase())
         );
 
         if ($marketPrice) {
@@ -163,10 +134,52 @@ class Exchanger implements ExchangerInterface
             $this->getSymbol($market->getQuote())
         );
 
+        $userFee = $user->getTradingFee() ?? $this->limitOrderConfig->getFeeRateByMarket($market);
+
         $fee = $this->mw->parse(
-            (string)($isSellSide ? $this->bag->get('maker_fee_rate') : $this->bag->get('taker_fee_rate')),
+            $userFee,
             $this->getSymbol($market->getQuote())
         );
+
+        $totalPrice = $price->multiply($amountInput);
+
+        $isBuySide = Order::BUY_SIDE === $side;
+        $possibleMatchingSellOrders = $isBuySide
+             ? $this->mh->getPendingSellOrders($market)
+             : [];
+
+        $minValidators = [
+            $this->vf->createMinTradableValidator($market->getBase(), $market, $priceInput),
+            $this->vf->createMinTradableValidator($market->getQuote(), $market, $amountInput),
+            $this->vf->createOrderMinUsdValidator(
+                $market->getBase(),
+                $price,
+                $amount,
+                $isBuySide,
+                $possibleMatchingSellOrders
+            ),
+            $this->vf->createMinAmountValidator($market->getQuote(), $amountInput),
+            $this->vf->createMinTradableValidator($market->getBase(), $market, $this->mw->format($totalPrice)),
+            $this->vf->createMinUsdValidator($market->getBase(), $this->mw->format($totalPrice)),
+        ];
+
+        foreach ($minValidators as $validator) {
+            try {
+                if (!$validator->validate()) {
+                    return new TradeResult(
+                        TradeResult::SMALL_AMOUNT,
+                        $this->translator,
+                        $validator->getMessage()
+                    );
+                }
+            } catch (FetchException $e) {
+                $this->logger->error('Failed to fetch min amount', [
+                    'base' => $market->getBase()->getSymbol(),
+                    'quote' => $market->getQuote()->getSymbol(),
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
 
         $order = new Order(
             null,
@@ -186,7 +199,7 @@ class Exchanger implements ExchangerInterface
         $tradeResult = $this->trader->placeOrder($order);
 
         try {
-            $this->mp->send($market);
+            $this->mp->send($market, $user);
         } catch (Throwable $exception) {
             $this->logger->error(
                 "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
@@ -194,7 +207,7 @@ class Exchanger implements ExchangerInterface
         }
 
         $this->logger->info(
-            sprintf('Create %s order', Order::BUY_SIDE === $side ? 'buy' : 'sell'),
+            sprintf('Create %s order', $isBuySide ? 'buy' : 'sell'),
             [
                 'base' => $market->getBase()->getSymbol(),
                 'quote' => $market->getQuote()->getSymbol(),
@@ -209,42 +222,31 @@ class Exchanger implements ExchangerInterface
     public function executeOrder(
         User $user,
         Market $market,
-        string $amountInput,
-        string $expectedToReceive,
+        string $value,
         int $side,
-        ?string $fee = null
+        ?string $fee = null,
+        bool $updateTokenOrCrypto = true
     ): TradeResult {
         $isSellSide = Order::SELL_SIDE === $side;
 
-        if ($isSellSide && $this->exceedAvailableReleased($user, $market->getQuote()->getSymbol(), $amountInput)) {
+        if ($isSellSide && $this->exceedAvailableReleased($user, $market->getQuote()->getSymbol(), $value)) {
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-        $avgPrice = $this->mw->parse(
-            $expectedToReceive,
-            $market->getBase()->getSymbol()
-        )->divide($amountInput);
-
-        $minOrderValidator = $this->vf->createOrderValidator(
-            $market,
-            $this->mw->format($avgPrice),
-            $amountInput
-        );
-
-        if (!$minOrderValidator->validate()) {
-            return new TradeResult(
-                TradeResult::SMALL_AMOUNT,
-                $this->translator,
-                $minOrderValidator->getMessage()
-            );
-        }
-
+        // In order to use the same Order class, we use amount and price logic
         $amount = $this->mw->parse(
-            $this->parseAmount($amountInput, $market),
+            $isSellSide ? $this->parseAmount($value, $market) : '0',
             $this->getSymbol($market->getQuote())
         );
 
-        $fee = $fee ?? (string)$this->bag->get($isSellSide ? 'maker_fee_rate' : 'taker_fee_rate');
+        $price = $this->mw->parse(
+            $isSellSide ? '0' : $this->parseAmount($value, $market, true),
+            $market->getBase()->getSymbol()
+        );
+
+        $userFee = $user->getTradingFee() ?? $this->limitOrderConfig->getFeeRateByMarket($market);
+
+        $fee = $fee ?? $userFee;
 
         $fee = $this->mw->parse(
             $fee,
@@ -258,7 +260,7 @@ class Exchanger implements ExchangerInterface
             $market,
             $amount,
             $side,
-            $avgPrice,
+            $price,
             Order::PENDING_STATUS,
             $fee,
             null,
@@ -266,10 +268,10 @@ class Exchanger implements ExchangerInterface
             $user->getReferencer() ? (int)$user->getReferencer()->getId() : 0
         );
 
-        $tradeResult = $this->trader->executeOrder($order);
+        $tradeResult = $this->trader->executeOrder($order, $updateTokenOrCrypto);
 
         try {
-            $this->mp->send($market);
+            $this->mp->send($market, $user);
         } catch (Throwable $exception) {
             $this->logger->error(
                 "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
@@ -281,8 +283,7 @@ class Exchanger implements ExchangerInterface
             [
                 'base' => $market->getBase()->getSymbol(),
                 'quote' => $market->getQuote()->getSymbol(),
-                'amount' => $amount->getAmount(),
-                'received' => $expectedToReceive,
+                'value' => $value,
             ]
         );
 
@@ -296,23 +297,33 @@ class Exchanger implements ExchangerInterface
             $market->getBase() :
             $market->getQuote();
 
+        $scale = $crypto->getShowSubunit();
+
+        if ($market->isTokenMarket()) {
+            /** @var Token $quote */
+            $quote = $market->getQuote();
+
+            $scale = $quote->getPriceDecimals()
+                ?: (Symbols::WEB === $crypto->getSymbol()
+                    ? (int)$this->bag->get('token_precision')
+                    : $crypto->getShowSubunit());
+        }
+
         /** @var string $amount */
         $amount = (string) BigDecimal::of($amount)->dividedBy(
             '1',
-            $market->isTokenMarket()
-                ? $this->bag->get('token_precision')
-                : $crypto->getShowSubunit(),
+            $scale,
             RoundingMode::HALF_DOWN
         );
 
         return $amount;
     }
 
-    private function getSymbol(TradebleInterface $tradeble): string
+    private function getSymbol(TradableInterface $tradable): string
     {
-        return $tradeble instanceof Token
+        return $tradable instanceof Token
             ? Symbols::TOK
-            : $tradeble->getSymbol();
+            : $tradable->getSymbol();
     }
 
     /** @return array<Order> */
@@ -340,6 +351,7 @@ class Exchanger implements ExchangerInterface
         if ($profile && $user->getId() === $profile->getUser()->getId()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
+                [$token],
                 $this->bh->balances($user, [$token]),
                 $user
             )[$token->getSymbol()];
@@ -415,12 +427,12 @@ class Exchanger implements ExchangerInterface
         return $marketPrice;
     }
 
-    private function getBalance(User $user, TradebleInterface $tradeble): Money
+    private function getBalance(User $user, TradableInterface $tradable): Money
     {
-        $balanceResult = $this->bh->balance($user, $tradeble);
+        $balanceResult = $this->bh->balance($user, $tradable);
 
-        if ($tradeble instanceof Token) {
-            return $this->tm->getRealBalance($tradeble, $balanceResult, $user)->getAvailable();
+        if ($tradable instanceof Token) {
+            return $this->tm->getRealBalance($tradable, $balanceResult, $user)->getAvailable();
         }
 
         return $balanceResult->getAvailable();

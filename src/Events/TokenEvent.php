@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Entity\Token\Token;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/** @codeCoverageIgnore */
 class TokenEvent extends Event implements TokenEventInterface
 {
     protected Token $token;

@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     fields={"url"},
  *     message="This url is already use."
  * )
+ * @codeCoverageIgnore
  */
 class KnowledgeBase
 {
@@ -81,6 +82,11 @@ class KnowledgeBase
     protected ?string $uaTitle;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $deTitle;
+
+    /**
      * @ORM\Column(type="string", unique=true, nullable=false)
      */
     protected ?string $url;
@@ -126,11 +132,15 @@ class KnowledgeBase
     protected ?string $uaDescription;
 
     /**
-     * @Gedmo\SortablePosition
-     * @ORM\Column(type="integer")
-     * @var int
+     * @ORM\Column(type="text", nullable=true)
      */
-    private $position;
+    protected ?string $deDescription;
+
+    /**
+     * @Gedmo\SortablePosition
+     * @ORM\Column(type="integer", options={"default": -1})
+     */
+    protected int $position = -1; //phpcs:ignore
 
     public function getId(): int
     {
@@ -301,6 +311,18 @@ class KnowledgeBase
         return $this;
     }
 
+    public function getDeTitle(): string
+    {
+        return $this->deTitle ?? '';
+    }
+
+    public function setDeTitle(?string $deTitle): self
+    {
+        $this->deTitle = $deTitle;
+
+        return $this;
+    }
+
     public function getArDescription(): string
     {
         return $this->arDescription ?? '';
@@ -369,6 +391,18 @@ class KnowledgeBase
     public function setUaDescription(?string $uaDescription): self
     {
         $this->uaDescription = $uaDescription;
+
+        return $this;
+    }
+
+    public function getDeDescription(): string
+    {
+        return $this->deDescription ?? '';
+    }
+
+    public function setDeDescription(?string $deDescription): self
+    {
+        $this->deDescription = $deDescription;
 
         return $this;
     }

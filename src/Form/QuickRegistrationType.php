@@ -3,12 +3,13 @@
 namespace App\Form;
 
 use App\Form\Type\NicknameType;
+use App\Services\TranslatorService\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
+/** @codeCoverageIgnore */
 class QuickRegistrationType extends AbstractType
 {
     /** @var TranslatorInterface */

@@ -17,8 +17,10 @@ class DonationVoter extends Voter
     ];
     private AccessDecisionManagerInterface $decisionManager;
 
-    public function __construct(AccessDecisionManagerInterface $decisionManager, ContainerInterface $container)
-    {
+    public function __construct(
+        AccessDecisionManagerInterface $decisionManager,
+        ContainerInterface $container
+    ) {
         $this->decisionManager = $decisionManager;
         $this->container = $container;
     }

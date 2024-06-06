@@ -1,87 +1,102 @@
 <template>
-    <div>
-        <div class="card h-100">
-            <div class="card-header">
-               {{ $t('token.intro.description.header') }}
-                <guide class="float-right">
-                    <template  slot="header">
-                        {{ $t('token.intro.description.guide_header') }}
-                    </template>
-                    <template slot="body">
-                        <span v-html="this.$t('token.intro.description.guide_body', translationsContext)"></span>
-                    </template>
-                </guide>
-            </div>
-            <div class="card-body">
-                <div class="row fix-height custom-scrollbar">
-                    <div class="col-12 overflow-y-hidden">
-                        <span class="card-header-icon">
-                            <font-awesome-icon
-                                v-if="showEditIcon"
-                                class="float-right c-pointer icon-default"
-                                icon="edit"
-                                transform="shrink-4 up-1.5"
-                                @click="editingDescription = true"
-                            />
-                        </span>
-                        <div id="description-text">
-                            <div :class="{'show-hide-text': showMore}" ref="hide" >
-                                <bbcode-view v-if="!editingDescription" :value="description" />
-                                <a class="show" v-show="height>=400" href="#0" @click="toggleDescription">{{showMessage}}</a>
+    <div class="card">
+        <div
+            class="card-body p-0 description"
+            :class="{'closed': !shouldUnfoldDescription}"
+        >
+            <div class="fix-height custom-scrollbar">
+                <div class="overflow-hidden">
+                    <span>
+                        <font-awesome-icon
+                            v-if="showEditIcon"
+                            class="float-right c-pointer icon-default"
+                            icon="pen"
+                            transform="shrink-4 up-1.5"
+                            @click="editingDescription = true"
+                        />
+                    </span>
+                    <div id="description-text">
+                        <div :class="{'show-hide-text': showMore}" ref="hide">
+                            <plain-text-view v-if="!editingDescription && description" :text="description" />
+                            <div v-if="!editingDescription && !description" class="text-muted text-center mb-3">
+                                {{ $t('page.pair.no_description') }}
                             </div>
                         </div>
-                        <template v-if="editable">
-                            <div v-if="editingDescription">
-                                <div class="pb-1">
-                                    {{ $t('token.intro.description.plan.header') }}
-                                    <guide>
-                                        <template slot="header">
-                                            {{ $t('token.intro.description.plan.guide_header') }}
-                                        </template>
-                                        <template slot="body">
-                                            <span v-html="this.$t('token.intro.description.plan.guide_body', translationsContext)"></span>
-                                        </template>
-                                    </guide>
-                                    <bbcode-help class="d-inline"/>
-                                </div>
-                                <div class="pb-1 text-xs">{{ $t('token.intro.description.plan') }}</div>
-                                <bbcode-editor
-                                    rows="5"
-                                    class="form-control"
-                                    :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
-                                    :value="newDescriptionHtmlDecode"
-                                    @change="onDescriptionChange"
-                                    @input="onDescriptionChange"
-                                />
-                                <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
-                                     class="text-sm text-danger">
-                                    {{ $t('token.intro.description.min_length', translationsContext) }}
-                                </div>
-                                <div v-if="!$v.newDescription.maxLength" class="text-sm text-danger">
-                                    {{ $t('token.intro.description.max_length', translationsContext) }}
-                                </div>
-                                <div class="text-left pt-3">
-                                    <button
-                                        class="btn btn-primary"
-                                        :disabled="$v.$invalid || !readyToSave"
-                                        @click="editDescription"
-                                        @keyup.enter="editDescription"
-                                        tabindex="0"
-                                    >
-                                        {{ $t('save') }}
-                                    </button>
-                                    <span
-                                        class="btn-cancel pl-3 c-pointer"
-                                        @click="editingDescription = false"
-                                        @keyup.enter="editingDescription = false"
-                                        tabindex="0"
-                                    >
-                                        {{ $t('cancel') }}
-                                    </span>
-                                </div>
-                            </div>
-                        </template>
+                        <div
+                            v-show="shouldShowMoreBtn"
+                            :class="{'opened': !showMore}"
+                            class="text-center show-more-wrp"
+                        >
+                            <button
+                                class="btn btn-secondary-rounded"
+                                @click="toggleDescription"
+                            >
+                                {{ showMessage }}
+                            </button>
+                        </div>
                     </div>
+                    <template v-if="editable">
+                        <div v-if="editingDescription">
+                            <div class="pb-1">
+                                {{ $t('token.intro.description.plan.header') }}
+                                <guide>
+                                    <template slot="header">
+                                        {{ $t('token.intro.description.plan.guide_header') }}
+                                    </template>
+                                    <template slot="body">
+                                        <span v-html="this.$t(
+                                            'token.intro.description.plan.guide_body',
+                                            translationsContext
+                                        )"></span>
+                                    </template>
+                                </guide>
+                            </div>
+                            <counted-textarea
+                                :rows="5"
+                                :value="newDescriptionHtmlDecode"
+                                :invalid="$v.$invalid && newDescription.length > 0"
+                                editable
+                                @change="onDescriptionChange"
+                                @input="onDescriptionChange"
+                            >
+                                <template v-slot:label>
+                                    <span class="token-intro-description-plan label-bg-primary-dark">
+                                        {{ $t('token.intro.description.plan') }}
+                                    </span>
+                                </template>
+                                <template v-slot:errors>
+                                    <div v-if="newDescription.length > 0 && !$v.newDescription.minLength">
+                                        {{ $t('token.intro.description.min_length', translationsContext) }}
+                                    </div>
+                                    <div v-if="!$v.newDescription.maxLength">
+                                        {{ $t('token.intro.description.max_length', translationsContext) }}
+                                    </div>
+                                    <div
+                                        v-if="!$v.newDescription.noBadWords"
+                                        v-text="newDescriptionBadWordMessage"
+                                    ></div>
+                                </template>
+                            </counted-textarea>
+                            <div class="mb-4">
+                                <m-button
+                                    tabindex="0"
+                                    type="primary"
+                                    :disabled="$v.$invalid || !readyToSave"
+                                    :loading="saving"
+                                    @click="editDescription"
+                                >
+                                    {{ $t('save') }}
+                                </m-button>
+                                <span
+                                    class="btn-cancel pl-3 c-pointer"
+                                    tabindex="1"
+                                    @click="cancelEditing"
+                                >
+                                    {{ $t('cancel') }}
+                                </span>
+                            </div>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -90,33 +105,46 @@
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit} from '@fortawesome/free-solid-svg-icons';
+import {faPen} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
-import BbcodeEditor from '../../bbcode/BbcodeEditor';
-import BbcodeHelp from '../../bbcode/BbcodeHelp';
-import BbcodeView from '../../bbcode/BbcodeView';
+import {CountedTextarea, MButton} from '../../UI';
+import PlainTextView from '../../UI/PlainTextView';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {descriptionLength} from '../../../utils/constants';
-import {LoggerMixin, NotificationMixin} from '../../../mixins';
+import {
+    NotificationMixin,
+    ClearInputMixin,
+    NoBadWordsMixin,
+} from '../../../mixins';
+import TruncateFilterMixin from '../../../mixins/filters/truncate';
 import he from 'he';
 
-library.add(faEdit);
+const DESCRIPTION_TRUNCATE_LENGTH = 70;
+
+library.add(faPen);
 
 export default {
     name: 'TokenIntroductionDescription',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [
+        NotificationMixin,
+        ClearInputMixin,
+        NoBadWordsMixin,
+        TruncateFilterMixin,
+    ],
     props: {
         description: String,
         editable: Boolean,
         name: String,
+        shouldUnfoldDescription: Boolean,
+        isMobileScreen: Boolean,
     },
     components: {
-        BbcodeEditor,
-        BbcodeHelp,
-        BbcodeView,
+        CountedTextarea,
+        PlainTextView,
         FontAwesomeIcon,
         Guide,
+        MButton,
     },
     data() {
         return {
@@ -124,9 +152,10 @@ export default {
             newDescription: this.description || '',
             readyToSave: false,
             showMore: true,
-            readMore: this.$t('read_more'),
             height: 0,
             resizeObserver: null,
+            saving: false,
+            newDescriptionBadWordMessage: '',
         };
     },
     mounted: function() {
@@ -135,7 +164,17 @@ export default {
                 this.resizeObserver = new ResizeObserver(this.updateHeight.bind(this));
                 this.resizeObserver.observe(this.$refs.hide);
             });
-        },
+
+        window.addEventListener('scroll', () => {
+            if (!this.isMobileScreen &&
+                !this.editingDescription &&
+                this.showMore &&
+                this.shouldUnfoldDescription
+            ) {
+                this.$emit('fold', false);
+            }
+        });
+    },
     beforeDestroy() {
         this.resizeObserver.disconnect();
     },
@@ -145,6 +184,9 @@ export default {
         },
         showMessage() {
             return this.showMore ? this.$t('read_more') : this.$t('read_less');
+        },
+        shouldShowMoreBtn: function() {
+            return 239 <= this.height;
         },
         newDescriptionHtmlDecode: function() {
             return he.decode(this.newDescription);
@@ -163,54 +205,53 @@ export default {
             this.readyToSave = true;
         },
         updateHeight() {
-            let styles = window.getComputedStyle(this.$refs.hide, null);
-            let height = parseFloat(styles.getPropertyValue('height'));
-            let topPadding = parseFloat(styles.getPropertyValue('padding-top'));
-            let bottomPadding = parseFloat(styles.getPropertyValue('padding-bottom'));
+            const styles = window.getComputedStyle(this.$refs.hide, null);
+            const height = parseFloat(styles.getPropertyValue('height'));
+            const topPadding = parseFloat(styles.getPropertyValue('padding-top'));
+            const bottomPadding = parseFloat(styles.getPropertyValue('padding-bottom'));
             this.height = height - topPadding - bottomPadding;
         },
         toggleDescription: function() {
             this.showMore = !this.showMore;
         },
-        editDescription: function() {
+        editDescription: async function() {
             this.$v.$touch();
-            this.readyToSave = false;
+
             if (this.$v.$invalid) {
-                if (!this.$v.newDescription.minLength || !this.$v.newDescription.required) {
-                    this.notifyError(this.$t('token.intro.description.min_length'));
-                } else if (!this.$v.newDescription.maxLength) {
-                    this.notifyError(
-                        this.$t('token.intro.description.max_length', this.translationsContext)
-                    );
-                }
                 return;
             }
 
-            this.$axios.single.patch(this.$routing.generate('token_update', {
-                name: this.name,
-            }), {
-                description: this.newDescriptionHtmlDecode,
-            })
-                .then((response) => {
-                    this.newDescription = response.data.newDescription;
-                    this.$emit('updated', this.newDescription);
-                }, (error) => {
-                    this.readyToSave = true;
-                    if (!error.response) {
-                        this.notifyError(this.$t('toasted.error.network'));
-                        this.sendLogs('error', 'Edit description network error', error);
-                    } else if (error.response.data.message) {
-                        this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not edit description', error);
-                    } else {
-                        this.notifyError(this.$t('toasted.error.try_later'));
-                        this.sendLogs('error', 'An error has occurred, please try again later', error);
-                    }
-                })
-                .then(() => {
-                    this.editingDescription = false;
-                    this.icon = 'edit';
+            this.readyToSave = false;
+            this.saving = true;
+            try {
+                const response = await this.$axios.single.patch(this.$routing.generate('token_update', {
+                    name: this.name,
+                }), {
+                    description: this.newDescriptionHtmlDecode,
                 });
+                const truncatedDescription = this.truncateFunc(
+                    response.data.newDescription,
+                    DESCRIPTION_TRUNCATE_LENGTH
+                );
+
+                this.newDescription = response.data.newDescription;
+                document.title = `${this.name} ${truncatedDescription}`;
+                this.$emit('updated', this.newDescription);
+            } catch (error) {
+                this.readyToSave = true;
+                this.notifyError(error.response?.data?.message || this.$t('toasted.error.try_later'));
+                this.$logger.error('Error while editing description', error);
+            } finally {
+                this.editingDescription = false;
+                this.saving = false;
+            }
+        },
+        cancelEditing() {
+            if (this.saving) {
+                return;
+            }
+
+            this.editingDescription = false;
         },
     },
     validations() {
@@ -219,6 +260,8 @@ export default {
                 required,
                 minLength: minLength(descriptionLength.min),
                 maxLength: maxLength(descriptionLength.max),
+                changed: () => this.description !== this.newDescriptionHtmlDecode,
+                noBadWords: () => this.noBadWordsValidator('newDescription', 'newDescriptionBadWordMessage'),
             },
         };
     },

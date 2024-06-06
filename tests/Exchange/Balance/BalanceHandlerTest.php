@@ -11,15 +11,21 @@ use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalancesArrayFactoryInterface;
 use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
+use App\Exchange\Balance\Factory\UpdateBalanceView;
+use App\Exchange\Balance\Factory\UpdateBalanceViewFactoryInterface;
+use App\Exchange\Balance\Model\BalanceHistory;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\BonusBalanceTransactionManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Manager\UserTokenManagerInterface;
-use App\Tests\MockMoneyWrapper;
+use App\Mercure\Publisher as MercurePublisher;
+use App\Tests\Mocks\MockMoneyWrapper;
 use App\Utils\Converter\TokenNameConverterInterface;
+use App\Utils\RandomNumber;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -54,6 +60,24 @@ class BalanceHandlerTest extends TestCase
                 $this->mockToken('baz'),
             ]
         );
+    }
+
+    public function testHistory(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+        $converter->expects($this->exactly(0))->method('convert');
+
+        $fetcher = $this->mockBalanceFetcher();
+        $fetcher->expects($this->once())->method('history');
+
+        $handler = $this->mockBalanceHandler(
+            $converter,
+            $fetcher
+        );
+
+        $result = $handler->history(1, 'foo', 'bar');
+
+        $this->assertInstanceOf(BalanceHistory::class, $result);
     }
 
     public function testSummary(): void
@@ -95,6 +119,54 @@ class BalanceHandlerTest extends TestCase
         );
     }
 
+    public function testGetReferralBalances(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+        $converter->expects($this->exactly(2))->method('convert');
+
+        $fetcher = $this->mockBalanceFetcher();
+
+        $handler = $this->mockBalanceHandler(
+            $converter,
+            $fetcher
+        );
+
+        /** @var Money[] $allBalances */
+        $allBalances = $handler->getReferralBalances(
+            $this->mockUser(1),
+            [
+                $this->mockToken('foo'),
+            ]
+        );
+
+        $this->assertEquals('1', $allBalances['foo']->getAmount());
+        $this->assertEquals('BTC', $allBalances['foo']->getCurrency());
+    }
+
+    public function testIndexedBalances(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+        $converter->expects($this->exactly(2))->method('convert');
+
+        $fetcher = $this->mockBalanceFetcher();
+
+        $handler = $this->mockBalanceHandler(
+            $converter,
+            $fetcher
+        );
+
+        /** @var BalanceResult[] $indexedBalances */
+        $indexedBalances = $handler->indexedBalances(
+            $this->mockUser(1),
+            [
+                $this->mockToken('foo'),
+            ]
+        );
+
+        $this->assertEquals('1', $indexedBalances['foo']->getAvailable()->getAmount());
+        $this->assertEquals('BTC', $indexedBalances['foo']->getAvailable()->getCurrency());
+    }
+
     public function testTopHolders(): void
     {
         $converter = $this->mockTokenNameConverter();
@@ -106,7 +178,6 @@ class BalanceHandlerTest extends TestCase
         $handler = $this->mockBalanceHandler(
             $converter,
             $fetcher,
-            null,
             $this->mockUserManager([$this->mockUserToken($this->mockUser(1), $this->mockDate())])
         );
 
@@ -119,7 +190,7 @@ class BalanceHandlerTest extends TestCase
         );
     }
 
-    public function testTopHoldersWithManyFetchs(): void
+    public function testTopHoldersWithManyFetches(): void
     {
         $converter = $this->mockTokenNameConverter();
         $converter->expects($this->exactly(2))->method('convert');
@@ -128,15 +199,14 @@ class BalanceHandlerTest extends TestCase
         $fetcher->expects($this->exactly(2))
             ->method('topBalances')
             ->willReturn([
-                [1, '999'],
-                [2, '99'],
-                [3, '9'],
+                [1, '999', '999'],
+                [2, '99', '99'],
+                [3, '9', '9'],
             ]);
 
         $handler = $this->mockBalanceHandler(
             $converter,
             $fetcher,
-            null,
             $this->mockUserManager([$this->mockUserToken($this->mockUser(1), $this->mockDate())])
         );
 
@@ -158,15 +228,14 @@ class BalanceHandlerTest extends TestCase
         $fetcher->expects($this->once())
             ->method('topBalances')
             ->willReturn([
-                [1, '999'],
-                [2, '99'],
-                [3, '9'],
+                [1, '999', '999'],
+                [2, '99', '999'],
+                [3, '9', '999'],
             ]);
 
         $handler = $this->mockBalanceHandler(
             $converter,
             $fetcher,
-            null,
             $this->mockUserManager([$this->mockUserToken($this->mockUser(1), $this->mockDate())])
         );
 
@@ -185,7 +254,7 @@ class BalanceHandlerTest extends TestCase
         $converter->expects($this->exactly(2))->method('convert');
 
         $res = $this->mockBalanceResult();
-        $res->method('getAvailable')->willReturn(new Money(2, new Currency('FOO')));
+        $res->method('getAvailable')->willReturn(new Money(5, new Currency('FOO')));
 
         $resContainer = $this->mockBalanceResultContainer();
         $resContainer->method('get')->willReturn($res);
@@ -232,7 +301,7 @@ class BalanceHandlerTest extends TestCase
         $this->assertTrue(
             $handler->isNotExchanged(
                 $this->mockToken('foo'),
-                5
+                1
             )
         );
     }
@@ -240,20 +309,16 @@ class BalanceHandlerTest extends TestCase
     public function testDeposit(): void
     {
         $converter = $this->mockTokenNameConverter();
-        $converter->expects($this->exactly(1))->method('convert');
+        $converter->expects($this->exactly(3))->method('convert');
 
         $fetcher = $this->mockBalanceFetcher();
         $fetcher->expects($this->once())
             ->method('update')
             ->with(1, 'fooFOO', 2, 'deposit');
 
-        $em = $this->mockEm();
-        $em->expects($this->once())->method('flush');
-
         $handler = $this->mockBalanceHandler(
             $converter,
-            $fetcher,
-            $em
+            $fetcher
         );
 
         $tok = $this->mockToken('foo');
@@ -267,20 +332,16 @@ class BalanceHandlerTest extends TestCase
     public function testDepositWithRelatedToken(): void
     {
         $converter = $this->mockTokenNameConverter();
-        $converter->expects($this->exactly(1))->method('convert');
+        $converter->expects($this->exactly(3))->method('convert');
 
         $fetcher = $this->mockBalanceFetcher();
         $fetcher->expects($this->once())
             ->method('update')
             ->with(1, 'fooFOO', 2, 'deposit');
 
-        $em = $this->mockEm();
-        $em->expects($this->never())->method('flush');
-
         $handler = $this->mockBalanceHandler(
             $converter,
-            $fetcher,
-            $em
+            $fetcher
         );
 
         $tok = $this->mockToken('foo');
@@ -294,7 +355,7 @@ class BalanceHandlerTest extends TestCase
     public function testWithdraw(): void
     {
         $converter = $this->mockTokenNameConverter();
-        $converter->expects($this->exactly(1))->method('convert');
+        $converter->expects($this->exactly(3))->method('convert');
 
         $fetcher = $this->mockBalanceFetcher();
         $fetcher->expects($this->once())
@@ -361,12 +422,119 @@ class BalanceHandlerTest extends TestCase
         );
     }
 
+    public function testDepositBonus(): void
+    {
+        $bonusTransactionManager = $this->mockBonusBalanceTransactionManager();
+        $bonusTransactionManager->method('getBalance')->willReturn(null);
+        $bonusTransactionManager->expects($this->once())
+            ->method('updateBalance')
+            ->with(
+                $this->mockUser(1),
+                $this->mockToken('foo'),
+                new Money(20, new Currency('FOO')),
+                'deposit',
+                'airdrop'
+            );
+
+        $handler = $this->mockBalanceHandler(
+            null,
+            null,
+            null,
+            $bonusTransactionManager
+        );
+
+        $handler->depositBonus(
+            $this->mockUser(1),
+            $this->mockToken('foo'),
+            new Money(20, new Currency('FOO')),
+            'airdrop'
+        );
+    }
+
+    public function testWithdrawBonusEnough(): void
+    {
+        $bonusTransactionManager = $this->mockBonusBalanceTransactionManager();
+        $bonusTransactionManager->method('getBalance')->willReturn(new Money(100, new Currency('FOO')));
+        $bonusTransactionManager->expects($this->once())
+            ->method('updateBalance')
+            ->with(
+                $this->mockUser(1),
+                $this->mockToken('FOO'),
+                new Money(100, new Currency('FOO')),
+                'withdraw',
+                'reward'
+            );
+
+        $handler = $this->mockBalanceHandler(
+            null,
+            null,
+            null,
+            $bonusTransactionManager
+        );
+
+        $response = $handler->withdrawBonus(
+            $this->mockUser(1),
+            $this->mockToken('FOO'),
+            new Money(100, new Currency('FOO')),
+            'reward'
+        );
+
+        $expectedResponse = new UpdateBalanceView(
+            new Money(0, new Currency('FOO')),
+            new Money(100, new Currency('FOO')),
+        );
+
+        $this->assertEquals($expectedResponse, $response);
+    }
+
+    public function testWithdrawBonusNotEnough(): void
+    {
+        $bonusTransactionManager = $this->mockBonusBalanceTransactionManager();
+        $bonusTransactionManager->method('getBalance')->willReturn(new Money(100, new Currency('FOO')));
+        $bonusTransactionManager->expects($this->once())
+            ->method('updateBalance')
+            ->with(
+                $this->mockUser(1),
+                $this->mockToken('foo'),
+                new Money(100, new Currency('FOO')),
+                'withdraw',
+                'reward'
+            );
+
+        $fetcher = $this->mockBalanceFetcher();
+        $fetcher->expects($this->once())
+            ->method('update')
+            ->with(1, 'fooFOO', -10, 'reward');
+
+        $handler = $this->mockBalanceHandler(
+            null,
+            $fetcher,
+            null,
+            $bonusTransactionManager
+        );
+
+        $response = $handler->withdrawBonus(
+            $this->mockUser(1),
+            $this->mockToken('foo'),
+            new Money(110, new Currency('FOO')),
+            'reward'
+        );
+
+        $expectedResponse = new UpdateBalanceView(
+            new Money(10, new Currency('FOO')),
+            new Money(100, new Currency('FOO')),
+        );
+
+        $this->assertEquals($expectedResponse, $response);
+    }
+
     private function mockToken(string $name): Token
     {
         $tok = $this->createMock(Token::class);
         $tok->method('getName')->willReturn($name);
+        $tok->method('getSymbol')->willReturn($name);
         $tok->method('getId')->willReturn(1);
-        $tok->method('getWithdrawn')->willReturn(1);
+        $tok->method('getWithdrawn')->willReturn($this->mockMoney("1"));
 
         $profile = $this->createMock(Profile::class);
         $profile->method('getUser')->willReturn($this->mockUser(5));
@@ -398,16 +566,13 @@ class BalanceHandlerTest extends TestCase
         return $this->createMock(TraderBalanceViewFactoryInterface::class);
     }
 
-    /** @return EntityManagerInterface|MockObject */
-    private function mockEm(): EntityManagerInterface
-    {
-        return $this->createMock(EntityManagerInterface::class);
-    }
-
     /** @return BalanceFetcherInterface|MockObject */
     private function mockBalanceFetcher(): BalanceFetcherInterface
     {
-        return $this->createMock(BalanceFetcherInterface::class);
+        $balanceFetcher = $this->createMock(BalanceFetcherInterface::class);
+        $balanceFetcher->method('balance')->willReturn($this->mockBalanceResultContainer());
+
+        return $balanceFetcher;
     }
 
     /** @return TokenNameConverterInterface|MockObject */
@@ -424,13 +589,20 @@ class BalanceHandlerTest extends TestCase
     /** @return BalanceResultContainer|MockObject */
     private function mockBalanceResultContainer(): BalanceResultContainer
     {
-        return $this->createMock(BalanceResultContainer::class);
+        $balanceResultContainer = $this->createMock(BalanceResultContainer::class);
+        $balanceResultContainer->method('get')->willReturn($this->mockBalanceResult());
+
+        return $balanceResultContainer;
     }
 
     /** @return BalanceResult|MockObject */
     private function mockBalanceResult(): BalanceResult
     {
-        return $this->createMock(BalanceResult::class);
+        $balanceResult = $this->createMock(BalanceResult::class);
+        $balanceResult->method('getAvailable')->willReturn($this->mockMoney('1', Symbols::BTC));
+        $balanceResult->method('getReferral')->willReturn($this->mockMoney('1', Symbols::BTC));
+
+        return $balanceResult;
     }
 
     /**
@@ -442,6 +614,14 @@ class BalanceHandlerTest extends TestCase
         $manager->method('getUserToken')->willReturn($UsersTokens);
 
         return $manager;
+    }
+
+    /**
+     * @return BonusBalanceTransactionManagerInterface|MockObject
+     */
+    private function mockBonusBalanceTransactionManager(): BonusBalanceTransactionManagerInterface
+    {
+        return $this->createMock(BonusBalanceTransactionManagerInterface::class);
     }
 
     /**
@@ -479,27 +659,64 @@ class BalanceHandlerTest extends TestCase
         return $this->createMock(UserTokenManagerInterface::class);
     }
 
+
+    private function mockMoney(string $amount, string $currency = Symbols::TOK): Money
+    {
+        return new Money($amount, new Currency($currency));
+    }
+
+    private function mockUpdateBalanceViewFactory(): UpdateBalanceViewFactoryInterface
+    {
+        $updateBalanceViewFactory = $this->createMock(UpdateBalanceViewFactoryInterface::class);
+        $updateBalanceViewFactory->method('createUpdateBalanceView')
+            ->willReturn($this->mockUpdateBalanceView());
+
+        return $updateBalanceViewFactory;
+    }
+
+    private function mockUpdateBalanceView(): UpdateBalanceView
+    {
+        $updateBalanceView = $this->createMock(UpdateBalanceView::class);
+        $updateBalanceView->method('getChange')->willReturn($this->mockMoney('1', Symbols::BTC));
+
+        return $updateBalanceView;
+    }
+
+    private function mockRandomNumber(): RandomNumber
+    {
+        return $this->createMock(RandomNumber::class);
+    }
+
+    private function mockMercurePublisher(): MercurePublisher
+    {
+        return $this->createMock(MercurePublisher::class);
+    }
+
     private function mockBalanceHandler(
         ?TokenNameConverterInterface $converter = null,
         ?BalanceFetcherInterface $balanceFetcher = null,
-        ?EntityManagerInterface $entityManager = null,
         ?UserManagerInterface $userManager = null,
+        ?BonusBalanceTransactionManagerInterface $bonusBalanceTransactionManager = null,
         ?BalancesArrayFactoryInterface $balanceArrayFactory = null,
         ?MoneyWrapperInterface $moneyWrapper = null,
         ?TraderBalanceViewFactoryInterface $traderBalanceViewFactory = null,
         ?LoggerInterface $logger = null,
-        ?UserTokenManagerInterface $userTokenManager = null
+        ?UserTokenManagerInterface $userTokenManager = null,
+        ?MercurePublisher $mercurePublisher = null
     ): BalanceHandler {
         return new BalanceHandler(
             $converter ?? $this->mockTokenNameConverter(),
             $balanceFetcher ?? $this->mockBalanceFetcher(),
-            $entityManager ?? $this->mockEm(),
             $userManager ?? $this->mockUserManager([]),
+            $bonusBalanceTransactionManager ?? $this->mockBonusBalanceTransactionManager(),
             $balanceArrayFactory ?? $this->mockBalancesArrayFactory(),
             $moneyWrapper ?? $this->mockMoneyWrapper(),
             $traderBalanceViewFactory ?? $this->mockTraderBalanceViewFactory(),
             $logger ?? $this->mockLogger(),
-            $userTokenManager ?? $this->mockUserTokenManager()
+            $userTokenManager ?? $this->mockUserTokenManager(),
+            $this->mockUpdateBalanceViewFactory(),
+            $this->mockRandomNumber(),
+            $mercurePublisher ?? $this->mockMercurePublisher()
         );
     }
 }

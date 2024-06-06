@@ -3,6 +3,7 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import WithdrawModal from '../../js/components/modal/WithdrawModal';
 import moxios from 'moxios';
 import axios from 'axios';
+import Vuex from 'vuex';
 
 /**
  * @return {Wrapper<Vue>}
@@ -10,27 +11,31 @@ import axios from 'axios';
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(Vuelidate);
+    localVue.use(Vuex);
     localVue.use({
         install(Vue) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$te = (val) => true;
+            Vue.prototype.$logger = {error: () => {}};
         },
     });
     return localVue;
-};
+}
 
-let rebrandingTest = (val) => {
+const rebrandingTest = (val) => {
     if (!val) {
         return val;
     }
 
     const brandDict = [
-        {regexp: /(webTest)/g, replacer: 'mintimeTest'},
+        {regexp: /(web)/g, replacer: 'mintme'},
     ];
+
     brandDict.forEach((item) => {
-        if (typeof val !== 'string') {
+        if ('string' !== typeof val) {
             return;
         }
         val = val.replace(item.regexp, item.replacer);
@@ -39,20 +44,74 @@ let rebrandingTest = (val) => {
     return val;
 };
 
-let propsForTestCorrectlyRenders = {
+const defaultProps = {
     visible: true,
     currency: 'Token',
     isToken: true,
-    fee: '0',
-    baseFee: '0',
-    baseSymbol: 'WEB',
+    isCreatedOnMintmeSite: true,
+    isOwner: true,
+    tokenNetworks: {
+        WEB: {
+            symbol: 'WEB',
+            fee: '10',
+            feeCurrency: 'WEB',
+            subunit: 4,
+        },
+    },
+    availableBalances: {
+        ETH: '100',
+        WEB: '100',
+        Token: '100',
+    },
     withdrawUrl: 'withdraw_url',
-    maxAmount: '0',
-    availableBase: '0',
-    subunit: 0,
+    subunit: 4,
     twofa: '0',
     noClose: false,
+    isHackerAllowed: false,
+    minWithdrawal: {
+        BTC: 0.0005,
+        ETH: 0.005,
+        BNB: 0.05,
+        USDC: 10,
+        CRO: 50,
+        WEB: 10,
+    },
 };
+
+/**
+ * @param {object} props
+ * @return {Wrapper<Vue>}
+ */
+function mountWithdrawModal(props = {}) {
+    return shallowMount(WithdrawModal, {
+        propsData: {...defaultProps, ...props},
+        localVue: mockVue(),
+        stubs: {
+            Modal: {template: '<div><slot name="body"></slot></div>'},
+        },
+        filters: {
+            rebranding: function(val) {
+                return rebrandingTest(val);
+            },
+        },
+        store: new Vuex.Store({
+            modules: {
+                crypto: {
+                    namespaced: true,
+                    getters: {
+                        getCryptosMap: () => {
+                            return {
+                                'BTC': {networkInfo: {blockchainAvailable: true}},
+                                'WEB': {networkInfo: {blockchainAvailable: true}},
+                                'ETH': {networkInfo: {blockchainAvailable: true}},
+                            };
+                        },
+                    },
+                },
+            },
+        }),
+    });
+}
 
 describe('WithdrawModal', () => {
     beforeEach(() => {
@@ -63,266 +122,327 @@ describe('WithdrawModal', () => {
         moxios.uninstall();
     });
 
-    const addressOk = '0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359';
-    const addressNotOk = '00fB6916095ca1df60bB79Ce92cE3Ea74c37c5d359';
+    const addressBTCOk = '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2';
     const amountOk = 100;
     const subunitOk = 0;
     const maxAmountOk = '1000';
     const code = '123456';
     it('should be visible when visible props is true', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-        });
+        const wrapper = mountWithdrawModal();
         expect(wrapper.vm.visible).toBe(true);
     });
 
     it('should provide closing on ESC and closing on backdrop click when noClose props is false', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-        });
+        const wrapper = mountWithdrawModal();
         expect(wrapper.vm.noClose).toBe(false);
     });
 
     it('emit "close" when the function closeModal() is called', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-        });
+        const wrapper = mountWithdrawModal();
         wrapper.vm.closeModal();
         expect(wrapper.emitted('close').length).toBe(1);
     });
 
     it('emit "cancel" and "close" when clicking on button "Cancel"', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-        });
-        wrapper.find('button.btn-cancel.pl-3.c-pointer').trigger('click');
+        const wrapper = mountWithdrawModal();
+        wrapper.findComponent('button.btn-cancel.pl-3.c-pointer').trigger('click');
         expect(wrapper.emitted('cancel').length).toBe(1);
         expect(wrapper.emitted('close').length).toBe(1);
     });
 
-    it('should be equal "0.001" when subunit props is equal 0.001', () => {
-        propsForTestCorrectlyRenders.subunit = 3;
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    it('should be equal "0.001" when subunit props is equal 3 ' +
+        'and minWithdrawal does not contain value for currency property', async () => {
+        const wrapper = mountWithdrawModal();
+
+        await wrapper.setProps({
+            subunit: 3,
         });
-        propsForTestCorrectlyRenders.subunit = 0;
         expect(wrapper.vm.minAmount).toBe('0.001');
     });
 
-    it('should be contain "123456789" in the "Withdrawal fee" field  when isToken props is true', () => {
-        propsForTestCorrectlyRenders.webFee = '123456789';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-            stubs: {
-                Modal: {template: '<div><slot name="body"></slot></div>'},
+    it('min amount for crypto should be taken from minWithdrawal object', async () => {
+        const wrapper = mountWithdrawModal();
+
+        await wrapper.setProps({
+            currency: 'WEB',
+        });
+        expect(wrapper.vm.minAmount).toBe('10');
+    });
+
+    it('should contain "123456789" in the "Withdrawal fee" field  when network is selected', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '123456789',
+            feeCurrency: 'WEB',
+            subunit: 4,
+        };
+        const wrapper = mountWithdrawModal({
+            tokenNetworks: {
+                WEB: webNetwork,
             },
         });
-        propsForTestCorrectlyRenders.webFee = '0';
+
+        await wrapper.setData({
+            selectedNetwork: webNetwork,
+        });
+
         expect(wrapper.html().includes('123456789')).toBe(true);
     });
 
-    it('should be contain "987654321" in the "Withdrawal fee" field  when isToken props is false', () => {
-        propsForTestCorrectlyRenders.isToken = false;
-        propsForTestCorrectlyRenders.fee = '987654321';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-            stubs: {
-                Modal: {template: '<div><slot name="body"></slot></div>'},
-            },
-        });
-        propsForTestCorrectlyRenders.isToken = true;
-        propsForTestCorrectlyRenders.fee = '0';
-        expect(wrapper.html().includes('987654321')).toBe(true);
-    });
+    it('feeCurrency, and feeAmount should change depending on network', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '1234',
+            feeCurrency: 'WEB',
+            subunit: 4,
+        };
+        const ethNetwork = {
+            symbol: 'ETH',
+            fee: '4321',
+            feeCurrency: 'ETH',
+            subunit: 4,
+        };
 
-    it('should be equal "WEB" when isToken props is true', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-        });
-        expect(wrapper.vm.feeCurrency).toBe('Token');
-    });
+        const wrapper = mountWithdrawModal({
+            tokenNetworks: {
+                WEB: webNetwork,
+                ETH: ethNetwork,
+            }});
 
-    it('should be equal "webTest" when isToken props is false', () => {
-        propsForTestCorrectlyRenders.isToken = false;
-        propsForTestCorrectlyRenders.currency = 'webTest';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+        await wrapper.setData({
+            selectedNetwork: webNetwork,
         });
-        propsForTestCorrectlyRenders.isToken = true;
-        propsForTestCorrectlyRenders.currency = '';
-        expect(wrapper.vm.feeCurrency).toBe('webTest');
+
+        expect(wrapper.vm.feeCurrency).toBe('WEB');
+        expect(wrapper.vm.feeAmount).toBe('1234');
+
+        await wrapper.setData({
+            selectedNetwork: ethNetwork,
+        });
+
+        expect(wrapper.vm.feeCurrency).toBe('ETH');
+        expect(wrapper.vm.feeAmount).toBe('4321');
     });
 
     it('should be contain "mintimeTest" in the form', () => {
-        propsForTestCorrectlyRenders.isToken = false;
-        propsForTestCorrectlyRenders.currency = 'webTest';
-        const wrapper = shallowMount(WithdrawModal, {
-            filters: {
-                rebranding: function(val) {
-                    return rebrandingTest(val);
-                },
-            },
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-            stubs: {
-                Modal: {template: '<div><slot name="body"></slot></div>'},
-            },
-        });
-        propsForTestCorrectlyRenders.isToken = true;
-        propsForTestCorrectlyRenders.currency = '';
-        expect(wrapper.html().includes('mintimeTest')).toBe(true);
+        const wrapper = mountWithdrawModal({isToken: false, currency: 'webTest'});
+        expect(wrapper.html().includes('mintmeTest')).toBe(true);
     });
 
-    it('should be equal "15912.12" in the "Total to be withdrawn" field', () => {
-        propsForTestCorrectlyRenders.subunit = 2;
-        propsForTestCorrectlyRenders.fee = '3567';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    it('fullAmount should be the sum of fee and amount if both currencies are the same', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '3567',
+            feeCurrency: 'Token', // same as this.currency
+            subunit: 4,
+        };
+        const wrapper = mountWithdrawModal({
+            subunit: 2,
+            tokenNetworks: {
+                WEB: webNetwork,
+            },
         });
-        wrapper.vm.amount = 12345.1234;
-        propsForTestCorrectlyRenders.subunit = 0;
-        propsForTestCorrectlyRenders.fee = '0';
+
+        await wrapper.setData({
+            selectedNetwork: webNetwork,
+            amount: 12345.1234,
+        });
+
         expect(wrapper.vm.fullAmount).toBe('15912.12');
     });
 
-    it('should be equal "48023" in the "Total to be withdrawn" field', () => {
-        propsForTestCorrectlyRenders.fee = '35678';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    it('fullAmount should be amount only if both currencies are not the same', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '3567',
+            feeCurrency: 'WEB', // not the same as this.currency
+            subunit: 4,
+        };
+
+        const wrapper = mountWithdrawModal({
+            subunit: 2,
+            tokenNetworks: {
+                WEB: webNetwork,
+            },
         });
-        wrapper.vm.amount = 12345;
-        propsForTestCorrectlyRenders.fee = '0';
-        expect(wrapper.vm.fullAmount).toBe('48023');
+
+        await wrapper.setData({
+            selectedNetwork: webNetwork,
+            amount: 2456.789,
+        });
+
+        expect(wrapper.vm.fullAmount).toBe('2456.78');
     });
 
-    it('should\'t be equal "12345f" in the "Total to be withdrawn" field', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    it('should\'t be equal "12345f" in the "Total to be withdrawn" field', async () => {
+        const wrapper = mountWithdrawModal({});
+
+        await wrapper.setData({
+            amount: '12345f',
         });
-        wrapper.vm.amount = '12345f';
         expect(wrapper.vm.fullAmount).toBe('0');
     });
 
-    it('should be false when address data is incorrect', () => {
-        propsForTestCorrectlyRenders.currency = 'BTC';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    it('shouldn\'t be error when address data is correct', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '3567',
+            feeCurrency: 'WEB',
+            subunit: 4,
+        };
+
+        const wrapper = mountWithdrawModal({currency: 'BTC'});
+
+        await wrapper.setData({
+            selectedNetwork: webNetwork,
+            address: addressBTCOk,
         });
-        wrapper.vm.address = '';
-        wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.address.$error).toBe(false);
 
-        wrapper.vm.address = 'ab-cd';
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.address.$error).toBe(false);
 
-        wrapper.vm.address = 'abcd';
-        wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.address.$error).toBe(false);
-
-        wrapper.vm.address = 'abcd1234567890123456789012345678901234567890';
-        wrapper.vm.$v.$touch();
-        propsForTestCorrectlyRenders.currency = '';
-        expect(!wrapper.vm.$v.address.$error).toBe(false);
+        expect(wrapper.vm.$v.address.$error).toBe(false);
     });
 
-    it('should be true when address data is correct', () => {
-        propsForTestCorrectlyRenders.currency = 'BTC';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-        });
-        wrapper.vm.address = addressOk;
+    it('should be error when amount data is incorrect', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '3567',
+            feeCurrency: 'WEB',
+            subunit: 4,
+        };
+
+        const wrapper = mountWithdrawModal({});
+
+        await wrapper.setData({selectedNetwork: webNetwork});
+
+        await wrapper.setData({amount: ''});
         wrapper.vm.$v.$touch();
-        propsForTestCorrectlyRenders.currency = '';
-        expect(!wrapper.vm.$v.address.$error).toBe(true);
+        expect(wrapper.vm.$v.amount.$error).toBe(true);
+
+        await wrapper.setData({amount: 'abcd'});
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.amount.$error).toBe(true);
+
+        await wrapper.setData({amount: '0.1'});
+        await wrapper.setProps({subunit: 0});
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.amount.$error).toBe(true);
+
+        await wrapper.setProps({availableBalances: {
+            Token: maxAmountOk,
+            WEB: 0,
+        }});
+
+        await wrapper.setData({amount: maxAmountOk + '1000'});
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.amount.$error).toBe(true);
     });
 
-    it('should be false when amount data is incorrect', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    it('shouldn\'t be error when amount data is correct', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '3567',
+            feeCurrency: 'WEB',
+            subunit: 4,
+        };
+
+        const wrapper = mountWithdrawModal({
+            subunit: subunitOk,
+            availableBalances: {
+                Token: maxAmountOk,
+                WEB: maxAmountOk,
+            },
         });
-        wrapper.vm.amount = '';
-        wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).toBe(false);
 
-        wrapper.vm.amount = 'abcd';
+        await wrapper.setData({
+            selectedNetwork: webNetwork,
+            amount: amountOk,
+        });
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).toBe(false);
 
-        wrapper.vm.amount = 0.1;
-        wrapper.setProps({subunit: 0});
-        wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).toBe(false);
-
-        wrapper.vm.amount = 1000;
-        wrapper.setProps({maxAmount: '100'});
-        wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).toBe(false);
+        expect(wrapper.vm.$v.amount.$error).toBe(false);
     });
 
-    it('should be true when amount data is correct', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
-        });
-        wrapper.vm.amount = amountOk;
-        wrapper.setProps({subunit: subunitOk});
-        wrapper.setProps({maxAmount: maxAmountOk});
-        wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).toBe(true);
-    });
+    it('calculate the amount correctly when the function setMaxAmount() is called', async () => {
+        const webNetwork = {
+            symbol: 'WEB',
+            fee: '123.1234',
+            feeCurrency: 'Token',
+            subunit: 2,
+        };
 
-    it('calculate the amount correctly when the function setMaxAmount() is called', () => {
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+        const wrapper = mountWithdrawModal({
+            subunit: 2,
+            availableBalances: {
+                Token: maxAmountOk,
+            },
+            tokenNetworks: {
+                WEB: webNetwork,
+            },
         });
-        wrapper.setProps({maxAmount: '1000'});
-        wrapper.setProps({subunit: 2});
-        wrapper.setProps({fee: '123.1234'});
+
+        await wrapper.setData({
+            selectedNetwork: webNetwork,
+            amount: amountOk,
+        });
+
         wrapper.vm.setMaxAmount();
-        expect(wrapper.vm.amount).toBe('876.87');
+        expect(wrapper.vm.amount).toBe('876.88'); // 1000 - 123.1234 rounded up to 2 decimals
 
-        wrapper.setProps({maxAmount: '100'});
-        wrapper.setProps({subunit: 2});
-        wrapper.setProps({fee: '123.1234'});
+        await wrapper.setProps({
+            availableBalances: {
+                Token: '100',
+            },
+        });
+
         wrapper.vm.setMaxAmount();
+
         expect(wrapper.vm.amount).toBe('0');
     });
 
-    it('do $axios request and emit "withdraw" when the function onWithdraw() is called and when data is correct', (done) => {
-        propsForTestCorrectlyRenders.currency = 'BTC';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    it('do $axios request and emit "withdraw" when the function onWithdraw() is called', async (done) => {
+        const btcNetwork = {
+            symbol: 'BTC',
+            fee: '1',
+            feeCurrency: 'BTC',
+            subunit: subunitOk,
+        };
+
+        const wrapper = mountWithdrawModal({
+            subunit: subunitOk,
+            currency: 'BTC',
+            availableBalances: {
+                BTC: maxAmountOk,
+            },
+            isToken: false,
+            cryptoNetworks: {
+                BTC: {
+                    symbol: 'BTC',
+                    fee: '1',
+                    feeCurrency: 'BTC',
+                    subunit: subunitOk,
+                },
+            },
         });
-        wrapper.vm.address = addressOk;
-        wrapper.vm.amount = amountOk;
-        wrapper.vm.code = code;
-        wrapper.setProps({subunit: subunitOk});
-        wrapper.setProps({maxAmount: maxAmountOk});
-        wrapper.vm.$v.$touch();
-        wrapper.vm.onWithdraw();
-        expect(wrapper.emitted('withdraw').length).toBe(1);
 
         moxios.stubRequest('withdraw_url', {
             status: 200,
         });
+
+        await wrapper.setData({
+            selectedNetwork: btcNetwork,
+            address: addressBTCOk,
+            amount: amountOk,
+            code: code, // withdraw emitted here
+            withdrawing: false,
+        });
+
+        wrapper.vm.$v.$touch();
+
+        wrapper.vm.onWithdraw(); // and here
+
+        expect(wrapper.emitted('withdraw').length).toBe(2);
+
 
         moxios.wait(() => {
             expect(wrapper.vm.withdrawing).toBe(false);
@@ -330,14 +450,169 @@ describe('WithdrawModal', () => {
         });
     });
 
-    it('provide address without "0x" for web currencies', () => {
-        propsForTestCorrectlyRenders.currency = 'WEB';
-        const wrapper = shallowMount(WithdrawModal, {
-            propsData: propsForTestCorrectlyRenders,
-            localVue: mockVue(),
+    describe('isInsufficientAmount', () => {
+        it('should return false if has decimal validation error', async () => {
+            const webNetwork = {
+                symbol: 'WEB',
+                fee: '123.1234',
+                feeCurrency: 'WEB',
+                subunit: 2,
+            };
+
+            const wrapper = mountWithdrawModal({
+                subunit: 2,
+                availableBalances: {
+                    WEB: '100',
+                },
+                tokenNetworks: {
+                    WEB: webNetwork,
+                },
+            });
+            await wrapper.setData({
+                selectedNetwork: webNetwork,
+                amount: 'abcd',
+            });
+
+            wrapper.vm.$v.$touch();
+
+            expect(wrapper.vm.isInsufficientAmount).toBe(false);
         });
-        wrapper.vm.address = addressNotOk;
-        wrapper.vm.$v.$touch();
-        expect(wrapper.vm.$v.address.$error).toBe(true);
+
+        it('should return false if does not have max validation error', async () => {
+            const webNetwork = {
+                symbol: 'WEB',
+                fee: '123.1234',
+                feeCurrency: 'WEB',
+                subunit: 2,
+            };
+
+            const wrapper = mountWithdrawModal({
+                currency: 'WEB',
+                subunit: 2,
+                availableBalances: {
+                    WEB: '1000',
+                },
+                tokenNetworks: {
+                    WEB: webNetwork,
+                },
+            });
+
+            await wrapper.setData({
+                selectedNetwork: webNetwork,
+                amount: 200,
+            });
+
+            wrapper.vm.$v.$touch();
+
+            expect(wrapper.vm.isInsufficientAmount).toBe(false);
+        });
+
+        it('should return true if has max validation error', async () => {
+            const webNetwork = {
+                symbol: 'WEB',
+                fee: '123.1234',
+                feeCurrency: 'WEB',
+                subunit: 2,
+            };
+
+            const wrapper = mountWithdrawModal({
+                currency: 'WEB',
+                subunit: 2,
+                availableBalances: {
+                    WEB: '100',
+                },
+                tokenNetworks: {
+                    WEB: webNetwork,
+                },
+            });
+            await wrapper.setData({
+                selectedNetwork: webNetwork,
+                amount: 100,
+            });
+
+            wrapper.vm.$v.$touch();
+            expect(wrapper.vm.isInsufficientAmount).toBe(true);
+        });
+    });
+
+    describe('isInsufficientFee', () => {
+        it('should return false if currency and feeCurrency are the same', async () => {
+            const webNetwork = {
+                symbol: 'WEB',
+                fee: '100',
+                feeCurrency: 'Token',
+                subunit: 0,
+            };
+
+            const wrapper = mountWithdrawModal({
+                subunit: 2,
+                isToken: true,
+                availableBalances: {
+                    WEB: '100',
+                    Token: '100',
+                },
+                tokenNetworks: {
+                    WEB: webNetwork,
+                },
+            });
+
+            await wrapper.setData({
+                selectedNetwork: webNetwork,
+            });
+
+            expect(wrapper.vm.isInsufficientFee).toBe(false);
+        });
+
+        it('should return false if selected network available is more than network fee', async () => {
+            const webNetwork = {
+                symbol: 'WEB',
+                fee: '100',
+                feeCurrency: 'WEB',
+                subunit: 0,
+            };
+
+            const wrapper = mountWithdrawModal({
+                subunit: 2,
+                isToken: true,
+                availableBalances: {
+                    WEB: '100',
+                },
+                tokenNetworks: {
+                    WEB: webNetwork,
+                },
+            });
+
+            await wrapper.setData({
+                selectedNetwork: webNetwork,
+            });
+
+            expect(wrapper.vm.isInsufficientFee).toBe(false);
+        });
+
+        it('should return true if selected network available is less than network fee', async () => {
+            const webNetwork = {
+                symbol: 'WEB',
+                fee: '100',
+                feeCurrency: 'WEB',
+                subunit: 0,
+            };
+
+            const wrapper = mountWithdrawModal({
+                subunit: 2,
+                isToken: true,
+                availableBalances: {
+                    WEB: '10',
+                },
+                tokenNetworks: {
+                    WEB: webNetwork,
+                },
+            });
+
+            await wrapper.setData({
+                selectedNetwork: webNetwork,
+            });
+
+            expect(wrapper.vm.isInsufficientFee).toBe(true);
+        });
     });
 });

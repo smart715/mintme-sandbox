@@ -6,14 +6,8 @@
 #}
 {% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
 
-{% if '/v1' in app.request.uri %}
-    {% set version = 'v1' %}
-{% else %}
-    {% set version = 'v2' %}
-{% endif %}
-
 {% block title %}
-    {% trans %}api.page.title{% endtrans %} | mintMe
+    {{ 'api.page.title'|trans|striptags }} | mintMe
 {% endblock %}
 
 {% block stylesheets %}
@@ -63,7 +57,7 @@
         replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
         raw
     %}
-    <script src="{{ asset('bundles/nelmioapidoc/init-swagger-ui.js') }}"></script>
+    <script src="{{ asset('build/init-swagger-ui.js') }}"></script>
     {% endapply %}
 {% endblock swagger_initialization %}
 
@@ -99,6 +93,16 @@
 {% endblock svg_icons %}
 
 {% block swagger_ui %}
+    {% set apiVersion = 'v2' %}
+    {% set break = false %}
+
+    {% for key, value in swagger_data.spec.paths if not break %}
+        {% if '/v1' in key %}
+            {% set apiVersion = 'v1' %}
+            {% set break = true %}
+        {% endif %}
+    {% endfor %}
+
     {% apply
         replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
         raw
@@ -112,18 +116,22 @@
                         <div class="card card-fixed-large mx-auto">
                             <div class="card-header py-3 px-4">
                                 <div class="row justify-content-md-center align-items-center">
-                                    <div class="col"><h2 class="m-0">{% trans %}api.page.title{% endtrans %}</h2></div>
-                                    <div id="api-version" class="col-auto mr-auto">
+                                    <div class="col text-white">
+                                        <h2 class="m-0 page-header font-weight-semibold">
+                                            {% trans %}api.page.title{% endtrans %}
+                                        </h2>
+                                    </div>
+                                    <div id="api-version" class="col-auto mr-0">
                                         <api-version
-                                            url-version={{ version }}
+                                            url-version={{ apiVersion }}
                                         >
                                         </api-version>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body py-2 px-0">
-                                <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
-                                    {% if version != 'v1' %}
+                            <div class="card-body py-2 px-1 px-sm-4 px-4">
+                                <div class="mx-0 mt-4 mb-0 pb-0">
+                                    {% if apiVersion != 'v1' %}
                                     <p>
                                         {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a> {% trans %}api.page.v2.body.2{% endtrans %}
                                     </p>
@@ -141,6 +149,8 @@
                                         {% trans %}api.page.body.4{% endtrans %}
                                         <span class="text-danger">X-API-KEY</span>
                                         {% trans %}api.page.body.5{% endtrans %}
+                                        <span class="text-danger">X-API-ID</span>
+                                        {% trans %}api.page.body.5.1{% endtrans %}
                                         <span class="text-danger">Authorization: Bearer {token}</span>
                                         {% trans %}api.page.body.6{% endtrans %}
                                     </p>
@@ -152,12 +162,18 @@
                                     <p>
                                         {% trans %}api.page.body.9{% endtrans %}
                                     </p>
-                                    <p>
+                                    <p id="api-generator">
                                         {% if app.user is not null %}
                                             {% trans %}api.page.body.10{% endtrans %}
                                             <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a>
                                             {% trans with {'%path%': path('settings')} %}api.page.body.11{% endtrans %}
                                         {% else %}
+                                            <button
+                                                class="btn btn-link seo-link"
+                                                @click.prevent="goToPage( {{ path('fos_user_security_login') | json_encode}} )"
+                                            >
+                                                {% trans %} log_in {% endtrans %}
+                                            </button>
                                             {% trans with {'%path%': path('login')} %}api.page.body.12{% endtrans %}
                                         {% endif %}
                                     </p>

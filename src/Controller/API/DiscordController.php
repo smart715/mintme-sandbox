@@ -2,18 +2,24 @@
 
 namespace App\Controller\API;
 
+use App\Activity\ActivityTypes;
 use App\Communications\DiscordOAuthClientInterface;
+use App\Controller\TokenSettingsController;
+use App\Controller\Traits\ViewOnlyTrait;
 use App\Discord\SlashCommandsHandlerInterface;
 use App\Entity\DiscordRole;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\Activity\TokenEventActivity;
 use App\Exception\ApiBadRequestException;
+use App\Exception\ApiForbiddenException;
 use App\Exception\ApiNotFoundException;
 use App\Form\DiscordRoleType;
 use App\Manager\DiscordConfigManager;
 use App\Manager\DiscordManagerInterface;
 use App\Manager\DiscordRoleManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Services\TranslatorService\TranslatorInterface;
 use Discord\InteractionResponseType;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,14 +27,16 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use GuzzleHttp\Command\Exception\CommandClientException;
 use Psr\Log\LoggerInterface;
 use RestCord\DiscordClient;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/discord")
@@ -44,6 +52,10 @@ class DiscordController extends AbstractFOSRestController
     private DiscordOAuthClientInterface $discordOAuthClient;
     private LoggerInterface $logger;
     private SlashCommandsHandlerInterface $slashCommandsHandler;
+    private EventDispatcherInterface $eventDispatcher;
+    protected SessionInterface $session;
+
+    use ViewOnlyTrait;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -54,7 +66,9 @@ class DiscordController extends AbstractFOSRestController
         TranslatorInterface $translator,
         DiscordOAuthClientInterface $discordOAuthClient,
         LoggerInterface $logger,
-        SlashCommandsHandlerInterface $slashCommandsHandler
+        SlashCommandsHandlerInterface $slashCommandsHandler,
+        EventDispatcherInterface $eventDispatcher,
+        SessionInterface $session
     ) {
         $this->tokenManager = $tokenManager;
         $this->discordManager = $discordManager;
@@ -65,6 +79,8 @@ class DiscordController extends AbstractFOSRestController
         $this->discordOAuthClient = $discordOAuthClient;
         $this->logger = $logger;
         $this->slashCommandsHandler = $slashCommandsHandler;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->session = $session;
     }
 
     /**
@@ -93,11 +109,14 @@ class DiscordController extends AbstractFOSRestController
      * @Rest\RequestParam(name="newRoles", allowBlank=true, nullable=true)
      * @Rest\RequestParam(name="currentRoles", allowBlank=true, nullable=true)
      * @Rest\RequestParam(name="removedRoles", allowBlank=true, nullable=true)
-     * @Rest\RequestParam(name="specialRolesEnabled", nullable=false)
      * @throws ApiBadRequestException
      */
     public function manageRoles(string $tokenName, ParamFetcherInterface $request): View
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         $token = $this->tokenManager->findByName($tokenName);
 
         if (!$token) {
@@ -123,14 +142,19 @@ class DiscordController extends AbstractFOSRestController
         $newRolesData = $request->get('newRoles');
         $this->addRoles($token, $newRolesData, $rolesFromDiscord);
 
-        $rolesCount = $token->getDiscordRoles()->count();
-        $specialRolesEnabled = $rolesCount && $request->get('specialRolesEnabled');
-        $token->getDiscordConfig()->setSpecialRolesEnabled($specialRolesEnabled);
+        if (count($newRolesData)) {
+            $this->eventDispatcher->dispatch(
+                new TokenEventActivity($token, ActivityTypes::DISCORD_REWARDS_ADDED),
+                TokenEventActivity::NAME
+            );
+        }
 
         $this->entityManager->persist($token);
 
         try {
             $this->entityManager->flush();
+
+            $this->discordManager->updateRolesOfUsers($token);
         } catch (\Throwable $e) {
             return $this->view(
                 ['message' => $this->translator->trans('api.something_went_wrong')],
@@ -204,6 +228,7 @@ class DiscordController extends AbstractFOSRestController
             }
 
             $token->removeDiscordRole($role);
+            $this->discordManager->removeAllGuildMembersRole($token, $role);
             $this->entityManager->remove($role);
         }
     }
@@ -214,6 +239,10 @@ class DiscordController extends AbstractFOSRestController
      */
     public function userCallback(ParamFetcherInterface $request): RedirectResponse
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         /** @var User|null $user */
         $user = $this->getUser();
 
@@ -224,10 +253,17 @@ class DiscordController extends AbstractFOSRestController
         $code = $request->get('code');
 
         if (!$code) {
-            return $this->redirectToRoute('settings');
+            return $this->redirectToRoute(
+                'settings',
+                ['_locale' => $this->session->get('locale_lang')]
+            );
         }
 
-        $redirectUrl = $this->generateUrl('discord_callback_user', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $redirectUrl = $this->generateUrl(
+            'discord_callback_user',
+            ['_locale' => 'en'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         $accessToken = $this->discordOAuthClient->getAccessToken($code, $redirectUrl);
 
@@ -247,7 +283,10 @@ class DiscordController extends AbstractFOSRestController
             }
         }
 
-        return $this->redirectToRoute('settings');
+        return $this->redirectToRoute(
+            'settings',
+            ['_locale' => $this->session->get('locale_lang')]
+        );
     }
 
     /**
@@ -258,6 +297,10 @@ class DiscordController extends AbstractFOSRestController
      */
     public function botCallback(ParamFetcherInterface $request): RedirectResponse
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         $guildId = (int)$request->get('guild_id');
         $permissions = (int)$request->get('permissions');
         $tokenId = (int)$request->get('state');
@@ -270,20 +313,31 @@ class DiscordController extends AbstractFOSRestController
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        if ($guildId && DiscordOAuthClientInterface::BOT_PERMISSIONS_ADMINISTRATOR === $permissions) {
+        if ($this->discordConfigManager->findByGuildId($guildId)) {
+            $this->addFlash('danger', $this->translator->trans('discord.error.guild_already_used'));
+        } elseif ($guildId && DiscordOAuthClientInterface::BOT_PERMISSIONS_ADMINISTRATOR === $permissions) {
             $config = $token->getDiscordConfig();
 
             if ($config->hasGuild() && $guildId !== $config->getGuildId()) {
                 $this->discordRoleManager->removeAllRoles($token);
             }
 
-            $config->setGuildId($guildId)->setEnabled(true);
+            $config->setGuildId($guildId)
+                   ->setEnabled(true)
+                   ->setSpecialRolesEnabled(true);
 
             $this->entityManager->persist($config);
             $this->entityManager->flush();
         }
 
-        return $this->redirectToRoute('token_show', ['name' => $token->getName()]);
+        $this->session->set(TokenSettingsController::SHOW_DISCORD_TAB_SESSION_NAME, true);
+
+        return $this->redirectToRoute('token_settings', [
+            'tokenName' => $token->getName(),
+            'tab' => 'promotion',
+            'sub' => 'discord_rewards',
+            '_locale' => $this->session->get('locale_lang'),
+        ]);
     }
 
     /**
@@ -292,6 +346,10 @@ class DiscordController extends AbstractFOSRestController
      */
     public function interaction(Request $request): View
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         $body = $request->getContent();
 
         $headers = $request->headers;
@@ -326,6 +384,10 @@ class DiscordController extends AbstractFOSRestController
      */
     public function removeGuild(string $tokenName): View
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         $token = $this->tokenManager->findByName($tokenName);
 
         if (!$token) {
@@ -334,7 +396,14 @@ class DiscordController extends AbstractFOSRestController
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        $this->discordManager->leaveGuild($token);
+        try {
+            $this->discordManager->leaveGuild($token);
+        } catch (CommandClientException $ex) {
+            // If guild does not exists or bot was kicked
+            if (Response::HTTP_NOT_FOUND !== $ex->getResponse()->getStatusCode()) {
+                throw $ex;
+            }
+        }
 
         $config = $token->getDiscordConfig()->setGuildId(null);
 
@@ -351,6 +420,10 @@ class DiscordController extends AbstractFOSRestController
      */
     public function updateRolesFromDiscord(string $tokenName): View
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         $token = $this->tokenManager->findByName($tokenName);
 
         if (!$token) {

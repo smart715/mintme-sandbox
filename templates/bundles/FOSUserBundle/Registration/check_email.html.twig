@@ -3,18 +3,32 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% block messageClass %}d-none{% endblock %}
 
+{% block pagestyles %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('security_pages') }}
+{% endblock %}
+
 {% block fos_user_content %}
     <div class="container">
         <div class="row pt-4 justify-content-center notification">
             <div class="col-12">
-                <div class="card card-fixed-small mx-auto">
-                    <div class="card-header">
-                        {% trans %}register.email_sent.header{% endtrans %}
+                <div class="card py-3 py-md-5 card-fixed-lg mx-auto">
+                    <div class="d-flex justify-content-center">
+                        <img src="{{ asset('build/images/paper-plane.svg') }}" class="my-4 paper-plane-img" />
                     </div>
-                    <div class="card-body py-2 text-center">
-                        <p>{% trans %}register.email_sent.body{% endtrans %}</p>
-                        <h1 class="title">{{ user.username }}</h1>
-                        <p class="pb-0 mb-0">{% trans %}register.email_sent.help{% endtrans %}</p>
+                    <div class="h1 font-weight-semibold text-center">
+                        {% trans %} register.email_sent.header {% endtrans %}
+                    </div>
+                    <div class="card-body card-body-limited py-2 text-center w-100 m-auto">
+                        <span class="font-size-1 line-height-md">
+                            {% trans %}register.email_sent.body{% endtrans %}
+                        </span>
+                        <span class="font-size-1 line-height-md text-primary font-weight-semibold">
+                            {{ user.username }}.
+                        </span>
+                        <span class="font-size-1 line-height-md">
+                            {% trans %}register.email_sent.help{% endtrans %}
+                        </span>
                     </div>
                 </div>
             </div>

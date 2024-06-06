@@ -10,6 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @codeCoverageIgnore
  * @ORM\Entity
+ * @ORM\Table(
+ *     name="airdrop_action",
+ *     indexes={
+ *         @ORM\Index(name="FK_AirdropActions_Airdrops", columns={"airdrop_id"})
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks()
  */
 class AirdropAction
@@ -23,6 +29,7 @@ class AirdropAction
         'linkedinMessage' => 5,
         'youtubeSubscribe' => 6,
         'postLink' => 7,
+        'visitExternalUrl'=> 8,
     ];
 
     /**
@@ -39,11 +46,12 @@ class AirdropAction
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\AirdropCampaign\Airdrop", inversedBy="actions")
+     * @ORM\JoinColumn(name="airdrop_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected Airdrop $airdrop;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="airdropActions")
      * @ORM\JoinTable(name="airdrop_action_user",
      *      joinColumns={@ORM\JoinColumn(name="airdrop_action_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")}

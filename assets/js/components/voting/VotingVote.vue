@@ -1,47 +1,56 @@
 <template>
-    <div class="card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between">
-                <slot name="title">{{ $t('voting.vote') }}</slot>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="d-flex flex-column">
-                <div
+    <div class="card container-items-vote mb-4">
+        <div class="m-3">
+            <ul class="list-group text-justify">
+                <li
                     v-for="(option, key) in voting.options"
                     :key="key"
-                    class="d-flex align-items-center m-2 p-2 bg-primary c-pointer"
-                    :class="{border: selected === key}"
+                    class="mb-3 c-pointer list-group-item item-vote"
+                    :class="{'active' : selected === key}"
                     @click="select(key)"
                 >
-                    <div class="flex-1 text-center">
-                        <elastic-text :value="option.title"/>
-                    </div>
-                </div>
-                <button :disabled="btnDisabled" class="btn btn-primary m-2" @click="vote">
-                    {{ $t('voting.vote') }}
-                </button>
-            </div>
+                    <span :class="{'text-item-select' : selected === key}">
+                        {{option.title}}
+                    </span>
+                </li>
+            </ul>
+            <button
+                :disabled="btnDisabled"
+                class="btn btn-primary btn-lg btn-block"
+                @click="vote"
+            >
+                {{ $t('voting.vote') }}
+            </button>
         </div>
     </div>
 </template>
 
 <script>
-import {NotificationMixin, LoggerMixin, RebrandingFilterMixin} from '../../mixins';
-import ElasticText from '../ElasticText';
-import {mapGetters, mapActions} from 'vuex';
+import {NotificationMixin, RebrandingFilterMixin} from '../../mixins';
+import {
+    mapGetters,
+    mapActions,
+} from 'vuex';
 
 export default {
     name: 'VotingVote',
-    mixins: [NotificationMixin, LoggerMixin, RebrandingFilterMixin],
+    mixins: [
+        NotificationMixin,
+        RebrandingFilterMixin,
+    ],
     data() {
         return {
             selected: -1,
             requesting: false,
         };
     },
-    components: {
-        ElasticText,
+    props: {
+        minAmount: {
+            type: Number,
+            default: 0,
+        },
+        loggedIn: Boolean,
+        isOwner: Boolean,
     },
     computed: {
         ...mapGetters('voting', {
@@ -49,10 +58,10 @@ export default {
             voting: 'getCurrentVoting',
         }),
         ...mapGetters('tradeBalance', {
-            quoteBalance: 'getQuoteBalance',
+            quoteFullBalance: 'getQuoteFullBalance',
         }),
         btnDisabled() {
-            return this.selected < 0 || this.requesting || 0 === this.quoteBalance;
+            return 0 > this.selected || this.requesting || 0 === this.quoteFullBalance;
         },
     },
     methods: {
@@ -63,29 +72,40 @@ export default {
             this.selected = i;
         },
         vote() {
-            if (this.quoteBalance > 0) {
-                this.storeVote();
+            if (!this.loggedIn) {
+                this.notifyInfo(this.$t('voting.vote.not_logged_in'));
+
                 return;
             }
 
-            this.notifyInfo(
-                this.$t('voting.vote.zero_balance', {
-                    amount: 0,
-                    currency: this.rebrandingFunc(this.tokenName),
-                })
-            );
+            if (!this.isOwner && this.quoteFullBalance < this.minAmount) {
+                this.notifyInfo(
+                    this.$t('voting.vote.zero_balance', {
+                        amount: this.minAmount,
+                        currency: this.rebrandingFunc(this.tokenName),
+                    })
+                );
+
+                return;
+            }
+
+            this.storeVote();
         },
-        storeVote() {
+        async storeVote() {
             this.requesting = true;
-            this.$axios.single.post(
-                this.$routing.generate('user_vote', {optionId: this.voting.options[this.selected].id})
-            )
-                .then(({data}) => this.updateVoting(data.voting))
-                .catch((err) => {
-                    this.notifyError(this.$t(err.response.data.message || 'toasted.error.try_later'));
-                    this.sendLogs('error', err);
-                })
-                .then(() => this.requesting = false);
+            try {
+                const {data} = await this.$axios.single.post(this.$routing.generate(
+                    'user_vote',
+                    {optionId: this.voting.options[this.selected].id},
+                ));
+
+                this.updateVoting(data.voting);
+            } catch (err) {
+                this.notifyError(this.$t(err.response.data.message || 'toasted.error.try_later'));
+                this.$logger.error(err);
+            } finally {
+                this.requesting = false;
+            }
         },
     },
 };

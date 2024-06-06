@@ -17,7 +17,7 @@ class BTCAddressValidator implements ValidatorInterface
 
     public function validate(): bool
     {
-        return strlen($this->address) >= 26 && strlen($this->address) <= 35;
+        return strlen($this->address) >= 26 && strlen($this->address) <= 62;
     }
 
     public function getMessage(): string

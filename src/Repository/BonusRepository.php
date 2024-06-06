@@ -2,18 +2,25 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use App\Entity\Bonus;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
-class BonusRepository extends EntityRepository
+ /** @codeCoverageIgnore */
+class BonusRepository extends ServiceEntityRepository
 {
-    /** @codeCoverageIgnore */
-    public function getPaidSum(string $type): int
+    public function __construct(ManagerRegistry $registry)
     {
-        return (int)$this->createQueryBuilder('bonus')
-            ->select('SUM(bonus.quantityWeb)')
+        parent::__construct($registry, Bonus::class);
+    }
+
+    public function getPaidSum(string $type): ?string
+    {
+        return $this->createQueryBuilder('bonus')
+            ->select('COALESCE(SUM(bonus.quantity), 0) as totalBonus')
             ->where('bonus.type = :type')
             ->setParameter('type', $type)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getResult()[0]['totalBonus'];
     }
 }

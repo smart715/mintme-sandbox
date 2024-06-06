@@ -13,70 +13,60 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 class MarketInfo
 {
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $last;
+    private Money $last;
 
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $volume;
+    private Money $volume;
 
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $open;
+    private Money $open;
 
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $close;
+    private Money $close;
 
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $high;
+    private Money $high;
 
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $low;
+    private Money $low;
 
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $deal;
+    private Money $deal;
 
     /**
      * @SWG\Property(property="quote")
-     * @var string
      */
-    private $tokenName;
+    private string $tokenName;
 
-    /** @var Money */
-    private $monthDeal;
+    private Money $monthDeal;
 
     /**
      * @SWG\Property(property="base")
-     * @var string
      */
-    private $cryptoSymbol;
+    private string $cryptoSymbol;
 
     /**
-     * @var Money
      * @SWG\Property(type="number")
      */
-    private $buyDepth;
+    private Money $buyDepth;
 
-    /** @var Money */
-    private $soldOnMarket;
+    private Money $soldOnMarket;
+
+    private Money $volumeDonation;
 
     /** @var \DateTimeImmutable|null */
     private $expires;
@@ -94,6 +84,7 @@ class MarketInfo
         Money $monthDeal,
         Money $buyDepth,
         Money $soldOnMarket,
+        Money $volumeDonation,
         ?\DateTimeImmutable $expires
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
@@ -108,6 +99,7 @@ class MarketInfo
         $this->monthDeal = $monthDeal;
         $this->buyDepth = $buyDepth;
         $this->soldOnMarket = $soldOnMarket;
+        $this->volumeDonation = $volumeDonation;
         $this->expires = $expires;
     }
 
@@ -199,6 +191,11 @@ class MarketInfo
     public function getSoldOnMarket(): Money
     {
         return $this->soldOnMarket;
+    }
+
+    public function getVolumeDonation(): Money
+    {
+        return $this->volumeDonation;
     }
 
     public function getExpires(): ?\DateTimeImmutable

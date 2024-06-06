@@ -1,0 +1,6 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+{% trans %} hello {% endtrans %} {{ nickname}}
+{% trans with {'%hours%': maxHours} %} login.user_blocked {% endtrans %}
+
+{% endblock %}

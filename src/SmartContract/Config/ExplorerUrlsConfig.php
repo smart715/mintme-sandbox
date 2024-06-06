@@ -2,34 +2,25 @@
 
 namespace App\SmartContract\Config;
 
-use App\Utils\Symbols;
-
 /** @codeCoverageIgnore */
 class ExplorerUrlsConfig implements ExplorerUrlsConfigInterface
 {
-    private string $mintmeExplorerUrl;
-    private string $ethExplorerUrl;
-    private string $bnbExplorerUrl;
+    private array $explorerUrls;
 
-    public function __construct(string $mintmeExplorerUrl, string $ethExplorerUrl, string $bnbExplorerUrl)
+    public function __construct(array $explorerUrls)
     {
-        $this->mintmeExplorerUrl = $mintmeExplorerUrl;
-        $this->ethExplorerUrl = $ethExplorerUrl;
-        $this->bnbExplorerUrl = $bnbExplorerUrl;
+        $this->explorerUrls = $explorerUrls;
     }
 
     public function getExplorerUrl(string $symbol, string $hash): string
     {
-        return $this->getExplorerUrlsMap($hash)[$symbol] ?? '';
-    }
+        $explorerUrl = $this->explorerUrls[$symbol];
 
-    private function getExplorerUrlsMap(string $hash): array
-    {
-        return [
-            Symbols::WEB => $this->getTxUrl($this->mintmeExplorerUrl, $hash),
-            Symbols::ETH => $this->getTxUrl($this->ethExplorerUrl, $hash),
-            Symbols::BNB => $this->getTxUrl($this->bnbExplorerUrl, $hash),
-        ];
+        if (!$explorerUrl) {
+            return '';
+        }
+
+        return $this->getTxUrl($explorerUrl, $hash);
     }
 
     private function getTxUrl(string $url, string $hash): string

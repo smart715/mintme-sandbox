@@ -10,17 +10,20 @@ use Twig\TwigFilter;
 
 class SafeHtmlExtension extends AbstractExtension
 {
-
+    public array $internalLinks;
+    
     use CheckContentLinksTrait;
 
     /** @var HTMLPurifier */
     private $purifier;
 
-    public function __construct()
+    public function __construct(string $cachePath, array $internalLinks)
     {
-        $this->purifier = new HTMLPurifier(
-            HTMLPurifier_Config::createDefault()
-        );
+        $config = HTMLPurifier_Config::createDefault();
+        $config->set('Cache.SerializerPath', $cachePath);
+
+        $this->purifier = new HTMLPurifier($config);
+        $this->internalLinks = $internalLinks;
     }
 
     public function getFilters(): array
@@ -35,7 +38,7 @@ class SafeHtmlExtension extends AbstractExtension
         $purifiedValue = $this->purifier->purify($value);
 
         if ($purifiedValue && preg_match('/<a (.*)>(.*)<\/a>/i', $purifiedValue)) {
-            $result = $this->addNoopenerToLinks($purifiedValue);
+            $result = $this->addNoopenerNofollowToLinks($purifiedValue, $this->internalLinks);
 
             if ($result['contentChanged']) {
                 return $result['content'];

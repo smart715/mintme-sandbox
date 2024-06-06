@@ -4,7 +4,8 @@ namespace App\Wallet;
 
 use App\Entity\Crypto;
 use App\Entity\PendingWithdrawInterface;
-use App\Entity\TradebleInterface;
+use App\Entity\Token\Token;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
@@ -12,6 +13,7 @@ use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
+use App\Wallet\Model\WithdrawInfo;
 
 interface WalletInterface
 {
@@ -27,7 +29,7 @@ interface WalletInterface
      * @param User $user
      * @param Address $address
      * @param Amount $amount
-     * @param TradebleInterface $tradable
+     * @param TradableInterface $tradable
      * @return PendingWithdrawInterface
      * @throws \Throwable
      * @throws NotEnoughAmountException
@@ -37,7 +39,8 @@ interface WalletInterface
         User $user,
         Address $address,
         Amount $amount,
-        TradebleInterface $tradable
+        TradableInterface $tradable,
+        Crypto $cryptoNetwork
     ): PendingWithdrawInterface;
 
     public function withdrawCommit(PendingWithdrawInterface $pendingWithdraw): void;
@@ -57,5 +60,11 @@ interface WalletInterface
 
     public function getDepositCredential(User $user, Crypto $crypto): Address;
 
-    public function getDepositInfo(TradebleInterface $tradable): DepositInfo;
+    public function getDepositInfo(
+        TradableInterface $tradable,
+        Crypto $cryptoNetwork,
+        ?User $user = null
+    ): ?DepositInfo;
+
+    public function getWithdrawInfo(Crypto $cryptoNetwork, TradableInterface $tradable): ?WithdrawInfo;
 }

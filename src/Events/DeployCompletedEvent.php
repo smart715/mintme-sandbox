@@ -2,12 +2,25 @@
 
 namespace App\Events;
 
+use App\Activity\ActivityTypes;
 use App\Entity\Token\Token;
+use App\Entity\Token\TokenDeploy;
+use App\Events\Activity\TokenEventActivity;
 
-class DeployCompletedEvent extends TokenEvent implements TokenEventInterface
+/** @codeCoverageIgnore */
+class DeployCompletedEvent extends TokenEventActivity
 {
-    public function __construct(Token $token)
+    protected TokenDeploy $tokenDeploy;
+
+    public function __construct(Token $token, TokenDeploy $tokenDeploy)
     {
-        parent::__construct($token);
+        parent::__construct($token, ActivityTypes::TOKEN_DEPLOYED);
+
+        $this->tokenDeploy = $tokenDeploy;
+    }
+
+    public function getTokenDeploy(): TokenDeploy
+    {
+        return $this->tokenDeploy;
     }
 }

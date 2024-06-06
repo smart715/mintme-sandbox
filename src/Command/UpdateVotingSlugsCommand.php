@@ -63,7 +63,7 @@ class UpdateVotingSlugsCommand extends Command
         }
 
         $count = count($votings);
-        $io->success("We updated {$count} votings susscessfully.");
+        $io->success("We updated {$count} votings successfully.");
 
         return 0;
     }

@@ -2,29 +2,27 @@
 
 namespace App\Exchange\Donation;
 
+use App\Entity\Crypto;
 use App\Entity\Donation;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exchange\Donation\Model\CheckDonationResult;
 use App\Exchange\Market;
+use App\Exchange\Trade\CheckTradeResult;
 use Money\Money;
 
 interface DonationHandlerInterface
 {
     public function checkDonation(
         Market $market,
-        string $currency,
         string $amount,
         User $donorUser
-    ): CheckDonationResult;
+    ): CheckTradeResult;
 
     public function makeDonation(
         Market $market,
-        string $currency,
-        string $amount,
+        string $donationAmountInCrypto,
         string $expectedAmountUser,
-        User $donorUser,
-        string $sellOrdersSummary
+        User $donorUser
     ): Donation;
 
     public function saveDonation(
@@ -35,7 +33,9 @@ interface DonationHandlerInterface
         Money $feeAmount,
         Money $tokenAmount,
         Token $token,
-        Money $mintmeAmount,
-        Money $mintmeFeeAmount
+        Money $receiverAmount,
+        Money $receiverFeeAmount,
+        string $receiverCurrency,
+        string $type
     ): Donation;
 }

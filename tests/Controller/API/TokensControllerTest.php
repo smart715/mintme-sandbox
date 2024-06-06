@@ -167,7 +167,7 @@ class TokensControllerTest extends WebTestCase
         /** @var Token $token */
         $token = $this->getToken($tokName);
         $token->setWithdrawn('10000000000000');
-        $token->setAddress('0x00');
+        $token->getMainDeploy()->setAddress('0x00');
         $this->em->persist($token);
         $this->em->flush();
 
@@ -377,7 +377,7 @@ class TokensControllerTest extends WebTestCase
 
         /** @var Token $token */
         $token = $this->getToken($tokName);
-        $token->setAddress('0x');
+        $token->getMainDeploy()->setAddress('0x');
         $this->em->persist($token);
         $this->em->flush();
 
@@ -462,7 +462,7 @@ class TokensControllerTest extends WebTestCase
 
         /** @var Token $token */
         $token = $this->getToken($tokName);
-        $token->setAddress('0x00');
+        $token->getMainDeploy()->setAddress('0x00');
         $this->em->persist($token);
         $this->em->flush();
 

@@ -9,14 +9,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /** @codeCoverageIgnore */
 class TraderBalanceView
 {
-    /** @var User */
-    private $user;
+    private User $user;
 
-    /** @var string */
-    private $balance;
+    private string $balance;
 
-    /** @var DateTimeImmutable|null */
-    private $date;
+    private ?DateTimeImmutable $date;
+
+    private int $rank;
 
     public function __construct(User $user, string $balance, ?DateTimeImmutable $date)
     {
@@ -31,8 +30,7 @@ class TraderBalanceView
     }
 
     /**
-     * @Groups({"API"})
-     * @return int
+     * @Groups({"API", "API_BASIC"})
      */
     public function getTimestamp(): ?int
     {
@@ -42,8 +40,7 @@ class TraderBalanceView
     }
 
     /**
-     * @Groups({"API"})
-     * @return User
+     * @Groups({"API", "API_BASIC"})
      */
     public function getUser(): User
     {
@@ -51,11 +48,25 @@ class TraderBalanceView
     }
 
     /**
-     * @Groups({"API"})
-     * @return string
+     * @Groups({"API", "API_BASIC"})
      */
     public function getBalance(): string
     {
         return $this->balance;
+    }
+
+    /**
+     * @Groups({"API", "API_BASIC"})
+     */
+    public function getRank(): int
+    {
+        return $this->rank;
+    }
+
+    public function setRank(int $rank): self
+    {
+        $this->rank = $rank;
+
+        return $this;
     }
 }

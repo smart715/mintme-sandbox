@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+/** @codeCoverageIgnore */
 class Clock implements ClockInterface
 {
     public function sleep(int $s): void

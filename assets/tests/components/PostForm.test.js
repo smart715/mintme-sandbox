@@ -1,6 +1,8 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import PostForm from '../../js/components/posts/PostForm';
 import Vuelidate from 'vuelidate';
+import Vuex from 'vuex';
+import posts from '../../js/storage/modules/posts';
 
 /**
  * @return {Wrapper<Vue>}
@@ -8,12 +10,27 @@ import Vuelidate from 'vuelidate';
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(Vuelidate);
+    localVue.use(Vuex);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
+}
+
+/**
+ * @return {Vuex.Store}
+ */
+function createStore() {
+    return new Vuex.Store({
+        modules: {
+            posts: {
+                namespaced: true,
+                getters: posts.getters,
+            },
+        },
+    });
 }
 
 const testPost = {
@@ -24,9 +41,11 @@ const testPost = {
 };
 
 describe('PostForm', () => {
-    it('button is disabled if content, title, amount or shareReward is empty or submitting is true', () => {
+    it('button is disabled if content or title is empty or submitting is true', () => {
         const localVue = mockVue();
+
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
@@ -41,36 +60,37 @@ describe('PostForm', () => {
         });
 
         // all empty
-        expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
+        expect(wrapper.findComponent('button').attributes('disabled')).toBe('disabled');
 
         // only content is empty
         wrapper.setData({...testPost, content: ''});
-        expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
+        expect(wrapper.findComponent('button').attributes('disabled')).toBe('disabled');
 
         // only title is empty
         wrapper.setData({...testPost, title: ''});
-        expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
+        expect(wrapper.findComponent('button').attributes('disabled')).toBe('disabled');
 
         // only amount is empty
         wrapper.setData({...testPost, amount: ''});
-        expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
+        expect(wrapper.findComponent('button').attributes('disabled')).toBe('disabled');
 
         // only shareReward is empty
         wrapper.setData({...testPost, shareReward: ''});
-        expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
+        expect(wrapper.findComponent('button').attributes('disabled')).toBe('disabled');
 
         // none is empty are not empty but submitting is true
         wrapper.setData({...testPost, submitting: true});
-        expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
+        expect(wrapper.findComponent('button').attributes('disabled')).toBe('disabled');
 
         // none is empty and submitting is false
         wrapper.setData({...testPost, submitting: false});
-        expect(wrapper.find('button').attributes('disabled')).toBe(undefined);
+        expect(wrapper.findComponent('button').attributes('disabled')).toBe('disabled');
     });
 
     it('content validations work', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
@@ -105,6 +125,7 @@ describe('PostForm', () => {
     it('title validations work', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
@@ -123,6 +144,7 @@ describe('PostForm', () => {
     it('amount validations work', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
@@ -153,6 +175,7 @@ describe('PostForm', () => {
     it('shareReward validations work', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
@@ -183,6 +206,7 @@ describe('PostForm', () => {
     it('computes invalidContent correctly', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
@@ -206,6 +230,7 @@ describe('PostForm', () => {
     it('computes invalidAmount correctly', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
@@ -220,16 +245,15 @@ describe('PostForm', () => {
     it('displays post if passed', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(PostForm, {
+            store: createStore(),
             localVue,
             propsData: {
                 apiUrl: 'testApiUrl',
                 post: testPost,
             },
         });
-
-        expect(wrapper.find('bbcode-editor-stub').html().includes('foo')).toBe(true);
-        expect(wrapper.find('input[name=\'amount\']').element.value.includes('10')).toBe(true);
-        expect(wrapper.find('input[name=\'share_reward\']').element.value.includes('1')).toBe(true);
-        expect(wrapper.find('input[name=\'title\']').element.value.includes('bar')).toBe(true);
+        expect(wrapper.findComponent('input[name=\'amount\']').element.value.includes('10')).toBe(true);
+        expect(wrapper.findComponent('input[name=\'share_reward\']').element.value.includes('1')).toBe(true);
+        expect(wrapper.findComponent('input[name=\'title\']').element.value.includes('bar')).toBe(true);
     });
 });

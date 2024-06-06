@@ -18,6 +18,7 @@ function mockVue() {
             Vue.prototype.$t = (val) => val;
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: (val) => val};
+            Vue.prototype.$logger = {error: (val) => {}};
         },
     });
 
@@ -61,85 +62,76 @@ describe('VotingVote', () => {
     });
 
     describe('btnDisabled', () => {
-        it('should be true in case no selection', () => {
+        it('should be true in case no selection', async () => {
             const wrapper = createWrapper({}, {
                 getters: {
                     ...tradeBalance.getters,
-                    getQuoteBalance: () => 1,
+                    getQuoteFullBalance: () => 1,
                 },
             });
             expect(wrapper.vm.btnDisabled).toBe(true);
-            wrapper.vm.selected = 1;
+
+            await wrapper.setData({
+                selected: 1,
+            });
             expect(wrapper.vm.btnDisabled).toBe(false);
         });
 
-        it('should be true in case no requesting', () => {
+        it('should be true in case no requesting', async () => {
             const wrapper = createWrapper({}, {
                 getters: {
                     ...tradeBalance.getters,
-                    getQuoteBalance: () => 1,
+                    getQuoteFullBalance: () => 1,
                 },
             });
-            wrapper.vm.selected = 1;
-            wrapper.vm.requesting = true;
+
+            await wrapper.setData({
+                selected: 1,
+                requesting: true,
+            });
             expect(wrapper.vm.btnDisabled).toBe(true);
-            wrapper.vm.requesting = false;
+
+            await wrapper.setData({
+                requesting: false,
+            });
             expect(wrapper.vm.btnDisabled).toBe(false);
         });
 
-        it('should be true in case quote balance not loaded', () => {
+        it('should be true in case quote balance not loaded', async () => {
             let wrapper = createWrapper({}, {
                 getters: {
                     ...tradeBalance.getters,
-                    getQuoteBalance: () => 0,
+                    getQuoteFullBalance: () => 0,
                 },
             });
-            wrapper.vm.selected = 1;
-            wrapper.vm.requesting = false;
+
+            await wrapper.setData({
+                selected: 1,
+                requesting: false,
+            });
             expect(wrapper.vm.btnDisabled).toBe(true);
+
             wrapper = createWrapper({}, {
                 getters: {
                     ...tradeBalance.getters,
-                    getQuoteBalance: () => 1,
+                    getQuoteFullBalance: () => 1,
                 },
             });
-            wrapper.vm.selected = 1;
-            wrapper.vm.requesting = false;
+
+            await wrapper.setData({
+                selected: 1,
+                requesting: false,
+            });
             expect(wrapper.vm.btnDisabled).toBe(false);
         });
     });
 
-    it('shouldn\'t call storeVote() in case balance not lower than the limit', () => {
+    it('shouldn\'t call storeVote() in case balance not lower than the limit', async () => {
         let storeVoteCalled = false;
         let wrapper = createWrapper();
-        wrapper.vm.storeVote = () => storeVoteCalled = true;
-        wrapper.vm.vote();
-        expect(storeVoteCalled).toBe(false);
-        wrapper = createWrapper(
-            {
-                getters: {
-                    getCurrentVoting: () => {
-                        return {
-                            options: {'-1': {id: 1}},
-                        };
-                    },
-                },
-            },
-            {
-                getters: {
-                    ...tradeBalance.getters,
-                    getQuoteBalance: () => 2,
-                },
-            }
-        );
-        wrapper.vm.storeVote = () => storeVoteCalled = true;
-        wrapper.vm.vote();
-        expect(storeVoteCalled).toBe(true);
-    });
 
-    it('shouldn\'t call storeVote() in case balance not lower than the limit', () => {
-        let storeVoteCalled = false;
-        let wrapper = createWrapper();
+        await wrapper.setProps({minAmount: 1, loggedIn: true});
+
         wrapper.vm.storeVote = () => storeVoteCalled = true;
         wrapper.vm.vote();
         expect(storeVoteCalled).toBe(false);
@@ -157,16 +149,19 @@ describe('VotingVote', () => {
             {
                 getters: {
                     ...tradeBalance.getters,
-                    getQuoteBalance: () => 2,
+                    getQuoteFullBalance: () => 2,
                 },
             }
         );
+
+        await wrapper.setProps({minAmount: 1, loggedIn: true});
+
         wrapper.vm.storeVote = () => storeVoteCalled = true;
         wrapper.vm.vote();
         expect(storeVoteCalled).toBe(true);
     });
 
-    it('should storeVote successfully', (done) => {
+    it('should storeVote successfully', async (done) => {
         let updateVotingCalled = false;
         const wrapper = createWrapper({
             getters: {
@@ -182,7 +177,6 @@ describe('VotingVote', () => {
                 updateVoting: () => updateVotingCalled = true,
             },
         });
-        wrapper.vm.storeVote();
 
         moxios.stubRequest('user_vote', {
             status: 200,
@@ -192,6 +186,8 @@ describe('VotingVote', () => {
                 },
             },
         });
+
+        await wrapper.vm.storeVote();
 
         moxios.wait(() => {
             expect(updateVotingCalled).toBe(true);

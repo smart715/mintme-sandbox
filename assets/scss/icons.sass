@@ -1,14 +1,10 @@
-.icon-loading
-    display: inline-block
-    width: 16px
-    height: 16px
-    vertical-align: text-bottom
-    border: 2px solid currentColor
-    border-right-color: transparent
-    border-radius: 50%
-    animation: spinner 1s linear infinite
-
-.icon-success, .icon-warning, .icon-error, .icon-info, .icon-danger, .icon-primary
+.icon-success,
+.icon-warning,
+.icon-error,
+.icon-info,
+.icon-danger,
+.icon-primary,
+.icon-tooltip
   display: inline-block
   width: 32px
   height: 32px
@@ -28,6 +24,30 @@
 
 .icon-info, .icon-primary
   background-image: url('../img/info-icon.svg')
+
+// Light weight loading icon
+.icon-loading
+  display: inline-block
+  width: 16px
+  height: 16px
+  vertical-align: text-bottom
+  border: 2px solid currentColor
+  border-right-color: transparent
+  border-radius: 50%
+  animation: spinner 1s linear infinite
+
+.icon-tooltip
+  width: 16px
+  height: 16px
+  min-width: 16px
+  min-height: 16px
+  background-image: url('../img/tooltip-icon.png')
+
+  &--small
+    width: 13px
+    height: 13px
+    min-width: 13px
+    min-height: 13px
 
 @keyframes spinner
   to

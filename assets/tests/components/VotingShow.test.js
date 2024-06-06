@@ -57,7 +57,6 @@ describe('VotingShow', () => {
             },
             {
                 getters: {
-                    ...voting.getters,
                     getCurrentVoting: () => {
                         return {
                             id: 0,
@@ -68,7 +67,6 @@ describe('VotingShow', () => {
                     },
                 },
                 mutations: {
-                    ...voting.mutations,
                     setCurrentVoting: () => setCurrentVotingCalled = true,
                 },
             }
@@ -86,7 +84,6 @@ describe('VotingShow', () => {
             },
             {
                 getters: {
-                    ...voting.getters,
                     getCurrentVoting: () => {
                         return {
                             id: 0,
@@ -97,7 +94,6 @@ describe('VotingShow', () => {
                     },
                 },
                 mutations: {
-                    ...voting.mutations,
                     setCurrentVoting: () => setCurrentVotingCalled = true,
                 },
             }

@@ -2,7 +2,7 @@
 
 namespace App\Exception;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 abstract class ApiException extends \Exception implements ApiExceptionInterface
 {
     abstract public function getStatusCode(): int;

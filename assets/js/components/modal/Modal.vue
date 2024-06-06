@@ -1,28 +1,38 @@
 <template>
     <b-modal
+        :id="id"
         :visible="visible"
         :size="size"
-        :body-class="paddingClass"
+        :body-class="bodyClasses"
         @hidden="closeModal"
         hide-footer
         :no-close-on-backdrop="noClose"
         :no-close-on-esc="noClose"
         :modal-class="{'modal-embeded': embeded}"
+        :dialog-class="dialogClass"
         :no-fade="embeded"
     >
-        <div slot="modal-header" class="d-flex flex-nowrap justify-content-between">
-            <span class="text-truncate d-block flex-grow-1 modal-title pl-4">
+        <div slot="modal-header" class="d-flex flex-nowrap align-items-center">
+            <!-- to keep same space on left and right -->
+            <div class="invisible pointer-events-none flex-grow-0">
+                <slot name="close">
+                    <a class="modal-close px-3 c-pointer float-right">
+                        &times;
+                    </a>
+                </slot>
+            </div>
+            <div class="text-truncate d-flex align-items-center justify-content-center flex-fill modal-title">
                 <slot name="header"></slot>
-            </span>
-            <slot name="close">
-                <a class="modal-close px-2 c-pointer float-right" @click="closeModal()">
+            </div>
+            <slot v-if="enableCloseBtn" name="close">
+                <a class="modal-close modal-close-visible px-3 c-pointer" @click="closeModal()">
                     &times;
                 </a>
             </slot>
         </div>
         <div
             class="modal-body"
-            :class="paddingClass"
+            :class="bodyClasses"
         >
             <slot name="body"></slot>
         </div>
@@ -38,6 +48,7 @@ export default {
         BModal,
     },
     props: {
+        id: String,
         visible: Boolean,
         size: String,
         noClose: Boolean,
@@ -46,10 +57,18 @@ export default {
             type: Boolean,
             default: false,
         },
+        dialogClass: [String, Object, Array],
+        enableCloseBtn: {
+            type: Boolean,
+            default: true,
+        },
+        bodyClass: {type: String, default: ''},
     },
     computed: {
-        paddingClass: function() {
-            return this.withoutPadding ? 'm-0 p-0': '';
+        bodyClasses: function() {
+            const padding = this.withoutPadding ? 'm-0 p-0' : '';
+
+            return this.bodyClass ? this.bodyClass + ' ' + padding : padding;
         },
     },
     methods: {

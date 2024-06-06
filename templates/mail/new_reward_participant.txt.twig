@@ -1,0 +1,10 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ nickname }}!
+{% trans %} mail.reward.participant.msg {% endtrans %}
+{{ absolute_url(path('token_show',  {'name': rewardToken, 'tab': 'intro', 'modal': 'reward-summary', 'slug': slug })) }}
+{{ rewardTitle }}
+
+{% endblock %}
+

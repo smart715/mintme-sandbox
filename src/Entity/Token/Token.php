@@ -4,13 +4,17 @@ namespace App\Entity\Token;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
+use App\Entity\DeployNotification;
 use App\Entity\DiscordRole;
 use App\Entity\Image;
 use App\Entity\ImagineInterface;
 use App\Entity\Message\Thread;
 use App\Entity\Post;
 use App\Entity\Profile;
-use App\Entity\TradebleInterface;
+use App\Entity\TokenCrypto;
+use App\Entity\TokenSignupBonusCode;
+use App\Entity\TokenSignupHistory;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Utils\Symbols;
@@ -22,7 +26,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use Money\Currency;
 use Money\Money;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -30,11 +33,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
  * @UniqueEntity("name", message="Token name is already taken")
- * @UniqueEntity("address")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class Token implements TradebleInterface, ImagineInterface
+class Token implements TradableInterface, ImagineInterface
 {
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
@@ -45,6 +47,7 @@ class Token implements TradebleInterface, ImagineInterface
     public const PENDING = 'pending';
     public const TOKEN_SUBUNIT = 4;
     public const PENDING_ADDR = '0x';
+    public const TRADABLE_TYPE = 'token';
 
     /**
      * @ORM\Id()
@@ -62,24 +65,10 @@ class Token implements TradebleInterface, ImagineInterface
      * @AppAssert\DashedUniqueName(message="Token name is already exists.")
      * @AppAssert\IsNotBlacklisted(type="token", message="Forbidden token name, please try another")
      * @AppAssert\DisallowedWord()
-     * @Groups({"API", "API_TOK"})
+     * @Groups({"API", "API_TOK", "API_BASIC"})
      * @var string
      */
     protected $name;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"API_TOK"})
-     * @var string|null
-     */
-    protected $address;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"API", "API_TOK"})
-     * @var string|null
-     */
-    protected $txHash;
 
     /**
      * @ORM\Column(type="bigint",nullable=true)
@@ -90,16 +79,10 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
      */
-    protected $deployCost;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @var string|null
-     */
     protected $mintDestination;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=2048, nullable=true)
      * @Assert\Url()
      * @Groups({"API_TOK"})
      * @var string|null
@@ -116,6 +99,13 @@ class Token implements TradebleInterface, ImagineInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @AppAssert\IsUrlFromDomain("www.twitter.com")
+     * @Groups({"API_TOK"})
+     */
+    protected ?string $twitterUrl = null; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"API_TOK"})
      * @var string|null
      */
@@ -125,7 +115,7 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
      * @Assert\Regex(
-      *     pattern="/^https:\/\/t\.me\/joinchat\/([-\w]{1,})$/",
+      *     pattern="/^https:\/\/(?:t|telegram)\.(?:me|dog)\/(joinchat\/|\+)?([\w-]+)$/",
       *     match=true,
       *     message="Invalid telegram link"
       * )
@@ -137,7 +127,7 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
      * @Assert\Regex(
-      *     pattern="/^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\w]{1,})$/",
+      *     pattern="/^https:\/\/(discord\.gg|(discordapp|discord)\.com\/invite)\/([-\w]{1,})$/",
       *     match=true,
       *     message="Invalid discord link"
       * )
@@ -181,18 +171,13 @@ class Token implements TradebleInterface, ImagineInterface
     protected $lockIn;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
-     * @ORM\JoinColumn(nullable=true)
-     * @var Crypto|null
+     * @ORM\OneToMany(targetEntity="App\Entity\TokenCrypto",
+     *     mappedBy="token",
+     *     fetch="EXTRA_LAZY",
+     *     cascade={"persist", "remove"}
+     *  )
      */
-    protected $crypto;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
-     * @ORM\JoinColumn(nullable=true)
-     * @var Crypto|null
-     */
-    protected $exchangeCrypto;
+    protected Collection $exchangeCryptos;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -210,15 +195,20 @@ class Token implements TradebleInterface, ImagineInterface
     protected $users;
 
     /**
-     * @ORM\Column(type="datetime_immutable", nullable=true)
-     * @var \DateTimeImmutable|null
-     */
-    private $deployedDate;
-
-    /**
      * @ORM\Column(type="boolean", nullable=false, options={"default"=false})
      */
     private bool $deployed = false; // phpcs:ignore
+
+    /**
+     * @ORM\OneToMany(
+     *      targetEntity="App\Entity\Token\TokenDeploy",
+     *      cascade={"persist", "remove"},
+     *      mappedBy="token",
+     *      fetch="EXTRA_LAZY"
+     *  )
+     * @ORM\OrderBy({"createdAt" = "ASC"})
+     */
+    protected Collection $deploys;
 
     /**
      * @ORM\Column(type="string")
@@ -229,10 +219,16 @@ class Token implements TradebleInterface, ImagineInterface
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
-     * @Groups({"Default", "API"})
-     * @var Image|null
+     * @Groups({"Default", "API", "API_BASIC"})
      */
-    protected $image;
+    protected ?Image $image = null; // phpcs:ignore
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
+     * @ORM\JoinColumn(name="cover_image_id", referencedColumnName="id")
+     * @Groups({"Default", "API"})
+     */
+    protected ?Image $coverImage = null; // phpcs:ignore
 
      /**
      * @ORM\Column(type="string", nullable=true)
@@ -258,17 +254,33 @@ class Token implements TradebleInterface, ImagineInterface
     protected $airdropsAmount = '0';
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token", cascade={"remove"})
      * @ORM\OrderBy({"createdAt" = "DESC"})
      * @var ArrayCollection
      */
     protected $posts;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\TokenSignupHistory", mappedBy="token", cascade={"remove"})
+     */
+    protected Collection $tokenSignupHistory; // phpcs:ignore
+
+    /**
      * @ORM\Column(type="boolean", nullable=false)
      * @var bool
      */
     protected $isBlocked = false;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default"=false})
+     */
+    protected bool $isQuiet = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default"=true})
+     * @Groups({"Default", "API"})
+     */
+    protected bool $createdOnMintmeSite = true; // phpcs:ignore
 
     /**
      * @ORM\Column(type="boolean", nullable=false)
@@ -282,16 +294,14 @@ class Token implements TradebleInterface, ImagineInterface
     private $numberOfReminder = 0;
 
     /**
-     * @ORM\Column(name="next_reminder_date", type="datetime", nullable=true)
-     * @var \DateTime
+     * @ORM\Column(name="next_reminder_date", type="datetime_immutable", nullable=true)
      */
-    private $nextReminderDate;
+    private \DateTimeImmutable $nextReminderDate;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Message\Thread", mappedBy="token", cascade={"persist", "remove"})
-     * @var ArrayCollection
      */
-    private $threads;
+    private Collection $threads;
 
     /**
      * @ORM\Column(type="integer", options={"default"=12})
@@ -301,14 +311,18 @@ class Token implements TradebleInterface, ImagineInterface
     private $decimals = 12;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private ?int $priceDecimals = null; // phpcs:ignore
+
+    /**
      * @ORM\OneToMany(
      *     targetEntity="App\Entity\Voting\TokenVoting",
      *     mappedBy="token"
      * )
-     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
-     *  @var ArrayCollection
+     * @ORM\OrderBy({"createdAt" = "DESC", "endDate" = "DESC"})
      */
-    private $votings;
+    private Collection $votings;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
@@ -325,9 +339,88 @@ class Token implements TradebleInterface, ImagineInterface
      */
     protected PersistentCollection $discordRoles;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\CommentTip", mappedBy="token", cascade={"remove"})
+    */
+    private ?Collection $tips; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string", nullable=false, options={"default": 1000})
+     */
+    protected string $tokenProposalMinAmount = '1000'; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string", nullable=false, options={"default": 1000})
+     */
+    protected string $dmMinAmount = '1000'; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string", nullable=false, options={"default": 1000})
+     */
+    protected string $commentMinAmount = '1000'; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": false}, nullable=false)
+     */
+    protected bool $hasTax = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": false}, nullable=false)
+     */
+    protected bool $isPausable = false; // phpcs:ignore
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Token\TokenRank", inversedBy="token")
+     */
+    private ?TokenRank $rank;
+
+    /**
+    * @ORM\OneToOne(targetEntity=TokenSignupBonusCode::class, mappedBy="token", cascade={"persist", "remove"}, fetch="EAGER")
+    */
+    private ?TokenSignupBonusCode $signUpBonusCode;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": false}, nullable=false)
+     */
+    protected bool $depositsDisabled = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": false}, nullable=false)
+     */
+    protected bool $withdrawalsDisabled = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": false}, nullable=false)
+     */
+    protected bool $tradesDisabled = false; // phpcs:ignore
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Token\TokenPromotion", mappedBy="token", fetch="EXTRA_LAZY")
+     */
+    protected Collection $promotions;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\DeployNotification", mappedBy="token", fetch="EXTRA_LAZY")
+     */
+    protected Collection $deployNotifications;
+
     public function __construct()
     {
+        $this->exchangeCryptos = new ArrayCollection();
+        $this->deploys = new ArrayCollection();
         $this->airdrops = new ArrayCollection();
+        $this->threads = new ArrayCollection();
+        $this->votings = new ArrayCollection();
+        $this->rank = null;
+        $this->tips = new ArrayCollection();
+        $this->tokenSignupHistory = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
+        $this->deployNotifications = new ArrayCollection();
+    }
+
+    public static function getTradableType(): string
+    {
+        return self::TRADABLE_TYPE;
     }
 
     /** @return User[] */
@@ -338,21 +431,26 @@ class Token implements TradebleInterface, ImagineInterface
         }, $this->users->toArray());
     }
 
+    /** @return UserToken[] */
+    public function getHolders(): array
+    {
+        return $this->users->toArray();
+    }
+
     /**
-     * @Groups({"Default", "API"})
-     * @return int
+     * Avoid adding this property to group serializer due to performance
      */
     public function getHoldersCount(): int
     {
-        if ($this->users) {
-            $holders = $this->users->filter(function ($userToken) {
-                return $userToken->isHolder();
-            });
-
-            return $holders->count();
+        if (!$this->users) {
+            return 0;
         }
 
-        return 0;
+        $expr = Criteria::expr();
+        $criteria = Criteria::create()
+            ->where($expr->eq('isHolder', true));
+
+        return $this->users->matching($criteria)->count();
     }
 
     /** {@inheritdoc} */
@@ -368,41 +466,57 @@ class Token implements TradebleInterface, ImagineInterface
 
     public function getCrypto(): ?Crypto
     {
-        return $this->crypto;
+        $mainDeploy = $this->getMainDeploy();
+
+        return $mainDeploy
+            ? $mainDeploy->getCrypto()
+            : null;
     }
 
     /**
-     * @Groups({"API"})
+     * @Groups({"API", "API_BASIC"})
      */
     public function getCryptoSymbol(): string
     {
-        return $this->crypto
-            ? $this->crypto->getSymbol()
+        $crypto = $this->getCrypto();
+
+        return $crypto
+            ? $crypto->getSymbol()
             : Symbols::WEB;
     }
 
-    public function setCrypto(?Crypto $crypto): self
+    public function getMoneySymbol(): string
     {
-        $this->crypto = $crypto;
+        return Symbols::TOK;
+    }
+
+    public function getExchangeCryptos(): Collection
+    {
+        return $this->exchangeCryptos;
+    }
+
+    public function addExchangeCrypto(TokenCrypto $tokenCrypto): self
+    {
+        if (!$this->exchangeCryptos->contains($tokenCrypto)) {
+            $this->exchangeCryptos->add($tokenCrypto);
+        }
 
         return $this;
     }
 
-    public function getExchangeCryptoSymbol(): string
+    public function containsExchangeCrypto(Crypto $crypto): bool
     {
-        return $this->exchangeCrypto
-            ? $this->exchangeCrypto->getSymbol()
-            : Symbols::WEB;
+        /** @var TokenCrypto $tokenCrypto */
+        foreach ($this->exchangeCryptos->toArray() as $tokenCrypto) {
+            if ($tokenCrypto->getCrypto()->getId() === $crypto->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public function setExchangeCrypto(?Crypto $crypto): self
-    {
-        $this->exchangeCrypto = $crypto;
-
-        return $this;
-    }
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -428,11 +542,6 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
     public function getFee(): ?Money
     {
         return $this->fee ?
@@ -449,37 +558,11 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
-    public function setPendingDeployment(): self
-    {
-        $this->address = '0x';
-
-        return $this;
-    }
-
     public function setUpdatingMintDestination(): self
     {
         $this->mintDestination = '0x';
 
         return $this;
-    }
-
-    public function setAddress(string $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
-
-    public function setDeployCost(?string $cost): self
-    {
-        $this->deployCost = $cost;
-
-        return $this;
-    }
-
-    public function getDeployCost(): ?string
-    {
-        return $this->deployCost;
     }
 
     public function getMintDestination(): ?string
@@ -502,6 +585,18 @@ class Token implements TradebleInterface, ImagineInterface
     public function setWebsiteUrl(string $websiteUrl): self
     {
         $this->websiteUrl = $websiteUrl;
+
+        return $this;
+    }
+
+    public function getTwitterUrl(): ?string
+    {
+        return $this->twitterUrl;
+    }
+
+    public function setTwitterUrl(?string $twitterUrl): self
+    {
+        $this->twitterUrl = $twitterUrl;
 
         return $this;
     }
@@ -567,20 +662,77 @@ class Token implements TradebleInterface, ImagineInterface
     }
 
     /**
-     * @Groups({"API", "dev"})
+     * @Groups({"API", "dev", "API_BASIC"})
      */
     public function getDeploymentStatus(): string
     {
-        return !$this->address
-            ? self::NOT_DEPLOYED
-            : (self::PENDING_ADDR === $this->address
-                ? self::PENDING
-                : self::DEPLOYED);
+        $mainDeploy = $this->getMainDeploy();
+
+        if (!$mainDeploy) {
+            return self::NOT_DEPLOYED;
+        }
+
+        if ($mainDeploy->isPending()) {
+            return self::PENDING;
+        }
+
+        return self::DEPLOYED;
+    }
+
+    public function getMainDeploy(): ?TokenDeploy
+    {
+        return $this->getDeploys()[0] ?? null;
+    }
+
+    public function getLastDeploy(): ?TokenDeploy
+    {
+        $deploys = $this->getDeploys();
+
+        return $deploys
+            ? end($deploys)
+            : null;
     }
 
     public function isDeployed(): bool
     {
         return self::DEPLOYED === $this->getDeploymentStatus();
+    }
+
+    /**
+     * @return TokenDeploy[]
+     */
+    public function getDeploys(): array
+    {
+        return $this->deploys->toArray();
+    }
+
+    public function addDeploy(TokenDeploy $deploy): self
+    {
+        if (!$this->deploys->contains($deploy)) {
+            $this->deploys->add($deploy);
+        }
+
+        return $this;
+    }
+
+    public function removeDeploy(TokenDeploy $deploy): self
+    {
+        if (!$this->deploys->contains($deploy)) {
+            $this->deploys->removeElement($deploy);
+        }
+
+        return $this;
+    }
+
+    public function getDeployByCrypto(Crypto $crypto): ?TokenDeploy
+    {
+        foreach ($this->getDeploys() as $deploy) {
+            if ($crypto->getId() === $deploy->getCrypto()->getId()) {
+                return $deploy;
+            }
+        }
+
+        return null;
     }
 
     public function getCreated(): \DateTimeImmutable
@@ -596,7 +748,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /** @Groups({"Default", "API", "API_BASIC"}) */
     public function getTelegramUrl(): ?string
     {
         return $this->telegramUrl;
@@ -609,7 +761,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /** @Groups({"Default", "API", "API_BASIC"}) */
     public function getDiscordUrl(): ?string
     {
         return $this->discordUrl;
@@ -618,20 +770,6 @@ class Token implements TradebleInterface, ImagineInterface
     public function setDiscordUrl(?string $url): self
     {
         $this->discordUrl = $url;
-
-        return $this;
-    }
-
-    /** @codeCoverageIgnore */
-    public function getDeployedDate(): ?\DateTimeImmutable
-    {
-        return $this->deployedDate;
-    }
-
-    /** @codeCoverageIgnore */
-    public function setDeployedDate(?\DateTimeImmutable $deployedDate): self
-    {
-        $this->deployedDate = $deployedDate;
 
         return $this;
     }
@@ -651,9 +789,9 @@ class Token implements TradebleInterface, ImagineInterface
     }
 
     /** @codeCoverageIgnore */
-    public function getWithdrawn(): string
+    public function getWithdrawn(): Money
     {
-        return $this->withdrawn;
+        return new Money($this->withdrawn, new Currency(Symbols::TOK));
     }
 
     /** @codeCoverageIgnore */
@@ -669,15 +807,21 @@ class Token implements TradebleInterface, ImagineInterface
         $this->image = $image;
     }
 
-    public function getImage(): ?Image
+    public function getImage(): Image
     {
-        if ($this->image) {
-            return $this->image;
-        }
+        $url = Image::TOKEN_AVATARS_PATH .'/' . strtoupper($this->name[0]) . '.png';
 
-        return Symbols::WEB === $this->getCryptoSymbol()
-            ? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL)
-            : null;
+        return $this->image ?? Image::defaultImage($url);
+    }
+
+    public function setCoverImage(Image $image): void
+    {
+        $this->coverImage = $image;
+    }
+
+    public function getCoverImage(): ?Image
+    {
+        return $this->coverImage;
     }
 
     public function getMintedAmount(): Money
@@ -697,6 +841,7 @@ class Token implements TradebleInterface, ImagineInterface
     }
 
     /** @codeCoverageIgnore */
+    /** @Groups({"EXTENDED_INFO"}) */
     public function getActiveAirdrop(): ?Airdrop
     {
         $activeAirdrop = $this->getAirdrops()->filter(function (Airdrop $airdrop) {
@@ -765,6 +910,19 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    /** @Groups({"Default", "API", "dev"}) */
+    public function isQuiet(): bool
+    {
+        return $this->isQuiet;
+    }
+
+    public function setIsQuiet(bool $isQuiet): self
+    {
+        $this->isQuiet = $isQuiet;
+
+        return $this;
+    }
+
     public function isHidden(): bool
     {
         return $this->isHidden;
@@ -783,6 +941,14 @@ class Token implements TradebleInterface, ImagineInterface
     public function getPosts(): array
     {
         return $this->posts->toArray();
+    }
+
+    /**
+     * @return TokenSignupHistory[]
+     */
+    public function getTokenSignupHistory(): array
+    {
+        return $this->tokenSignupHistory->toArray();
     }
 
     public function getOwner(): ?User
@@ -816,12 +982,12 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
-    public function getNextReminderDate(): ?\DateTime
+    public function getNextReminderDate(): ?\DateTimeImmutable
     {
         return $this->nextReminderDate;
     }
 
-    public function setNextReminderDate(\DateTime $nextReminderDate): self
+    public function setNextReminderDate(\DateTimeImmutable $nextReminderDate): self
     {
         $this->nextReminderDate = $nextReminderDate;
 
@@ -830,7 +996,7 @@ class Token implements TradebleInterface, ImagineInterface
 
     public function addThread(Thread $thread): self
     {
-        $this->threads[] = $thread;
+        $this->threads->add($thread);
 
         return $this;
     }
@@ -860,14 +1026,6 @@ class Token implements TradebleInterface, ImagineInterface
         return Symbols::WEB === $this->getCryptoSymbol();
     }
 
-    /*
-     * @Groups({"Default"})
-     */
-    public function isControlledToken(): bool
-    {
-        return !$this->isDeployed() || ($this->getAddress() && $this->getTxHash());
-    }
-
     public function isOwner(array $ownTokens): bool
     {
         /** @var Token $ownToken */
@@ -892,18 +1050,6 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
-    public function setTxHash(?string $txHash): self
-    {
-        $this->txHash = $txHash;
-
-        return $this;
-    }
-
-    public function getTxHash(): ?string
-    {
-        return $this->txHash;
-    }
-
     public function getVotings(): array
     {
         return $this->votings->toArray();
@@ -911,7 +1057,7 @@ class Token implements TradebleInterface, ImagineInterface
 
     public function getShowSubunit(): int
     {
-        return self::TOKEN_SUBUNIT;
+        return min(self::TOKEN_SUBUNIT, $this->getDecimals()) ?? self::TOKEN_SUBUNIT;
     }
 
     public function getDiscordConfig(): DiscordConfig
@@ -941,5 +1087,158 @@ class Token implements TradebleInterface, ImagineInterface
         $this->discordRoles->removeElement($role);
 
         return $this;
+    }
+
+    public function isCreatedOnMintmeSite(): bool
+    {
+        return $this->createdOnMintmeSite;
+    }
+
+    public function setCreatedOnMintmeSite(bool $createdOnMintmeSite): self
+    {
+        $this->createdOnMintmeSite = $createdOnMintmeSite;
+
+        return $this;
+    }
+
+    public function getTokenProposalMinAmount(): string
+    {
+        return $this->tokenProposalMinAmount;
+    }
+
+    public function setTokenProposalMinAmount(string $tokenProposalMinAmount): self
+    {
+        $this->tokenProposalMinAmount = $tokenProposalMinAmount;
+
+        return $this;
+    }
+
+    public function getDmMinAmount(): string
+    {
+        return $this->dmMinAmount;
+    }
+
+    public function setDmMinAmount(string $dmMinAmount): self
+    {
+        $this->dmMinAmount = $dmMinAmount;
+
+        return $this;
+    }
+
+    public function getCommentMinAmount(): string
+    {
+        return $this->commentMinAmount;
+    }
+
+    public function setCommentMinAmount(string $commentMinAmount): self
+    {
+        $this->commentMinAmount = $commentMinAmount;
+
+        return $this;
+    }
+
+    public function getRank(): ?int
+    {
+        return $this->rank && $this->isDeployed()
+            ? $this->rank->getRank()
+            : null;
+    }
+
+    public function getSignUpBonusCode(): ?TokenSignupBonusCode
+    {
+        return $this->signUpBonusCode;
+    }
+
+    public function setSignUpBonusCode(?TokenSignupBonusCode $signUpBonusCode): self
+    {
+        $this->signUpBonusCode = $signUpBonusCode;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getHasTax(): bool
+    {
+        return $this->hasTax;
+    }
+
+    public function setHasTax(bool $hasTax): self
+    {
+        $this->hasTax = $hasTax;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getIsPausable(): bool
+    {
+        return $this->isPausable;
+    }
+
+    public function setIsPausable(bool $isPausable): self
+    {
+        $this->isPausable = $isPausable;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getDepositsDisabled(): bool
+    {
+        return $this->depositsDisabled;
+    }
+
+    public function setDepositsDisabled(bool $disabled): self
+    {
+        $this->depositsDisabled = $disabled;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getWithdrawalsDisabled(): bool
+    {
+        return $this->withdrawalsDisabled;
+    }
+
+    public function setWithdrawalsDisabled(bool $disabled): self
+    {
+        $this->withdrawalsDisabled = $disabled;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getTradesDisabled(): bool
+    {
+        return $this->tradesDisabled;
+    }
+
+    public function setTradesDisabled(bool $disabled): self
+    {
+        $this->tradesDisabled = $disabled;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getPriceDecimals(): ?int
+    {
+        return $this->priceDecimals;
+    }
+
+    public function setPriceDecimals(?int $priceDecimals): self
+    {
+        $this->priceDecimals = $priceDecimals;
+
+        return $this;
+    }
+
+    /**
+     * @return DeployNotification[]
+     */
+    public function getDeployNotifications(): array
+    {
+        return $this->deployNotifications->toArray();
     }
 }

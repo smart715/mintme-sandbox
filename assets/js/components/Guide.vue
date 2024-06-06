@@ -1,5 +1,5 @@
 <template>
-    <div class="d-inline">
+    <div :class="classProp">
         <a v-tippy="tooltipOptions"
            :class="tippyClass"
         >
@@ -8,10 +8,10 @@
                     icon="question"
                     slot='icon'
                     class="ml-1 text-white
-                    rounded-circle square blue-question"/>
+                    rounded-circle square guide-icon"/>
             </slot>
         </a>
-        <div :id="id" class="d-none">
+        <div :id="id" :class="{'d-none': !reactive}">
             <slot name="template">
                 <div class="m-2">
                     <h5 class="font-bold">
@@ -42,6 +42,9 @@ export default {
         maxWidth: {type: String, default: '350px'},
         placement: {type: String, default: 'bottom'},
         tippyClass: {type: String, default: ''},
+        reactive: {type: Boolean, default: false},
+        boundariesElement: {type: String, default: 'scrollParent'},
+        classProp: {type: String, default: 'd-inline'},
     },
     data() {
         return {
@@ -50,15 +53,23 @@ export default {
     },
     computed: {
         tooltipOptions: function() {
-            if (this.id !== null) {
+            if (null !== this.id) {
                 return {
                     placement: this.placement,
                     html: '#' + this.id,
                     arrow: true,
                     interactive: true,
+                    reactive: this.reactive,
                     theme: 'light',
                     delay: [200, 0],
                     maxWidth: this.maxWidth,
+                    popperOptions: {
+                        modifiers: {
+                            preventOverflow: {
+                                boundariesElement: this.boundariesElement,
+                            },
+                        },
+                    },
                 };
             }
             return null;

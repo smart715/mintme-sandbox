@@ -6,17 +6,16 @@
             @close="$emit('close')"
         >
             <template slot="header">
-                <p class="word-break-all">{{ $t('wallet.buy_crypto') }}</p>
+                <p class="m-0">{{ $t('wallet.buy_crypto') }}</p>
             </template>
             <template slot="body">
                 <div class="pl-2 pt-2">
                     <span>
                         {{ $t('wallet.buy_crypto.can_exchange', translationContext) }}
                     </span>
-                    <div v-for="crypto in cryptoToExchangeWithMintme" :key="crypto.name">
-                        <a :href="crypto.url" target="_blank" v-html="generatePairText(crypto.name)">
-                        </a>
-                    </div>
+                    <a :href="getTradingCoinsUrl()" target="_blank">
+                        {{ getTradingCoinsUrl() }}
+                    </a>
                 </div>
                 <iframe
                     v-if="paramsLoaded"
@@ -28,7 +27,11 @@
                     allow="camera"
                 ></iframe>
                 <div v-else class="p-5 d-flex justify-content-center">
+                    <span v-if="serviceUnavailable">
+                        {{ this.$t('toasted.error.service_unavailable_support') }}
+                    </span>
                     <font-awesome-icon
+                        v-else
                         icon="circle-notch"
                         spin
                         class="loading-spinner"
@@ -45,8 +48,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Modal from './Modal';
-import {primaryColor} from '../../utils/constants';
-import {webSymbol, MINTME} from '../../utils/constants';
+import {primaryColor, webSymbol} from '../../utils/constants';
 
 library.add(faCircleNotch);
 
@@ -61,6 +63,7 @@ export default {
     },
     props: {
         visible: Boolean,
+        serviceUnavailable: Boolean,
         uiUrl: String,
         partnerId: Number,
         cryptoCurrencies: Array,
@@ -117,14 +120,14 @@ export default {
             return `${this.uiUrl}/widget?${this.frameSrcQueryStr}`;
         },
         paramsLoaded: function() {
-            return Object.keys(this.addresses).length > 0
-                && Object.keys(this.addressesSignature).length > 0
+            return 0 < Object.keys(this.addresses).length
+                && 0 < Object.keys(this.addressesSignature).length
                 && this.refreshToken;
         },
     },
     methods: {
-        generatePairText: function(name) {
-            return `${MINTME.symbol}/${name}`;
+        getTradingCoinsUrl: function() {
+            return `${window.location.origin}` + this.$routing.generate('trading', {type: 'coins'});
         },
         listenForEvents: function() {
             window.addEventListener('message', (event) => {

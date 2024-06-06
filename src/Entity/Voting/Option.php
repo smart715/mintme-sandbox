@@ -37,7 +37,7 @@ class Option
     private Voting $voting;
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getId(): int
     {
@@ -45,7 +45,7 @@ class Option
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getTitle(): string
     {

@@ -5,46 +5,52 @@
     {{ encore_entry_link_tags('pages/voting') }}
 {% endblock %}
 
-{% block title %}{% trans %}voting.voting{% endtrans %} | mintMe{% endblock %}
+{% block title %}
+    {% trans %} voting.voting {% endtrans %} | mintMe
+{% endblock %}
 
 {% block content %}
 {% set loggedIn = app.user ? 'true' : 'false' %}
 {% set hash = app.user ? app.user.getHash() : '' %}
-   <div id="voting" class="container mt-5">
-      <balance-init
-           :is-token="false"
-           websocket-url="{{ global_websocket_url }}"
-           hash="{{ hash }}"
-           :market="{{ market | json_encode }}"
-           :logged-in="{{ loggedIn }}"
-           :is-owner="false"
-           :precision="{{ precision }}"
-      >
-      </balance-init>
-      <voting-widget
-           token-name-prop="{{ crypto.symbol }}"
-           :votings-prop="{{ votings | json_encode }}"
-           :min-amount="{{ minAmount }}"
-           {% if activePage is defined %}
-           active-page-prop="{{ activePage }}"
-           {% endif %}
-           {% if voting is defined %}
-           :voting-prop="{{ voting | json_encode }}"
-           {% endif %}
-      >
-      </voting-widget>
-      {% if activePage is not defined or activePage == '' %}
-         {{ include('spinners/voting_list.html.twig') }}
-      {% endif %}
-      {% if activePage is defined and activePage == 'create_voting' %}
-         {{ include('spinners/voting_create.html.twig') }}
-      {% endif %}
-      {% if activePage is defined and activePage == 'show_voting' %}
-         {{ include('spinners/voting_show.html.twig') }}
-      {% endif %}
-   </div>
+    <div id="voting" class="container mt-5">
+        <balance-init
+            :is-token="false"
+            websocket-url="{{ global_websocket_url }}"
+            hash="{{ hash }}"
+            :market-prop="{{ market | json_encode }}"
+            :logged-in="{{ loggedIn }}"
+            :is-owner="false"
+            :precision="{{ precision }}"
+        ></balance-init>
+        <voting-widget
+            token-name-prop="{{ crypto.symbol }}"
+            token-avatar="{{ crypto.image.url }}"
+            :votings-prop="{{ votings | json_encode }}"
+            :min-amount-propose="{{ minAmountPropose }}"
+            :min-amount-vote="{{ minAmountVote }}"
+            :logged-in="{{ loggedIn }}"
+            :total-voting-count="{{ totalVotingCount }}"
+            {% if activePage is defined %}
+                active-page-prop="{{ activePage }}"
+            {% endif %}
+            {% if voting is defined %}
+                :voting-prop="{{ voting | json_encode }}"
+            {% endif %}
+        ></voting-widget>
+        <div v-if="false">
+            {% if activePage is not defined or activePage == '' %}
+                {{ include('spinners/voting_list.html.twig') }}
+            {% endif %}
+            {% if activePage is defined and activePage == 'create_voting' %}
+                {{ include('spinners/voting_create.html.twig') }}
+            {% endif %}
+            {% if activePage is defined and activePage == 'show_voting' %}
+                {{ include('spinners/voting_show.html.twig') }}
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block pagescripts %}
-   {{ encore_entry_script_tags('pages/voting') }}
+    {{ encore_entry_script_tags('pages/voting') }}
 {% endblock %}

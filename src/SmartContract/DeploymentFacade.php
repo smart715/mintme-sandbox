@@ -2,54 +2,86 @@
 
 namespace App\SmartContract;
 
+use App\Communications\ConnectCostFetcherInterface;
 use App\Communications\DeployCostFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\Token\TokenDeploy;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\BalanceTransactionBonusType;
 use App\Exchange\Balance\Exception\BalanceException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DeploymentFacade implements DeploymentFacadeInterface
 {
     private EntityManagerInterface $em;
-    private DeployCostFetcherInterface $costFetcher;
+    private DeployCostFetcherInterface $deployCostFetcher;
+    private ConnectCostFetcherInterface $connectCostFetcher;
     private BalanceHandlerInterface $balanceHandler;
     private ContractHandlerInterface $contractHandler;
 
     public function __construct(
         EntityManagerInterface $em,
-        DeployCostFetcherInterface $costFetcher,
+        DeployCostFetcherInterface $deployCostFetcher,
+        ConnectCostFetcherInterface $connectCostFetcher,
         BalanceHandlerInterface $balanceHandler,
         ContractHandlerInterface $contractHandler
     ) {
         $this->em = $em;
-        $this->costFetcher = $costFetcher;
+        $this->deployCostFetcher = $deployCostFetcher;
+        $this->connectCostFetcher = $connectCostFetcher;
         $this->balanceHandler = $balanceHandler;
         $this->contractHandler = $contractHandler;
     }
 
+    /**
+     * @throws \App\Communications\Exception\FetchException
+     * @throws \Throwable
+     * @throws BalanceException
+     */
     public function execute(User $user, Token $token, Crypto $crypto): void
     {
-        $cost = $this->costFetcher->getDeployCost($crypto->getSymbol());
+        $isMainDeploy = !$token->getMainDeploy();
+
+        $cost = $isMainDeploy
+            ? $this->deployCostFetcher->getCost($crypto->getSymbol())
+            : $this->connectCostFetcher->getCost($crypto->getSymbol());
+
         $balance = $this->balanceHandler
-            ->balance($token->getOwner(), $crypto)->getAvailable();
+            ->balance($token->getOwner(), $crypto->getNativeCoin())->getFullAvailable();
 
         if ($cost->greaterThan($balance)) {
             throw new BalanceException('Low balance');
         }
 
-        $token->setCrypto($crypto);
-        $this->contractHandler->deploy($token);
+        $deploy = (new TokenDeploy())
+            ->setToken($token)
+            ->setCrypto($crypto)
+            ->setDeployCost($cost->getAmount());
 
-        $this->balanceHandler->withdraw(
-            $token->getOwner(),
-            $crypto,
-            $cost
-        );
+        $this->contractHandler->deploy($deploy, $isMainDeploy);
 
-        $token->setPendingDeployment();
-        $token->setDeployCost($cost->getAmount());
+        $token->addDeploy($deploy);
+
+        if (!$cost->isZero()) {
+            try {
+                $this->balanceHandler->beginTransaction();
+
+                $this->balanceHandler->withdrawBonus(
+                    $token->getOwner(),
+                    $crypto->getNativeCoin(),
+                    $cost,
+                    BalanceTransactionBonusType::DEPLOY_TOKEN
+                );
+            } catch (\Throwable $e) {
+                $this->balanceHandler->rollback();
+
+                throw $e;
+            }
+        }
+
         $this->em->persist($token);
         $this->em->flush();
     }

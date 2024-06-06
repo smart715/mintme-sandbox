@@ -1,7 +1,7 @@
 <template>
-    <div class="container p-0 m-0">
+    <div class="container-fluid p-0 m-0">
         <div class="row p-0 m-0">
-            <div class="col-12 col-xl-6 pr-xl-2 mt-3">
+            <div class="col-12 col-lg-6 mt-3 pr-lg-2">
                 <trade-buy-orders
                     @update-data="updateBuyOrders"
                     :full-orders-list="buyOrders"
@@ -9,15 +9,19 @@
                     :orders-loaded="ordersLoaded"
                     :orders-updated="ordersUpdated"
                     :token-name="market.base.symbol"
+                    :token-avatar="market.base.image.url"
                     :fields="fields"
                     :total-buy-orders="totalBuyOrders"
-                    :basePrecision="market.base.subunit"
+                    :service-unavailable="serviceUnavailable"
+                    :basePrecision="priceSubunits"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
                     @modal="removeOrderModal"
-                    :currency-mode="currencyMode"/>
+                    :currency-mode="currencyMode"
+                    :is-token="isToken"
+                />
             </div>
-            <div class="col-12 col-xl-6 pl-xl-2 mt-3">
+            <div class="col-12 col-lg-6 mt-3 pl-lg-2">
                 <trade-sell-orders
                     @update-data="updateSellOrders"
                     :full-orders-list="sellOrders"
@@ -27,54 +31,135 @@
                     :market="market"
                     :fields="fields"
                     :total-sell-orders="totalSellOrders"
-                    :basePrecision="market.base.subunit"
+                    :service-unavailable="serviceUnavailable"
+                    :basePrecision="priceSubunits"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
                     @modal="removeOrderModal"
-                    :currency-mode="currencyMode"/>
+                    :currency-mode="currencyMode"
+                    :is-token="isToken"
+                />
             </div>
         </div>
         <confirm-modal
-                :visible="confirmModal"
-                :no-close="false"
-                @close="switchConfirmModal(false)"
-                @confirm="removeOrder"
+            :visible="confirmModal"
+            :show-image="false"
+            no-title
+            type="warning"
+            @close="switchConfirmModal(false)"
+            @confirm="removeOrder"
         >
-                <span class="text-white">
-                    {{ $t('trade.orders.confirm.body_1') }}<br>
-                    <span v-for="order in this.removeOrders" :key="order.id">
-                    {{ $t('trade.orders.price') }} {{ order.price }}
-                    {{ $t('trade.orders.amount') }} {{ order.amount }}<br>
-                </span>
-                {{ $t('trade.orders.confirm.body_2') }}
-                </span>
+            <div class="text-center text-break mb-3">
+                {{ $t('trade.orders.confirm.body') }}
+            </div>
+            <b-table-simple
+                hover
+                small
+                responsive
+                sticky-header
+                class="text-left"
+                table-class="fix-layout table-min-width"
+            >
+                <b-thead sticky-header>
+                    <b-tr>
+                        <b-th class="bg-primary-dark text-white font-weight-normal">
+                            {{ $t('trade.orders.price') }}
+                        </b-th>
+                        <b-th class="bg-primary-dark text-white font-weight-normal">
+                            {{ $t('trade.orders.amount') }}
+                        </b-th>
+                    </b-tr>
+                </b-thead>
+                <b-tbody>
+                    <b-tr v-for="order in removeOrders" :key="order.id">
+                        <b-td class="remove-orders-td">
+                            <div class="d-flex align-items-center">
+                                <span class="font-weight-bold text-nowrap">{{ order.price | numberAbbr }}</span>
+                                <span
+                                    class="ml-1 d-flex align-items-center overflow-hidden"
+                                    v-b-tooltip="getTooltipConfig(order.market.base.symbol)"
+                                >
+                                    <coin-avatar
+                                        class="mr-1"
+                                        :is-crypto="undefined === order.market.base.ownerId"
+                                        :symbol="order.market.base.symbol"
+                                        :is-user-token="undefined !== order.market.base.ownerId"
+                                        :image="order.market.base.image"
+                                    />
+                                    <span class="text-truncate">
+                                        {{ order.market.base.symbol | rebranding }}
+                                    </span>
+                                </span>
+                            </div>
+                        </b-td>
+                        <b-td class="remove-orders-td">
+                            <div class="d-flex align-items-center">
+                                <span class="font-weight-bold text-nowrap">{{ order.amount | numberAbbr }}</span>
+                                <span
+                                    class="ml-1 d-flex align-items-center overflow-hidden"
+                                    v-b-tooltip="getTooltipConfig(order.market.quote.symbol)"
+                                >
+                                    <coin-avatar
+                                        class="mr-1"
+                                        :is-crypto="undefined === order.market.quote.ownerId"
+                                        :symbol="order.market.quote.symbol"
+                                        :is-user-token="undefined !== order.market.quote.ownerId"
+                                        :image="order.market.quote.image"
+                                    />
+                                    <span class="text-truncate">
+                                        {{ order.market.quote.symbol | rebranding }}
+                                    </span>
+                                </span>
+                            </div>
+                        </b-td>
+                    </b-tr>
+                </b-tbody>
+            </b-table-simple>
         </confirm-modal>
     </div>
 </template>
 
 <script>
+import {BTableSimple, BTr, BThead, BTbody, BTd, BTh, VBTooltip} from 'bootstrap-vue';
 import TradeBuyOrders from './TradeBuyOrders';
 import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {formatMoney, toMoney} from '../../utils';
-import {WSAPI} from '../../utils/constants';
-import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import {mapMutations} from 'vuex';
+import {formatMoney, toMoney, toMoneyWithTrailingZeroes} from '../../utils';
+import {tokenDeploymentStatus, WSAPI, HTTP_ACCESS_DENIED} from '../../utils/constants';
+import {
+    RebrandingFilterMixin,
+    NotificationMixin,
+    FiltersMixin,
+    NumberAbbreviationFilterMixin} from '../../mixins/';
+import {mapMutations, mapGetters} from 'vuex';
+import CoinAvatar from '../CoinAvatar';
 
 export default {
-    name: 'TokenTradeOrders',
+    name: 'TradeOrders',
     mixins: [
         RebrandingFilterMixin,
         NotificationMixin,
-        LoggerMixin,
+        FiltersMixin,
+        NumberAbbreviationFilterMixin,
     ],
     components: {
+        CoinAvatar,
         TradeBuyOrders,
         TradeSellOrders,
         ConfirmModal,
+        BTableSimple,
+        BTr,
+        BThead,
+        BTd,
+        BTh,
+        BTbody,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
+        isToken: Boolean,
         ordersLoaded: Boolean,
         ordersUpdated: {
             type: Boolean,
@@ -82,8 +167,9 @@ export default {
         },
         buyOrders: [Array, Object],
         sellOrders: [Array, Object],
-        totalSellOrders: [Array, Object],
-        totalBuyOrders: [Array, Object],
+        totalSellOrders: [Array, Object, Decimal],
+        totalBuyOrders: [Array, Object, Decimal],
+        serviceUnavailable: Boolean,
         market: Object,
         userId: Number,
         loggedIn: Boolean,
@@ -91,48 +177,88 @@ export default {
     },
     data() {
         return {
+            maxLengthToTruncate: 10,
             removeOrders: [],
             removedOrders: [],
             confirmModal: false,
-            fields: [
+            isSellSide: false,
+            tokenDeploymentStatus,
+            orderFields: [
                 {
                     key: 'price',
                     label: this.$t('trade.orders.price'),
-                    formatter: formatMoney,
                 },
                 {
                     key: 'amount',
                     label: this.$t('trade.orders.amount'),
-                    formatter: formatMoney,
-                },
-                {
-                    key: 'sum',
-                    label: this.$t('trade.orders.sum'),
-                    formatter: formatMoney,
-                },
-                {
-                    key: 'trader',
-                    label: this.$t('trade.orders.trader'),
                 },
             ],
         };
     },
     computed: {
-        filteredBuyOrders: function() {
-            let orders = this.buyOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.buyOrders)), false) : [];
-            this.setBuyOrders(orders);
-
-            return orders;
+        ...mapGetters('orders', {
+            filteredBuyOrders: 'getBuyOrders',
+            filteredSellOrders: 'getSellOrders',
+        }),
+        typeOrder() {
+            return this.isSellSide ? this.$t('sell') : this.$t('buy');
         },
-        filteredSellOrders: function() {
-            let orders = this.sellOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.sellOrders)), true) : [];
-            this.setSellOrders(orders);
+        fields() {
+            const commonFields = [
+                {
+                    key: 'price',
+                    label: this.$t('trade.orders.price'),
+                    formatter: formatMoney,
+                    tdClass: this.textDirection,
+                    thClass: this.textDirection,
+                },
+                {
+                    key: 'amount',
+                    label: this.$t('trade.orders.amount'),
+                    formatter: formatMoney,
+                    tdClass: this.textDirection,
+                    thClass: this.textDirection,
+                },
+                {
+                    key: 'sum',
+                    label: this.$t('trade.orders.sum'),
+                    formatter: formatMoney,
+                    tdClass: this.textDirection,
+                    thClass: this.textDirection,
+                },
+            ];
+            const tokensField = [
+                {
+                    key: 'trader',
+                    label: this.$t('trade.orders.trader'),
+                },
+            ];
 
-            return orders;
+            return this.isToken ? [...tokensField, ...commonFields] : commonFields;
+        },
+        textDirection() {
+            return this.isToken ? 'text-right' : 'text-left';
+        },
+        priceSubunits() {
+            return this.isToken && this.market.quote.priceDecimals
+                ? this.market.quote.priceDecimals
+                : this.market.base.subunit;
         },
     },
     methods: {
         ...mapMutations('orders', ['setSellOrders', 'setBuyOrders']),
+        getSymbol: function(data) {
+            if (undefined === data.ownerId) {
+                return data.symbol;
+            }
+
+            return data.cryptoSymbol;
+        },
+        getTooltipConfig: function(data) {
+            return this.rebrandingFunc(data).length > this.maxLengthToTruncate
+                ? {title: this.rebrandingFunc(data), boundary: 'window', customClass: 'tooltip-custom'}
+                : null;
+        },
         updateBuyOrders: function({attach, resolve}) {
             return this.updateOrders(attach, 'buy', resolve);
         },
@@ -145,10 +271,10 @@ export default {
         ordersList: function(orders) {
             return orders.map((order) => {
                 return {
-                    price: toMoney(order.price, this.market.base.subunit),
-                    amount: toMoney(order.amount, this.market.quote.subunit),
-                    sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
                     trader: order.maker.profile.nickname,
+                    price: toMoneyWithTrailingZeroes(order.price, this.priceSubunits),
+                    amount: toMoney(order.amount, this.market.quote.subunit),
+                    sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.priceSubunits),
                     traderUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
                     side: order.side,
                     owner: order.owner,
@@ -160,11 +286,11 @@ export default {
             });
         },
         groupByPrice: function(orders) {
-            let filtered = [];
-            let accounted = [];
+            const filtered = [];
+            const accounted = [];
 
-            let grouped = this.clone(orders).reduce((a, e) => {
-                let price = parseFloat(e.price);
+            const grouped = this.clone(orders).reduce((a, e) => {
+                const price = parseFloat(e.price);
 
                 if (a[price] === undefined) {
                     a[price] = [];
@@ -180,12 +306,12 @@ export default {
 
             Object.values(grouped).forEach((e) => {
                 e.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
-                let obj = e.reduce((a, e) => {
+                const obj = e.reduce((a, e) => {
                     a.owner = a.owner || e.maker.id === this.userId;
                     a.orders.push(e);
                     a.sum = new Decimal(a.sum).add(e.amount);
 
-                    let amount = a.orders.filter((order) => order.maker.id === e.maker.id)
+                    const amount = a.orders.filter((order) => order.maker.id === e.maker.id)
                         .reduce((a, e) => new Decimal(a).add(e.amount), 0);
 
                     a.main.amount = amount;
@@ -194,24 +320,27 @@ export default {
                     return a;
                 }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});
 
-                let order = obj.main.order;
+                const order = obj.main.order;
                 if (order) {
-                  order.amount = obj.sum;
-                  order.owner = obj.owner;
-                  filtered.push(order);
+                    order.amount = obj.sum;
+                    order.owner = obj.owner;
+                    filtered.push(order);
                 }
             });
             return filtered;
         },
         removeOrderModal: function(row) {
-            let isSellSide = WSAPI.order.type.SELL === row.side;
-            let orders = isSellSide ? this.sellOrders : this.buyOrders;
+            this.isSellSide = WSAPI.order.type.SELL === row.side;
+            const orders = this.isSellSide ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
-            let accounted = [];
+            const accounted = [];
 
             this.clone(orders).forEach((order) => {
-                if (toMoney(order.price, this.market.base.subunit) === row.price && order.maker.id === this.userId) {
-                    order.price = toMoney(order.price, this.market.base.subunit);
+                if (
+                    toMoney(order.price, this.priceSubunits) === toMoney(row.price, this.priceSubunits) &&
+                    order.maker.id === this.userId
+                ) {
+                    order.price = toMoney(order.price, this.priceSubunits);
                     order.amount = toMoney(order.amount, this.market.quote.subunit);
                     if (-1 === accounted.indexOf(order.id) && -1 === this.removedOrders.indexOf(order.id)) {
                         accounted.push(order.id);
@@ -222,16 +351,28 @@ export default {
             this.switchConfirmModal(true);
         },
         removeOrder: function() {
-            let removeNow = this.removeOrders.map((order) => order.id);
-            this.removedOrders = [...this.removedOrders, ...removeNow];
-            let deleteOrdersUrl = this.$routing.generate('orders_сancel', {
+            const removeNow = this.removeOrders.map((order) => order.id);
+            const deleteOrdersUrl = this.$routing.generate('orders_сancel', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
             });
             this.$axios.single.post(deleteOrdersUrl, {'orderData': removeNow})
+                .then((response) => {
+                    const data = response.data;
+
+                    if (data.hasOwnProperty('error')) {
+                        this.notifyError(data.error);
+                    } else {
+                        this.removedOrders = [...this.removedOrders, ...removeNow];
+                    }
+                })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.service_unavailable'));
-                    this.sendLogs('error', 'Remove order service unavailable', err);
+                    if (HTTP_ACCESS_DENIED === err.response.status && err.response.data.message) {
+                        this.notifyError(err.response.data.message);
+                    } else {
+                        this.notifyError(this.$t('toasted.error.service_unavailable'));
+                    }
+                    this.$logger.error('Remove order service unavailable', err);
                 });
         },
         switchConfirmModal: function(val) {
@@ -246,6 +387,30 @@ export default {
                     parseFloat(a.price) - parseFloat(b.price) :
                     parseFloat(b.price) - parseFloat(a.price);
             });
+        },
+    },
+    watch: {
+        buyOrders: {
+            handler: function(newOrders) {
+                const orders = newOrders
+                    ? this.sortOrders(this.ordersList(this.groupByPrice(newOrders)), false)
+                    : [];
+
+                this.setBuyOrders(orders);
+            },
+            deep: true,
+            immediate: true,
+        },
+        sellOrders: {
+            handler: function(newOrders, oldOrders) {
+                const orders = newOrders
+                    ? this.sortOrders(this.ordersList(this.groupByPrice(newOrders)), true)
+                    : [];
+
+                this.setSellOrders(orders);
+            },
+            deep: true,
+            immediate: true,
         },
     },
 };

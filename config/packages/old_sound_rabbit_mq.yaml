@@ -2,6 +2,8 @@ old_sound_rabbit_mq:
     connections:
         default:
             url: '%env(RABBITMQ_URL)%'
+            lazy: true
+            keepalive: true
 
     consumers:
         payment:
@@ -25,6 +27,10 @@ old_sound_rabbit_mq:
             exchange_options: {name: 'market', type: 'x-delayed-message', durable: true, arguments: {x-delayed-type: ['S', fanout]}}
             queue_options:    {name: 'market', durable: true}
             callback: market_consumer
+        email:
+            connection: default
+            queue_options:    {name: 'panel-email', durable: true}
+            callback: notifications_consumer
 
     producers:
         payment:

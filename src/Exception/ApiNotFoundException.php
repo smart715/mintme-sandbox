@@ -4,7 +4,7 @@ namespace App\Exception;
 
 use Symfony\Component\HttpFoundation\Response;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class ApiNotFoundException extends ApiException
 {
     public function getStatusCode(): int

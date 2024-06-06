@@ -20,7 +20,6 @@ class Client extends BaseClient
      */
     protected $id;
 
-
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="clients", cascade={"persist"})
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")

@@ -37,7 +37,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: true,
+                isCreatedOnMintmeSite: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -51,7 +51,7 @@ describe('TokenPointsProgress', () => {
         });
         expect(wrapper.vm.tokenPointsGained).toBe(0);
     });
-    it('should calculate token points gained correctly "release period"', () => {
+    it('should calculate token points gained correctly "release period"', async () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {
@@ -69,7 +69,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: true,
+                isCreatedOnMintmeSite: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -82,15 +82,15 @@ describe('TokenPointsProgress', () => {
                 hasReleasePeriod: true,
             },
         });
-        expect(wrapper.vm.tokenPointsGained).toBe(4);
-        wrapper.setProps({hasReleasePeriod: false});
+        expect(wrapper.vm.tokenPointsGained).toBe(22);
+        await wrapper.setProps({hasReleasePeriod: false});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
         store.commit('tokenStatistics/setStats', {releasePeriod: 10});
-        expect(wrapper.vm.tokenPointsGained).toBe(4);
+        expect(wrapper.vm.tokenPointsGained).toBe(22);
         store.commit('tokenStatistics/setStats', {releasePeriod: '-'});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
     });
-    it('should calculate token points gained correctly "token description"', () => {
+    it('should calculate token points gained correctly "token description"', async () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
@@ -99,7 +99,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: true,
+                isCreatedOnMintmeSite: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -111,11 +111,11 @@ describe('TokenPointsProgress', () => {
                 tokenYoutube: null,
             },
         });
-        expect(wrapper.vm.tokenPointsGained).toBe(4);
-        wrapper.setProps({tokenDescription: null});
+        expect(wrapper.vm.tokenPointsGained).toBe(22);
+        await wrapper.setProps({tokenDescription: null});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
-        });
-    it('should calculate token points gained correctly "user profile with out trade anonymously"', () => {
+    });
+    it('should calculate token points gained correctly "user profile with out trade anonymously"', async () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
@@ -124,7 +124,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: true,
+                isCreatedOnMintmeSite: true,
                 profileAnonymously: '',
                 profileDescription: 'Description',
                 profileLastname: 'last name',
@@ -136,11 +136,11 @@ describe('TokenPointsProgress', () => {
                 tokenYoutube: null,
             },
         });
-        expect(wrapper.vm.tokenPointsGained).toBe(4);
-        wrapper.setProps({profileAnonymously: '1'});
+        expect(wrapper.vm.tokenPointsGained).toBe(22);
+        await wrapper.setProps({profileAnonymously: '1'});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
-        });
-    it('should calculate token points gained correctly if is not MINTME token', () => {
+    });
+    it('should calculate token points gained correctly if is not MINTME token', async () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {
@@ -158,7 +158,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: false,
+                isCreatedOnMintmeSite: false,
                 profileAnonymously: '',
                 profileDescription: 'Description',
                 profileLastname: 'last name',
@@ -170,9 +170,9 @@ describe('TokenPointsProgress', () => {
                 tokenYoutube: null,
             },
         });
-        expect(wrapper.vm.tokenPointsGained).toBe(12);
-        wrapper.setProps({profileAnonymously: '1'});
-        expect(wrapper.vm.tokenPointsGained).toBe(8);
+        expect(wrapper.vm.tokenPointsGained).toBe(66);
+        await wrapper.setProps({profileAnonymously: '1'});
+        expect(wrapper.vm.tokenPointsGained).toBe(44);
     });
     it('should calculate token points gained correctly with all items', () => {
         const localVue = mockVue();
@@ -192,7 +192,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: true,
+                isCreatedOnMintmeSite: true,
                 profileAnonymously: '',
                 profileDescription: 'description',
                 profileLastname: 'last name',
@@ -205,8 +205,9 @@ describe('TokenPointsProgress', () => {
             },
         });
         store.commit('tokenStatistics/setStats', {releasePeriod: 10});
-        expect(wrapper.vm.tokenPointsGained).toBe(18);
+        expect(wrapper.vm.tokenPointsGained).toBe(100);
     });
+
     describe('token status', () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
@@ -216,7 +217,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: true,
+                isCreatedOnMintmeSite: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -231,19 +232,20 @@ describe('TokenPointsProgress', () => {
         it('should calculate token points gained correctly on token status "not deployed"', () => {
             expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
-        it('should calculate token points gained correctly on token status "token pending"', () => {
-            wrapper.setProps({
+        it('should calculate token points gained correctly on token status "token pending"', async () => {
+            await wrapper.setProps({
                 tokenStatus: tokenDeploymentStatus.pending,
             });
             expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
-         it('should calculate token points gained correctly "token deployed"', () => {
-            wrapper.setProps({
+        it('should calculate token points gained correctly "token deployed"', async () => {
+            await wrapper.setProps({
                 tokenStatus: tokenDeploymentStatus.deployed,
             });
-            expect(wrapper.vm.tokenPointsGained).toBe(4);
+            expect(wrapper.vm.tokenPointsGained).toBe(22);
         });
     });
+
     describe('social media status', () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
@@ -253,7 +255,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isControlledToken: true,
+                isCreatedOnMintmeSite: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -268,29 +270,29 @@ describe('TokenPointsProgress', () => {
         it('should calculate token points gained correctly any social media', () => {
             expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
-        it('should calculate token points gained correctly all social media', () => {
-            wrapper.setProps({tokenFacebook: 'facebook'});
-            wrapper.setProps({tokenYoutube: 'youtube'});
-            wrapper.setProps({tokenWebsite: 'website'});
-            expect(wrapper.vm.tokenPointsGained).toBe(2);
+        it('should calculate token points gained correctly all social media', async () => {
+            await wrapper.setProps({tokenFacebook: 'facebook'});
+            await wrapper.setProps({tokenYoutube: 'youtube'});
+            await wrapper.setProps({tokenWebsite: 'website'});
+            expect(wrapper.vm.tokenPointsGained).toBe(12);
         });
-        it('should calculate token points gained correctly when facebok dont exist', () =>{
-            wrapper.setProps({tokenFacebook: null});
-            wrapper.setProps({tokenYoutube: 'youtube'});
-            wrapper.setProps({tokenWebsite: 'website'});
-            expect(wrapper.vm.tokenPointsGained).toBe(2);
+        it('should calculate token points gained correctly when facebok dont exist', async () => {
+            await wrapper.setProps({tokenFacebook: null});
+            await wrapper.setProps({tokenYoutube: 'youtube'});
+            await wrapper.setProps({tokenWebsite: 'website'});
+            expect(wrapper.vm.tokenPointsGained).toBe(12);
         });
-        it('should calculate token points gained correctly when youtube dont exist', () =>{
-            wrapper.setProps({tokenFacebook: 'facebook'});
-            wrapper.setProps({tokenWebsite: 'website'});
-            wrapper.setProps({tokenYoutube: null});
-            expect(wrapper.vm.tokenPointsGained).toBe(2);
+        it('should calculate token points gained correctly when youtube dont exist', async () => {
+            await wrapper.setProps({tokenFacebook: 'facebook'});
+            await wrapper.setProps({tokenWebsite: 'website'});
+            await wrapper.setProps({tokenYoutube: null});
+            expect(wrapper.vm.tokenPointsGained).toBe(12);
         });
-        it('should calculate token points gained correctly when website dont exist', () =>{
-            wrapper.setProps({tokenFacebook: 'facebook'});
-            wrapper.setProps({tokenYoutube: 'youtube'});
-            wrapper.setProps({tokenWebsite: null});
-            expect(wrapper.vm.tokenPointsGained).toBe(2);
+        it('should calculate token points gained correctly when website dont exist', async () => {
+            await wrapper.setProps({tokenFacebook: 'facebook'});
+            await wrapper.setProps({tokenYoutube: 'youtube'});
+            await wrapper.setProps({tokenWebsite: null});
+            expect(wrapper.vm.tokenPointsGained).toBe(12);
         });
     });
 });

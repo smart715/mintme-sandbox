@@ -2,24 +2,36 @@
 
 namespace App\Manager;
 
-use App\Entity\Bonus;
 use App\Repository\BonusRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Currency;
+use Money\Money;
 
 class BonusManager implements BonusManagerInterface
 {
-    /** @var BonusRepository */
-    private $bonusRepo;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        /** @var BonusRepository $repo */
-        $repo = $entityManager->getRepository(Bonus::class);
-        $this->bonusRepo = $repo;
+    private BonusRepository $bonusRepository;
+    private MoneyWrapperInterface $moneyWrapper;
+
+    public function __construct(
+        BonusRepository $bonusRepository,
+        MoneyWrapperInterface $moneyWrapper
+    ) {
+        $this->bonusRepository = $bonusRepository;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function isLimitReached(int $limit, string $type): bool
+    public function isLimitReached(string $limit, string $type): bool
     {
-        return $limit <= $this->bonusRepo->getPaidSum($type);
+        return $this->moneyWrapper->parse(
+            $limit,
+            Symbols::WEB
+        )->lessThanOrEqual(
+            new Money($this->moneyWrapper->convertToDecimalIfNotation(
+                $this->bonusRepository->getPaidSum($type),
+                Symbols::WEB
+            ), new currency(Symbols::WEB))
+        );
     }
 }

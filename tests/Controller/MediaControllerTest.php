@@ -15,7 +15,7 @@ class MediaControllerTest extends WebTestCase
             DIRECTORY_SEPARATOR .
             'media' . DIRECTORY_SEPARATOR;
         $path = $dir . DIRECTORY_SEPARATOR . 'foo.png';
-        copy($dir . DIRECTORY_SEPARATOR . 'default_mintme.png', $path);
+        copy($dir . DIRECTORY_SEPARATOR . 'default_mintme.svg', $path);
         $file = new UploadedFile($path, $originalName, null, UPLOAD_ERR_OK, true);
 
         $this->client->request('POST', self::LOCALHOST . '/api/media/upload', [

@@ -1,11 +1,16 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Vuex from 'vuex';
 import {status} from '../../js/storage/modules/websocket';
+import userStore from '../../js/storage/modules/user';
 import Wallet from '../../js/components/wallet/Wallet';
 import Decimal from 'decimal.js';
 import {webSymbol} from '../../js/utils/constants';
 import moxios from 'moxios';
 import axios from 'axios';
+
+Object.defineProperty(window, 'EventSource', {
+    value: jest.fn(),
+});
 
 /**
  * @param {object} params
@@ -37,33 +42,56 @@ function mockVue() {
             };
             Vue.prototype.$routing = $routing;
             Vue.prototype.$store = new Vuex.Store({
-                modules: {status},
+                modules: {status, user: userStore},
             });
             Vue.prototype.$toasted = {show: (val) => val};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = {error: () => {}};
         },
     });
     return localVue;
-};
+}
 
-let propsForTestCorrectlyRenders = {
+const defaultProps = {
     withdrawUrl: 'withdraw_url',
     createTokenUrl: 'createTokenUrl',
-    tradingUrl: 'tradingUrl',
     depositMore: 'depositMore',
     twofa: 'twofa',
     websocketUrl: '',
-    disabledCrypto: '["CRYPTO"]',
-    disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
+    disabledCryptos: [],
+    disabledServicesConfig: {
+        depositDisabled: false,
+        deployDisabled: false,
+        allServicesDisabled: false,
+        depositsDisabled: {},
+        withdrawalsDisabled: {},
+    },
+    minAmount: 0.0001,
 };
 
-const assertData = {WEB: {name: 'WEB', available: 1}, bar: {name: 'bar', available: 1}, baz: {name: 'baz', available: 0}};
+const assertData = {
+    WEB: {name: 'WEB', available: 1, removed: false},
+    bar: {name: 'bar', available: 1, removed: false},
+    baz: {name: 'baz', available: 0, removed: false},
+};
 const expectData = [{name: 'WEB', available: 1}, {name: 'bar', available: 1}, {name: 'baz', available: 0}];
-const expectedTokenData = [{name: 'WEB', available: 1}, {name: 'bar', available: 1}];
+const expectedTokenData = [{name: 'WEB', available: 1}, {name: 'bar', available: 1}, {name: 'baz', available: 0}];
 
-let assertTokens = {};
+const assertTokens = {};
 assertTokens['oTokenName'] = {};
 assertTokens['oTokenName'] = {identifier: 'identifier', owner: 'owner', available: '0.5000'};
+
+/**
+ * @return {Wrapper<Vue>}
+ * @param {object} extraWrapperProps
+ */
+function mockWallet(extraWrapperProps = {}) {
+    return shallowMount(Wallet, {
+        localVue: mockVue(),
+        propsData: defaultProps,
+        ...extraWrapperProps,
+    });
+}
 
 describe('Wallet', () => {
     beforeEach(() => {
@@ -74,325 +102,741 @@ describe('Wallet', () => {
         moxios.uninstall();
     });
 
-    it('should compute hasTokens correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.tokens = null;
-        expect(wrapper.vm.hasTokens).toBe(false);
-        wrapper.vm.tokens = [{foo: {name: 'foo'}}];
-        expect(wrapper.vm.hasTokens).toBe(true);
-    });
+    describe('computed', () => {
+        it('should compute hasTokens correctly', async () => {
+            const wrapper = mockWallet();
 
-    it('should compute allTokens correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.tokens = null;
-        wrapper.vm.predefinedTokens = null;
-        expect(wrapper.vm.allTokens).toMatchObject({});
-        wrapper.vm.tokens = {foo: {name: 'foo'}};
-        wrapper.vm.predefinedTokens = {bar: {name: 'bar'}};
-        expect(wrapper.vm.allTokens).toMatchObject({bar: {name: 'bar'}, foo: {name: 'foo'}});
-    });
-
-    it('should compute allTokensName correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.tokens = {foo: {identifier: 'foo'}, bar: {identifier: 'bar'}};
-        expect(wrapper.vm.allTokensName).toEqual(['foo', 'bar']);
-    });
-
-    it('should compute predefinedItems correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.predefinedTokens = null;
-        expect(wrapper.vm.predefinedItems).toEqual([]);
-        wrapper.vm.predefinedTokens = assertData;
-        expect(wrapper.vm.predefinedItems).toMatchObject(expectData);
-    });
-
-    it('should compute items correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.tokens = null;
-        expect(wrapper.vm.items).toEqual([]);
-        wrapper.vm.tokens = assertData;
-        expect(wrapper.vm.items).toMatchObject(expectedTokenData);
-    });
-
-    it('should compute showLoadingIconP correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.predefinedTokens = null;
-        expect(wrapper.vm.showLoadingIconP).toBe(true);
-        wrapper.vm.predefinedTokens = [{name: 'foo'}];
-        expect(wrapper.vm.showLoadingIconP).toBe(false);
-    });
-
-    it('should compute showLoadingIcon correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.tokens = null;
-        expect(wrapper.vm.showLoadingIcon).toBe(true);
-        wrapper.vm.tokens = [{name: 'foo'}];
-        expect(wrapper.vm.showLoadingIcon).toBe(false);
-    });
-
-    it('should set data correctly when the function openWithdraw() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.showModal = false;
-        wrapper.setProps({twofa: 'foo'});
-        wrapper.vm.predefinedTokens = {};
-        wrapper.vm.predefinedTokens[webSymbol] = {fee: '0.500000000000000000', available: '.01'};
-        wrapper.vm.openWithdraw(webSymbol, '0.500000000000000000', '0.800000000000000000', 8, false, false, webSymbol);
-        expect(wrapper.vm.showModal).toBe(true);
-        expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
-        expect(wrapper.vm.isTokenModal).toBe(false);
-        expect(wrapper.vm.withdraw.fee).toBe('0.5');
-        expect(wrapper.vm.withdraw.baseFee).toBe('0');
-        expect(wrapper.vm.withdraw.availableBase).toBe('.01');
-        expect(wrapper.vm.withdraw.amount).toBe('0.8');
-        expect(wrapper.vm.withdraw.subunit).toBe(8);
-    });
-
-    it('should set showModal correctly when the function closeWithdraw() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.showModal = true;
-        wrapper.vm.closeWithdraw();
-        expect(wrapper.vm.showModal).toBe(false);
-    });
-
-    describe('openDeposit', () => {
-        it('should set properties correctly without $axios request', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
+            await wrapper.setData({
+                tokens: null,
             });
-            wrapper.vm.openDeposit(webSymbol, 8);
-            expect(wrapper.vm.depositAddress).toBe('wallet.loading');
-            expect(wrapper.vm.depositDescription).toBe('wallet.send_to_address');
-            expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
-            expect(wrapper.vm.deposit.fee).toBeUndefined();
-            expect(wrapper.vm.isTokenModal).toBe(false);
-            expect(wrapper.vm.deposit.min).toBe(undefined);
-            expect(wrapper.vm.showDepositModal).toBe(true);
+            expect(wrapper.vm.hasTokens).toBe(false);
+
+            await wrapper.setData({
+                tokens: {foo: {name: 'foo', removed: false}},
+            });
+            expect(wrapper.vm.hasTokens).toBe(true);
+
+            await wrapper.setData({
+                tokens: {foo: {name: 'foo', removed: true}},
+            });
+            expect(wrapper.vm.hasTokens).toBe(false);
+
+            await wrapper.setData({
+                tokens: {foo: {name: 'foo', removed: true}, bar: {name: 'bar', removed: false}},
+            });
+            expect(wrapper.vm.hasTokens).toBe(true);
+        });
+        it('should hide zero balances in case of isHiddenZeroBalances equals true', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                tokens: assertData,
+                isHiddenZeroBalances: true,
+            });
+            expect(wrapper.vm.validTokens).toEqual([
+                {name: 'WEB', available: 1, removed: false},
+                {name: 'bar', available: 1, removed: false},
+            ]);
         });
 
-        it('should do $axios request and set properties correctly when result of $axios request is empty', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.deposit.fee = 'foo';
-            wrapper.vm.openDeposit(webSymbol, 8);
 
-            moxios.stubRequest('deposit_fee', {
+        it('should show zero balances in case of isHiddenZeroBalances equals false', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                tokens: assertData,
+                isHiddenZeroBalances: false,
+            });
+            expect(wrapper.vm.validTokens).toEqual([
+                {name: 'WEB', available: 1, removed: false},
+                {name: 'bar', available: 1, removed: false},
+                {name: 'baz', available: 0, removed: false},
+            ]);
+        });
+
+        it('should compute allTokens correctly', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                tokens: null,
+                predefinedTokens: null,
+            });
+
+            expect(wrapper.vm.allTokens).toMatchObject({});
+
+            await wrapper.setData({
+                tokens: {foo: {name: 'foo'}},
+                predefinedTokens: {bar: {name: 'bar'}},
+            });
+            expect(wrapper.vm.allTokens).toMatchObject({bar: {name: 'bar'}, foo: {name: 'foo'}});
+        });
+
+        it('should compute allTokensName correctly', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                tokens: {foo: {identifier: 'foo'}, bar: {identifier: 'bar'}},
+
+            });
+            expect(wrapper.vm.allTokensName).toEqual(['foo', 'bar']);
+        });
+
+        it('should compute predefinedItems correctly', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                predefinedTokens: null,
+            });
+            expect(wrapper.vm.predefinedItems).toEqual([]);
+
+            await wrapper.setData({
+                predefinedTokens: assertData,
+            });
+            expect(wrapper.vm.predefinedItems).toMatchObject(expectData);
+        });
+
+        it('should compute items correctly', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                tokens: null,
+            });
+            expect(wrapper.vm.items).toEqual([]);
+
+            await wrapper.setData({
+                tokens: assertData,
+            });
+            expect(wrapper.vm.items).toMatchObject(expectedTokenData);
+        });
+
+        it('should compute showLoadingIconP correctly', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                predefinedTokens: null,
+            });
+
+            expect(wrapper.vm.showLoadingIconP).toBe(true);
+
+            await wrapper.setData({
+                predefinedTokens: [{name: 'foo'}],
+            });
+            expect(wrapper.vm.showLoadingIconP).toBe(false);
+        });
+
+        it('should compute showLoadingIcon correctly', async () => {
+            const wrapper = mockWallet();
+
+            await wrapper.setData({
+                tokens: null,
+            });
+            expect(wrapper.vm.showLoadingIcon).toBe(true);
+
+            await wrapper.setData({
+                tokens: [{name: 'foo'}],
+            });
+            expect(wrapper.vm.showLoadingIcon).toBe(false);
+        });
+    });
+
+    describe('methods', () => {
+        it('should set data correctly when the function openWithdraw() is called', async (done) => {
+            const predefinedTokensTest = {
+                [webSymbol]: {
+                    fee: '0.500000000000000000',
+                    available: '.01',
+                    subunit: 8,
+                },
+            };
+
+            moxios.stubRequest('withdraw_delays', {
                 status: 200,
+                response: {
+                    login: {
+                        passed: true,
+                        errorMsg: '',
+                    },
+                    registration: {
+                        passed: true,
+                        errorMsg: '',
+                    },
+                },
             });
+
+            const wrapper = mockWallet();
+
+            await wrapper.setProps({twofa: 'foo'});
+
+            await wrapper.setData({
+                showModal: false,
+                tokens: {},
+                predefinedTokens: predefinedTokensTest,
+            });
+
+            await wrapper.vm.openWithdraw(webSymbol, false, false);
 
             moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).toBeUndefined();
+                expect(wrapper.vm.showModal).toBe(true);
+                expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+                expect(wrapper.vm.isTokenModal).toBe(false);
+                expect(wrapper.vm.currentSubunit).toBe(8);
                 done();
             });
         });
 
-        it('should do $axios request and set properties correctly when result of $axios request is 0.0', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.deposit.fee = 'foo';
-            wrapper.vm.openDeposit(webSymbol, 8);
+        it('should set showModal correctly when the function closeWithdraw() is called', async () => {
+            const wrapper = mockWallet();
 
-            moxios.stubRequest('deposit_fee', {
-                status: 200,
-                response: 0.0,
+            await wrapper.setData({
+                showModal: true,
             });
+            wrapper.vm.closeWithdraw();
+            expect(wrapper.vm.showModal).toBe(false);
+        });
 
-            moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).toBeUndefined();
-                done();
+        describe('openDeposit', () => {
+            it('should set properties correctly without $axios request', async () => {
+                const wrapper = mockWallet();
+                const predefinedTokensTest = {
+                    [webSymbol]: {
+                        fee: '0.500000000000000000',
+                        available: '.01',
+                        subunit: 8,
+                    },
+                };
+
+                await wrapper.setData({
+                    tokens: {},
+                    depositTokens: {},
+                    predefinedTokens: predefinedTokensTest,
+                });
+                wrapper.vm.openDeposit(webSymbol);
+
+                expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+                expect(wrapper.vm.isTokenModal).toBe(false);
+                expect(wrapper.vm.showDepositModal).toBe(true);
             });
         });
 
-        it('should do $axios request and set properties correctly when result of $axios request is not empty', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.deposit.fee = '.01';
-            wrapper.vm.openDeposit(webSymbol, 8);
+        describe('openDepositMore', () => {
+            it('should set properties correctly', async () => {
+                const wrapper = mockWallet();
 
-            moxios.stubRequest(/deposit_info.*/, {
-                status: 200,
-                response: {fee: 0.5},
-            });
+                await wrapper.setData({
+                    depositMore: webSymbol,
+                    tokens: [],
+                    depositTokens: [],
+                    predefinedTokens: {[webSymbol]: {subunit: 8}},
+                });
 
-            moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).toBe('0.5');
-                done();
-            });
-        });
-    });
+                wrapper.vm.openDepositMore();
 
-    describe('openDepositMore', () => {
-        it('should do $axios request and set properties correctly', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.setData({depositMore: webSymbol, tokens: []});
-            wrapper.vm.predefinedTokens = {};
-            wrapper.vm.predefinedTokens[wrapper.vm.depositMore] = {subunit: 8};
-            wrapper.vm.depositAddresses = {};
-            wrapper.vm.depositAddresses[wrapper.vm.depositMore] = 'foo';
-            wrapper.vm.openDepositMore();
-
-            moxios.stubRequest(/deposit_info.*/, {
-                status: 200,
-                response: {fee: 0.5},
-            });
-
-            moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).toBe('0.5');
-                done();
-            });
-        });
-    });
-
-    describe('updateBalances', () => {
-        it('should do $axios request and set properties correctly without $axios request', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.predefinedTokens = {};
-            wrapper.vm.predefinedTokens['token'] = {identifier: 'oTokenName'};
-            wrapper.vm.tokens = {};
-            wrapper.vm.tokens['token'] = {identifier: 'oTokenName'};
-            wrapper.vm.updateBalances(assertTokens);
-            expect(wrapper.vm.predefinedTokens['token'].available).toBe('0.5000');
-            expect(wrapper.vm.tokens['token'].available).toBe('0.5000');
-        });
-
-        it('should do $axios request and set properties correctly when result of $axios request is not empty', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.predefinedTokens = {};
-            wrapper.vm.predefinedTokens['token'] = {identifier: 'oTokenName'};
-            wrapper.vm.tokens = {};
-            wrapper.vm.tokens['token'] = {identifier: 'oTokenName', owner: 'owner'};
-            wrapper.vm.updateBalances(assertTokens);
-
-            moxios.stubRequest('lock-period-token', {
-                status: 200,
-                response: {frozenAmount: '0.05'},
-            });
-
-            moxios.wait(() => {
-                expect(wrapper.vm.tokens['token'].available).toMatchObject(new Decimal(assertTokens['oTokenName'].available).sub('0.05'));
-                done();
+                expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+                expect(wrapper.vm.currentSubunit).toBe(8);
+                expect(wrapper.vm.isTokenModal).toBe(false);
+                expect(wrapper.vm.showDepositModal).toBe(true);
             });
         });
 
-        it('should do $axios request and set properties correctly when result of $axios request is empty', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Wallet, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.predefinedTokens = {};
-            wrapper.vm.predefinedTokens['token'] = {identifier: 'oTokenName'};
-            wrapper.vm.tokens = {};
-            wrapper.vm.tokens['token'] = {identifier: 'oTokenName', owner: 'owner'};
-            wrapper.vm.updateBalances(assertTokens);
+        describe('updateBalances', () => {
+            it('should do $axios request and set properties correctly without $axios request', async () => {
+                const wrapper = mockWallet();
 
-            moxios.stubRequest('lock-period-token', {
-                status: 200,
-            });
+                await wrapper.setData({
+                    predefinedTokens: {['token']: {identifier: 'oTokenName'}},
+                    tokens: {['token']: {identifier: 'oTokenName'}},
+                });
 
-            moxios.wait(() => {
+                wrapper.vm.updateBalances(assertTokens);
+
+                expect(wrapper.vm.predefinedTokens['token'].available).toBe('0.5000');
                 expect(wrapper.vm.tokens['token'].available).toBe('0.5000');
-                done();
+            });
+
+            it('should do $axios request and set properties correctly when response is not empty', async (done) => {
+                const wrapper = mockWallet();
+
+                await wrapper.setData({
+                    predefinedTokens: {['token']: {identifier: 'oTokenName'}},
+                    tokens: {['token']: {identifier: 'oTokenName', owner: 'owner'}},
+                });
+
+                moxios.stubRequest('lock-period-token', {
+                    status: 200,
+                    response: {frozenAmount: '0.05', frozenAmountWithReceived: '0.06'},
+                });
+
+                wrapper.vm.updateBalances(assertTokens);
+
+                moxios.wait(() => {
+                    expect(wrapper.vm.tokens['token'].available)
+                        .toMatchObject(new Decimal(assertTokens['oTokenName'].available).sub('0.06'));
+                    done();
+                });
+            });
+
+            it('should do $axios request and set properties correctly when result of $axios request is empty',
+                async (done) => {
+                    const wrapper = mockWallet();
+
+                    await wrapper.setData({
+                        predefinedTokens: {['token']: {identifier: 'oTokenName'}},
+                        tokens: {['token']: {identifier: 'oTokenName', owner: 'owner'}},
+                    });
+
+                    moxios.stubRequest('lock-period-token', {
+                        status: 200,
+                    });
+
+                    wrapper.vm.updateBalances(assertTokens);
+
+                    moxios.wait(() => {
+                        expect(wrapper.vm.tokens['token'].available).toBe('0.5000');
+                        done();
+                    });
+                });
+        });
+
+        it('should set closeDepositModal correctly when the function closeDeposit() is called', async () => {
+            const wrapper = mockWallet();
+
+            wrapper.vm.closeDepositModal();
+            expect(wrapper.vm.showDepositModal).toBe(false);
+        });
+
+        it('should return correctly value when the function tokensToArray() is called', () => {
+            const wrapper = mockWallet();
+
+            expect(wrapper.vm.tokensToArray(assertData)).toMatchObject(expectData);
+        });
+
+        it('should return correctly url when the function generatePairUrl() is called', () => {
+            const wrapper = mockWallet();
+
+            expect(wrapper.vm.generatePairUrl({name: 'foo'})).toBe('token_show_trade-foo');
+        });
+
+        it('should return correctly url when the function generateCoinUrl() is called', () => {
+            const wrapper = mockWallet();
+
+            const coin = {
+                name: 'foo',
+                exchangeble: true,
+                tradable: true,
+            };
+
+            expect(wrapper.vm.generateCoinUrl(coin)).toBe('coin-foo-WEB');
+
+            coin.exchangeble = false;
+            expect(wrapper.vm.generateCoinUrl(coin)).toBe('coin-foo-WEB');
+
+            coin.exchangeble = true;
+            coin.tradable = false;
+            expect(wrapper.vm.generateCoinUrl(coin)).toBe('coin-WEB-foo');
+
+            coin.tradable = true;
+            coin.name = 'WEB';
+            expect(wrapper.vm.generateCoinUrl(coin)).toBe('coin-BTC-WEB');
+        });
+
+        it('should return correctly value when the function isTokenDepositDisabled() is called', () => {
+            const wrapper = mockWallet();
+
+            const data = {
+                item: {
+                    blocked: false,
+                },
+            };
+
+            wrapper.vm.isTokenDepositDisabled(data);
+            expect(wrapper.classes('text-white')).toBe(false);
+
+            data.item.blocked = true;
+            expect(wrapper.classes('text-muted pointer-events-none')).toBe(false);
+        });
+
+        it('should return correctly value when the function isTokenWithdrawalDisabled() is called', () => {
+            const wrapper = mockWallet();
+
+            const data = {
+                item: {
+                    blocked: false,
+                },
+            };
+
+            wrapper.vm.isTokenWithdrawalDisabled(data);
+            expect(wrapper.classes('text-white')).toBe(false);
+
+            data.item.blocked = true;
+            expect(wrapper.classes('text-muted pointer-events-none')).toBe(false);
+        });
+
+        it('should return correctly value when the function tooltipRemoveTokenButton() is called', () => {
+            const wrapper = mockWallet();
+
+            const data = {
+                item: {
+                    available: '8.006000000000',
+                    owner: false,
+                    bonus: '0.000000000000',
+                },
+            };
+
+            expect(wrapper.vm.tooltipRemoveTokenButton(data)).toBe('wallet.disabled.delete_token');
+
+            data.item.owner = true;
+            expect(wrapper.vm.tooltipRemoveTokenButton(data)).toBe('wallet.disabled.delete_token_owner');
+        });
+
+        it('should return correctly value when the function tooltipDepositOrWithdrawButton() is called', async () => {
+            const wrapper = mockWallet();
+
+            const data = {
+                item: {
+                    deployed: false,
+                    cryptoSymbol: 'FOO',
+                },
+            };
+
+            await wrapper.setData({
+                tokens: data,
+            });
+            expect(wrapper.vm.tooltipDepositOrWithdrawButton(data)).toBe('wallet.disabled.deposit_and_withdraw');
+
+            data.item.deployed = true;
+            expect(wrapper.vm.tooltipDepositOrWithdrawButton(data)).toBe(wrapper.vm.tooltipDisabledDeposits(data));
+        });
+
+        it('should isTokenActionDisabled return true if isUserBlocked is true', () => {
+            const localVue = mockVue();
+            const wrapper = shallowMount(Wallet, {
+                localVue,
+                propsData: {...defaultProps},
+            });
+
+            const data = {
+                item: {
+                    blocked: true,
+                },
+            };
+
+            expect(wrapper.vm.isTokenActionDisabled(data)).toBe(true);
+        });
+
+        it('should isTokenActionDisabled be true if disabledServicesConfig.allServicesDisabled is true', () => {
+            const localVue = mockVue();
+            const wrapper = shallowMount(Wallet, {
+                localVue,
+                propsData: {...defaultProps, disabledServicesConfig: {allServicesDisabled: true}},
+            });
+
+            const data = {
+                item: {
+                    blocked: false,
+                },
+            };
+
+            expect(wrapper.vm.isTokenActionDisabled(data)).toBe(true);
+        });
+
+        describe('areCryptoTokenActionsDisabled', () => {
+            const data = [
+                {
+                    viewOnly: true,
+                    expect: true,
+                },
+                {
+                    viewOnly: false,
+                    expect: false,
+                },
+            ];
+
+            describe.each(data)('should return', (testData) => {
+                it(`${testData.expect}`, async () => {
+                    const wrapper = mockWallet();
+                    await wrapper.setProps({
+                        viewOnly: testData.viewOnly,
+                        isUserBlocked: testData.isUserBlocked,
+                    });
+
+                    expect(wrapper.vm.areCryptoTokenActionsDisabled()).toBe(testData.expect);
+                });
             });
         });
-    });
 
-    it('should set showDepositModal correctly when the function closeDeposit() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        wrapper.vm.showDepositModal = true;
-        wrapper.vm.closeDeposit();
-        expect(wrapper.vm.showDepositModal).toBe(false);
-    });
+        describe('isTokenActionDisabled', () => {
+            const data = [
+                {
+                    areCryptoTokenActionsDisabled: true,
+                    tokenBlocked: false,
+                    tokenDeployed: true,
+                    expect: true,
+                },
+                {
+                    areCryptoTokenActionsDisabled: false,
+                    tokenBlocked: true,
+                    tokenDeployed: true,
+                    expect: true,
+                },
+                {
+                    areCryptoTokenActionsDisabled: false,
+                    tokenBlocked: false,
+                    tokenDeployed: false,
+                    expect: true,
+                },
+                {
+                    areCryptoTokenActionsDisabled: false,
+                    tokenBlocked: false,
+                    tokenDeployed: true,
+                    expect: false,
+                },
+            ];
 
-    it('should return correctly value when the function tokensToArray() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        expect(wrapper.vm.tokensToArray(assertData)).toMatchObject(expectData);
-    });
+            describe.each(data)('should return', (testData) => {
+                it(`${testData.expect}`, () => {
+                    const wrapper = mockWallet();
+                    jest.spyOn(wrapper.vm, 'areCryptoTokenActionsDisabled')
+                        .mockReturnValue(testData.areCryptoTokenActionsDisabled);
 
-    it('should return correctly url when the function generatePairUrl() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        expect(wrapper.vm.generatePairUrl({name: 'foo'})).toBe('token_show-foo');
-    });
+                    const tokenData = {
+                        item: {
+                            blocked: testData.tokenBlocked,
+                            deployed: testData.tokenDeployed,
+                        },
+                    };
 
-    it('should return correctly url when the function generateCoinUrl() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Wallet, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
+                    expect(wrapper.vm.isTokenActionDisabled(tokenData)).toBe(testData.expect);
+                });
+            });
         });
-        wrapper.vm.predefinedTokens = {BTC: {name: 'BTC'}, WEB: {name: 'WEB'}};
-        expect(wrapper.vm.generateCoinUrl({exchangeble: false})).toBe('coin-WEB');
-        expect(wrapper.vm.generateCoinUrl({exchangeble: true, tradable: false, name: 'foo'})).toBe('coin-BTC-WEB');
-        expect(wrapper.vm.generateCoinUrl({exchangeble: true, tradable: true, name: 'foo'})).toBe('coin-BTC-foo');
+
+        describe('isTokenDepositDisabled', () => {
+            const data = [
+                {
+                    isTokenActionDisabled: true,
+                    tokenDepositsDisabled: false,
+                    expect: true,
+                },
+                {
+                    isTokenActionDisabled: false,
+                    tokenDepositsDisabled: true,
+                    expect: true,
+                },
+                {
+                    isTokenActionDisabled: false,
+                    tokenDepositsDisabled: false,
+                    expect: false,
+                },
+            ];
+
+            describe.each(data)('should return', (testData) => {
+                it(`${testData.expect}`, () => {
+                    const extraWrapperProps = {
+                        propsData: {
+                            ...defaultProps,
+                            disabledServicesConfig: {
+                                tokenDepositsDisabled: testData.tokenDepositsDisabled,
+                                allServicesDisabled: false,
+                                depositsDisabled: {},
+                                withdrawalsDisabled: {},
+                            },
+                        },
+                    };
+                    const wrapper = mockWallet(extraWrapperProps);
+                    jest.spyOn(wrapper.vm, 'isTokenActionDisabled').mockReturnValue(testData.isTokenActionDisabled);
+
+                    const data = {
+                        item: {
+                            blocked: false,
+                            depositsDisabled: false,
+                        },
+                    };
+
+                    expect(wrapper.vm.isTokenDepositDisabled(data)).toBe(testData.expect);
+                });
+            });
+        });
+
+        describe('isTokenWithdrawalDisabled', () => {
+            const data = [
+                {
+                    isTokenActionDisabled: true,
+                    tokenWithdrawalsDisabled: false,
+                    expect: true,
+                },
+                {
+                    isTokenActionDisabled: false,
+                    tokenWithdrawalsDisabled: true,
+                    expect: true,
+                },
+                {
+                    isTokenActionDisabled: false,
+                    tokenWithdrawalsDisabled: false,
+                    expect: false,
+                },
+            ];
+
+            describe.each(data)('should return', (testData) => {
+                it(`${testData.expect}`, () => {
+                    const extraWrapperProps = {
+                        propsData: {
+                            ...defaultProps,
+                            disabledServicesConfig: {
+                                tokenWithdrawalsDisabled: testData.tokenWithdrawalsDisabled,
+                                allServicesDisabled: false,
+                                depositsDisabled: {},
+                                withdrawalsDisabled: {},
+                            },
+                        },
+                    };
+                    const wrapper = mockWallet(extraWrapperProps);
+                    jest.spyOn(wrapper.vm, 'isTokenActionDisabled').mockReturnValue(testData.isTokenActionDisabled);
+                    expect(wrapper.vm.isTokenWithdrawalDisabled({item: {withdrawalsDisabled: false}}))
+                        .toBe(testData.expect);
+                });
+            });
+        });
+
+        describe('isCryptoActionDisabled', () => {
+            const data = [
+                {
+                    areCryptoTokenActionsDisabled: true,
+                    isDisabledCrypto: false,
+                    expect: true,
+                },
+                {
+                    areCryptoTokenActionsDisabled: false,
+                    isDisabledCrypto: true,
+                    expect: true,
+                },
+                {
+                    areCryptoTokenActionsDisabled: false,
+                    isDisabledCrypto: false,
+                    expect: false,
+                },
+            ];
+
+            describe.each(data)('should return', (testData) => {
+                it(`${testData.expect}`, () => {
+                    const wrapper = mockWallet();
+                    jest.spyOn(wrapper.vm, 'areCryptoTokenActionsDisabled').mockReturnValue(testData.expect);
+                    jest.spyOn(wrapper.vm, 'isDisabledCrypto').mockReturnValue(testData.isDisabledCrypto);
+                    const cryptoData = {
+                        name: 'foo',
+                    };
+
+                    expect(wrapper.vm.isCryptoActionDisabled(cryptoData)).toBe(testData.expect);
+                });
+            });
+        });
+
+        describe('isCryptoDepositDisabled', () => {
+            const data = [
+                {
+                    isCryptoActionDisabled: true,
+                    coinDepositsDisabled: false,
+                    expect: true,
+                },
+                {
+                    isCryptoActionDisabled: false,
+                    coinDepositsDisabled: true,
+                    expect: true,
+                },
+                {
+                    isCryptoActionDisabled: false,
+                    coinDepositsDisabled: false,
+                    expect: false,
+                },
+            ];
+
+            const coinData = {
+                item: {
+                    cryptoSymbol: 'FOO',
+                },
+            };
+
+            describe.each(data)('should return', (testData) => {
+                it(`${testData.expect}`, () => {
+                    const extraWrapperProps = {
+                        propsData: {
+                            ...defaultProps,
+                            disabledServicesConfig: {
+                                coinDepositsDisabled: testData.coinDepositsDisabled,
+                                allServicesDisabled: false,
+                                depositsDisabled: {},
+                                withdrawalsDisabled: {},
+                            },
+                        },
+                    };
+                    const wrapper = mockWallet(extraWrapperProps);
+                    jest.spyOn(wrapper.vm, 'isCryptoActionDisabled').mockReturnValue(testData.isCryptoActionDisabled);
+
+                    expect(wrapper.vm.isCryptoDepositDisabled(coinData)).toBe(testData.expect);
+                });
+            });
+        });
+
+        describe('isCryptoWithdrawalDisabled', () => {
+            const data = [
+                {
+                    isCryptoActionDisabled: true,
+                    coinWithdrawalsDisabled: false,
+                    expect: true,
+                },
+                {
+                    isCryptoActionDisabled: false,
+                    coinWithdrawalsDisabled: true,
+                    expect: true,
+                },
+                {
+                    isCryptoActionDisabled: false,
+                    coinWithdrawalsDisabled: false,
+                    expect: false,
+                },
+            ];
+
+            const coinData = {
+                item: {
+                    cryptoSymbol: 'FOO',
+                },
+            };
+
+            describe.each(data)('should return', (testData) => {
+                it(`${testData.expect}`, () => {
+                    const extraWrapperProps = {
+                        propsData: {
+                            ...defaultProps,
+                            disabledServicesConfig: {
+                                coinWithdrawalsDisabled: testData.coinWithdrawalsDisabled,
+                                allServicesDisabled: false,
+                                depositsDisabled: {},
+                                withdrawalsDisabled: {},
+                            },
+                        },
+                    };
+                    const wrapper = mockWallet(extraWrapperProps);
+                    jest.spyOn(wrapper.vm, 'isCryptoActionDisabled').mockReturnValue(testData.isCryptoActionDisabled);
+                    expect(wrapper.vm.isCryptoWithdrawalDisabled(coinData)).toBe(testData.expect);
+                });
+            });
+        });
+
+
+        it('should return correctly value when the function tooltipRemoveTokenButton() is called', () => {
+            const wrapper = mockWallet();
+
+            const data = {
+                item: {
+                    available: '8.006000000000',
+                    owner: false,
+                    bonus: '0.000000000000',
+                },
+            };
+
+            expect(wrapper.vm.tooltipRemoveTokenButton(data)).toBe('wallet.disabled.delete_token');
+
+            data.item.owner = true;
+            expect(wrapper.vm.tooltipRemoveTokenButton(data)).toBe('wallet.disabled.delete_token_owner');
+        });
     });
 });

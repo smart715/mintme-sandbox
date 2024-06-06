@@ -15,11 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WebSocketController extends AbstractFOSRestController
 {
-    /** @var bool */
-    private $isAuth;
-
-    /** @var Config */
-    private $config;
+    private bool $isAuth;
+    
+    private Config$config;
 
     public function __construct(bool $isAuth, Config $config)
     {

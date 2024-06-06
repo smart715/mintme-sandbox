@@ -1,13 +1,18 @@
 <template>
     <div>
-        <div v-if="!loaded" class="d-flex justify-content-center">
-            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        <div v-if="!loaded" class="d-flex justify-content-center py-3">
+            <span class="spinner-border spinner-border-sm">
+                <span class="sr-only"> {{ $t('loading') }} </span>
+            </span>
         </div>
         <div v-else>
             <div v-if="!enabled">
-                <a :href="authUrl" class="btn btn-primary btn-block">
+                <a :href="authUrl" class="btn btn-primary btn-block mt-1">
                     {{ $t('discord.rewards.bot.invite') }}
                 </a>
+                <div class="py-1">
+                    {{ $t('discord.rewards.bot.invite.info') }}
+                </div>
                 <div v-if="guildId">
                     <p>
                         {{ $t('discord.rewards.warning_1') }}
@@ -19,129 +24,116 @@
             </div>
             <div v-else>
                 <div>
-                    <a href="#" class="btn btn-primary btn-block" @click.prevent="openConfirmModal">
-                        {{ $t('discord.rewards.bot.remove') }}
-                    </a>
-                </div>
-                <div class="mt-3">
-                    {{ $t('discord.rewards.description') }}
-                    <guide>
-                        <template slot="body">
-                            {{ $t('discord.rewards.description.guide') }}
-                        </template>
-                    </guide>
-                </div>
-                <div class="mt-2">
-                    <div class="custom-control custom-checkbox">
-                        <input
-                            type="checkbox"
-                            class="custom-control-input"
-                            id="special-roles"
-                            v-model="specialRolesEnabled"
-                            @input="anyChange = true"
+                    <div class="d-flex flex-row justify-content-between mb-3">
+                        <m-button
+                            type="primary"
+                            :disabled="saving"
+                            :loading="loadingRoles"
+                            @click="updateRolesFromDiscord"
                         >
-                        <label for="special-roles" class="custom-control-label">
-                            {{ $t('discord.rewards.special_roles') }}
-                        </label>
+                            {{ $t('discord.rewards.special_roles.add') }}
+                        </m-button>
+                        <m-button
+                            type="primary"
+                            class="ml-2"
+                            @click.prevent="openConfirmModal"
+                        >
+                            <template v-slot:prefix>
+                                <font-awesome-icon :icon="['fa', 'trash']" class="mr-2" />
+                            </template>
+                            {{ $t('discord.rewards.bot.remove') }}
+                        </m-button>
+                    </div>
+                    <div v-if="showNewRolesInfo" class="py-1">
+                        <span>
+                            {{ $t('discord.rewards.bot.new_roles.info', translationContext) }}
+                        </span>
+                    </div>
+                    <div v-if="showHelp" class="d-flex discord-help p-1 mt-4">
+                        <span v-html="$t('discord.rewards.special_roles.add.no_found', translationContext)"></span>
                     </div>
                 </div>
                 <div>
                     <discord-role-edit
-                        class="mt-2"
                         v-for="(role, i) in roles"
                         :key="i"
                         :role="role"
                         :i="i"
+                        :roles="roles"
+                        :min-required-balance="balances.min"
+                        :max-required-balance="balances.max"
+                        :token-avatar="tokenAvatar"
                         @update="updateRole"
                         @remove="removeRole"
+                        @all-unique="changeUnique"
                     />
-                    <div class="mt-3 d-flex align-items-center">
-                        <button class="btn btn-primary"
-                            :disabled="saving || loadingRoles"
-                            @click="updateRolesFromDiscord"
-                        >
-                            {{ $t('discord.rewards.special_roles.add') }}
-                        </button>
-                        <font-awesome-icon v-show="loadingRoles" icon="circle-notch" spin class="loading-spinner ml-3" fixed-width />
+                    <div v-if="showMinValueWarning" class="mt-2 text-danger">
+                      {{ $t('discord.rewards.min_token_balance', translationContext) }}
                     </div>
                 </div>
-                <div class="mt-2 text-danger">
-                    {{ errorMessage }}
-                </div>
-                <div v-show="showHelp" class="mt-2">
-                    <a href="#" class="text-info" @click="showHelpModal = true">
-                        <font-awesome-icon icon="info-circle" class="text-info" />
-                        {{ $t('discord.rewards.special_roles.help_1') }}
-                    </a>
-                </div>
-                <div v-show="anyChange && !saveDisabled" class="mt-2 text-info">
-                    {{ $t('discord.rewards.need_to_save') }}
-                </div>
-                <div class="my-3 d-flex align-items-center">
-                    <button class="btn btn-primary mr-2"
+                <div class="d-flex align-items-center m-3">
+                    <m-button
+                        type="primary"
                         :disabled="saveDisabled"
+                        :loading="saving"
                         @click="save"
                     >
+                        <template v-slot:prefix>
+                            <font-awesome-icon :icon="['far', 'check-square']" class="mr-2" />
+                        </template>
                         {{ $t('save') }}
-                    </button>
-                    <font-awesome-icon v-show="saving" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </m-button>
                 </div>
             </div>
         </div>
         <confirm-modal
             :visible="confirmModalVisible"
+            type="warning"
+            :show-image="false"
             @confirm="removeGuild"
             @cancel="closeConfirmModal"
             @close="closeConfirmModal"
         >
             <span class="text-white">
-                {{ $t('discord.rewards.guild.remove.confirm_1') }}
-                <br>
-                {{ guildId }}
-                <br>
-                {{ $t('discord.rewards.guild.remove.confirm_2') }}
+                {{ $t('discord.rewards.guild.remove.confirm') }}
             </span>
         </confirm-modal>
-        <modal :visible="showHelpModal" @close="showHelpModal = false">
-            <template slot="body">
-                {{ $t('discord.rewards.special_roles.help_2') }}
-                <br>
-                {{ $t('discord.rewards.special_roles.help_3') }}
-            </template>
-        </modal>
     </div>
 </template>
 
 <script>
-import Guide from '../../Guide';
-import {NotificationMixin, LoggerMixin} from '../../../mixins';
+import {NotificationMixin} from '../../../mixins';
 import {toMoney} from '../../../utils';
 import DiscordRoleEdit from './DiscordRoleEdit';
 import ConfirmModal from '../../modal/ConfirmModal';
-import Modal from '../../modal/Modal';
-import {assertUniquePropertyValuesInObjectArray} from '../../../utils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {faInfoCircle, faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {faTrash} from '@fortawesome/free-solid-svg-icons';
 import {library} from '@fortawesome/fontawesome-svg-core';
+import Decimal from 'decimal.js';
+import {MButton} from '../../UI';
+import {faCheckSquare} from '@fortawesome/free-regular-svg-icons';
 
-library.add(faInfoCircle, faCircleNotch);
+library.add(faCheckSquare, faTrash);
+
+const minRequiredBalance = 0;
+const maxRequiredBalance = 1000000;
 
 export default {
     name: 'DiscordRewardsEdit',
     mixins: [
         NotificationMixin,
-        LoggerMixin,
     ],
     components: {
-        Guide,
         DiscordRoleEdit,
         ConfirmModal,
-        Modal,
         FontAwesomeIcon,
+        MButton,
     },
     props: {
         tokenName: String,
+        tokenAvatar: String,
         authUrl: String,
+        loadRoles: Boolean,
     },
     data() {
         return {
@@ -150,37 +142,46 @@ export default {
             removedRoles: [],
             saving: false,
             enabled: false,
-            specialRolesEnabled: false,
             loaded: false,
             guildId: null,
             confirmModalVisible: false,
-            anyChange: false,
-            showHelp: false,
-            showHelpModal: false,
+            showHelp: true,
             loadingRoles: false,
+            showNewRolesInfo: false,
+            showMinValueWarning: false,
+            allUniqueValues: true,
+            balances: {
+                min: minRequiredBalance,
+                max: maxRequiredBalance,
+            },
         };
     },
-    mounted() {
-        this.loadDiscordInfo()
-            .then(() => this.loaded = true);
+    async mounted() {
+        try {
+            await this.loadDiscordInfo();
+            this.loaded = true;
+
+            if (this.loadRoles && this.enabled) {
+                await this.updateRolesFromDiscord();
+
+                if (0 !== this.newRoles.length) {
+                    this.showNewRolesInfo = true;
+                }
+            }
+        } catch { }
     },
     computed: {
         saveDisabled() {
-            return this.$v.$invalid || this.saving;
+            return this.$v.$invalid || this.saving || !this.allUniqueValues;
         },
         roles() {
             return this.currentRoles.concat(this.newRoles);
         },
-        errorMessage() {
-            if (!this.$v.roles.required && this.specialRolesEnabled) {
-                return this.$t('discord.rewards.special_roles.required');
-            }
-
-            if (!this.$v.roles.uniqueBalances) {
-                return this.$t('discord.rewards.special_roles.unique_balances');
-            }
-
-            return '';
+        translationContext() {
+            return {
+                min: this.balances.min + 1,
+                kbUrl: this.$routing.generate('kb_show', {url: 'How-to-manage-discord-roles'}),
+            };
         },
     },
     methods: {
@@ -193,12 +194,13 @@ export default {
                         return role;
                     });
 
+                    this.newRoles = [];
+                    this.removedRoles = [];
                     this.enabled = res.data.config.enabled;
-                    this.specialRolesEnabled = res.data.config.specialRolesEnabled;
                     this.guildId = res.data.config.guildId;
                 })
                 .catch((err) => {
-                    this.sendLogs('error', 'can\'t load discord info', err);
+                    this.$logger.error('can\'t load discord info', err);
                     this.notifyError(this.$t('toasted.error.try_later'));
 
                     throw err;
@@ -221,14 +223,13 @@ export default {
                         return role;
                     });
 
-                    this.showHelp = res.data.showHelp;
+                    this.showHelp = (this.loadRoles && 0 === this.newRoles.length);
                 })
                 .catch((err) => {
-                    this.sendLogs('error', 'can\'t update roles from discord', err);
+                    this.$logger.error('can\'t update roles from discord', err);
                 })
                 .finally(() => {
                     this.loadingRoles = false;
-                    this.anyChange = true;
                 });
         },
         save() {
@@ -238,12 +239,20 @@ export default {
 
             this.saving = true;
 
-            let data = {
-                specialRolesEnabled: this.specialRolesEnabled && this.roles.length > 0,
-                newRoles: this.newRoles,
-                currentRoles: this.currentRoles,
-                removedRoles: this.removedRoles,
+            const data = {
+                newRoles: this.filterRoles(this.newRoles),
+                currentRoles: this.filterRoles(this.currentRoles),
+                removedRoles: this.filterRoles(this.removedRoles),
             };
+
+            if (0 === data.newRoles.length && 0 === data.currentRoles.length && 0 === data.removedRoles.length) {
+                this.showMinValueWarning = true;
+                this.saving = false;
+
+                return;
+            } else {
+                this.showMinValueWarning = false;
+            }
 
             this.$axios.single.post(this.$routing.generate('manage_discord_roles', {tokenName: this.tokenName}), data)
                 .then((res) => {
@@ -254,40 +263,38 @@ export default {
                     }
 
                     return this.loadDiscordInfo().then(() => {
-                        this.newRoles = [];
-                        this.removedRoles = [];
                         this.saving = false;
-                        this.anyChange = false;
                         this.notifySuccess(this.$t('discord.rewards.save.success'));
                     });
                 }, (err) => {
-                    this.sendLogs('error', 'can\'t save discord rewards', err);
+                    this.$logger.error('can\'t save discord rewards', err);
                     this.notifyError(err.response.data.message);
                 })
                 .finally(() => this.saving = false);
         },
+        filterRoles(roles) {
+            return roles.filter((role) => !new Decimal(role.requiredBalance).isZero());
+        },
         updateRole(role, property, value) {
             role[property] = value;
             this.$v.$touch();
-
-            if ('valid' !== property) {
-                this.anyChange = true;
-            }
         },
         removeRole(role) {
-            let newRolesIndex = this.newRoles.indexOf(role);
+            const newRolesIndex = this.newRoles.indexOf(role);
 
-            if (newRolesIndex !== -1) {
+            if (-1 !== newRolesIndex) {
                 this.newRoles.splice(newRolesIndex, 1);
                 return;
             }
 
-            let currentRolesIndex = this.currentRoles.indexOf(role);
+            const currentRolesIndex = this.currentRoles.indexOf(role);
 
             this.currentRoles.splice(currentRolesIndex, 1);
 
             this.removedRoles.push(role);
-            this.anyChange = true;
+        },
+        changeUnique(isUniq) {
+            this.allUniqueValues = isUniq;
         },
         removeGuild() {
             return this.$axios.single.delete(this.$routing.generate('remove_guild', {tokenName: this.tokenName}))
@@ -297,7 +304,7 @@ export default {
                     this.notifySuccess(this.$t('discord.rewards.guild.removed'));
                 })
                 .catch((err) => {
-                    this.sendLogs('error', 'can\'t remove discord guild', err);
+                    this.$logger.error('can\'t remove discord guild', err);
                     this.notifyError(this.$t('discord.rewards.guild.removed.error'));
                 });
         },
@@ -308,18 +315,10 @@ export default {
             this.confirmModalVisible = false;
         },
     },
-    watch: {
-        roles() {
-            if (this.roles.length === 0) {
-                this.specialRolesEnabled = false;
-            }
-        },
-    },
     validations() {
         return {
             roles: {
-                required: (val) => val.length > 0 || this.removedRoles.length > 0,
-                uniqueBalances: (arr) => assertUniquePropertyValuesInObjectArray(arr, 'requiredBalance'),
+                required: (val) => 0 < val.length || 0 < this.removedRoles.length,
                 rolesValid: (arr) => arr.every((item) => item.valid),
             },
         };

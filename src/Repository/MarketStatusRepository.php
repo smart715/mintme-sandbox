@@ -5,18 +5,26 @@ namespace App\Repository;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Utils\Symbols;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class MarketStatusRepository extends EntityRepository
+/**
+ * @extends ServiceEntityRepository<MarketStatus>
+ * @codeCoverageIgnore
+ */
+class MarketStatusRepository extends ServiceEntityRepository
 {
-    /** @codeCoverageIgnore */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, MarketStatus::class);
+    }
+
     public function findByName(string $tokenName): ?MarketStatus
     {
         return $this->findOneBy(['tokenName' => $tokenName]);
     }
 
-    /** @codeCoverageIgnore */
     public function findByBaseQuoteNames(string $base, string $quote): ?MarketStatus
     {
         return $this->createQueryBuilder('m')
@@ -31,7 +39,6 @@ class MarketStatusRepository extends EntityRepository
             ->getResult()[0] ?? null;
     }
 
-    /** @codeCoverageIgnore */
     public function getTokenWEBMarkets(): array
     {
         return $this->createQueryBuilder('m')
@@ -44,7 +51,6 @@ class MarketStatusRepository extends EntityRepository
             ->getResult();
     }
 
-    /** @codeCoverageIgnore */
     public function getExchangeableCryptoMarkets(): array
     {
         return $this->createQueryBuilder('m')
@@ -68,9 +74,10 @@ class MarketStatusRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('ms')
             ->leftJoin('ms.quoteToken', 'qt')
-            ->leftJoin('qt.crypto', 'qt_crypto')
+            ->leftJoin('qt.deploys', 'qt_deploys')
+            ->leftJoin('qt_deploys.crypto', 'qt_crypto')
             ->where('ms.quoteToken IS NULL')
-            ->orWhere('qt.address IS NOT NULL AND qt.address != :pending AND qt.isBlocked = false')
+            ->orWhere('qt_deploys.address IS NOT NULL AND qt_deploys.address != :pending AND qt.isBlocked = false')
             ->orWhere('qt_crypto.symbol IS NOT NULL AND qt_crypto.symbol = :ethSymbol')
             ->setParameter('pending', Token::PENDING_ADDR)
             ->setParameter('ethSymbol', Symbols::ETH)
@@ -85,5 +92,19 @@ class MarketStatusRepository extends EntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function getMarketsByToken(int $tokenId): array
+    {
+        return $this->createQueryBuilder('ms')
+            ->join('ms.quoteToken', 'qt')
+            ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false')
+            ->andWhere('qt.isHidden=false')
+            ->andWhere('qt.id = :id')
+            ->setParameter('id', $tokenId)
+            ->groupBy('ms')
+            ->getQuery()
+            ->getResult();
     }
 }

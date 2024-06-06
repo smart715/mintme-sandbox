@@ -27,11 +27,28 @@
 {% block contentClass %}blog{% endblock %}
 
 {% block content %}
-    <div id="news" class="py-4">
+    <div id="news" class="py-4 container">
         {{ include("@SonataNews/Post/view_content.html.twig") }}
     </div>
 {% endblock %}
 
 {% block pagescripts %}
     {{ encore_entry_script_tags('pages/news') }}
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org/",
+            "@type": "NewsArticle",
+            "url": "{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}",
+            "publisher": {
+                "@type": "{% trans %}page.news.schema_organization{% endtrans %}",
+                "name": "MintMe",
+                "logo": "{{ absolute_url(asset('build/images/logo.png')) }}"
+            },
+            "headline": "{{ title }}",
+            "mainEntityOfPage": "{{ url('homepage') }}",
+            "articleBody": "{{ post.rawContent }}",
+            "image": "{{ post.image }}",
+            "datePublished": "{{ post.publicationDateStart | format_date }}"
+        }
+    </script>
 {% endblock %}

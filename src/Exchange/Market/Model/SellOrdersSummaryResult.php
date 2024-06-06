@@ -4,6 +4,7 @@ namespace App\Exchange\Market\Model;
 
 use Money\Money;
 
+/** @codeCoverageIgnore */
 class SellOrdersSummaryResult
 {
     private string $baseAmount;

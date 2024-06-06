@@ -1,0 +1,37 @@
+{% set ownerProfileUrl = absolute_url(path('profile-view', {'nickname': ownerNickname})) %}
+{% set urlToken = absolute_url(path('token_show',  {'name': rewardToken})) %}
+{% set urlProduct = absolute_url(path('token_show', {'name': rewardToken, 'tab': 'intro', 'modal': 'reward-finalize', 'slug': slug})) %}
+
+{% extends 'mail/layout.html.twig' %}
+{% block content %}
+    {{ parent() }}
+    <div class="box-table">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border" bgcolor="#ffffff">
+            <tr>
+                <td align="center" width="600" class="td-body" bgcolor="#ffffff">
+                    <img alt="Description" src="{{ absolute_url(asset('build/images/mail-reward.png')) }}" width="120" class="img-build-v0" />
+                    <p class="p-hello">
+                        {% trans %} hello {% endtrans %}
+                        {{ nickname }}
+                    </p>
+                    <p class="p-second-line">
+                        {% trans with {
+                            '%ownerProfileUrl%': ownerProfileUrl,
+                            '%ownerNickname%': ownerNickname,
+                            '%amount%': amount,
+                            '%urlToken%': urlToken,
+                            '%tokenName%': rewardToken,
+                            '%urlProduct%': urlProduct,
+                            '%productTitle%': rewardTitle
+                        }%} mail.reward.refund {% endtrans %}
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" class="prev-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

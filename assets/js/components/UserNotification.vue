@@ -1,85 +1,83 @@
 <template>
-  <div class="dropdown" v-on-clickaway="hideUserNotifications">
-      <a
-          class="nav-link pl-1 dropdown-toggle c-pointer"
-          aria-haspopup="true"
-          :aria-expanded="showUserNotifications"
-          @click="toggleUserNotifications"
-          tabindex="0"
-          @keyup.enter="toggleUserNotifications"
-      >
-          <notification-bell
-              class="bell-notification"
-              :size="23"
-              :count="unreadNotifications"
-              counterStyle="round"
-              counterBackgroundColor="#FF0000"
-              counterTextColor="#FFFFFF"
-              iconColor="#ebebeb"
-          />
-      </a>
-      <div
-          class="dropdown-menu dropdown-menu-right align-self-lg-center bell-notification-dropdown"
-          :class="{ 'show': showUserNotifications }"
-      >
-          <div class="notification-header">
-              <span> {{ $t('userNotification.title') }}</span>
-          </div>
-          <vue-scroll
-              ref="notificationsScroll"
-              :ops="scrollOps"
-              @handle-scroll="handleScroll"
-              v-bind:class="scrollClass"
-          >
-              <div class="notification-container">
-                  <template v-if="loaded">
-                      <template v-if="hasNotifications">
-                          <div
-                              v-for="notification in userNotificationsFiltered"
-                              :key="notification.id"
-                              class="notification-body"
-                          >
-                              <NotificationType :notification="notification"/>
-                          </div>
-                      </template>
-                      <div v-if="!hasNotifications" class="text-center notification-body">
-                          {{ $t('userNotification.no_notifications_yet') }}
-                      </div>
-                  </template>
-                  <template v-else>
-                      <div class="text-center notification-body">
-                          <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                      </div>
-                  </template>
-              </div>
-          </vue-scroll>
-      </div>
-  </div>
+    <div class="dropdown" v-on-clickaway="hideUserNotifications">
+        <a
+            class="nav-link pl-1 dropdown-toggle c-pointer"
+            aria-haspopup="true"
+            :aria-expanded="showUserNotifications"
+            tabindex="0"
+            @click="toggleUserNotifications"
+            @keyup.enter="toggleUserNotifications"
+        >
+            <counter-wrapper :count="unreadNotifications">
+                <font-awesome-icon :icon="['far', 'bell']" />
+            </counter-wrapper>
+        </a>
+        <div
+            class="dropdown-menu dropdown-menu-right align-self-lg-center bell-notification-dropdown"
+            :class="{ 'show': showUserNotifications }"
+        >
+            <div class="notification-header">
+                {{ $t('userNotification.title') }}
+            </div>
+            <vue-scroll
+                ref="notificationsScroll"
+                :ops="scrollOps"
+                v-bind:class="scrollClass"
+                @handle-scroll="handleScroll"
+            >
+                <div class="notification-container">
+                    <template v-if="loaded">
+                        <template v-if="hasNotifications">
+                            <div
+                                v-for="notification in userNotificationsFiltered"
+                                :key="notification.id"
+                                class="notification-body"
+                            >
+                                <NotificationType :notification="notification" :currentLocale="currentLocale" />
+                            </div>
+                        </template>
+                        <div v-if="!hasNotifications" class="text-center notification-body">
+                            {{ $t('userNotification.no_notifications_yet') }}
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="text-center notification-body">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </div>
+                    </template>
+                </div>
+            </vue-scroll>
+        </div>
+    </div>
 </template>
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import NotificationBell from 'vue-notification-bell';
 import VueScroll from 'vuescroll';
 import {mixin as clickaway} from 'vue-clickaway';
 import NotificationType from './NotificationType';
-import {LoggerMixin} from '../mixins';
 import {notificationTypes, GENERAL} from '../utils/constants';
 import moment from 'moment';
+import CounterWrapper from './CounterWrapper.vue';
+import {faBell} from '@fortawesome/free-regular-svg-icons';
 
-library.add(faCircleNotch);
+library.add(faCircleNotch, faBell);
 
 const MAX_NOTIFICATIONS = 90;
 export default {
+    name: 'UserNotification',
     components: {
-        NotificationBell,
         VueScroll,
         NotificationType,
         FontAwesomeIcon,
+        CounterWrapper,
     },
-    mixins: [clickaway, LoggerMixin],
+    mixins: [clickaway],
+    props: {
+        currentLocale: String,
+    },
     data() {
         return {
             notificationTypes,
@@ -101,10 +99,10 @@ export default {
     },
     methods: {
         loadNotifications: function() {
-            let filtered = this.userNotificationsFiltered;
+            const filtered = this.userNotificationsFiltered;
             let notificationCount = 0;
             this.userNotifications.forEach((item) => {
-                let existNotification = filtered.includes(item);
+                const existNotification = filtered.includes(item);
                 if (!existNotification && MAX_NOTIFICATIONS > notificationCount) {
                     notificationCount++;
                     filtered.push(item);
@@ -113,20 +111,20 @@ export default {
             this.userNotificationsFiltered = filtered;
         },
         handleScroll: function(vertical, horizontal, native) {
-            if (vertical.scrollTop >= ( native.explicitOriginalTarget.scrollHeight - native.target.clientHeight)) {
+            if (vertical.scrollTop >= (native.target.scrollHeight - native.target.clientHeight)) {
                 this.loadNotifications();
             }
         },
         updateReadNotifications: function() {
             this.$axios.retry.get(this.$routing.generate('update_read_notifications'))
                 .catch((err) => {
-                    this.sendLogs('error', 'Error Updating Notifications', err);
+                    this.$logger.error('Error Updating Notifications', err);
                 });
         },
         toggleUserNotifications: function() {
             this.$refs['notificationsScroll'].scrollTo({y: 0}, 0, 'easeInQuad');
             this.showUserNotifications = !this.showUserNotifications;
-            if (this.showUserNotifications && this.unreadNotifications > 0) {
+            if (this.showUserNotifications && 0 < this.unreadNotifications) {
                 this.updateReadNotifications();
                 this.userNotificationsFiltered.forEach((item) => {
                     this.$set(item, 'viewed', true);
@@ -137,79 +135,104 @@ export default {
             this.showUserNotifications = false;
             this.$refs['notificationsScroll'].scrollTo({y: 0}, 0, 'easeInQuad');
         },
-        groupPosts: function() {
-            let postsNotifications = {};
-            let viewedPostsNotifications = {};
-            let postsToDelete = [];
+        groupNotificationByType(userNotifications, type, newType, slugFunc) {
+            const notifications = {};
+            const viewedNotifications = {};
+            const notificationsToDelete = [];
 
-            this.userNotifications.forEach((item) => {
-                if (notificationTypes.newPost !== item.type && item.viewed) {
+            userNotifications.forEach((item) => {
+                if (type !== item.type) {
                     return;
                 }
 
-                let jsonData = JSON.parse(item.jsonData);
+                const jsonData = JSON.parse(item.jsonData);
 
                 if (item.viewed) {
-                    const tokenSlug = jsonData.tokenName + ' ' + moment(item.date, GENERAL.date);
+                    const tokenSlug = slugFunc(item, jsonData) + ' ' + moment(item.date).format(GENERAL.date);
 
-                    if (viewedPostsNotifications[tokenSlug] === undefined) {
+                    if (undefined === viewedNotifications[tokenSlug]) {
                         item.number = 1;
-                        viewedPostsNotifications[tokenSlug] = item;
+                        viewedNotifications[tokenSlug] = item;
                     } else {
-                          viewedPostsNotifications[tokenSlug].number += 1;
+                        viewedNotifications[tokenSlug].number += 1;
+                        viewedNotifications[tokenSlug].type = newType || type;
                     }
                 } else {
-                    if (postsNotifications[jsonData.tokenName] === undefined) {
+                    if (undefined === notifications[jsonData.tokenName]) {
                         item.number = 1;
-                        postsNotifications[jsonData.tokenName] = item;
+                        notifications[jsonData.tokenName] = item;
                     } else {
-                        postsNotifications[jsonData.tokenName].number += 1;
+                        notifications[jsonData.tokenName].number += 1;
+                        notifications[jsonData.tokenName].type = newType || type;
                     }
                 }
 
-                postsToDelete.push(item);
+                notificationsToDelete.push(item);
             });
 
-            this.userNotifications = this.userNotifications.filter((post) => !postsToDelete.includes(post));
+            userNotifications = userNotifications.filter((post) => !notificationsToDelete.includes(post));
 
-            for (const notification in viewedPostsNotifications) {
-                if (viewedPostsNotifications.hasOwnProperty(notification)) {
-                    this.userNotifications.unshift(viewedPostsNotifications[notification]);
+            for (const notification in viewedNotifications) {
+                if (viewedNotifications.hasOwnProperty(notification)) {
+                    userNotifications.unshift(viewedNotifications[notification]);
                 }
             }
 
-            for (const notification in postsNotifications) {
-                if (postsNotifications.hasOwnProperty(notification)) {
-                    this.userNotifications.unshift(postsNotifications[notification]);
+            for (const notification in notifications) {
+                if (notifications.hasOwnProperty(notification)) {
+                    userNotifications.unshift(notifications[notification]);
                 }
             }
 
-            this.userNotifications.sort(function(a, b) {
+            userNotifications.sort(function(a, b) {
                 return new Date(b.date) - new Date(a.date);
             });
+
+            return userNotifications;
         },
         fetchUserNotifications: function() {
             this.$axios.retry.get(this.$routing.generate('user_notifications'))
                 .then((res) => {
-                    this.userNotifications = res.data;
-                    this.groupPosts();
+                    this.userNotifications = this.groupNotifications(res.data || []);
                     this.loadNotifications();
                 })
                 .catch((err) => {
-                    this.sendLogs('error', 'Error loading Notifications', err);
+                    this.$logger.error('Error loading Notifications', err);
                 });
+        },
+        groupNotifications(notifications) {
+            notifications = this.groupNotificationByType(
+                notifications,
+                notificationTypes.newPost,
+                notificationTypes.newPost,
+                (notification, jsonData) => jsonData.tokenName,
+            );
+            notifications = this.groupNotificationByType(
+                notifications,
+                notificationTypes.reward_new,
+                notificationTypes.reward_new_grouped,
+                (notification, jsonData) => jsonData.rewardToken,
+            );
+            notifications = this.groupNotificationByType(
+                notifications,
+                notificationTypes.bounty_new,
+                notificationTypes.bounty_new_grouped,
+                (notification, jsonData) => jsonData.rewardToken,
+            );
+
+            return notifications;
         },
     },
     computed: {
         hasNotifications: function() {
-            return this.userNotificationsFiltered.length > 0;
+            return 0 < this.userNotificationsFiltered.length;
         },
         loaded: function() {
             return !!this.userNotifications;
         },
         unreadNotifications: function() {
             return this.userNotifications ?
-               this.userNotifications.filter((item) => !item.viewed).length : 0;
+                this.userNotifications.filter((item) => !item.viewed).length : 0;
         },
         scrollClass: function() {
             return this.userNotificationsFiltered.length

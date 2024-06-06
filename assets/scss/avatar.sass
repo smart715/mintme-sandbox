@@ -1,55 +1,74 @@
 .avatar
   position: relative
-  border-style: solid
-  border-color: $white
-  border-radius: 50%
 
-  .avatar-overlay
-    top: 50%
-    left: 50%
-    position: absolute
-    transform: translate(-50%, -50%)
-    visibility: hidden
-    opacity: 0
-
-  &:after
-    content: ""
-    position: absolute
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    border-radius: 50%
-    background: rgba(0, 0, 0, 0)
-    transition: background 1s ease
-
-  &.avatar__large
-    &.avatar_owner:hover:after
-      background: rgba(0, 0, 0, 0.3)
-
-  &:hover .avatar-overlay
-    visibility: visible
-    opacity: 1
-    transition: opacity 1s ease
+.avatar__container
+  display: inline-block
+  width: 25px
+  text-align: center
 
 .avatar__small
   max-width: 22px
   max-height: 22px
   min-height: 10px
   min-width: 20px
+
+.avatar__coin
+  max-width: 25px
+  max-height: 25px
+  min-height: 10px
+  min-width: 10px
+  bottom: 2px
   border-width: 0 !important
 
 .avatar__middle
-  width: 37px
-  height: 37px
-  border-width: 1px
+  max-width: 28px
+  max-height: 28px
+  min-height: 22px
+  min-width: 22px
 
 .avatar__large
   max-width: 152px
   max-height: 152px
-  min-height: auto
-  min-width: auto
-  border-width: 2px
+  min-height: 152px
+  min-width: 152px
 
 .card-header .avatar
   margin-right: 0.5rem
+
+.dark-coin-avatar
+  filter: grayscale(100%) brightness(20%)
+
+.coin-avatar-sm
+  width: 18px !important
+  height: 18px !important
+
+  &.coin-avatar-mintme
+    width: auto !important
+
+.coin-avatar-md
+  width: 25px !important
+  height: 25px !important
+
+  &.coin-avatar-mintme
+    width: auto !important
+
+.coin-avatar-lg
+  width: 30px !important
+  height: 30px !important
+
+  &.coin-avatar-mintme
+    width: auto !important
+
+.coin-avatar-xl
+  width: 90px !important
+  height: 90px !important
+
+  &.coin-avatar-mintme
+    width: auto !important
+
+.coin-avatar-post
+  width: 60px !important
+  height: 60px !important
+
+  &.coin-avatar-mintme
+    width: auto !important

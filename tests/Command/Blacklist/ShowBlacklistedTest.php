@@ -3,7 +3,7 @@
 namespace App\Tests\Command\Blacklist;
 
 use App\Command\Blacklist\ShowBlacklisted;
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -39,9 +39,9 @@ class ShowBlacklistedTest extends KernelTestCase
 
         $output = $commandTester->getDisplay();
 
-        $this->assertContains("type   value", $output);
-        $this->assertContains("foo    bar", $output);
-        $this->assertContains("baz    qux", $output);
+        $this->assertStringContainsString("type   value", $output);
+        $this->assertStringContainsString("foo    bar", $output);
+        $this->assertStringContainsString("baz    qux", $output);
     }
 
     public function testExecuteWithoutData(): void
@@ -58,7 +58,7 @@ class ShowBlacklistedTest extends KernelTestCase
 
         $output = $commandTester->getDisplay();
 
-        $this->assertContains("No entries found", $output);
+        $this->assertStringContainsString("No entries found", $output);
     }
 
     private function mockBlacklist(string $type, string $value): Blacklist

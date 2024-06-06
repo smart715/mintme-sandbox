@@ -1,20 +1,26 @@
 <template>
     <div class="card h-100">
-        <div class="card-body p-0">
+        <div class="card-header px-5 py-4">
+            <span class="text-white">
+                {{ $t('chat.chat_contacts.contacts') }}
+            </span>
+        </div>
+        <div class="card-body contacts-list p-0 w-100">
             <contacts-list
                 v-if="showContactsListWidget"
                 :nickname="nickname"
                 :thread-id="threadId"
                 :contacts="contactsList"
                 @change-contact="changeChat"
+                @delete-chat-modal="deleteChatModal"
             />
-            <div class="row" v-else>
+            <div v-else class="row m-0">
                 <contacts-dropdown
-                    class="col-12 col-md-6"
                     :nickname="nickname"
                     :thread-id="threadId"
                     :contacts="contactsList"
                     @change-contact="changeChat"
+                    @delete-chat-modal="deleteChatModal"
                 />
             </div>
         </div>
@@ -25,6 +31,8 @@
 import ContactsList from './ContactsList';
 import ContactsDropdown from './ContactsDropdown';
 import {mapMutations, mapGetters} from 'vuex';
+import orderBy from 'lodash/orderBy';
+import {getRankMedalSrcByNickname} from '../../utils';
 
 export default {
     name: 'ContactsBox',
@@ -32,11 +40,13 @@ export default {
         nickname: String,
         threadIdProp: Number,
         threadsProp: Array,
+        topHolders: Array,
     },
     data() {
         return {
             showContactsListWidget: false,
             threads: {},
+            firstCall: true,
         };
     },
     components: {
@@ -56,20 +66,28 @@ export default {
             },
         },
         participants: function() {
-            let participants = {};
+            const participants = {};
 
             Object.values(this.threads).forEach((thread) => {
                 thread.metadata.forEach((metadata) => {
-                    if (metadata.participant.profile.nickname === this.nickname) {
+                    const participant = metadata.participant;
+                    const participantNickname = participant.profile.nickname;
+
+                    if (participantNickname === this.nickname) {
                         return;
                     }
 
-                    participants[metadata.participant.id] = {
-                        ...metadata.participant,
+                    const rankImg = getRankMedalSrcByNickname(this.topHolders, participantNickname);
+
+                    participants[participant.id] = {
+                        ...participant,
                         threadId: thread.id,
                         tokenName: thread.token.name,
                         lastMessageTimestamp: thread.lastMessageTimestamp,
+                        lastMessage: thread.lastMessage,
                         hasUnreadMessages: thread.hasUnreadMessages,
+                        isBlocked: metadata.isBlocked,
+                        rankImg,
                     };
                 });
             });
@@ -77,25 +95,27 @@ export default {
             return participants;
         },
         contacts: function() {
-            let contactList = {};
+            const contactList = {};
 
             Object.values(this.participants).forEach((participant) => {
-                    contactList[participant.threadId] = {
-                        id: participant.id,
-                        nickname: participant.profile.nickname,
-                        avatar: participant.profile.image.avatar_middle,
-                        threadId: participant.threadId,
-                        tokenName: participant.tokenName,
-                        lastMessageTimestamp: participant.lastMessageTimestamp,
-                        hasUnreadMessages: participant.hasUnreadMessages,
-                    };
-                });
+                contactList[participant.threadId] = {
+                    id: participant.id,
+                    nickname: participant.profile.nickname,
+                    avatar: participant.profile.image.avatar_large,
+                    threadId: participant.threadId,
+                    tokenName: participant.tokenName,
+                    lastMessageTimestamp: participant.lastMessageTimestamp,
+                    lastMessage: participant.lastMessage,
+                    hasUnreadMessages: participant.hasUnreadMessages,
+                    isBlocked: participant.isBlocked,
+                    rankImg: participant.rankImg,
+                };
+            });
 
             return contactList;
         },
         contactsList: function() {
-            return Object.values(this.contacts)
-                .sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+            return orderBy(this.contacts, ['isBlocked', 'lastMessageTimestamp'], ['asc', 'desc']);
         },
     },
     methods: {
@@ -103,13 +123,20 @@ export default {
             'setContactName',
             'setTokenName',
             'setCurrentThreadId',
+            'setRankImg',
         ]),
         initThreads: function() {
             this.threadsProp.forEach((thread) => {
                 this.$set(this.threads, thread.id, thread);
             });
+
+            if (0 < this.threadIdProp && this.firstCall) {
+                this.changeChat(this.threadIdProp, false);
+            }
         },
         changeChat: function(threadId, updateUrl = true) {
+            this.firstCall = false;
+
             if (this.threadId === threadId) {
                 return;
             }
@@ -120,10 +147,11 @@ export default {
                 }, 'Mintme', this.$routing.generate('chat', {threadId}));
             }
 
-            if (threadId > 0) {
+            if (0 < threadId) {
                 this.$set(this.threads[threadId], 'hasUnreadMessages', false);
                 this.setTokenName(this.contacts[threadId].tokenName);
                 this.setContactName(this.contacts[threadId].nickname);
+                this.setRankImg(this.contacts[threadId].rankImg);
             }
 
             this.threadId = threadId;
@@ -138,22 +166,24 @@ export default {
             };
         },
         matchScreens: function() {
-            let media = window.matchMedia('(min-width: 992px)');
+            const media = window.matchMedia('(min-width: 992px)');
             this.showContactsListWidget = media.matches;
             media.addEventListener('change', (e) => {
                 this.showContactsListWidget = e.matches;
             });
         },
+        deleteChatModal: function(data) {
+            this.$emit('delete-chat-modal', data);
+        },
     },
     mounted() {
-        this.initThreads();
-
-        if (this.threadIdProp > 0) {
-            this.changeChat(this.threadIdProp, false);
-        }
-
         this.listenForUrlChanges();
         this.matchScreens();
+    },
+    watch: {
+        threadsProp: function() {
+            this.initThreads();
+        },
     },
 };
 </script>

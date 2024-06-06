@@ -1,6 +1,6 @@
 import {bnbSymbol, bscSymbol} from '../../utils/constants';
 
-let bnbToBsc = (val) => {
+const bnbToBsc = (val) => {
     return val === bnbSymbol ? bscSymbol : val;
 };
 

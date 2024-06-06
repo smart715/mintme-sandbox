@@ -6,17 +6,46 @@ import moxios from 'moxios';
 import axios from 'axios';
 import {Constants} from '../../js/utils';
 import tradeBalance from '../../js/storage/modules/trade_balance';
+import market from '../../js/storage/modules/market';
+import rates from '../../js/storage/modules/rates';
+import minOrder from '../../js/storage/modules/min_order';
+import orders from '../../js/storage/modules/orders';
+import TradeBuyOrder from '../../js/components/trade/TradeBuyOrder';
+import TradeSellOrder from '../../js/components/trade/TradeSellOrder';
+import AddPhoneAlertModal from '../../js/components/modal/AddPhoneAlertModal';
 
 const $routing = {generate: (val, params) => val};
+const $logger = {error: (val, params) => val, success: (val, params) => val};
 
-let ordersBuy = [{price: '1'}, {price: '2'}];
-let ordersSell = [{price: '3'}, {price: '4'}];
+const ordersBuy = [{price: '1'}, {price: '2'}];
+const ordersSell = [{price: '3'}, {price: '4'}];
+
+const baseQuoteMarket = {
+    base: {
+        name: 'Betcoin',
+        symbol: 'BTC',
+        subunit: 8,
+        identifier: 'BTC',
+    },
+    identifier: 'WEBBTC',
+    quote: {
+        name: 'Webchain',
+        symbol: 'WEB',
+        subunit: 4,
+        identifier: 'WEB',
+    },
+};
+
 
 /**
  * @return {Wrapper<Vue>}
  */
 function mockVue() {
     const localVue = createLocalVue();
+
+    market.state.currentMarketIndex = 'WEB';
+    market.state.markets = {'WEB': baseQuoteMarket};
+
     localVue.use(Vuex);
     localVue.use({
         install(Vue) {
@@ -29,6 +58,10 @@ function mockVue() {
                 modules: {
                     status,
                     tradeBalance,
+                    market,
+                    minOrder,
+                    rates,
+                    orders,
                     websocket: {
                         namespaced: true,
                         actions: {
@@ -44,38 +77,29 @@ function mockVue() {
             });
             Vue.prototype.$toasted = {show: () => false};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = $logger;
         },
     });
     return localVue;
-};
+}
 
-let propsForTestCorrectlyRenders = {
-        websocketUrl: 'testWebsocketUrl',
-        hash: 'testHash',
-        loginUrl: 'testLoginUrl',
-        signupUrl: 'testSignupUrl',
-            market: {
-                base: {
-                    name: 'Betcoin',
-                    symbol: 'BTC',
-                    subunit: 8,
-                    identifier: 'BTC',
-                },
-                quote: {
-                    name: 'Webchain',
-                    symbol: 'WEB',
-                    subunit: 4,
-                    identifier: 'WEB',
-                },
-            },
-        loggedIn: true,
-        tokenName: 'testTokenName',
-        isOwner: true,
-        userId: 2,
-        precision: 0,
-        mintmeSupplyUrl: 'testMintmeSupplyUrl',
-        minimumVolumeForMarketcap: 11,
-        disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
+const propsForTestCorrectlyRenders = {
+    websocketUrl: 'testWebsocketUrl',
+    hash: 'testHash',
+    loginUrl: 'testLoginUrl',
+    signupUrl: 'testSignupUrl',
+    market: baseQuoteMarket,
+    markets: {
+        'WEB': baseQuoteMarket,
+    },
+    loggedIn: true,
+    tokenName: 'testTokenName',
+    isOwner: true,
+    userId: 2,
+    precision: 0,
+    mintmeSupplyUrl: 'testMintmeSupplyUrl',
+    minimumVolumeForMarketcap: 11,
+    disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
 };
 
 describe('Trade', () => {
@@ -92,30 +116,33 @@ describe('Trade', () => {
         const wrapper = shallowMount(Trade, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
-        expect(wrapper.find('trade-chart-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
-        expect(wrapper.find('trade-chart-stub').attributes('market')).toBe('[object Object]');
-        expect(wrapper.find('trade-chart-stub').attributes('mintmesupplyurl')).toBe('testMintmeSupplyUrl');
-        expect(wrapper.find('trade-chart-stub').attributes('minimumvolumeformarketcap')).toBe('11');
-        expect(wrapper.find('trade-buy-order-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
-        expect(wrapper.find('trade-buy-order-stub').attributes('hash')).toBe('testHash');
-        expect(wrapper.find('trade-buy-order-stub').attributes('loggedin')).toBe('true');
-        expect(wrapper.find('trade-buy-order-stub').attributes('market')).toBe('[object Object]');
-        expect(wrapper.find('trade-buy-order-stub').attributes('loginurl')).toBe('testLoginUrl');
-        expect(wrapper.find('trade-buy-order-stub').attributes('signupurl')).toBe('testSignupUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('hash')).toBe('testHash');
-        expect(wrapper.find('trade-sell-order-stub').attributes('loggedin')).toBe('true');
-        expect(wrapper.find('trade-sell-order-stub').attributes('market')).toBe('[object Object]');
-        expect(wrapper.find('trade-sell-order-stub').attributes('loginurl')).toBe('testLoginUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('signupurl')).toBe('testSignupUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('isowner')).toBe('true');
-        expect(wrapper.find('trade-orders-stub').attributes('market')).toBe('[object Object]');
-        expect(wrapper.find('trade-orders-stub').attributes('userid')).toBe('2');
-        expect(wrapper.find('trade-orders-stub').attributes('loggedin')).toBe('true');
-        expect(wrapper.find('trade-trade-history-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
-        expect(wrapper.find('trade-trade-history-stub').attributes('hash')).toBe('testHash');
-        expect(wrapper.find('trade-trade-history-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.findComponent('trade-chart-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.findComponent('trade-chart-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.findComponent('trade-chart-stub').attributes('mintmesupplyurl')).toBe('testMintmeSupplyUrl');
+        expect(wrapper.findComponent('trade-chart-stub').attributes('minimumvolumeformarketcap')).toBe('11');
+        expect(wrapper.findComponent('trade-buy-order-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.findComponent('trade-buy-order-stub').attributes('hash')).toBe('testHash');
+        expect(wrapper.findComponent('trade-buy-order-stub').attributes('loggedin')).toBe('true');
+        expect(wrapper.findComponent('trade-buy-order-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.findComponent('trade-buy-order-stub').attributes('loginurl')).toBe('testLoginUrl');
+        expect(wrapper.findComponent('trade-buy-order-stub').attributes('signupurl')).toBe('testSignupUrl');
+        expect(wrapper.findComponent('trade-sell-order-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.findComponent('trade-sell-order-stub').attributes('hash')).toBe('testHash');
+        expect(wrapper.findComponent('trade-sell-order-stub').attributes('loggedin')).toBe('true');
+        expect(wrapper.findComponent('trade-sell-order-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.findComponent('trade-sell-order-stub').attributes('loginurl')).toBe('testLoginUrl');
+        expect(wrapper.findComponent('trade-sell-order-stub').attributes('signupurl')).toBe('testSignupUrl');
+        expect(wrapper.findComponent('trade-sell-order-stub').attributes('isowner')).toBe('true');
+        expect(wrapper.findComponent('trade-orders-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.findComponent('trade-orders-stub').attributes('userid')).toBe('2');
+        expect(wrapper.findComponent('trade-orders-stub').attributes('loggedin')).toBe('true');
+        expect(wrapper.findComponent('trade-trade-history-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.findComponent('trade-trade-history-stub').attributes('hash')).toBe('testHash');
+        expect(wrapper.findComponent('trade-trade-history-stub').attributes('market')).toBe('[object Object]');
     });
 
     it('should compute baseBalance correctly', () => {
@@ -126,6 +153,9 @@ describe('Trade', () => {
                 balances: () => false,
             },
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         expect(wrapper.vm.baseBalance).toBe(false);
 
@@ -135,6 +165,9 @@ describe('Trade', () => {
                 balances: () => [],
             },
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         expect(wrapper.vm.baseBalance).toBe(false);
 
@@ -146,6 +179,9 @@ describe('Trade', () => {
                 },
             },
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         expect(wrapper.vm.baseBalance).toBe('10');
     });
@@ -158,6 +194,9 @@ describe('Trade', () => {
                 balances: () => false,
             },
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         expect(wrapper.vm.quoteBalance).toBe(false);
 
@@ -167,6 +206,9 @@ describe('Trade', () => {
                 balances: () => [],
             },
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         expect(wrapper.vm.quoteBalance).toBe(false);
 
@@ -178,6 +220,9 @@ describe('Trade', () => {
                 },
             },
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         expect(wrapper.vm.quoteBalance).toBe('11');
     });
@@ -187,8 +232,14 @@ describe('Trade', () => {
         const wrapper = shallowMount(Trade, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            computed: {
+                balances: () => null,
+            },
+            directives: {
+                'b-tooltip': {},
+            },
         });
-        wrapper.vm.balances = null;
+
         expect(wrapper.vm.balanceLoaded).toBe(false);
     });
 
@@ -197,6 +248,9 @@ describe('Trade', () => {
         const wrapper = shallowMount(Trade, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         wrapper.vm.buyOrders = [];
         wrapper.vm.sellOrders = null;
@@ -214,6 +268,9 @@ describe('Trade', () => {
         const wrapper = shallowMount(Trade, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         wrapper.vm.buyOrders = null;
         expect(wrapper.vm.marketPriceSell).toBe(0);
@@ -228,6 +285,9 @@ describe('Trade', () => {
         const wrapper = shallowMount(Trade, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         wrapper.vm.sellOrders = null;
         expect(wrapper.vm.marketPriceBuy).toBe(0);
@@ -242,6 +302,9 @@ describe('Trade', () => {
         const wrapper = shallowMount(Trade, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            directives: {
+                'b-tooltip': {},
+            },
         });
         wrapper.vm.sellOrders = null;
         wrapper.vm.saveOrders([], true);
@@ -252,71 +315,86 @@ describe('Trade', () => {
     });
 
     describe('updateOrders', () => {
-        it('should do $axios request and set buyOrders and sellOrders correctly when context is undefined', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
+        it(
+            'should do $axios request and set buyOrders and sellOrders correctly when context is undefined',
+            (done) => {
+                const localVue = mockVue();
+                const wrapper = shallowMount(Trade, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                    directives: {
+                        'b-tooltip': {},
+                    },
+                });
 
-            moxios.stubRequest('pending_orders', {
-                status: 200,
-                response: {
-                    buy: ordersBuy,
-                    sell: ordersSell,
-                    buyDepth: 0,
-                    totalSellOrders: '1.0001',
-                    totalBuyOrders: '1.0001',
-                },
-            });
+                moxios.stubRequest('pending_orders', {
+                    status: 200,
+                    response: {
+                        buy: ordersBuy,
+                        sell: ordersSell,
+                        buyDepth: 0,
+                        totalSellOrders: '1.0001',
+                        totalBuyOrders: '1.0001',
+                    },
+                });
 
-            wrapper.vm.updateOrders(false);
+                wrapper.vm.updateOrders(false);
 
-            moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}]);
-                expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}]);
-                expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
-                expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
-                done();
-            });
-        });
+                moxios.wait(() => {
+                    expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}]);
+                    expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}]);
+                    expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
+                    expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
+                    done();
+                });
+            }
+        );
 
-        it('should do $axios request and don\'t modify buyOrders and sellOrders when "buy" and "sell" is empty', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            let context = {type: 'sell', isAssigned: true, resolve() {}};
-            wrapper.vm.updateOrders(context);
+        it(
+            `should do $axios request and don't modify buyOrders and sellOrders when "buy" and "sell" is empty`,
+            (done) => {
+                const localVue = mockVue();
+                const wrapper = shallowMount(Trade, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                    directives: {
+                        'b-tooltip': {},
+                    },
+                });
+                const context = {type: 'sell', isAssigned: true, resolve() {}};
 
-            moxios.stubRequest('pending_orders', {
-                status: 200,
-                response: {
-                    buy: [],
-                    sell: [],
-                    buyDepth: 0,
-                    totalSellOrders: 0,
-                    totalBuyOrders: 0,
-                },
-            });
+                moxios.stubRequest('pending_orders', {
+                    status: 200,
+                    response: {
+                        buy: [],
+                        sell: [],
+                        buyDepth: 0,
+                        totalSellOrders: 0,
+                        totalBuyOrders: 0,
+                    },
+                });
 
-            moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).toEqual([]);
-                expect(wrapper.vm.sellOrders).toEqual([]);
-                done();
-            });
-        });
+                wrapper.vm.updateOrders(context);
+
+                moxios.wait(() => {
+                    expect(wrapper.vm.buyOrders).toEqual(null);
+                    expect(wrapper.vm.sellOrders).toEqual(null);
+                    done();
+                });
+            }
+        );
 
         it('should do $axios request and set sellOrders and sellPage correctly when context is defined', (done) => {
             const localVue = mockVue();
             const wrapper = shallowMount(Trade, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
+                directives: {
+                    'b-tooltip': {},
+                },
             });
-            let context = {type: 'sell', isAssigned: true, resolve: ()=>{}};
+            const context = {type: 'sell', isAssigned: true, resolve: ()=>{}};
             wrapper.vm.sellOrders = [];
-            wrapper.vm.updateOrders(context);
 
             moxios.stubRequest('pending_orders', {
                 status: 200,
@@ -329,8 +407,10 @@ describe('Trade', () => {
                 },
             });
 
+            wrapper.vm.updateOrders(context);
+
             moxios.wait(() => {
-                expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}, {price: '3'}, {price: '4'}]);
+                expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}]);
                 expect(wrapper.vm.sellPage).toBe(3);
                 expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
                 expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
@@ -343,10 +423,12 @@ describe('Trade', () => {
             const wrapper = shallowMount(Trade, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
+                directives: {
+                    'b-tooltip': {},
+                },
             });
-            let context = {type: 'buy', isAssigned: true, resolve: ()=>{}};
+            const context = {type: 'buy', isAssigned: true, resolve: ()=>{}};
             wrapper.vm.buyOrders = [];
-            wrapper.vm.updateOrders(context);
 
             moxios.stubRequest('pending_orders', {
                 status: 200,
@@ -359,8 +441,10 @@ describe('Trade', () => {
                 },
             });
 
+            wrapper.vm.updateOrders(context);
+
             moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}, {price: '1'}, {price: '2'}]);
+                expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.buyPage).toBe(3);
                 expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
                 expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
@@ -375,6 +459,9 @@ describe('Trade', () => {
             const wrapper = shallowMount(Trade, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
+                directives: {
+                    'b-tooltip': {},
+                },
             });
             const oldSellOrders = wrapper.vm.sellOrders = [{id: 'bar'}];
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, 'foo');
@@ -384,57 +471,87 @@ describe('Trade', () => {
             expect(wrapper.vm.buyOrders).toMatchObject(oldBuyOrders);
         });
 
-        it('should do $axios request and set sellOrders and buyOrders correctly when when \'type\' type matches PUT', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
-            wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, Constants.WSAPI.order.status.PUT);
-            wrapper.vm.buyOrders = [{id: 'qwe', price: 3}];
-            wrapper.vm.processOrders({side: 'bar', id: 'foobar'}, Constants.WSAPI.order.status.PUT);
+        it(
+            `should do $axios request and set sellOrders and buyOrders correctly when when 'type' type matches PUT`,
+            (done) => {
+                const localVue = mockVue();
+                const wrapper = shallowMount(Trade, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                    directives: {
+                        'b-tooltip': {},
+                    },
+                });
 
-            moxios.stubRequest('pending_order_details', {
-                status: 200,
-                response: {id: 'foo', price: 1},
-            });
+                moxios.stubRequest('pending_order_details', {
+                    status: 200,
+                    response: {id: 'foo', price: 1},
+                });
 
-            moxios.wait(() => {
-                expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}, {id: 'foo', price: 1}]);
-                expect(wrapper.vm.buyOrders).toMatchObject([{id: 'qwe', price: 3}, {id: 'foo', price: 1}]);
-                done();
-            });
-        });
+                wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
+                wrapper.vm.processOrders(
+                    {side: Constants.WSAPI.order.type.SELL, id: 'foobar'},
+                    Constants.WSAPI.order.status.PUT
+                );
+                wrapper.vm.buyOrders = [{id: 'qwe', price: 3}];
 
-        it('set sellOrders and buyOrders correctly when when \'type\' type matches UPDATE and order is undefined', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
-            wrapper.vm.buyOrders = null;
-            wrapper.vm.totalSellOrders = {sub: () => {
-                return wrapper.vm.totalSellOrders;
-            }, add: () => {
-                return wrapper.vm.totalSellOrders;
-            }};
-            wrapper.vm.totalBuyOrders = {sub: () => {
-                 return wrapper.vm.totalBuyOrders;
-            }, add: () => {
-                 return wrapper.vm.totalBuyOrders;
-            }};
-            wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, Constants.WSAPI.order.status.UPDATE);
-            expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
-            expect(wrapper.vm.buyOrders).toBe(null);
-        });
+                wrapper.vm.addNewOrderDebounce.flush();
+
+                moxios.wait(() => {
+                    expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}, {id: 'foo', price: 1}]);
+                    done();
+                });
+
+                wrapper.vm.processOrders({side: 'bar', id: 'foobar'}, Constants.WSAPI.order.status.PUT);
+                wrapper.vm.addNewOrderDebounce.flush();
+
+                moxios.wait(() => {
+                    expect(wrapper.vm.buyOrders).toMatchObject([{id: 'qwe', price: 3}, {id: 'foo', price: 1}]);
+                    done();
+                });
+            }
+        );
+
+        it(
+            `set sellOrders and buyOrders correctly when when 'type' type matches UPDATE and order is undefined`,
+            () => {
+                const localVue = mockVue();
+                const wrapper = shallowMount(Trade, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                    directives: {
+                        'b-tooltip': {},
+                    },
+                });
+                wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
+                wrapper.vm.buyOrders = null;
+                wrapper.vm.totalSellOrders = {sub: () => {
+                    return wrapper.vm.totalSellOrders;
+                }, add: () => {
+                    return wrapper.vm.totalSellOrders;
+                }};
+                wrapper.vm.totalBuyOrders = {sub: () => {
+                    return wrapper.vm.totalBuyOrders;
+                }, add: () => {
+                    return wrapper.vm.totalBuyOrders;
+                }};
+                wrapper.vm.processOrders(
+                    {side: Constants.WSAPI.order.type.SELL, id: 'foobar'},
+                    Constants.WSAPI.order.status.UPDATE
+                );
+                expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
+                expect(wrapper.vm.buyOrders).toBe(null);
+            }
+        );
 
         it('set sellOrders and buyOrders correctly when when \'type\' type matches UPDATE and order is defined', () => {
             const localVue = mockVue();
             const wrapper = shallowMount(Trade, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
+                directives: {
+                    'b-tooltip': {},
+                },
             });
             wrapper.vm.sellOrders = [{id: 'bar', price: 2, ctime: 'nestCtime', amount: 5, mtime: 'testMtime'}];
             wrapper.vm.buyOrders = null;
@@ -446,7 +563,7 @@ describe('Trade', () => {
             wrapper.vm.totalBuyOrders = {sub: () => {
                 return wrapper.vm.totalBuyOrders;
             }, add: () => {
-                 return wrapper.vm.totalBuyOrders;
+                return wrapper.vm.totalBuyOrders;
             }};
             wrapper.vm.processOrders({
                 id: 'bar',
@@ -455,8 +572,8 @@ describe('Trade', () => {
                 ctime: 'nestCtime',
                 left: 3,
                 mtime: 'testMtime',
-                },
-                Constants.WSAPI.order.status.UPDATE
+            },
+            Constants.WSAPI.order.status.UPDATE
             );
 
             expect(wrapper.vm.sellOrders).toMatchObject([{
@@ -472,33 +589,42 @@ describe('Trade', () => {
             expect(wrapper.vm.buyOrders).toBe(null);
         });
 
-        it('set sellOrders and buyOrders correctly when when \'type\' type matches FINISH and order is undefined', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
-            wrapper.vm.buyOrders = null;
-            wrapper.vm.totalSellOrders = {sub: () => {
-                return wrapper.vm.totalSellOrders;
-            }, add: () => {
-                return wrapper.vm.totalSellOrders;
-            }};
-            wrapper.vm.totalBuyOrders = {sub: () => {
-                return wrapper.vm.totalBuyOrders;
-            }, add: () => {
-             return wrapper.vm.totalBuyOrders;
-            }};
-            expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
-            expect(wrapper.vm.buyOrders).toBe(null);
-        });
+        it(
+            `set sellOrders and buyOrders correctly when when 'type' type matches FINISH and order is undefined`,
+            () => {
+                const localVue = mockVue();
+                const wrapper = shallowMount(Trade, {
+                    localVue,
+                    propsData: propsForTestCorrectlyRenders,
+                    directives: {
+                        'b-tooltip': {},
+                    },
+                });
+                wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
+                wrapper.vm.buyOrders = null;
+                wrapper.vm.totalSellOrders = {sub: () => {
+                    return wrapper.vm.totalSellOrders;
+                }, add: () => {
+                    return wrapper.vm.totalSellOrders;
+                }};
+                wrapper.vm.totalBuyOrders = {sub: () => {
+                    return wrapper.vm.totalBuyOrders;
+                }, add: () => {
+                    return wrapper.vm.totalBuyOrders;
+                }};
+                expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
+                expect(wrapper.vm.buyOrders).toBe(null);
+            }
+        );
 
         it('set sellOrders and buyOrders correctly when when \'type\' type matches FINISH and order is defined', () => {
             const localVue = mockVue();
             const wrapper = shallowMount(Trade, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
+                directives: {
+                    'b-tooltip': {},
+                },
             });
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
@@ -512,9 +638,51 @@ describe('Trade', () => {
             }, add: () => {
                 return wrapper.vm.totalBuyOrders;
             }};
-            wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'bar'}, Constants.WSAPI.order.status.FINISH);
+            wrapper.vm.processOrders(
+                {side: Constants.WSAPI.order.type.SELL, id: 'bar'},
+                Constants.WSAPI.order.status.FINISH
+            );
             expect(wrapper.vm.sellOrders).toEqual([]);
             expect(wrapper.vm.buyOrders).toBe(null);
+        });
+
+        it('should set prevented action name on prevent', () => {
+            const localVue = mockVue();
+            const wrapper = shallowMount(Trade, {
+                localVue,
+                propsData: propsForTestCorrectlyRenders,
+                directives: {
+                    'b-tooltip': {},
+                },
+            });
+
+            wrapper.findComponent(TradeBuyOrder).vm.$emit('making-order-prevented');
+            expect(wrapper.vm.preventedActionRefName).toEqual('tradeBuyOrder');
+
+            wrapper.findComponent(TradeSellOrder).vm.$emit('making-order-prevented');
+            expect(wrapper.vm.preventedActionRefName).toEqual('tradeSellOrder');
+        });
+
+        it('should set prevented action name on prevent', () => {
+            const placeOrderStub = jest.fn();
+            const localVue = mockVue();
+            const wrapper = shallowMount(Trade, {
+                localVue,
+                propsData: propsForTestCorrectlyRenders,
+                stubs: {
+                    'TradeSellOrder': {
+                        methods: {
+                            placeOrder: placeOrderStub,
+                        },
+                        render: () => {},
+                    },
+                },
+            });
+
+            wrapper.vm.preventedActionRefName = 'tradeSellOrder';
+            wrapper.findComponent(AddPhoneAlertModal).vm.$emit('phone-verified');
+
+            expect(placeOrderStub).toBeCalled();
         });
     });
 });

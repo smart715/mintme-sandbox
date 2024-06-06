@@ -2,12 +2,12 @@
 
 namespace App\Exchange\Balance\Factory;
 
-use App\Entity\UserTradebleInterface;
+use App\Entity\UserTradableInterface;
 
 interface TraderBalanceViewFactoryInterface
 {
     /**
-     * @param UserTradebleInterface[] $usersTokens
+     * @param UserTradableInterface[] $usersTokens
      * @param string[] $balances
      * @param int $limit
      * @return TraderBalanceView[]

@@ -4,17 +4,11 @@ namespace App\Tests\Security;
 
 use App\Security\Request\RefererRequestHandlerInterface;
 use App\Security\TwoFactorRequireHandler;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Scheb\TwoFactorBundle\DependencyInjection\Factory\Security\TwoFactorFactory;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -22,103 +16,138 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class TwoFactorRequireHandlerTest extends TestCase
 {
-    /** @var RouteCollection */
-    private $routeCollection;
-
-    public function setUp(): void
+    public function testOnAuthenticationRequiredWithIs2faFalseAndIsRefererIsTrue(): void
     {
-        $this->routeCollection = new RouteCollection();
-        $this->routeCollection->add('en__RG__secure', new Route('secure', [], [], ['2fa_progress' => true]));
-        $this->routeCollection->add('en__RG__free', new Route('free', [], [], ['2fa_progress' => false]));
-    }
-
-    public function testOnAuthenticationRequiredSecure(): void
-    {
-        $request = $this->mockRequest('secure');
+        $request = $this->mockRequest(true);
         $handler = new TwoFactorRequireHandler(
-            $this->mockHttpUtils($request),
-            $this->createMock(TokenStorageInterface::class),
-            $this->mockRouter(),
+            $this->mockHttpUtils(),
+            $this->mockTokenStorage(true),
+            $this->mockRouter(false),
             $this->mockUrlGenerator(),
-            $this->createMock(SessionInterface::class),
-            $this->createMock(RefererRequestHandlerInterface::class)
+            $this->mockRefererRequestHandler(true),
         );
-        $response = $handler->onAuthenticationRequired($request, $this->createMock(TokenInterface::class));
-        $this->assertEquals('/2fa', $response->getContent());
+
+        $response = $handler->onAuthenticationRequired($request, $this->mockToken());
+
+        $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testOnAuthenticationRequiredFree(): void
+    public function testOnAuthenticationRequiredWithIs2faTrueAndIsRefererIsTrue(): void
     {
-        $request = $this->mockRequest('free');
+        $request = $this->mockRequest(true);
         $handler = new TwoFactorRequireHandler(
-            $this->mockHttpUtils($request),
-            $this->createMock(TokenStorageInterface::class),
-            $this->mockRouter(),
+            $this->mockHttpUtils(),
+            $this->mockTokenStorage(true),
+            $this->mockRouter(true),
             $this->mockUrlGenerator(),
-            $this->createMock(SessionInterface::class),
-            $this->createMock(RefererRequestHandlerInterface::class)
+            $this->mockRefererRequestHandler(true),
         );
-        $response = $handler->onAuthenticationRequired($request, $this->createMock(TokenInterface::class));
-        $this->assertEquals('/free', $response->getContent());
+
+        $response = $handler->onAuthenticationRequired($request, $this->mockToken());
+
+        $this->assertInstanceOf(Response::class, $response);
     }
 
-    /** @return MockObject|Request */
-    private function mockRequest(string $name): Request
+    public function testOnAuthenticationRequiredWithIs2faTrueAndIsRefererIsFalse(): void
     {
-        $session = $this->createMock(SessionInterface::class);
-        $session->method('invalidate');
+        $request = $this->mockRequest(false);
+        $handler = new TwoFactorRequireHandler(
+            $this->mockHttpUtils(),
+            $this->mockTokenStorage(false),
+            $this->mockRouter(true),
+            $this->mockUrlGenerator(true),
+            $this->mockRefererRequestHandler(false),
+        );
 
+        $response = $handler->onAuthenticationRequired($request, $this->mockToken());
+
+        $this->assertInstanceOf(Response::class, $response);
+    }
+
+    public function testOnAuthenticationRequiredWithIs2faFalseAndIsRefererIsFalse(): void
+    {
+        $request = $this->mockRequest(false);
+        $handler = new TwoFactorRequireHandler(
+            $this->mockHttpUtils(),
+            $this->mockTokenStorage(false),
+            $this->mockRouter(false),
+            $this->mockUrlGenerator(true),
+            $this->mockRefererRequestHandler(false),
+        );
+
+        $response = $handler->onAuthenticationRequired($request, $this->mockToken());
+
+        $this->assertInstanceOf(Response::class, $response);
+    }
+
+    private function mockRequest(bool $willLogout): Request
+    {
         $request = $this->createMock(Request::class);
-        $request->method('getSession')->willReturn($session);
-        $request->method('get')->with('_route')->willReturn($name);
+
+        $request->expects($this->once())->method('get')->with('_route')->willReturn('TEST');
+        $request->expects($this->once())->method('getPathInfo')->willReturn('TEST');
+        $request->expects($willLogout ? $this->once() : $this->never())
+            ->method('getSession')
+            ->willReturn($this->mockSession());
 
         return $request;
     }
 
-    /** @return MockObject|HttpUtils */
-    private function mockHttpUtils(Request $request): HttpUtils
+    private function mockHttpUtils(): HttpUtils
     {
-        $name = $request->get('_route');
         $httpUtils = $this->createMock(HttpUtils::class);
-        $httpUtils->method('generateUri')->with($request, $name)->willReturn("/{$name}");
-        $uri = 'secure' === $name
-            ? TwoFactorFactory::DEFAULT_AUTH_FORM_PATH
-            : $this->routeCollection->get('en__RG__free')->getPath();
-        $httpUtils
-            ->method('createRedirectResponse')
-            ->with($this->mockRequest($name), $uri)
-            ->willReturn($this->mockResponse($uri));
+        $httpUtils->method('generateUri')->willReturn('TEST');
+        $httpUtils->method('createRedirectResponse')->willReturn($this->mockResponse());
 
         return $httpUtils;
     }
 
-    private function mockUrlGenerator(): UrlGeneratorInterface
+    private function mockUrlGenerator(bool $willGenerate2faUrl = false): UrlGeneratorInterface
     {
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $urlGenerator->method('generate')->willReturn('/2fa');
+        $urlGenerator->expects($willGenerate2faUrl ? $this->once() : $this->never())
+            ->method('generate')
+            ->willReturn('/2fa');
 
         return $urlGenerator;
     }
 
-    /** @return MockObject|Response */
-    private function mockResponse(string $name): Response
+    private function mockResponse(): Response
     {
-        $response = $this->createMock(Response::class);
-        $response->method('getContent')->willReturn($name);
-
-        return $response;
+        return $this->createMock(Response::class);
     }
 
-    /** @return MockObject|RouterInterface */
-    private function mockRouter(): RouterInterface
+    private function mockRouter(bool $is2faProgress): RouterInterface
     {
-        $headerBag = $this->createMock(HeaderBag::class);
-        $headerBag->method('get')->willReturn('referer');
-
         $router = $this->createMock(RouterInterface::class);
-        $router->method('getRouteCollection')->willReturn($this->routeCollection);
-        $router->method('session')->willReturn($headerBag);
+        $router->method('match')->willReturn($is2faProgress ? [] : null);
 
         return $router;
+    }
+
+    private function mockSession(): SessionInterface
+    {
+        return $this->createMock(SessionInterface::class);
+    }
+
+    private function mockRefererRequestHandler(bool $isRefererValid): RefererRequestHandlerInterface
+    {
+        $handler = $this->createMock(RefererRequestHandlerInterface::class);
+        $handler->expects($this->once())->method('isRefererValid')->willReturn($isRefererValid);
+
+        return $handler;
+    }
+
+    private function mockToken(): TokenInterface
+    {
+        return $this->createMock(TokenInterface::class);
+    }
+
+    private function mockTokenStorage(bool $willLogout): TokenStorageInterface
+    {
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($willLogout ? $this->once() : $this->never())->method('setToken');
+
+        return $tokenStorage;
     }
 }

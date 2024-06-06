@@ -14,8 +14,12 @@ class ToMoneyExtension extends AbstractExtension
         ];
     }
 
-    public function toMoney(string $value, int $precision = 2, bool $fixedPoint = true): ?string
-    {
+    public function toMoney(
+        string $value,
+        int $precision = 2,
+        bool $fixedPoint = true,
+        bool $zeroToDash = false
+    ): string {
         $decimalFactor = (int)str_pad('1', $precision + 1, '0');
         $number = number_format(
             floor((float)$value * $decimalFactor) / $decimalFactor,
@@ -24,8 +28,12 @@ class ToMoneyExtension extends AbstractExtension
             ' '
         );
 
-        return $fixedPoint
+        $number = $fixedPoint
             ? $number
             : preg_replace('/(\.[1-9]+){0,1}(\.*0+)$/', '$1', $number);
+
+        return $zeroToDash && '0' === $number
+            ? '-'
+            : $number;
     }
 }

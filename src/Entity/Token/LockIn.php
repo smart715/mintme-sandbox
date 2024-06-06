@@ -23,7 +23,7 @@ class LockIn
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\Regex(pattern="/^([0-3]|5|15|[0-5]0)$/")
+     * @Assert\Regex(pattern="/^([1-4]?[0-9]$|^50)$/")
      * @GreaterThanPrevious(message="Release period can be prolonged only.", groups={"Exchanged"})
      * @var int
      */
@@ -129,14 +129,14 @@ class LockIn
      */
     public function getFrozenAmountWithReceived(): Money
     {
-        $received = $this->getReceivedMoneyFromDeploy();
+        $mintedAmount = $this->getReceivedMoneyFromDeploy();
         $releasedAtStart = $this->getReleasedAtStart();
 
         if ($this->token->isDeployed()) {
-            $frozenAmount = $received->lessThan($releasedAtStart)
+            $frozenAmount = $mintedAmount->lessThan($releasedAtStart)
                 ? $this->getAmountToRelease()
                 : $this->getAmountToRelease()
-                    ->subtract($received)
+                    ->subtract($mintedAmount)
                     ->add($releasedAtStart);
             $zeroValue = new Money(0, new Currency(Symbols::TOK));
 
@@ -195,18 +195,45 @@ class LockIn
      */
     public function getCountHoursFromDeploy(): float
     {
-        if ($this->token->getDeployedDate() instanceof \DateTimeImmutable) {
+        $mainDeploy = $this->token->getMainDeploy();
+
+        $deployDate = $mainDeploy
+            ? $mainDeploy->getDeployDate()
+            : null;
+
+        if ($deployDate instanceof \DateTimeImmutable) {
             $timezone = date_default_timezone_get();
             date_default_timezone_set('UTC');
-            $deployedTimestamp = strtotime($this->token->getDeployedDate()->format('Y-m-d H:i:s'));
+            
+            $deployedTimestamp = strtotime($deployDate->format('Y-m-d H:i:s'));
             $currentTimestamp = time();
-            $timestampDiff = abs($currentTimestamp - $deployedTimestamp);
+            $releaseFinishedTimestamp = $this->releaseFinishedTimestamp();
+            
+            $actualTimePassedFromDeploy = min($currentTimestamp, $releaseFinishedTimestamp);
+            $timestampDiff = abs($actualTimePassedFromDeploy - $deployedTimestamp);
+            
             date_default_timezone_set($timezone);
 
             return round(($timestampDiff / 3600), 2);
         }
 
         return 0;
+    }
+
+    public function releaseFinishedTimestamp(): int
+    {
+        $mainDeploy = $this->token->getMainDeploy();
+
+        if (!$mainDeploy) {
+            return 0;
+        }
+
+        $finishReleaseDate = $mainDeploy
+            ->getDeployDate()
+            ->add(new \DateInterval("P{$this->releasePeriod}Y"))
+            ->setTimezone(new \DateTimeZone('UTC'));
+
+        return $finishReleaseDate->getTimestamp();
     }
 
     /**

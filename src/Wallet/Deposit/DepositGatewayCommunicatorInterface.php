@@ -3,6 +3,7 @@
 namespace App\Wallet\Deposit;
 
 use App\Entity\Crypto;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Wallet\Deposit\Model\DepositCredentials;
 use App\Wallet\Model\DepositInfo;
@@ -21,5 +22,5 @@ interface DepositGatewayCommunicatorInterface extends RowsFetcherInterface
     /** @return Transaction[] */
     public function getTransactions(User $user, int $offset, int $limit): array;
 
-    public function getDepositInfo(string $crypto): DepositInfo;
+    public function getDepositInfo(TradableInterface $crypto, ?User $user = null): ?DepositInfo;
 }

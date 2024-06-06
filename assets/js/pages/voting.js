@@ -5,11 +5,11 @@ import BalanceInit from '../components/trade/BalanceInit';
 import VotingWidget from '../components/voting/VotingWidget';
 
 new Vue({
-  el: '#voting',
-  i18n,
-  components: {
-    BalanceInit,
-    VotingWidget,
-  },
-  store,
+    el: '#voting',
+    i18n,
+    components: {
+        BalanceInit,
+        VotingWidget,
+    },
+    store,
 });

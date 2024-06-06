@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\TokenManagerInterface;
 use Money\Money;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -20,18 +21,18 @@ class PostVoter extends Voter
         self::EDIT,
     ];
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
+    private TokenManagerInterface $tokenManager;
+    private BalanceHandlerInterface $balanceHandler;
+    private LoggerInterface $logger;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        LoggerInterface $logger
     ) {
         $this->tokenManager = $tokenManager;
         $this->balanceHandler = $balanceHandler;
+        $this->logger = $logger;
     }
 
     /**
@@ -79,13 +80,26 @@ class PostVoter extends Voter
 
     private function checkBalance(User $user, Token $token, Money $amount): bool
     {
-        $available = $this->tokenManager->getRealBalance(
-            $token,
-            $this->balanceHandler->balance($user, $token),
-            $user
-        )->getAvailable();
+        if ($amount->isZero()) {
+            return true;
+        }
 
-        return $available->greaterThanOrEqual($amount);
+        try {
+            $availableFullBalance = $this->tokenManager->getRealBalance(
+                $token,
+                $this->balanceHandler->balance($user, $token),
+                $user
+            )->getFullAvailable();
+
+            return $availableFullBalance->greaterThanOrEqual($amount);
+        } catch (\Throwable $ex) {
+            $this->logger->error('Can\'t fetch token balance to allow to view token posts', [
+                'user' => $user->getEmail(),
+                'message' => $ex->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     private function isOwner(User $user, Token $token): bool

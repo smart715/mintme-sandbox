@@ -19,9 +19,9 @@
 </template>
 
 <script>
-  import VueCircle from 'vue2-circle-progress';
+import VueCircle from 'vue2-circle-progress';
 
-  export default {
+export default {
     name: 'CircleProgress',
     props: {
         pointsGained: Number,
@@ -51,5 +51,5 @@
             this.$refs.circleElement.updateProgress(value);
         },
     },
-  };
+};
 </script>

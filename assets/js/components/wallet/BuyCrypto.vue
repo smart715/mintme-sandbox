@@ -1,34 +1,42 @@
 <template>
-    <div class="buy-crypto flex">
+    <div class="buy-crypto d-flex justify-content-center py-2">
         <div class="d-flex align-items-center">
             <button
-                    class="btn btn-primary"
-                    @click="buyCrypto"
+                class="btn btn-primary d-flex align-items-center px-4 py-2"
+                :disabled="viewOnly"
+                @click="buyCrypto"
             >
-                {{ $t('wallet.buy_crypto') }}
+                <font-awesome-icon
+                    class="ml-2 credit-card-icon"
+                    :icon="{prefix: 'fas', iconName: 'credit-card'}"
+                />
+                <span class="ml-2 button-text">
+                    {{ $t('wallet.buy_crypto') }}
+                </span>
             </button>
             <font-awesome-icon
                 class="ml-2"
                 :icon="{prefix: 'fab', iconName: 'cc-visa'}"
-                size="2x"
+                size="3x"
             />
             <font-awesome-icon
                 class="ml-2"
                 :icon="{prefix: 'fab', iconName: 'cc-mastercard'}"
-                size="2x"
+                size="3x"
             />
             <img
                 class="ml-2 img-rounded"
                 src="../../../img/sepa-icon.svg"
                 alt="visa icon"
-            >
+            />
         </div>
         <buy-crypto-modal
             :visible="modalVisible"
+            :service-unavailable="serviceUnavailable"
             :ui-url="coinifyUiUrl"
             :partner-id="coinifyPartnerId"
             :crypto-currencies="coinifyCryptoCurrencies"
-            :addresses="addresses"
+            :addresses="depositAddresses"
             :addresses-signature="addressesSignature"
             :refresh-token="refreshToken"
             :predefined-tokens="predefinedTokens"
@@ -41,9 +49,10 @@
 import BuyCryptoModal from '../modal/BuyCryptoModal';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCcVisa, faCcMastercard} from '@fortawesome/free-brands-svg-icons';
+import {faCreditCard} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
-library.add(faCcVisa, faCcMastercard);
+library.add(faCcVisa, faCcMastercard, faCreditCard);
 
 export default {
     name: 'BuyCrypto',
@@ -55,16 +64,18 @@ export default {
         coinifyUiUrl: String,
         coinifyPartnerId: Number,
         coinifyCryptoCurrencies: Array,
-        addresses: Object,
-        addressesSignature: Object,
         predefinedTokens: Array,
         mintmeExchangeMailSent: Boolean,
+        viewOnly: Boolean,
     },
     data() {
         return {
+            serviceUnavailable: false,
             modalVisible: false,
             refreshToken: null,
             isExchangeMailSent: false,
+            depositAddresses: {},
+            addressesSignature: {},
         };
     },
     methods: {
@@ -78,9 +89,19 @@ export default {
                         this.isExchangeMailSent = true;
                     })
                     .catch((err) => {
-                        this.sendLogs('error', 'Can not send exchange cryptos mail', err);
+                        this.$logger.error('Can not send exchange cryptos mail', err);
                     });
             }
+
+            this.$axios.retry.get(this.$routing.generate('deposit_addresses_signature'))
+                .then((res) => {
+                    this.depositAddresses = res.data.addresses;
+                    this.addressesSignature = res.data.signatures;
+                })
+                .catch((err) => {
+                    this.$logger.error('Service unavailable. Can not update deposit data now.', err);
+                    this.serviceUnavailable = true;
+                });
         },
         getRefreshToken: function() {
             if (this.refreshToken) {

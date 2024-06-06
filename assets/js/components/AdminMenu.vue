@@ -8,24 +8,33 @@
 </template>
 
 <script>
+import '../../scss/pages/admin_menu.sass';
 import {SidebarMenu} from 'vue-sidebar-menu';
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTasks, faAnchor, faCubes, faSignInAlt} from '@fortawesome/free-solid-svg-icons';
+import {RebrandingFilterMixin} from '../mixins';
 
 library.add(faTasks, faAnchor, faCubes, faSignInAlt);
 
 export default {
     name: 'AdminMenu',
+    mixins: [RebrandingFilterMixin],
     components: {
         SidebarMenu,
     },
     props: {
         isUserLogged: Boolean,
     },
+    mounted() {
+        if (this.isUserLogged) {
+            this.loadBalance();
+        }
+    },
     data() {
         return {
             isClicked: false,
+            cryptos: [],
             testingMenu:
                 {
                     title: 'Tester Options',
@@ -59,28 +68,6 @@ export default {
                 {
                     title: this.$t('hacker_menu.crypto.title'),
                     icon: 'fa fa-cubes',
-                    child: [
-                        {
-                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'web'}),
-                            title: this.$t('hacker_menu.crypto.web'),
-                        },
-                        {
-                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'eth'}),
-                            title: this.$t('hacker_menu.crypto.eth'),
-                        },
-                        {
-                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'btc'}),
-                            title: this.$t('hacker_menu.crypto.btc'),
-                        },
-                        {
-                          href: this.$routing.generate('hacker-add-crypto', {crypto: 'usdc'}),
-                          title: this.$t('hacker_menu.crypto.usdc'),
-                        },
-                        {
-                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'bnb'}),
-                            title: this.$t('hacker_menu.crypto.bnb'),
-                        },
-                    ],
                 },
             ],
             nonAuthorizedMenu: [
@@ -106,67 +93,48 @@ export default {
             return !this.isClicked ? 'v-sidebar-menu vsm-collapsed' : '';
         },
         menu: function() {
-            let menu = this.isUserLogged ?
+            const menu = this.isUserLogged ?
                 this.authorizedMenu :
                 this.nonAuthorizedMenu;
 
-            menu.push(this.testingMenu);
-            return menu;
+            if (this.isUserLogged) {
+                menu[2].child = Object.values(this.cryptos).reduce((acc, crypto) => {
+                    acc.push({
+                        title: `Add ${this.rebrandingFunc(crypto.identifier)}`,
+                        child: [0.001, 0.1, 1, 5, 100].reduce((acc, amount) => {
+                            acc.push({
+                                href: this.$routing.generate('hacker-add-crypto', {crypto: crypto.identifier, amount}),
+                                title: `${amount} ${this.rebrandingFunc(crypto.identifier)}`,
+                            });
+
+                            return acc;
+                        }, []),
+                    });
+
+                    return acc;
+                }, []);
+            }
+
+            return [...menu, this.testingMenu];
         },
         menuWidth: function() {
             return this.isClicked ? '350px' : '30px';
         },
     },
+    methods: {
+        loadBalance: async function() {
+            const response = await this.$axios.retry.get(this.$routing.generate('tokens'));
+            this.cryptos = response.data.predefined;
+        },
+    },
     watch: {
         isClicked: function() {
-            let collapseBtn = document.querySelector('.v-sidebar-menu button.collapse-btn');
-            collapseBtn.click();
+            const collapseBtn = document.querySelector('.v-sidebar-menu button.collapse-btn');
+
+            if (collapseBtn) {
+                collapseBtn.click();
+            }
         },
     },
 };
 </script>
-
-<style lang="scss">
-    @import '../../scss/variables';
-
-    .v-sidebar-menu {
-        background: $secondary !important;
-        z-index: 1040;
-    }
-
-    .v-sidebar-menu .vsm-dropdown>.vsm-list {
-        background: $primary !important;
-    }
-
-    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon {
-        background: transparent !important;
-    }
-
-    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link {
-        background: $primary-light !important;
-    }
-
-    .v-sidebar-menu.vsm-collapsed {
-        background: none !important;
-
-        & > *:not(button) {
-            display: none !important;
-        }
-    }
-
-    .v-sidebar-menu .vsm-arrow:after {
-        content: "↓" !important;
-    }
-
-    .v-sidebar-menu .collapse-btn:after {
-        content: ">" !important;
-    }
-
-    .vsm-collapsed {
-        width: 10px !important;
-
-        .collapse-btn {
-            width: 30px !important;
-        }
-    }
-</style>

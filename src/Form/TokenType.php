@@ -5,11 +5,12 @@ namespace App\Form;
 use App\Entity\Token\Token;
 use App\Form\DataTransformer\NameTransformer;
 use App\Form\DataTransformer\XSSProtectionTransformer;
+use App\Validator\Constraints\NoBadWords;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class TokenType extends AbstractType
 {
     /** @var NameTransformer  */
@@ -29,13 +30,22 @@ class TokenType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
+            ->add('name', null, [
+                "constraints" => [
+                    new NoBadWords(),
+                ],
+            ])
             ->add('websiteUrl')
+            ->add('twitterUrl')
             ->add('facebookUrl')
             ->add('telegramUrl')
             ->add('discordUrl')
             ->add('youtubeChannelId')
-            ->add('description')
+            ->add('description', null, [
+                "constraints" => [
+                    new NoBadWords(),
+                ],
+            ])
         ;
 
         $builder->get('name')

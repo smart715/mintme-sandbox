@@ -1,75 +1,120 @@
 <template>
     <div class="h-100">
         <div class="card h-100">
-            <div class="card-header">
-                {{ $t('trade.buy_orders.header') }}
-                <span class="card-header-icon">
-                    {{ $t('trade.buy_orders.header_total') }} {{ total | formatMoney }} {{ tokenName|rebranding }}
-                    <guide>
+            <div class="card-header my-2 d-flex flex-wrap align-items-center justify-content-between">
+                <div
+                    class="font-size-3 font-weight-semibold header-highlighting"
+                    v-html="$t('trade.buy_orders.header')"
+                ></div>
+                <span class="card-header-icon d-flex flex-wrap aling-items-center font-weight-semibold">
+                    {{ $t('trade.buy_orders.header_total') }}
+                    <span class="ml-1 text-primary">
+                        {{ totalSum | formatMoney }}
+                        <coin-avatar
+                            :symbol="tokenName"
+                            :is-crypto="true"
+                        />
+                        {{ tokenName | rebranding }}
+                    </span>
+                    <guide
+                        :key="tooltipKey"
+                        class="font-size-2 d-block ml-1 mtn-2"
+                    >
                         <template slot="header">
                             {{ $t('trade.buy_orders.guide_header') }}
                         </template>
                         <template slot="body">
-                            {{ $t('trade.buy_orders.guide_body', translationsContext) }}
+                            {{ $t('trade.buy_orders.guide_body') }}
+                            <coin-avatar
+                                :symbol="tokenName"
+                                :is-crypto="true"
+                            />
+                            {{ tokenName | rebranding }}.
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body p-0">
-                <template v-if="ordersLoaded">
-                    <div class="table-responsive fixed-head-table mb-0" ref="table">
-                        <b-table v-if="hasOrders"
-                            @row-clicked="orderClicked"
-                            :items="tableData"
+                <div v-if="serviceUnavailable" class="p-5 text-center text-white">
+                    {{ this.$t('toasted.error.service_unavailable_short') }}
+                </div>
+                <template v-else-if="ordersLoaded">
+                    <div
+                        class="table-orders table-sticky-head overflow-auto custom-scrollbar mx-3 mb-3"
+                        ref="table"
+                    >
+                        <b-table
+                            v-if="hasOrders"
+                            :items="ordersToShow"
                             :fields="fields"
+                            class="table-orders"
                             :tbody-tr-class="rowClass"
-                            :tbody-class="'table-orders'"
+                            :tbody-tr-attr="rowAttribute"
+                            @row-clicked="orderClicked"
                         >
                             <template v-slot:cell(price)="row">
-                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <div class="col-11 pl-0 ml-0">
-                                        <span class="d-inline-block truncate-name flex-grow-1">
-                                            <span
-                                                v-b-tooltip="{title: currencyConvert(row.value, rate, 2), boundary:'viewport'}">
-                                                {{ row.value }}
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
+                                <span
+                                    class="buy-order-price"
+                                    v-b-tooltip="{
+                                        title: currencyConvert(row.value, rate, usdPriceSubunits),
+                                        boundary:'viewport'
+                                    }"
+                                >
+                                    {{ row.value }}
+                                </span>
                             </template>
                             <template v-slot:cell(sum)="row">
-                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <div class="col-11 pl-0 ml-0">
-                                         <span
-                                             class="d-inline-block truncate-name flex-grow-1"
-                                             v-text="sum(row.value, rate)">
-                                         </span>
-                                    </div>
+                                <div
+                                    v-if="row.item.owner && !isToken"
+                                    class="d-flex justify-content-between"
+                                >
+                                    <span v-text="sum(row.value, rate)"></span>
+                                    <a
+                                        class="ml-2"
+                                        v-b-tooltip="modalTooltip"
+                                        @click="removeOrderModal(row.item)"
+                                    >
+                                        <font-awesome-icon
+                                            icon="times"
+                                            class="text-danger c-pointer"
+                                        />
+                                    </a>
                                 </div>
+                                <span
+                                    v-else
+                                    v-text="sum(row.value, rate)"
+                                ></span>
                             </template>
                             <template v-slot:cell(trader)="row">
-                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <div class="col-11 pl-0 ml-0">
-                                    <a
-                                        :href="row.item.traderUrl"
-                                        class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white"
-                                    >
-                                        <img
-                                            :src="row.item.traderAvatar"
-                                            class="rounded-circle d-block flex-grow-0 pointer-events-none pull-right mr-1"
-                                            alt="avatar">
-                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                <div class="d-flex flex-nowrap">
+                                    <div>
+                                        <a
+                                            :href="row.item.traderUrl"
+                                            class="d-flex flex-nowrap align-items-center text-link"
+                                        >
+                                            <img
+                                                :src="row.item.traderAvatar"
+                                                class="rounded-circle d-block flex-grow-0 pointer-events-none mr-1"
+                                                alt="avatar">
                                             <span
                                                 v-b-tooltip="popoverConfig"
-                                                v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                                v-on:mouseover="mouseoverHandler(
+                                                    fullOrdersList,
+                                                    basePrecision,
+                                                    row.item.price
+                                                )"
                                             >
-                                                {{ row.value }}
+                                                {{ row.value | truncate(12) }}
                                             </span>
-                                        </span>
-                                    </a>
+                                        </a>
                                     </div>
-                                    <div class="col-1 pull-right pl-0 ml-0">
-                                        <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
+                                    <div class="d-flex align-items-center">
+                                        <a
+                                            v-if="row.item.owner"
+                                            v-b-tooltip="modalTooltip"
+                                            class="ml-2"
+                                            @click="removeOrderModal(row.item)"
+                                        >
                                             <font-awesome-icon icon="times" class="text-danger c-pointer" />
                                         </a>
                                     </div>
@@ -99,16 +144,20 @@ import Decimal from 'decimal.js';
 import {mapGetters} from 'vuex';
 import {BTable, VBTooltip} from 'bootstrap-vue';
 import Guide from '../Guide';
-import {toMoney, removeSpaces, currencyConversion} from '../../utils';
-import {USD, usdSign, currencyModes} from '../../utils/constants.js';
+import {toMoney, removeSpaces} from '../../utils';
+import {USD, usdSign} from '../../utils/constants.js';
 import {
+    FiltersMixin,
     LazyScrollTableMixin,
     MoneyFilterMixin,
     OrderClickedMixin,
     RebrandingFilterMixin,
     TraderHoveredMixin,
     OrderHighlights,
+    CurrencyConverter,
+    OrdersFillWidthMixin,
 } from '../../mixins/';
+import CoinAvatar from '../CoinAvatar';
 
 library.add(faCircleNotch, faTimes);
 
@@ -118,37 +167,43 @@ export default {
         BTable,
         Guide,
         FontAwesomeIcon,
+        CoinAvatar,
     },
     directives: {
         'b-tooltip': VBTooltip,
     },
     mixins: [
+        FiltersMixin,
         LazyScrollTableMixin,
         MoneyFilterMixin,
         OrderClickedMixin,
         RebrandingFilterMixin,
         TraderHoveredMixin,
         OrderHighlights,
+        CurrencyConverter,
+        OrdersFillWidthMixin,
     ],
     props: {
         fullOrdersList: [Array],
         ordersList: [Array],
         tokenName: String,
         fields: Array,
-        totalBuyOrders: [Array, Object],
+        totalBuyOrders: [Array, Object, Decimal],
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
+        serviceUnavailable: Boolean,
         ordersUpdated: {
             type: Boolean,
             default: false,
         },
         currencyMode: String,
+        isToken: Boolean,
     },
     data() {
         return {
             tableData: this.ordersList,
-            currencyModes,
+            tooltipKey: 0,
         };
     },
     mounted: function() {
@@ -158,32 +213,46 @@ export default {
         ...mapGetters('rates', [
             'getRates',
         ]),
-        total: function() {
+        ...mapGetters('market', {
+            market: 'getCurrentMarket',
+        }),
+        usdPriceSubunits() {
+            return this.isToken && this.market.quote.priceDecimals
+                ? this.market.quote.priceDecimals
+                : USD.subunit;
+        },
+        totalSum: function() {
             if (this.totalBuyOrders) {
-              return toMoney(this.totalBuyOrders, this.basePrecision);
+                return toMoney(this.totalBuyOrders, this.basePrecision);
             } else {
-              return toMoney(this.tableData.reduce((sum, order) =>
-                  new Decimal(order.sum).add(sum), 0), this.basePrecision
-              );
+                return toMoney(
+                    this.tableData.reduce(
+                        (currentSum, order) => new Decimal(currentSum).add(order.sum).toString(),
+                        '0',
+                    ),
+                    this.quotePrecision
+                );
             }
         },
         hasOrders: function() {
-            return this.tableData.length > 0;
-        },
-        translationsContext: function() {
-            return {
-                name: this.rebrandingFunc(this.tokenName),
-            };
+            return 0 < this.tableData.length;
         },
         rate: function() {
             return (this.getRates[this.tokenName] || [])[USD.symbol] || 1;
         },
+        ordersToShow: function() {
+            return this.ordersWithFillWidth;
+        },
+        modalTooltip: function() {
+            return {
+                title: this.$t('tooltip.remove'),
+                boundary: 'viewport',
+            };
+        },
     },
     methods: {
         sum: function(value, rate) {
-            return this.currencyMode === this.currencyModes.usd.value ?
-                this.currencyConvert(value, rate, 2) :
-                value;
+            return this.currencyConvert(value, rate, 2);
         },
         removeOrderModal: function(row) {
             this.$emit('modal', row);
@@ -195,16 +264,21 @@ export default {
         },
         rowClass: function(item, type) {
             return 'row' === type && item.highlightClass
-                ? item.highlightClass
-                : '';
+                ? `buy-order ${item.highlightClass}`
+                : 'buy-order';
+        },
+        rowAttribute: function(order, type) {
+            return 'row' === type
+                ? {'style': this.orderFillingStyle(order.fillWidth)}
+                : null;
         },
         currencyConvert: function(val, rate, subunit) {
-            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
+            return this.currencyConversion(removeSpaces(val), rate, usdSign, subunit, this.market.base.subunit);
         },
     },
     watch: {
         ordersList: function(newOrders) {
-            let delayOrdersUpdating = this.ordersUpdated
+            const delayOrdersUpdating = this.ordersUpdated
                 ? this.handleOrderHighlights(this.tableData, newOrders)
                 : false;
 
@@ -216,10 +290,13 @@ export default {
 
             setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
         },
+        tokenName: function() {
+            this.tooltipKey += 1;
+        },
     },
     filters: {
         currencyConvert: function(val, rate, subunit) {
-            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
+            return this.currencyConversion(removeSpaces(val), rate, usdSign, subunit, this.market.base.subunit);
         },
     },
 };

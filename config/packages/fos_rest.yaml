@@ -2,10 +2,7 @@
 fos_rest:
     param_fetcher_listener:  true
     allowed_methods_listener:  true
-    routing_loader: true
-
-    access_denied_listener:
-        json: true
+    routing_loader: false
 
     exception:
         enabled: true
@@ -22,9 +19,13 @@ fos_rest:
 
     serializer:
         groups: ['API']
+        serialize_null: true
 
     format_listener:
         rules:
-            - { path: ^(%translation_prefixes%)/api, prefer_extension: true, fallback_format: json, priorities: [ json, js, html ] }
+            - { path: ^(%translation_prefixes%)/api, prefer_extension: true, fallback_format: json, priorities: [ json, js ] }
             - { path: ^(%translation_prefixes%)/dev/api, prefer_extension: true, fallback_format: json, priorities: [ json, js ] }
             - { path: ^/, prefer_extension: true, fallback_format: html, priorities: [ html, '*/*' ] }
+    
+    body_listener:
+        enabled: true

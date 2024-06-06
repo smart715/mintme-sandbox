@@ -3,6 +3,7 @@
 namespace App\Wallet\Withdraw;
 
 use App\Entity\Crypto;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Wallet\Withdraw\Communicator\CommunicatorInterface;
 use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
@@ -45,13 +46,23 @@ class CryptoWithdrawGateway implements WithdrawGatewayInterface
     }
 
     /** {@inheritdoc} */
-    public function getBalance(Crypto $crypto): Money
+    public function getBalance(TradableInterface $tradable, Crypto $cryptoNetwork): Money
     {
-        return $this->mapper->getBalance($crypto);
+        return $this->mapper->getBalance($tradable, $cryptoNetwork);
     }
 
     public function isContractAddress(string $address, string $crypto): bool
     {
         return $this->mapper->isContractAddress($address, $crypto);
+    }
+
+    public function getUserId(string $address, string $cryptoNetwork): ?int
+    {
+        return $this->mapper->getUserId($address, $cryptoNetwork);
+    }
+
+    public function getCryptoIncome(string $crypto, \DateTimeImmutable $from, \DateTimeImmutable $to): array
+    {
+        return $this->mapper->getCryptoIncome($crypto, $from, $to);
     }
 }

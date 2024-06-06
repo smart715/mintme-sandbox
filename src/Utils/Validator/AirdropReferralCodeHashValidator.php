@@ -5,7 +5,7 @@ namespace App\Utils\Validator;
 class AirdropReferralCodeHashValidator implements ValidatorInterface
 {
     private string $hash;
-    private string $message;
+    private string $message = ''; // phpcs:ignore
 
     public function __construct(string $hash)
     {

@@ -6,239 +6,190 @@ use App\Consumers\PaymentConsumer;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Utils\ClockInterface;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use PhpAmqpLib\Message\AMQPMessage;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentConsumerTest extends TestCase
 {
-    public function testExecute(): void
+    private const CRYPTO_SYMBOL = 'WEB';
+    private const TOKEN_SYMBOL = 'TOKEN';
+    private const USER_ID = 1;
+    private const STATUS_OK = 'ok';
+    private const TH_HASH = 'x01234123';
+    private const RETRIES = 0;
+    private const AMOUNT = '10000';
+    private const ADDRESS = '0x01';
+    private const CRYPTO_NETWORK = 'ETH';
+
+    public function testExecuteDbConnectionFailed(): void
     {
-        $cryptoSymbol = 'FOO';
         $dc = new PaymentConsumer(
-            $this->mockBalanceHandler($this->never()),
-            $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
+            $this->mockUserManager(),
+            $this->mockCryptoManager(),
             $this->mockTokenManager(),
             $this->mockLogger(),
-            $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
-            $this->mockEM(),
+            $this->mockEM(false),
             $this->mockEventDispatcher(),
-            $this->mockTokenConfig()
         );
 
-        $this->assertTrue(
-            $dc->execute($this->mockMessage((string)json_encode([
-                'id' => 1,
-                'status' => 'success',
-                'tx_hash' => 'x01234123',
-                'retries' => 0,
-                'crypto' => $cryptoSymbol,
-                'amount' => '10000',
-            ])))
-        );
+        $this->assertFalse($dc->execute($this->mockMessage('')));
     }
 
-    public function testExecuteWithoutUser(): void
+    public function testExecuteFailedParseMessage(): void
     {
-        $cryptoSymbol = 'WEB';
         $dc = new PaymentConsumer(
-            $this->mockBalanceHandler($this->never()),
-            $this->mockUserManager(null),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
+            $this->mockUserManager(),
+            $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockLogger(),
-            $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
+            $this->mockLogger(1, 'Failed to parse incoming message'),
             $this->mockEM(),
-            $this->mockEventDispatcher(),
-            $this->mockTokenConfig()
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
-            $dc->execute($this->mockMessage((string)json_encode([
-                'id' => 1,
-                'status' => 'success',
-                'tx_hash' => 'x01234123',
-                'retries' => 0,
-                'crypto' => $cryptoSymbol,
-                'amount' => '10000',
-            ])))
+            $dc->execute($this->mockMessage((string)json_encode('invalid message')))
         );
     }
 
-    public function testExecuteWithoutCrypto(): void
+    public function testExecuteUserNotFound(): void
     {
-        $cryptoSymbol = 'FOO';
         $dc = new PaymentConsumer(
-            $this->mockBalanceHandler($this->never()),
-            $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager(null, $this->once()),
-            $this->mockTokenManager(null, $this->once()),
-            $this->mockLogger(),
-            $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
-            $this->mockEM(),
-            $this->mockEventDispatcher(),
-            $this->mockTokenConfig()
-        );
-
-        $this->assertTrue(
-            $dc->execute($this->mockMessage((string)json_encode([
-                'id' => 1,
-                'status' => 'fail',
-                'tx_hash' => 'x01234123',
-                'retries' => 0,
-                'crypto' => $cryptoSymbol,
-                'amount' => '10000',
-            ])))
-        );
-    }
-
-    public function testExecuteFailedParse(): void
-    {
-        $cryptoSymbol = 'FOO';
-        $dc = new PaymentConsumer(
-            $this->mockBalanceHandler($this->never()),
-            $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
+            $this->mockUserManager(),
+            $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockLogger(),
-            $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
+            $this->mockLogger(1, 'User not found'),
             $this->mockEM(),
-            $this->mockEventDispatcher(),
-            $this->mockTokenConfig()
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'id' => 1,
-                'status' => 'success',
-                'tx_hash' => 'x01234123',
-                'retries' => 0,
-                'crypto' => $cryptoSymbol,
+                'id' => -1,
+                'status' => self::STATUS_OK,
+                'tx_hash' => self::TH_HASH,
+                'retries' => self::RETRIES,
+                'crypto' => self::CRYPTO_SYMBOL,
+                'amount' => self::AMOUNT,
+                'address' => self::ADDRESS,
+                'cryptoNetwork' => self::CRYPTO_NETWORK,
             ])))
         );
     }
 
-    public function testExecuteWithException(): void
+    public function testExecuteTradableNotFound(): void
     {
-        $cryptoSymbol = 'FOO';
-
-        $bh = $this->createMock(BalanceHandlerInterface::class);
-        $bh->method('deposit')
-            ->willThrowException(new \Exception());
-
         $dc = new PaymentConsumer(
-            $bh,
-            $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
+            $this->mockUserManager(),
+            $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockLogger(),
-            $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
+            $this->mockLogger(1, 'Invalid crypto "INVALID TRADABLE" given'),
             $this->mockEM(),
-            $this->mockEventDispatcher(),
-            $this->mockTokenConfig()
+            $this->mockEventDispatcher()
         );
 
-        $this->assertFalse(
+        $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'id' => 1,
-                'status' => 'fail',
-                'tx_hash' => 'x01234123',
-                'retries' => 0,
-                'crypto' => $cryptoSymbol,
-                'amount' => '10000',
+                'id' => self::USER_ID,
+                'status' => self::STATUS_OK,
+                'tx_hash' => self::TH_HASH,
+                'retries' => self::RETRIES,
+                'crypto' => 'INVALID TRADABLE',
+                'amount' => self::AMOUNT,
+                'address' => self::ADDRESS,
+                'cryptoNetwork' => self::CRYPTO_NETWORK,
             ])))
         );
     }
 
-    public function testExecuteFailedToDeposit(): void
+    public function testExecuteStatusNotOk(): void
     {
-        $cryptoSymbol = 'FOO';
-
-        $bh = $this->createMock(BalanceHandlerInterface::class);
-        $bh->expects($this->once())->method('deposit');
-
         $dc = new PaymentConsumer(
-            $bh,
-            $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
+            $this->mockUserManager(),
+            $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockLogger(),
-            $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
+            $this->mockLogger(1),
             $this->mockEM(),
-            $this->mockEventDispatcher(),
-            $this->mockTokenConfig()
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'id' => 1,
-                'status' => 'fail',
-                'tx_hash' => 'x01234123',
-                'retries' => 0,
-                'crypto' => $cryptoSymbol,
-                'amount' => '10000',
+                'id' => self::USER_ID,
+                'status' => 'NOT OK',
+                'tx_hash' => self::TH_HASH,
+                'retries' => self::RETRIES,
+                'crypto' => self::CRYPTO_SYMBOL,
+                'amount' => self::AMOUNT,
+                'address' => self::ADDRESS,
+                'cryptoNetwork' => self::CRYPTO_NETWORK,
             ])))
         );
     }
 
-    public function testExecuteFailedToDepositWithToken(): void
+    public function testExecuteCryptoStatusOk(): void
     {
-        $tokenName = 'tok1';
-
-        $bh = $this->createMock(BalanceHandlerInterface::class);
-        $bh->expects($this->exactly(2))->method('deposit');
-
         $dc = new PaymentConsumer(
-            $bh,
-            $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager(null, $this->exactly(2)),
-            $this->mockTokenManager($this->mockToken($tokenName), $this->once()),
-            $this->mockLogger(),
-            $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
+            $this->mockUserManager(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
+            $this->mockLogger(1),
             $this->mockEM(),
-            $this->mockEventDispatcher(),
-            $this->mockTokenConfig()
+            $this->mockEventDispatcher(true)
         );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'id' => 1,
-                'status' => 'fail',
-                'tx_hash' => 'x01234123',
-                'retries' => 0,
-                'crypto' => $tokenName,
-                'amount' => '10000',
+                'id' => self::USER_ID,
+                'status' => self::STATUS_OK,
+                'tx_hash' => self::TH_HASH,
+                'retries' => self::RETRIES,
+                'crypto' => self::CRYPTO_SYMBOL,
+                'amount' => self::AMOUNT,
+                'address' => self::ADDRESS,
+                'cryptoNetwork' => self::CRYPTO_NETWORK,
             ])))
         );
     }
 
-    private function mockCrypto(string $symbol): Crypto
+    public function testExecuteTokenStatusOk(): void
+    {
+        $dc = new PaymentConsumer(
+            $this->mockUserManager(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
+            $this->mockLogger(1),
+            $this->mockEM(),
+            $this->mockEventDispatcher(true)
+        );
+
+        $this->assertTrue(
+            $dc->execute($this->mockMessage((string)json_encode([
+                'id' => self::USER_ID,
+                'status' => self::STATUS_OK,
+                'tx_hash' => self::TH_HASH,
+                'retries' => self::RETRIES,
+                'crypto' => self::TOKEN_SYMBOL,
+                'amount' => self::AMOUNT,
+                'address' => self::ADDRESS,
+                'cryptoNetwork' => self::CRYPTO_NETWORK,
+            ])))
+        );
+    }
+
+    private function mockCrypto(): Crypto
     {
         $crypto = $this->createMock(Crypto::class);
-        $crypto->method('getSymbol')->willReturn($symbol);
-        $crypto->method('getFee')->willReturn(new Money(1, new Currency($symbol)));
+        $crypto->method('getSymbol')->willReturn(self::CRYPTO_SYMBOL);
+        $crypto->method('getFee')->willReturn(new Money(1, new Currency(self::CRYPTO_SYMBOL)));
 
         return $crypto;
     }
@@ -251,86 +202,98 @@ class PaymentConsumerTest extends TestCase
         return $msg;
     }
 
-    private function mockBalanceHandler(Invocation $im): BalanceHandlerInterface
-    {
-        $bh = $this->createMock(BalanceHandlerInterface::class);
-        $bh->expects($im)->method('deposit');
-
-        return $bh;
-    }
-
-    private function mockUserManager(?User $user): UserManagerInterface
+    private function mockUserManager(): UserManagerInterface
     {
         $um = $this->createMock(UserManagerInterface::class);
-        $um->method('find')->willReturn($user);
+        $um->method('find')->willReturnCallback(function ($id): ?User {
+            return self::USER_ID === $id
+                ? $this->createMock(User::class)
+                : null;
+        });
 
         return $um;
     }
 
-    private function mockCryptoManager(?Crypto $crypto, Invocation $invocation): CryptoManagerInterface
+    private function mockCryptoManager(): CryptoManagerInterface
     {
         $cm = $this->createMock(CryptoManagerInterface::class);
-        $cm->expects($invocation)->method('findBySymbol')->will($this->returnCallback(
-            function ($symbol) use ($crypto) {
-                return !$crypto && 'WEB' === $symbol
-                    ? $this->mockCrypto('WEB')
-                    : $crypto;
-            }
-        ));
+        $cm->method('findBySymbol')
+            ->willReturnCallback(function ($symbol): ?Crypto {
+                return self::CRYPTO_SYMBOL === $symbol
+                    ? $this->mockCrypto()
+                    : null;
+            });
 
         return $cm;
     }
 
-    private function mockTokenManager(?Token $token = null, ?Invocation $invocation = null): TokenManagerInterface
+    private function mockTokenManager(): TokenManagerInterface
     {
         $tm = $this->createMock(TokenManagerInterface::class);
-        $tm->expects($invocation ?? $this->never())
-            ->method('findByName')->willReturn($token);
+        $tm->method('findByName')->willReturnCallback(function ($name): ?Token {
+            return self::TOKEN_SYMBOL === $name
+                ? $this->mockToken()
+                : null;
+        });
 
         return $tm;
     }
 
-    private function mockToken(string $name): Token
+    private function mockToken(): Token
     {
         $token = $this->createMock(Token::class);
-        $token->method('getSymbol')->willReturn($name);
-        $token->method('getCryptoSymbol')->willReturn('WEB');
+        $token->method('getSymbol')->willReturn(self::TOKEN_SYMBOL);
+        $token->method('getCryptoSymbol')->willReturn(self::CRYPTO_SYMBOL);
 
         return $token;
     }
 
-    private function mockLogger(): LoggerInterface
+    private function mockLogger(int $infoLogs = 0, ?string $warningMessage = null): LoggerInterface
     {
-        return $this->createMock(LoggerInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->exactly($infoLogs))->method('info');
+        $logger->expects($warningMessage ? $this->once() : $this->never())
+            ->method('warning')
+            ->willReturnCallback(function ($message) use ($warningMessage): void {
+                $this->assertStringContainsString($warningMessage, $message);
+            });
+
+        return $logger;
     }
 
-    private function mockMoneyWrapper(): MoneyWrapperInterface
+    private function mockEventDispatcher(bool $dispatchEvent = false): EventDispatcherInterface
     {
-        $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
-            return new Money($amount, new Currency($symbol));
-        });
+        $ed = $this->createMock(EventDispatcherInterface::class);
+        $ed ->expects($dispatchEvent ? $this->once() : $this->never())
+            ->method('dispatch');
 
-        return $mw;
+        return $ed;
     }
 
-    private function mockEventDispatcher(): EventDispatcherInterface
-    {
-        return $this->createMock(EventDispatcherInterface::class);
-    }
-
-    private function mockEM(): EntityManagerInterface
+    private function mockEM(bool $isConnected = true): EntityManagerInterface
     {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getConnection')->willReturn(
-            $this->createMock(Connection::class)
-        );
+        $em->expects($this->exactly(($isConnected ? 0 : 2) + 1))
+            ->method('getConnection')
+            ->willReturn($this->mockConnection($isConnected));
 
         return $em;
     }
 
-    public function mockTokenConfig(): TokenConfig
+    private function mockConnection(bool $isConnected = true): Connection
     {
-        return $this->createMock(TokenConfig::class);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
+            ->method('ping')
+            ->willReturn($isConnected);
+
+        $connection->expects($isConnected ? $this->never() : $this->once())
+            ->method('close');
+
+        $connection->expects($isConnected ? $this->never() : $this->once())
+            ->method('connect')
+            ->willThrowException(new \Exception());
+
+        return $connection;
     }
 }

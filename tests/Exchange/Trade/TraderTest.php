@@ -4,24 +4,27 @@ namespace App\Tests\Exchange\Trade;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
-use App\Exchange\Market\MarketHandler;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
+use App\Exchange\Trade\PlaceOrderResult;
 use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderFetcherInterface;
-use App\Manager\ScheduledNotificationManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Manager\UserManagerInterface;
+use App\Repository\TokenInitOrderRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -34,7 +37,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
+            ->with(1, 'BARFOO', 1, 100, 50, '0.02', '0.02', 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::SUCCESS
@@ -44,14 +47,13 @@ class TraderTest extends TestCase
         $trader = $this->mockTrader(
             $trader,
             null,
-            $this->mockEm($this->once()),
+            $this->mockEm($this->never()),
         );
 
         $quote = $this->mockToken('BAR', true);
 
         $user = $this->mockUser(1);
-        $user->method('getReferrencer')->willReturn(null);
-        $user->expects($this->once())->method('addToken');
+        $user->method('getReferencer')->willReturn(null);
 
         $trader->placeOrder(
             $this->mockOrder($user, 1, 100, 50, 2, $this->mockMarket(
@@ -66,7 +68,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(2, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
+            ->with(2, 'BARFOO', 1, 100, 50, '0.02', '0.02', 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::SUCCESS
@@ -76,17 +78,15 @@ class TraderTest extends TestCase
         $trader = $this->mockTrader(
             $trader,
             null,
-            $this->mockEm($this->exactly(2)),
+            $this->mockEm($this->never()),
         );
 
         $quote = $this->mockToken('BAR', true);
 
         $referrencer = $this->mockUser(1);
         $user = $this->mockUser(2);
-        $user->method('getReferrencer')->willReturn($referrencer);
+        $user->method('getReferencer')->willReturn($referrencer);
 
-        $user->expects($this->once())->method('addToken');
-        $referrencer->expects($this->once())->method('addToken');
 
         $trader->placeOrder(
             $this->mockOrder($user, 1, 100, 50, 2, $this->mockMarket(
@@ -101,7 +101,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
+            ->with(1, 'BARFOO', 1, 100, 50, '0.02', '0.02', 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::SUCCESS
@@ -132,7 +132,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
+            ->with(1, 'BARFOO', 1, 100, 50, '0.02', '0.02', 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::FAILED
@@ -146,7 +146,6 @@ class TraderTest extends TestCase
         $quote = $this->mockToken('BAR', true);
 
         $user = $this->mockUser(1);
-        $user->expects($this->never())->method('addToken');
         $user->expects($this->never())->method('addCrypto');
 
         $trader->placeOrder(
@@ -154,6 +153,36 @@ class TraderTest extends TestCase
                 $this->mockToken('FOO', false),
                 $quote
             ))
+        );
+    }
+
+    public function testExecuteOrder(): void
+    {
+        $trader = $this->mockTraderFetcher();
+        $trader->expects($this->once())
+            ->method('executeOrder')
+            ->with(1, 'BARFOO', 1, 100, '1', 2, 0.5)
+            ->willReturn(
+                $this->mockTradeResult(
+                    TradeResult::SUCCESS
+                )
+            );
+
+        $trader = $this->mockTrader(
+            $trader,
+            null,
+            $this->mockEm($this->never()),
+        );
+
+        $quote = $this->mockToken('BAR', true);
+
+        $user = $this->mockUser(1);
+
+        $trader->executeOrder(
+            $this->mockOrder($user, 1, 100, 50, 2, $this->mockMarket(
+                $this->mockToken('FOO', false),
+                $quote
+            ), 1)
         );
     }
 
@@ -307,16 +336,22 @@ class TraderTest extends TestCase
         return $converter;
     }
 
-    private function mockLimitOrderConfig(int $makerFee, int $takerFee): LimitOrderConfig
-    {
+    private function mockLimitOrderConfig(
+        string $feeTokenRate,
+        string $feeCryptoRate
+    ): LimitOrderConfig {
         $config = $this->createMock(LimitOrderConfig::class);
-        $config->method('getMakerFeeRate')->willReturn($makerFee);
-        $config->method('getTakerFeeRate')->willReturn($takerFee);
+        $config
+            ->method('getFeeTokenRate')
+            ->willReturn($feeTokenRate);
+        $config
+            ->method('getFeeCryptoRate')
+            ->willReturn($feeCryptoRate);
 
         return $config;
     }
 
-    private function mockEm(Invocation $invocation): EntityManagerInterface
+    private function mockEm(InvokedCount $invocation): EntityManagerInterface
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($invocation)->method('flush');
@@ -330,21 +365,31 @@ class TraderTest extends TestCase
         return $this->createMock(TraderFetcherInterface::class);
     }
 
-    private function mockTradeResult(int $resultCode): TradeResult
+    private function mockTradeResult(int $resultCode): PlaceOrderResult
     {
-        $result = $this->createMock(TradeResult::class);
+        $result = $this->createMock(PlaceOrderResult::class);
         $result->method('getResult')->willReturn($resultCode);
+        $result->method('getLeft')->willReturn("1");
+        $result->method('getAmount')->willReturn("1");
 
         return $result;
     }
 
-    private function mockOrder(User $user, int $side, int $amount, int $price, int $referralId, Market $market): Order
-    {
+    private function mockOrder(
+        User $user,
+        int $side,
+        int $amount,
+        int $price,
+        int $referralId,
+        Market $market,
+        int $fee = 1
+    ): Order {
         $order = $this->createMock(Order::class);
         $order->method('getMaker')->willReturn($user);
         $order->method('getSide')->willReturn($side);
         $order->method('getAmount')->willReturn(Money::USD($amount));
         $order->method('getPrice')->willReturn(Money::USD($price));
+        $order->method('getFee')->willReturn(Money::USD($fee));
         $order->method('getReferralId')->willReturn($referralId);
         $order->method('getMarket')->willReturn($market);
         $order->method('getId')->willReturn(999);
@@ -352,17 +397,17 @@ class TraderTest extends TestCase
         return $order;
     }
 
-    /** @return TradebleInterface|MockObject */
-    private function mockToken(string $symbol, bool $isTok): TradebleInterface
+    /** @return TradableInterface|MockObject */
+    private function mockToken(string $symbol, bool $isTok): TradableInterface
     {
-        /** @var TradebleInterface|MockObject $tok */
+        /** @var TradableInterface|MockObject $tok */
         $tok = $this->createMock($isTok ? Token::class : Crypto::class);
         $tok->method('getSymbol')->willReturn($symbol);
 
         return $tok;
     }
 
-    private function mockMarket(TradebleInterface $base, TradebleInterface $quote): Market
+    private function mockMarket(TradableInterface $base, TradableInterface $quote): Market
     {
         $market = $this->createMock(Market::class);
         $market->method('getBase')->willReturn($base);
@@ -375,7 +420,12 @@ class TraderTest extends TestCase
     private function mockUser(int $id): User
     {
         $user = $this->createMock(User::class);
-        $user->method('getId')->willReturn($id);
+        $user
+            ->method('getId')
+            ->willReturn($id);
+        $user
+            ->method('getTradingFee')
+            ->willReturn('0.02');
 
         return $user;
     }
@@ -412,7 +462,7 @@ class TraderTest extends TestCase
     ): Trader {
         return new Trader(
             $fetcher ?? $this->mockTraderFetcher(),
-            $config ?? $this->mockLimitOrderConfig(1, 2),
+            $config ?? $this->mockLimitOrderConfig('0.02', '0.02'),
             $entityManager ?? $this->mockEm($this->never()),
             $moneyWrapper ?? $this->mockMoneyWrapper(),
             $marketNameConverter ?? $this->mockMarketNameConverter(),
@@ -420,7 +470,10 @@ class TraderTest extends TestCase
             $logger ?? $this->createMock(LoggerInterface::class),
             $referralFee ?? 0.5,
             $eventDispatcher ?? $this->mockEvenDispatcher(),
-            $balanceHandler ?? $this->createMock(BalanceHandlerInterface::class)
+            $balanceHandler ?? $this->createMock(BalanceHandlerInterface::class),
+            $this->createMock(MarketHandlerInterface::class),
+            $this->createMock(UserManagerInterface::class),
+            $this->createMock(TokenInitOrderRepository::class)
         );
     }
 }

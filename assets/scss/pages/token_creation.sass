@@ -1,0 +1,30 @@
+@import "../variables"
+
+body
+  background-image: url('../../img/token_creation_bg.webp')
+  background-position: center
+
+main.content
+  display: flex
+  align-items: center
+
+#token_creation
+  .card
+    max-width: 600px
+
+  .card-header
+    background-color: darken($bg-primary-dark, 2)
+
+    .title
+      font-size: 1.3rem
+      color: $text-color-primary
+
+      span
+        color: $primary
+        &::selection
+          color: $primary
+          background-color: $bg-secondary
+
+
+  .btn.btn-primary
+    font-size: 1.2rem

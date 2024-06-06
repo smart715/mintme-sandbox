@@ -8,46 +8,47 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /** @codeCoverageIgnore */
 class BalanceView
 {
-    /** @var string */
-    public $identifier;
+    public string $identifier;
 
-    /** @var Money */
-    public $available;
+    public Money $available;
 
-    /** @var Money|null */
-    public $frozen;
+    public ?Money $frozen;
 
-    /** @var string */
-    public $fullname;
+    public ?Money $bonus;
 
-    /** @var Money|null */
-    public $fee;
+    public string $fullname;
 
-    /** @var int */
-    public $subunit;
+    public ?Money $fee;
 
-    /** @var bool */
-    public $exchangeble;
+    public int $subunit;
 
-    /** @var bool */
-    public $tradable;
+    public bool $exchangeble;
 
-    /** @var bool */
-    public $deployed;
+    public bool $tradable;
 
-    /** @var bool */
-    public $owner;
+    public bool $deployed;
 
-    /** @var bool */
-    public $isBlocked;
+    public bool $owner;
 
-    /** @var string */
-    public $cryptoSymbol;
+    public bool $isBlocked;
+
+    public bool $isToken;
+
+    public string $cryptoSymbol;
+
+    public bool $isCreatedOnMintmeSite;
+
+    public bool $isRemoved;
+
+    public bool $hasTax;
+
+    public bool $isPausable;
 
     public function __construct(
         string $identifier,
         Money $available,
         ?Money $frozen,
+        ?Money $bonus,
         string $fullname,
         ?Money $fee,
         int $subunit,
@@ -56,11 +57,17 @@ class BalanceView
         bool $deployed,
         bool $owner,
         bool $isBlocked,
-        string $cryptoSymbol
+        bool $isToken,
+        string $cryptoSymbol,
+        bool $isCreatedOnMintmeSite,
+        bool $isRemoved,
+        bool $hasTax,
+        bool $isPausable
     ) {
         $this->identifier = $identifier;
         $this->available = $available;
         $this->frozen = $frozen;
+        $this->bonus = $bonus;
         $this->fullname = $fullname;
         $this->subunit = $subunit;
         $this->fee = $fee;
@@ -69,7 +76,12 @@ class BalanceView
         $this->deployed = $deployed;
         $this->owner = $owner;
         $this->isBlocked = $isBlocked;
+        $this->isToken = $isToken;
         $this->cryptoSymbol = $cryptoSymbol;
+        $this->isCreatedOnMintmeSite = $isCreatedOnMintmeSite;
+        $this->isRemoved = $isRemoved;
+        $this->hasTax = $hasTax;
+        $this->isPausable = $isPausable;
     }
 
     /** @Groups({"API"}) */
@@ -88,6 +100,12 @@ class BalanceView
     public function getFrozen(): ?Money
     {
         return $this->frozen;
+    }
+
+    /** @Groups({"API"}) */
+    public function getBonus(): ?Money
+    {
+        return $this->bonus;
     }
 
     /** @Groups({"API"}) */
@@ -142,5 +160,35 @@ class BalanceView
     public function getCryptoSymbol(): string
     {
         return $this->cryptoSymbol;
+    }
+
+    /** @Groups({"API"}) */
+    public function isCreatedOnMintmeSite(): bool
+    {
+        return $this->isCreatedOnMintmeSite;
+    }
+
+    /** @Groups({"API"}) */
+    public function isToken(): bool
+    {
+        return $this->isToken;
+    }
+
+    /** @Groups({"API"}) */
+    public function isRemoved(): bool
+    {
+        return $this->isRemoved;
+    }
+
+    /** @Groups({"API"}) */
+    public function getHasTax(): bool
+    {
+        return $this->hasTax;
+    }
+
+    /** @Groups({"API"}) */
+    public function isPausable(): bool
+    {
+        return $this->isPausable;
     }
 }

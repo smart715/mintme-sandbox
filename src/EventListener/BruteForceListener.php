@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Logger\UserActionLogger;
+use App\Services\TranslatorService\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class BruteForceListener
 {
-    private const MAX_ATTEMPT_COUNT = 4;
+    private const MAX_ATTEMPT_COUNT = 10;
     private const ATTEMPTS_KEY = 'attempts';
 
     /** @var UserActionLogger */
@@ -25,27 +26,26 @@ class BruteForceListener
     /** @var string */
     private $secret;
 
+    /** @var TranslatorInterface */
+    private $translator;
+
     public function __construct(
         UserActionLogger $logger,
         Session $session,
         TokenStorageInterface $tokenStorage,
-        string $secret
+        string $secret,
+        TranslatorInterface $translator
     ) {
         $this->logger = $logger;
         $this->session = $session;
         $this->tokenStorage = $tokenStorage;
         $this->secret = $secret;
+        $this->translator = $translator;
     }
 
     public function onSchebtwofactorAuthenticationAttempt(): void
     {
-        if ($this->getAttempts() >= self::MAX_ATTEMPT_COUNT) {
-            $this->tokenStorage->setToken(new AnonymousToken($this->secret, 'anon.', []));
-            $this->session->invalidate();
-            $this->session->getFlashBag()->set('danger', 'Maximum number of failed login attempts has been reached.');
-
-            throw new AuthenticationException();
-        }
+        return;
     }
 
     public function onSchebtwofactorAuthenticationSuccess(): void
@@ -64,6 +64,22 @@ class BruteForceListener
         $this->logger->warning('Failed to authenticate.', [
             'attempts' => $attempts,
         ]);
+
+        if ($this->getAttempts() >= self::MAX_ATTEMPT_COUNT) {
+            $this->tokenStorage->setToken(new AnonymousToken($this->secret, 'anon.', []));
+            $this->session->invalidate();
+            $this->session->getFlashBag()->set(
+                'danger',
+                $this->translator->trans('2fa.limit_exceeded')
+            );
+
+            throw new AuthenticationException();
+        }
+
+        $this->session->getFlashBag()->set(
+            'danger',
+            $this->translator->trans('2fa.chance_failure')
+        );
     }
 
     private function getAttempts(): int

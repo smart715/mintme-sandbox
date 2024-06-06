@@ -2,22 +2,34 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class LocaleSubscriber implements EventSubscriberInterface
 {
     private string $defaultLocale;
     private array $transLocales;
     private array $transAuto;
+    private TokenStorageInterface $tokenStorage;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(string $defaultLocale, array $transLocales, array $transAuto)
-    {
+    public function __construct(
+        TokenStorageInterface $tokenStorage,
+        EntityManagerInterface $entityManager,
+        string $defaultLocale,
+        array $transLocales,
+        array $transAuto
+    ) {
         $this->defaultLocale = $defaultLocale;
         $this->transLocales = $transLocales;
         $this->transAuto = $transAuto;
+        $this->tokenStorage = $tokenStorage;
+        $this->entityManager = $entityManager;
     }
 
     /** @codeCoverageIgnore */
@@ -49,6 +61,23 @@ class LocaleSubscriber implements EventSubscriberInterface
         } else {
             $request->setLocale($request->getSession()->get('_locale', $this->defaultLocale));
         }
+
+        $token = $this->tokenStorage->getToken();
+
+        /** @var User|null $user */
+        $user = $token
+            ? $token->getUser()
+            : null;
+
+        if ($user instanceof User &&
+            $locale &&
+            $locale !== $user->getLocale() &&
+            in_array($locale, $this->transLocales)
+        ) {
+            $user->setLocale($locale);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
     }
 
     /** @inheritdoc */
@@ -56,7 +85,7 @@ class LocaleSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequest', 17],
+                ['onKernelRequest'],
             ],
         ];
     }

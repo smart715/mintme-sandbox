@@ -19,10 +19,10 @@ interface ExchangerInterface
     public function executeOrder(
         User $user,
         Market $market,
-        string $amountInput,
-        string $expectedToReceive,
+        string $value,
         int $side,
-        ?string $fee
+        ?string $fee,
+        bool $updateTokenOrCrypto = true
     ): TradeResult;
 
     public function cancelOrder(Market $market, Order $order): TradeResult;

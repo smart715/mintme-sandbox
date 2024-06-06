@@ -1,0 +1,269 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'page.coin_faq.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/coin_faq') }}
+{% endblock %}
+
+{% block content %}
+    <section id="coin_faq" class="faq section mt-4">
+        <div class="row px-4">
+            <div class="col-12">
+                <h2 class="mb-2 text-primary page-header font-weight-semibold">{{ 'page.coin_faq.header'|trans }}</h2>
+                <p class="mb-4">{{ 'page.coin_faq.content'|trans|raw }}</p>
+            </div>
+            <div class="col-12">
+                <div class="accordion" id="accordionFAQ">
+                    {% for i in 1..34 %}
+                        <div class="card">
+                            <div class="card-header" v-b-toggle.collapse-{{ i }}>
+                                <h3 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button">
+                                        {{ ('page.coin_faq.' ~ i ~ '.title')|trans }}
+                                        <font-awesome-icon icon="angle-down"></font-awesome-icon>
+                                    </button>
+                                </h3>
+                            </div>
+                            <b-collapse id="collapse-{{ i }}" accordion="faq-accordion" style="display: none">
+                                <div class="card-body">
+                                    {% if i == 4 %}
+                                        <p>{{ ('page.coin_faq.4.content_1')|trans|raw }}</p>
+                                        <p><strong>1.</strong> {{ ('page.coin_faq.4.content_2')|trans|raw }}</p>
+                                        <p><strong>2.</strong> {{ ('page.coin_faq.4.content_3')|trans|raw }}</p>
+                                        <ul class="unstyled-list">
+                                            <li>
+                                                <p>
+                                                    <strong>2.1</strong> {{ ('page.coin_faq.4.content_4')|trans|raw }}
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <div class="code-block mb-3">
+                                                    <samp>C:\Users\UserName\AppData\Roaming\Webchain</samp>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    <strong>2.2</strong> {{ ('page.coin_faq.4.content_5')|trans|raw }}
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <div class="code-block mb-3">
+                                                    <samp>
+                                                        <code>></code> cd c:\users\UserName\AppData\Roaming\Webchain
+                                                    </samp>
+                                                </div>
+                                                <p>{{ ('page.coin_faq.4.content_6')|trans }}</p>
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    <strong>2.3</strong> {{ ('page.coin_faq.4.content_7')|trans|raw }}
+                                                </p>
+                                            </li>
+                                        </ul>
+                                        <p class="mb-0">
+                                            <strong>3.</strong> {{ ('page.coin_faq.4.content_8')|trans|raw }}
+                                        </p>
+                                    {% elseif i == 5 %}
+                                        <p>{{ ('page.coin_faq.5.content_1')|trans }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp>"Invalid login", code -1</samp>
+                                        </div>
+                                        <p>{{ ('page.coin_faq.5.content_2')|trans }}</p>
+                                        <p>{{ ('page.coin_faq.5.content_3')|trans|raw }}</p>
+                                        <p class="mb-0">{{ ('page.coin_faq.5.content_4')|trans|raw }}</p>
+                                    {% elseif i == 7 %}
+                                        <p>{{ ('page.coin_faq.7.content_1')|trans }}</p>
+                                        <img
+                                            src="{{ asset('build/images/faq_workers.jpg') }}"
+                                            alt="mining workers list"
+                                            class="img-fluid mb-3"
+                                        />
+                                        <p>{{ ('page.coin_faq.7.content_2')|trans }}</p>
+                                        <p class="mb-0">{{ ('page.coin_faq.7.content_3')|trans }}</p>
+                                    {% elseif i == 8 %}
+                                        <p>{{ ('page.coin_faq.8.content_1')|trans|raw }}</p>
+                                        <ul>{{ ('page.coin_faq.8.content_2')|trans|raw }}</ul>
+                                        <p class="mb-0">{{ ('page.coin_faq.8.content_3')|trans|raw }}</p>
+                                    {% elseif i == 9 %}
+                                        <p>{{ ('page.coin_faq.9.content_1')|trans|raw }}</p>
+                                        <img
+                                            src="{{ asset('build/images/faq_peers_error.png') }}"
+                                            alt="peers error"
+                                            class="img-fluid mb-3"
+                                        />
+                                        <p>{{ ('page.coin_faq.9.content_2')|trans|raw }}</p>
+                                        <ul>{{ ('page.coin_faq.9.content_3')|trans|raw }}</ul>
+                                    {% elseif i == 10 %}
+                                        <p>{{ ('page.coin_faq.10.content_1')|trans }}</p>
+                                        <p><strong>1.</strong> {{ ('page.coin_faq.10.content_2')|trans }}</p>
+                                        <p class="mb-0"><strong>Windows</strong></p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>$</code>HOME/AppData/Roaming/Webchain/</samp>
+                                        </div>
+                                        <p class="mb-0"><strong>Linux</strong></p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>$</code>HOME/.webchain/</samp>
+                                        </div>
+                                        <p class="border border-secondary p-3 mb-4">
+                                            {{ ('page.coin_faq.10.content_3')|trans }}
+                                        </p>
+                                        <p><strong>2.</strong> {{ ('page.coin_faq.10.content_4')|trans }}</p>
+                                        <p class="mb-0">{{ ('page.coin_faq.10.content_5')|trans|raw }}</p>
+                                    {% elseif i == 14 %}
+                                        <p>{{ ('page.coin_faq.14.content_1')|trans }}</p>
+                                        <ul class="unstyled-list">{{ ('page.coin_faq.14.content_2')|trans|raw }}</ul>
+                                        <p>{{ ('page.coin_faq.14.content_3')|trans|raw }}</p>
+                                        <img
+                                            src="{{ asset('build/images/faq_lookup.png') }}"
+                                            alt="mining on MintMe.com Coin pool lookup"
+                                            class="img-fluid mb-3"
+                                        />
+                                        <p>{{ ('page.coin_faq.14.content_4')|trans|raw }}</p>
+                                        <img
+                                            src="{{ asset('build/images/faq_workers.jpg') }}"
+                                            alt="statistics for miner and workers"
+                                            class="img-fluid"
+                                        />
+                                    {% elseif i == 15 %}
+                                        <p>{{ ('page.coin_faq.15.content_1')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp>cd C:\Users\MyName\webchaind</samp>
+                                        </div>
+                                        <p>{{ ('page.coin_faq.15.content_2')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> webchaind account new</samp>
+                                        </div>
+                                        <p>{{ ('page.coin_faq.15.content_3')|trans|raw }}</p>
+                                        <div class="code-block">
+                                            <samp><code>></code> webchaind account list</samp>
+                                        </div>
+                                    {% elseif i == 16 %}
+                                        <p>{{ ('page.coin_faq.16.content_1')|trans|raw }}</p>
+                                        <p><strong>1.</strong> {{ ('page.coin_faq.16.content_2')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp>./webchaind console</samp>
+                                        </div>
+                                        <p class="mt-0">{{ ('page.coin_faq.16.content_3')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp>webchaind.exe console</samp>
+                                        </div>
+                                        <p class="mt-0">{{ ('page.coin_faq.16.content_4')|trans|raw }}</p>
+                                        <p><strong>2.</strong> Get your balance (on console):</p>
+                                        <div class="code-block mb-3">
+                                            <samp>web3.fromWei(webchain.getBalance(webchain.coinbase), "ether")</samp>
+                                        </div>
+                                        <p><strong>3.</strong> {{ ('page.coin_faq.16.content_5')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp>miner.start()</samp>
+                                        </div>
+                                        <p><strong>4.</strong> {{ ('page.coin_faq.16.content_6')|trans|raw }}</p>
+                                        <div class="code-block">
+                                            <samp>web3.fromWei(webchain.getBalance(webchain.coinbase), "ether")</samp>
+                                        </div>
+                                    {% elseif i == 20 %}
+                                        <p>{{ ('page.coin_faq.20.content_1')|trans|raw }}</p>
+                                        <p><strong>{{ ('page.coin_faq.20.content_2')|trans|raw }}</strong></p>
+                                        <p><strong>1.</strong> {{ ('page.coin_faq.20.content_3')|trans|raw }}</p>
+                                        <p><strong>2.</strong> {{ ('page.coin_faq.20.content_4')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> C:\Users\UserName\Download\Webchaind</samp>
+                                        </div>
+                                        <p><strong>3.</strong> {{ ('page.coin_faq.20.content_5')|trans|raw }}</p>
+                                        <div class="code-block mb-4">
+                                            <samp><code>></code> cd C:\Users\UserName\Download\Webchaind</samp>
+                                        </div>
+                                        <p class="border border-secondary p-3 mb-4">
+                                            {{ ('page.coin_faq.20.content_6')|trans|raw }}
+                                        </p>
+                                        <p class="border border-secondary p-3 mb-4">
+                                            {{ ('page.coin_faq.20.content_7')|trans|raw }}
+                                        </p>
+                                        <p><strong>4.</strong> {{ ('page.coin_faq.20.content_8')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> webchaind.exe account list</samp>
+                                        </div>
+                                        <p><strong>{{ ('page.coin_faq.20.content_9')|trans|raw }}</strong></p>
+                                        <p><strong>1.</strong> {{ ('page.coin_faq.20.content_10')|trans|raw }}</p>
+                                        <p><strong>2.</strong> {{ ('page.coin_faq.20.content_11')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> /opt/webchaind/</samp>
+                                        </div>
+                                        <p><strong>3.</strong> {{ ('page.coin_faq.20.content_12')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> cd /opt/webchaind/</samp>
+                                        </div>
+                                        <p>{{ ('page.coin_faq.20.content_13')|trans|raw }}</p>
+                                        <p class="border border-secondary p-3 mb-4">
+                                            {{ ('page.coin_faq.20.content_14')|trans|raw }}
+                                        </p>
+                                        <p class="border border-secondary p-3 mb-4">
+                                            {{ ('page.coin_faq.20.content_15')|trans|raw }}
+                                        </p>
+                                        <p><strong>4.</strong> {{ ('page.coin_faq.20.content_16')|trans|raw }}</p>
+                                        <div class="code-block">
+                                            <samp><code>></code> ./webchaind account list</samp>
+                                        </div>
+                                    {% elseif i == 21 %}
+                                        <p>{{ ('page.coin_faq.21.content_1')|trans|raw }}</p>
+                                        <p>{{ ('page.coin_faq.21.content_2')|trans|raw }}</p>
+                                        <img
+                                            src="{{ asset('build/images/faq_balance.png') }}"
+                                            alt="mining shown balance"
+                                            class="img-fluid img-thumbnail mb-3"
+                                        />
+                                        <p>{{ ('page.coin_faq.21.content_3')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> webchain.getBalance("address")</samp>
+                                        </div>
+                                        <p>{{ ('page.coin_faq.21.content_4')|trans|raw }}</p>
+                                        <p class="mb-0">{{ ('page.coin_faq.21.content_5')|trans({'%startUrl%': path('coin_start_page')})|raw }}</p>
+                                    {% elseif i == 23 %}
+                                        <p>{{ ('page.coin_faq.23.content_1')|trans|raw }}</p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> webchaind account update YOURWALLETNUMBER</samp>
+                                        </div>
+                                        <p class="mb-0">{{ ('page.coin_faq.23.content_2')|trans|raw }}</p>
+                                    {% elseif i == 24 %}
+                                        <p>{{ ('page.coin_faq.24.content_1')|trans|raw }}</p>
+                                        <p>{{ ('page.coin_faq.24.content_2')|trans|raw }}</p>
+                                        <p><strong>Linux:</strong></p>
+                                        <div class="code-block mb-3">
+                                            <samp><code>></code> ~/.webchain/mainnet/log</samp>
+                                        </div>
+                                        <p><strong>Windows:</strong></p>
+                                        <div class="code-block">
+                                            <samp>
+                                                <code>></code> C:\Users\&#60;profilename&#62;\AppData\Roaming\Webchain\mainnet\log
+                                            </samp>
+                                        </div>
+                                    {% elseif i == 25 %}
+                                        <p>{{ ('page.coin_faq.25.content_1')|trans|raw }}</p>
+                                        <ul>{{ ('page.coin_faq.25.content_2')|trans|raw }}</ul>
+                                        <p class="mb-0">{{ ('page.coin_faq.25.content_3')|trans|raw }}</p>
+                                    {% elseif i == 32 %}
+                                        <p>{{ ('page.coin_faq.32.content_1')|trans|raw }}</p>
+                                        <ul class="list-unstyled">{{ ('page.coin_faq.32.content_2')|trans|raw }}</ul>
+                                    {% elseif i == 33 %}
+                                        <p class="mb-0">
+                                            {{ ('page.coin_faq.33.content')|trans({'%coinPageUrl%': path('coin_page')})|raw }}
+                                        </p>
+                                    {% else %}
+                                        <p class="mb-0">
+                                            {{ ('page.coin_faq.' ~ i ~ '.content')|trans({'%newsUrl%': path('sonata_news_home'), '%startUrl%': path('coin_start_page')})|raw }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </b-collapse>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/coin_faq') }}
+{% endblock %}

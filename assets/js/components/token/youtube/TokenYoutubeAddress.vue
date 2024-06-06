@@ -1,26 +1,28 @@
 <template>
     <div class="row">
-        <div class="col text-truncate">
+        <div
+            class="col text-truncate"
+            :class="{'token-youtube-address': isAirdrop}"
+        >
             <span
                 id="channel-link"
-                class="c-pointer text-white hover-icon"
                 @click="addChannel"
             >
-                <span class="token-introduction-profile-icon text-center d-inline-block">
+                <span
+                    class="token-introduction-profile-icon text-white text-center d-inline-block c-pointer mr-2"
+                >
                     <font-awesome-icon
-                        :icon="{prefix: 'fab', iconName: 'youtube-square'}"
+                        :icon="{prefix: 'fab', iconName: 'youtube'}"
+                        class="ml-n2 text-white"
+                        transform="right-3 down-1 shrink-1"
                         size="lg"
+                        fixed-width
                     />
                 </span>
-                <a href="#" class="text-reset text-nowrap">
+                <p class="text-reset text-nowrap d-inline link highlight" tabindex="0">
                     {{ computedChannel }}
-                </a>
+                </p>
             </span>
-            <b-tooltip
-                v-if="currentChannelId"
-                target="channel-link"
-                :title="computedChannel"
-            />
         </div>
         <div class="col-auto">
             <a
@@ -41,10 +43,9 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faYoutubeSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {BTooltip} from 'bootstrap-vue';
-import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
+import {FiltersMixin, NotificationMixin} from '../../../mixins';
 import gapi from 'gapi';
-import {HTTP_OK} from '../../../utils/constants';
+import {HTTP_OK, projectName} from '../../../utils/constants';
 
 library.add(faTimes, faYoutubeSquare);
 
@@ -54,19 +55,18 @@ const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
 export default {
     name: 'TokenYoutubeAddress',
     components: {
-        BTooltip,
         FontAwesomeIcon,
     },
     mixins: [
         FiltersMixin,
         NotificationMixin,
-        LoggerMixin,
     ],
     props: {
         channelId: String,
         clientId: String,
         editable: Boolean,
         tokenName: String,
+        isAirdrop: Boolean,
     },
     data() {
         return {
@@ -106,6 +106,7 @@ export default {
                 discoveryDocs: DISCOVERY_DOCS,
                 clientId: this.clientId,
                 scope: SCOPES,
+                plugin_name: projectName,
             });
         },
         addChannel: function() {
@@ -114,8 +115,8 @@ export default {
                     .then((channelId) => {
                         this.saveYoutubeChannel(channelId);
                     }), (error) => {
-                        this.notifyInfo(this.$t('toasted.info.operation_canceled'));
-                    });
+                    this.notifyInfo(this.$t('toasted.info.operation_canceled'));
+                });
         },
         deleteChannel: function() {
             this.saveYoutubeChannel('');
@@ -144,13 +145,13 @@ export default {
                 }, (error) => {
                     if (!error.response) {
                         this.notifyError(this.$t('toasted.error.network'));
-                        this.sendLogs('error', 'Save YouTube channel network error', error);
+                        this.$logger.error('Save YouTube channel network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not save YouTube channel', error);
+                        this.$logger.error('Can not save YouTube channel', error);
                     } else {
                         this.notifyError(this.$t('toasted.error.try_later'));
-                        this.sendLogs('error', 'An error has occurred, please try again later', error);
+                        this.$logger.error('An error has occurred, please try again later', error);
                     }
                 })
                 .then(() => {
@@ -158,7 +159,7 @@ export default {
                 });
         },
         signInYoutube: function() {
-            let options = new gapi.auth2.SigninOptionsBuilder();
+            const options = new gapi.auth2.SigninOptionsBuilder();
 
             options.setPrompt('select_account');
 
@@ -170,7 +171,7 @@ export default {
                     part: 'id',
                     mine: true,
                 }).then((response) => {
-                    let channel = response.result.items[0];
+                    const channel = response.result.items[0];
                     resolve(channel.id);
                 });
             });

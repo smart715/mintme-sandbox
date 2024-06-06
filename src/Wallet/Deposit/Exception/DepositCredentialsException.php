@@ -2,6 +2,7 @@
 
 namespace App\Wallet\Deposit\Exception;
 
+/** @codeCoverageIgnore */
 class DepositCredentialsException extends \Exception
 {
 

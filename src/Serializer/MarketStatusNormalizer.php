@@ -3,20 +3,18 @@
 namespace App\Serializer;
 
 use App\Entity\MarketStatus;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class MarketStatusNormalizer implements NormalizerInterface
 {
+    public const GROUP_KEY = "MARKET_STATUS";
 
     private ObjectNormalizer $normalizer;
-    private MoneyWrapperInterface $moneyWrapper;
 
-    public function __construct(ObjectNormalizer $normalizer, MoneyWrapperInterface $moneyWrapper)
+    public function __construct(ObjectNormalizer $normalizer)
     {
         $this->normalizer = $normalizer;
-        $this->moneyWrapper = $moneyWrapper;
     }
 
     /**
@@ -26,20 +24,20 @@ class MarketStatusNormalizer implements NormalizerInterface
      */
     public function normalize($marketStatus, $format = null, array $context = [])
     {
+        if (isset($context["groups"])) {
+            $context["groups"][] = self::GROUP_KEY;
+        } else {
+            $context[] = self::GROUP_KEY;
+        }
+
         /** @var array $normalized */
         $normalized = $this->normalizer->normalize($marketStatus, $format, $context);
 
-        if ($context['groups'] && (in_array('APIv2', $context['groups']))) {
+        if (array_key_exists('groups', $context) && (in_array('APIv2', $context['groups']))) {
             $temp = $normalized['base'];
             $normalized['base'] = $normalized['quote'];
             $normalized['quote'] = $temp;
         }
-
-        $normalized['marketCap'] = $this->moneyWrapper->format(
-            $marketStatus->getLastPrice()->multiply(
-                $this->moneyWrapper->format($marketStatus->getSoldOnMarket())
-            )
-        );
 
         return $normalized;
     }

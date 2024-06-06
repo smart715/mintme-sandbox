@@ -1,3 +1,14 @@
+{% set viewOnly = app.session.get('view_only_mode', false) %}
+{% set verificationInProgress = app.user and app.user.profile and app.user.profile.phoneNumber
+    ? not app.user.profile.phoneNumber.verified
+    : false
+%}
+{% set gemModalArticle = gem_modal.article is defined ? gem_modal.article : '' %}
+{% set gemModalDelay = gem_modal.appearance_delay is defined ? gem_modal.appearance_delay : 0 %}
+{% set gemModalMaxViews = gem_modal.max_views is defined ? gem_modal.max_views : 0 %}
+{% set depositPhoneRequired = auth_make_disable_deposit ? 'true' : 'false' %}
+{% set withdrawalPhoneRequired = auth_make_disable_withdrawals ? 'true' : 'false' %}
+
 {% apply
     replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
     raw
@@ -12,9 +23,7 @@
             {% endblock %}
             {% block javascripts %}
                 {% include 'base_scripts.html.twig' %}
-                {% if (app.request.attributes.get('_route') != 'homepage') %}
-                    {% include 'scripts.html.twig' %}
-                {% endif %}
+                {% include 'scripts.html.twig' %}
 
                 {% block pagescripts %}{% endblock %}
             {% endblock %}
@@ -30,22 +39,81 @@
             <title>
                 {% block title %}mintMe{% endblock %}
             </title>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <script>
+                // async load webfonts
+                WebFontConfig = {
+                    google: { families: ['Poppins:400,500,600,700&display=swap'] }
+                };
+
+                (function(d) {
+                    const wf = d.createElement('script'), s = d.scripts[0];
+                    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+                    wf.async = true;
+                    s.parentNode.insertBefore(wf, s);
+                })(document);
+            </script>
+            <noscript>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+                    rel="stylesheet"
+                >
+            </noscript>
         </head>
         <body class="{% block bodyclass %}{% endblock %}">
+            {% if enable_google_tag_manager %}
+                <!-- Google Tag Manager (noscript) -->
+                <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ google_tag_manager_id }}"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+                <!-- End Google Tag Manager (noscript) -->
+            {% endif %}
             <div id="user-init">
                 {% if app.user %}
                     <user-init
                         :is-signed-in-with-twitter="{{ app.user.isSignedInWithTwitter | json_encode }}"
                         :user-id="{{ app.user.id }}"
+                        :has-phone-verified="{{ app.user.profile.phoneNumber is null
+                            or not app.user.profile.phoneNumber.verified ? 'false' : 'true' }}"
+                        :is-phone-verification-pending="{{ verificationInProgress ? 'true' : 'false' }}"
+                        :deposit-phone-required="{{ depositPhoneRequired }}"
+                        :withdrawal-phone-required="{{ withdrawalPhoneRequired }}"
+                        user-nickname="{{ app.user.profile.nickname }}"
                     ></user-init>
                 {% endif %}
             </div>
+            {% if gemModalArticle is not empty %}
+                <div id="gem-modal">
+                    <gem-modal
+                        article-url="{{ gemModalArticle }}"
+                        :appearance-delay="{{ gemModalDelay }}"
+                        :max-views="{{ gemModalMaxViews }}"
+                    ></gem-modal>
+                </div>
+            {% endif %}
+            <div id="global-confirm-modal">
+                <global-confirm-modal
+                    :known-hosts="{{ known_hosts | json_encode }}"
+                ></global-confirm-modal>
+            </div>
             {% block body %}
+                {% if viewOnly %}
+                    <div>
+                        <span style="color:red">
+                            YOU ARE IN VIEW ONLY MODE.
+                        </span>
+                        <span style="color:blue">
+                            You are logged as {{ app.user.username }}.
+                        </span>
+                        <a href="{{ path('trading', {'_switch_user': '_exit', 'type':trading_coins_type}) }}">
+                            Click here to Exit
+                        </a>
+                    </div>
+                {% endif %}
                 <div class="content-wrapper d-flex flex-column {% block contentclass %}{% endblock %}">
                     {% block header %}
                         {% include 'topnav.html.twig' %}
                     {% endblock %}
-                    <main class="flex-fill content {% block bgclass %}{% endblock %}">
+                    <main class="flex-fill content main {% block bgclass %}{% endblock %}">
                         {% block main %}
                             {% block messageContainer %}
                                 {% if app.session.flashbag.peekAll() is not empty %}

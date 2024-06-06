@@ -1,16 +1,57 @@
 @import '../variables'
 @import '../mixins'
 
-#kb
+.related
+  border-radius: $border-radius
+  background-color: $bg-primary-dark
+  height: fit-content
+  margin-left: .5em
+  margin-right: .5em
+  max-width: fit-content
+
+  ul
+    margin-top: .4em
+    padding-left: 0
+    padding-right: 0
+
   li
-    background-color: $card-body-bg
+    list-style: none
+
+  a
+    color: $link-color-highlight
+    text-decoration: underline !important
+    &:hover
+      color: $primary-highlight !important
+    &::selection
+      color: $primary !important
+      background-color: $bg-secondary !important
+
+  &::selection
+    color: $primary
+    background-color: $bg-secondary
+
+
+  header
+    h4
+      color: $white
+
+      span
+        color: $link-color-highlight
+        &::selection
+          background-color: $bg-secondary
+
+  @include media-breakpoint-down(md)
+    margin-top: .8em
+    margin-left: 0
+    margin-right: 0
+    max-width: 100%
 
 #kb_show
   .row
     @include media-breakpoint-only(md)
       display: block !important
 
-  #back-btn
+  #kb-nav
     clear: both
 
   img
@@ -18,11 +59,14 @@
     height: auto !important
 
   .article
-    background-color: $primary
+    background-color: $bg-secondary
+    color: $bg-primary-dark
+    border-radius: $border-radius
 
   header
     h1
-      border-bottom: 2px solid #eee
+      border-bottom: 2px solid $primary
+      color: $bg-primary-dark
 
   blockquote
     padding: 10px 20px
@@ -41,3 +85,41 @@
 
   table, td
     border-color: white !important
+
+  a
+    color: $link-color-highlight
+
+    &:hover
+      color: $bg-primary-dark
+    @include link-highlight-selection
+
+#kb
+  .card
+    background: none
+
+    .card-header
+      h4
+        font-weight: 600
+        font-size: $table-header-font-size
+
+    .list-group-item
+      width: 100%
+
+      a
+        color: $white
+        width: 100%
+        background: $bg-primary-dark
+        border-radius: $btn-border-radius
+
+        &:hover
+          background: $primary-dark
+
+      img
+        max-height: 2rem
+
+  .subcategory
+    color: $primary
+    font-weight: bold
+
+  .questions-asset
+    max-height: 160px

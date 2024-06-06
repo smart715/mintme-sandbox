@@ -1,0 +1,25 @@
+{{ include("spinners/pair_coin.html.twig") }}
+{% include 'pages/pair_quick_trade.html.twig' with {'horizontal': true, class: 'mt-4 mb-4', tradePage: true} %}
+<trade
+    :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+    :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+    websocket-url="{{ global_websocket_url }}"
+    hash="{{ hash }}"
+    login-url="{{ path('fos_user_security_login') }}"
+    signup-url="{{ path('fos_user_registration_register') }}"
+    :logged-in="{{ loggedIn }}"
+    :is-owner="{{ isOwner }}"
+    :precision="{{ precision }}"
+    :user-id="{{ app.user ? app.user.id : 0 }}"
+    mintme-supply-url="{{ mintme_supply }}"
+    :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+    disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+    minimum-order="{{ global_minimum_order_usd }}"
+    {% if isTokenPage %}
+        :taker-fee="{{ taker_fee }}"
+    {% endif %}
+    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+    :is-user-blocked="{{ app.user.isBlocked|default(false) ? 'true' : 'false' }}"
+    :trades-disabled="{{ tradesDisabled ? 'true' : 'false'}}"
+>
+</trade>

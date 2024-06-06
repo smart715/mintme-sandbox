@@ -3,7 +3,7 @@
 namespace App\Tests\Utils\Converter;
 
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Exchange\Market;
 use App\Utils\Converter\MarketNameConverter;
 use App\Utils\Converter\TokenNameConverter;
@@ -13,10 +13,10 @@ use PHPUnit\Framework\TestCase;
 class MarketNameConverterTest extends TestCase
 {
     /**
-     * @var string $base
-     * @var string $quote
-     * @var bool $isToken
-     * @var string $marketName
+     * @param string $base
+     * @param string $quote
+     * @param bool $isToken
+     * @param string $marketName
      * @dataProvider convertProvider
      */
     public function testConvert(string $base, string $quote, bool $isToken, string $marketName): void
@@ -24,8 +24,8 @@ class MarketNameConverterTest extends TestCase
         $tokenNameConverter = $this->mockTokenNameConverter();
 
         $market = $this->mockMarket(
-            $this->mockTradeble($base, false),
-            $this->mockTradeble($quote, $isToken)
+            $this->mockTradable($base, false),
+            $this->mockTradable($quote, $isToken)
         );
 
         $converter = new MarketNameConverter($tokenNameConverter);
@@ -55,11 +55,11 @@ class MarketNameConverterTest extends TestCase
     }
 
     /**
-     * @var MockObject|TradebleInterface $base
-     * @var MockObject|TradebleInterface $quote
+     * @param MockObject|TradableInterface $base
+     * @param MockObject|TradableInterface $quote
      * @return MockObject|Market
      */
-    private function mockMarket(TradebleInterface $base, TradebleInterface $quote): Market
+    private function mockMarket(TradableInterface $base, TradableInterface $quote): Market
     {
         $market = $this->createMock(Market::class);
         $market->method('getQuote')->willReturn($quote);
@@ -71,16 +71,16 @@ class MarketNameConverterTest extends TestCase
     /**
      * @param string $symbol
      * @param bool $isToken
-     * @return MockObject|TradebleInterface
+     * @return MockObject|TradableInterface
      */
-    private function mockTradeble(string $symbol, bool $isToken): TradebleInterface
+    private function mockTradable(string $symbol, bool $isToken): TradableInterface
     {
-        $tradeble = $isToken
+        $tradable = $isToken
             ? $this->createMock(Token::class)
-            : $this->createMock(TradebleInterface::class);
+            : $this->createMock(TradableInterface::class);
 
-        $tradeble->method('getSymbol')->willReturn($symbol);
+        $tradable->method('getSymbol')->willReturn($symbol);
 
-        return $tradeble;
+        return $tradable;
     }
 }

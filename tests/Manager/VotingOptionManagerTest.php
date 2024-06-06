@@ -6,19 +6,38 @@ use App\Entity\Voting\Option;
 use App\Entity\Voting\Voting;
 use App\Manager\VotingOptionManager;
 use App\Repository\VotingOptionRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class VotingOptionManagerTest extends TestCase
 {
+    public function testGetById(): void
+    {
+        $optionId = 1;
+        $option = $this->mockOption($optionId);
+
+        $votingOptionRepository = $this->mockVotingOptionRepository();
+        $votingOptionRepository
+            ->expects($this->exactly(2))
+            ->method('find')
+            ->with($optionId)
+            ->willReturnOnConsecutiveCalls($option, null);
+
+        $votingOptionManager = new VotingOptionManager($votingOptionRepository);
+
+        $this->assertEquals($option, $votingOptionManager->getById($optionId));
+        $this->assertNull($votingOptionManager->getById($optionId));
+    }
+
     public function testGetByIdFromVotingExist(): void
     {
         $voting = $this->mockVoting([
             $this->mockOption(1),
         ]);
 
-        $vm = new VotingOptionManager($this->mockRepo());
+        $votingOptionManager = new VotingOptionManager($this->mockVotingOptionRepository());
 
-        $this->assertEquals($vm->getByIdFromVoting(1, $voting)->getId(), 1);
+        $this->assertEquals(1, $votingOptionManager->getByIdFromVoting(1, $voting)->getId());
     }
 
     public function testGetByIdFromVotingNotExist(): void
@@ -27,11 +46,12 @@ class VotingOptionManagerTest extends TestCase
             $this->mockOption(2),
         ]);
 
-        $vm = new VotingOptionManager($this->mockRepo());
+        $votingOptionManager = new VotingOptionManager($this->mockVotingOptionRepository());
 
-        $this->assertEquals($vm->getByIdFromVoting(1, $voting), null);
+        $this->assertNull($votingOptionManager->getByIdFromVoting(1, $voting));
     }
 
+    /** @return MockObject|Voting */
     private function mockVoting(array $options): Voting
     {
         $voting = $this->createMock(Voting::class);
@@ -40,15 +60,17 @@ class VotingOptionManagerTest extends TestCase
         return $voting;
     }
 
+    /** @return MockObject|Option */
     private function mockOption(int $id): Option
     {
-        $voting = $this->createMock(Option::class);
-        $voting->method('getId')->willReturn($id);
+        $option = $this->createMock(Option::class);
+        $option->method('getId')->willReturn($id);
 
-        return $voting;
+        return $option;
     }
 
-    private function mockRepo(): VotingOptionRepository
+    /** @return MockObject|VotingOptionRepository */
+    private function mockVotingOptionRepository(): VotingOptionRepository
     {
         return $this->createMock(VotingOptionRepository::class);
     }

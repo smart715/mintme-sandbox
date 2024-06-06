@@ -6,7 +6,7 @@ use App\Communications\RestRpcInterface;
 use App\Communications\SMS\Model\SMS;
 use Symfony\Component\HttpFoundation\Request;
 
-class D7NetworksCommunicator implements D7NetworksCommunicatorInterface
+class D7NetworksCommunicator implements SmsCommunicatorInterface
 {
     public const SEND_SMS_METHOD = 'send';
     public const SMS_GET_BALANCE = 'balance';
@@ -20,22 +20,30 @@ class D7NetworksCommunicator implements D7NetworksCommunicatorInterface
 
     public function send(SMS $sms): array
     {
+        $message = [
+            'channel' => 'sms',
+            'msg_type' => 'text',
+            'recipients' => [$sms->getTo()],
+            'content' => $sms->getContent(),
+            'data_coding' => 'auto',
+        ];
+
         $response = $this->rpc->send(
             self::SEND_SMS_METHOD,
             Request::METHOD_POST,
             [
-                'json' =>
-                    [
-                        'from' => $sms->getFrom(),
-                        'to' => $sms->getTo(),
-                        'content' => $sms->getContent(),
+                'json' => [
+                    'messages' => [
+                        $message,
                     ],
+                    'message_globals' => [
+                        'originator' => $sms->getFrom(),
+                    ],
+                ],
             ]
         );
 
-        $response = json_decode($response, true);
-
-        return $response;
+        return json_decode($response, true);
     }
 
     public function getBalance(): array
@@ -46,8 +54,6 @@ class D7NetworksCommunicator implements D7NetworksCommunicatorInterface
             []
         );
 
-        $response = json_decode($response, true);
-
-        return $response;
+        return json_decode($response, true);
     }
 }

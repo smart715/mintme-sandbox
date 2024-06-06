@@ -1,7 +1,21 @@
 {% trans_default_domain 'FOSUserBundle' %}
-{% extends 'form.html.twig' %}
 {% set formHeader = 'login.header'|trans %}
 {% set featured = true %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('pages/login') }}
+{% endblock %}
+
 {% block formBody %}
-    {{ include('@FOSUser/Security/login_form_content.html.twig') }}
+    <div class="container">
+        <div class="row py-5 justify-content-center">
+            <div class="login-container px-4 py-5 text-dark col-9 col-xs-10 col-md-5 col-lg-4">
+                <div class="text-dark h3">
+                    {{ formHeader }}
+                    <hr class="h-divider mt-2" />
+                </div>
+                {{ include('@FOSUser/Security/login_form_content.html.twig') }}
+            </div>
+        </div>
+    </div>
 {% endblock %}

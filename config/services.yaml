@@ -1,8 +1,10 @@
 parameters:
     service: 'mintme'
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    reg_google_recaptcha_site_key: '%env(REG_GOOGLE_RECAPTCHA_SITE_KEY)%'
     locale: 'en'
     sonata.media.admin.media.class: App\Admin\MediaAdmin
+    router.request_context.scheme: 'https'
     router.request_context.host: '%mintme_url%'
     router.request_context.base_url: ''
     asset.request_context.base_path: '%router.request_context.base_url%'
@@ -26,6 +28,11 @@ services:
         public: false       # Allows optimizing the container by removing unused services; this also means
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
+
+    token.url_generator:
+        class: App\TokenUrlGenerator
+        decorates: 'router'
+        arguments: ['@token.url_generator.inner']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -64,10 +71,30 @@ services:
     d7_networks.rest_rpc:
         class: App\Communications\GuzzleRestWrapper
         arguments:
-            $url: '%d7_networks_url%'
+            $url: '%env(D7_NETWORKS_URL)%'
             $timeoutSeconds: '10'
             $headers:
-                Authorization: 'Basic %env(D7_NETWORKS_TOKEN)%'
+                Authorization: 'Bearer %env(D7_NETWORKS_API_TOKEN)%'
+
+    clickatell.rest_api:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%env(CLICKATELL_NETWORKS_URL)%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: '%env(CLICKATELL_NETWORKS_TOKEN)%'
+                Accept: 'application/json'
+                Content-Type: 'application/json'
+
+    clickatell.rest_api_usa:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%env(CLICKATELL_NETWORKS_URL)%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: '%env(CLICKATELL_NETWORKS_TOKEN_USA)%'
+                Accept: 'application/json'
+                Content-Type: 'application/json'
 
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
@@ -76,24 +103,34 @@ services:
             $timeoutSeconds: '%viabtc_response_timeout_seconds%'
             $auth: '%viabtc_auth%'
 
+    viabtc.json_rpc_internal:
+        class: App\Communications\GuzzleWrapper
+        arguments:
+            $url: '%env(VIABTC_RPC)%'
+            $timeoutSeconds: '%viabtc_response_internal_timeout_seconds%'
+            $auth: '%viabtc_auth%'
+
+    internal_market_fetcher.json_rpc:
+        class: App\Exchange\Market\MarketFetcher
+        arguments:
+            $jsonRpc: '@viabtc.json_rpc_internal'
+
     deposit.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
             $url: '%env(DEPOSIT_RPC)%'
             $timeoutSeconds: '%deposit_response_timeout_seconds%'
-            $auth: '%deposit_auth%'
 
     withdraw.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
             $url: '%env(WITHDRAW_RPC)%'
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
-            $auth: '%withdraw_auth%'
 
     deploy.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
-            $url: '%deploy_rpc%'
+            $url: '%env(DEPLOY_RPC)%'
             $timeoutSeconds: '%deploy_response_timeout_seconds%'
 
     coinify.rest_rpc:
@@ -101,6 +138,16 @@ services:
         arguments:
             $url: '%coinify_api_url%'
             $timeoutSeconds: '%coinify_api_timeout%'
+
+    security.authentication.listener.form:
+        class: App\Security\Firewall\LoginFormAuthenticationListener
+        parent: "security.authentication.listener.abstract"
+        public: false
+        abstract: true
+        autowire: true
+        autoconfigure: false
+        arguments:
+          $googleSecretKey: '%env(GOOGLE_RECAPTCHA_SECRET)%'
 
     App\Communications\CoinmarketcapCommunicator:
         arguments:
@@ -113,15 +160,38 @@ services:
     App\Communications\DeployCostFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+            $cryptoIdsMapper: '@App\Communications\GeckoCoin\Config\GeckoCoinConfig'
+
+    App\Communications\ConnectCostFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+            $cryptoIdsMapper: '@App\Communications\GeckoCoin\Config\GeckoCoinConfig'
+
+    App\Communications\MarketCostFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+            $cryptoIdsMapper: '@App\Communications\GeckoCoin\Config\GeckoCoinConfig'
+
+    app.jwt_service.coinify:
+        class: App\Services\JwtService\JwtService
+        arguments:
+            $pemFile: '%coinify_pem_file%'
+            $passPhrase: '%coinify_pem_passphrase%'
 
     App\Communications\CoinifyCommunicator:
         arguments:
             $rpc: '@coinify.rest_rpc'
+            $jwtService: '@app.jwt_service.coinify'
             $partnerId: '%coinify_partner_id%'
 
     App\Communications\SMS\D7NetworksCommunicator:
         arguments:
             $rpc: '@d7_networks.rest_rpc'
+
+    App\Communications\SMS\ClickAtellCommunicator:
+        arguments:
+            $guzzleRestWrapper: '@clickatell.rest_api'
+            $guzzleRestWrapperUsa: '@clickatell.rest_api_usa'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -129,8 +199,11 @@ services:
 
     App\Exchange\Trade\Config\LimitOrderConfig:
         arguments:
-            $takerFeeRate: '%taker_fee_rate%'
-            $makerFeeRate: '%maker_fee_rate%'
+            $feeRates: '%order_fee_rates%'
+
+    App\Exchange\Trade\Config\IgnoreRequestDelay:
+        arguments:
+            $ips: '%ignore_request_delay_ips%'
 
     App\Exchange\Trade\TraderFetcher:
         arguments:
@@ -199,6 +272,14 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
+    App\Command\DeployNotificationBotCommand:
+        arguments:
+            $notificationsLimit: '%deploy_notifications_bot_limit%'
+            $botsIds: '%deploy_notifications_bot_ids%'
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: cron }
+
     App\Command\UpdateDisposableEmailDomains:
         arguments:
             $logger: '@logger'
@@ -211,7 +292,18 @@ services:
             $filled_intervals: '%orders_filled_intervals%'
             $cancelled_intervals: '%orders_cancelled_intervals%'
             $token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            $token_promotion_intervals: '%token_promotion_intervals%'
             $marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
+
+    App\Command\Crypto\AddCryptoCommand:
+        arguments:
+            $parametersPath: '%parameters_path%'
+            $assetsImgDir: '%assets_img_dir%'
+            $publicDir: '%public_dir%'
+
+    App\Command\SetParameterCommand:
+        arguments:
+            $parametersPath: '%parameters_path%'
 
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
@@ -219,14 +311,18 @@ services:
 
     App\Security\Config\DisabledServicesConfig:
         arguments:
-            $depositDisabled: '%disable_deposits%'
-            $withdrawalsDisabled: '%disable_withdrawals%'
+            $coinDepositDisabled: '%disable_coin_deposits%'
+            $coinWithdrawDisabled: '%disable_coin_withdrawals%'
             $tokenDepositDisabled: '%disable_token_deposits%'
             $tokenWithdrawDisabled: '%disable_token_withdrawals%'
             $deployDisabled: '%disable_deploy_tokens%'
             $newTradesDisabled: '%disable_new_trades%'
             $tradingDisabled: '%disable_trading%'
             $allServicesDisabled: '%disable_all%'
+            $blockchainDeployStatus: '%blockchain_deploy_status%'
+            $depositsDisabled: '%disable_deposits%'
+            $withdrawalsDisabled: '%disable_withdrawals%'
+            $tradesDisabled: '%disable_coin_trades%'
 
     # SonataAdminBundle Registered Admin Classes
     # =======================================
@@ -240,7 +336,7 @@ services:
             - { name: sonata.admin, manager_type: orm, label: User }
         public: true
         calls:
-             - [init, ['@fos_user.user_manager', '@App\Manager\ProfileManagerInterface']]
+            - [init, ['@fos_user.user_manager', '@App\Manager\ProfileManagerInterface']]
 
     admin.blacklist:
         class: App\Admin\BlacklistAdmin
@@ -271,6 +367,8 @@ services:
         tags:
             - { name: sonata.admin, manager_type: orm, label: Knowledge Base }
         public: true
+        properties:
+            internalLinks: '%internalLinks%'
 
     admin.knowledgebase.category:
         class: App\Admin\KnowledgeBase\KnowledgeBaseCategoryAdmin
@@ -301,6 +399,18 @@ services:
         tags:
             - { name: sonata.admin, manager_type: orm, label: Main Documents }
         public: true
+
+    tos_pp.translations:
+        class: App\Admin\TosAndPPTranslationAdmin
+        arguments:
+            - null
+            - App\Entity\Translation
+            - PixSortableBehaviorBundle:SortableAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: ToS and PP }
+        public: true
+        properties:
+            internalLinks: '%internalLinks%'
 
     # Required by rabbitmq bundle
     market_consumer:
@@ -339,12 +449,14 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
-    wallet:
-        class: 'App\Wallet\Wallet'
+    notifications_consumer:
+        class: 'App\Consumers\NotificationsConsumer'
         arguments:
+            $mailer: '@app.mailer'
             $logger: '@logger'
+            $adminEmails: '%admin_emails%'
         tags:
-            - { name: monolog.logger, channel: payments }
+            - { name: monolog.logger, channel: rabbitmq }
 
     App\Exchange\Trade\Trader:
         arguments:
@@ -367,6 +479,31 @@ services:
             - "@fos_user.util.canonical_fields_updater"
             - "@doctrine.orm.entity_manager"
             - "%fos_user.model.user.class%"
+            - '%env(APP_SECRET)%'
+
+    App\Manager\LinkedinManager:
+        arguments:
+          $linkedinClientId: '%env(LINKEDIN_CLIENT_ID)%'
+          $linkedinClientSecret: '%env(LINKEDIN_CLIENT_SECRET)%'
+
+    App\Manager\YoutubeManager:
+        arguments:
+          $youtubeClientId: '%env(YOUTUBE_CLIENT)%'
+          $youtubeClientSecret: '%env(YOUTUBE_CLIENT_SECRET)%'
+          $youtubeApiKey: '%env(YOUTUBE_API_KEY)%'
+
+    App\Manager\TopHolderManager:
+        arguments:
+            $limit: '%top_holders%'
+
+    App\Manager\ValidationCodeManager:
+        arguments:
+          $isEmailDisabled: "%disable_email%"
+
+    App\Manager\HashtagManager:
+        arguments:
+          $cacheMaxAge: '%hashtags_cache_max_age%'
+          $hashtagsPickInterval: '%hashtags_pick_interval%'
 
     App\Security\HackerVoter:
         arguments:
@@ -375,15 +512,12 @@ services:
     app.mailer:
         class: App\Mailer\Mailer
         arguments:
-            $mail: "%env(MAILER_USER)%"
+            $mail: '%env(MAILER_USER)%'
+            $mailName: '%env(MAILER_NAME)%'
+            $registrationTemplate: '%fos_user.registration.confirmation.template%'
+            $resettingTemplate: '%fos_user.resetting.email.template%'
 
     App\Mailer\MailerInterface: "@app.mailer"
-
-    app.instant.mailer:
-        class: App\Mailer\Mailer
-        arguments:
-            $mail: "%env(MAILER_USER)%"
-            $mailer: '@swiftmailer.mailer.instant_mailer'
 
     App\Exchange\Balance\Factory\BalanceViewFactory:
         arguments:
@@ -437,6 +571,7 @@ services:
         arguments:
             $session: '@session'
             $secret: '%env(APP_SECRET)%'
+            $translator: '@App\Services\TranslatorService\TranslatorInterface'
         tags:
             - { name: kernel.event_listener, event: scheb_two_factor.authentication.attempt }
             - { name: kernel.event_listener, event: scheb_two_factor.authentication.failure }
@@ -450,12 +585,23 @@ services:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed }
 
-    kernel.listener.command_dispatch:
-        class: App\EventListener\ConsoleCommandsListener
+    App\EventListener\DoctrineListener:
+        arguments:
+            $ignoredColumns:
+                - 'rank_id'
+                - 'error'
+            $ignoredKeys:
+                - 'FK_5F37A13B7616678F'
+                - 'UNIQ_5F37A13B7616678F'
         tags:
-            - { name: kernel.event_listener, event: console.terminate }
+            - { name: doctrine.event_listener, event: onSchemaAlterTable }
+            - { name: doctrine.event_listener, event: onSchemaAlterTableChangeColumn }
 
-    FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'
+    App\EventListener\SwitchUserSubscriber:
+        arguments:
+            $logger: '@App\Logger\UserActionLogger'
+
+    FOS\UserBundle\Mailer\MailerInterface: '@app.mailer'
 
     App\Logger\UserActionProcessor:
         autowire: true
@@ -495,6 +641,11 @@ services:
             - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postPersist, lazy: true }
             - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: preRemove, lazy: true }
 
+    App\EntityListener\UserListener:
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\User, event: preUpdate, lazy: true }
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\User, event: postUpdate, lazy: true }
+
     logout_listener:
         class: App\EventListener\LogoutListener
         tags:
@@ -514,6 +665,34 @@ services:
         tags:
             - { name: form.type, alias: app_user_resetting }
 
+    app.recaptcha.form.type:
+        class: App\Form\Type\RegisterRecaptchaType
+        public: true
+        arguments:
+            - '%env(REG_GOOGLE_RECAPTCHA_SITE_KEY)%'
+            - '%ewz_recaptcha.enabled%'
+            - '%ewz_recaptcha.ajax%'
+            - '@ewz_recaptcha.locale.resolver'
+            - '%ewz_recaptcha.api_host%'
+        tags:
+            - { name: form.type }
+
+    app_recaptcha.validator.true:
+        class: EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrueValidator
+        public: true
+        arguments:
+            - '%ewz_recaptcha.enabled%'
+            - '%env(REG_GOOGLE_RECAPTCHA_SECRET)%'
+            - '@request_stack'
+            - '%ewz_recaptcha.http_proxy%'
+            - '%ewz_recaptcha.verify_host%'
+            - '@?security.authorization_checker'
+            - '%ewz_recaptcha.trusted_roles%'
+            - '%ewz_recaptcha.api_host%'
+            - '%ewz_recaptcha.timeout%'
+        tags:
+            - { name: validator.constraint_validator, alias: 'app_recaptcha.true' }
+
     App\EventSubscriber\SitemapSubscriber:
         arguments:
             - "@router"
@@ -522,6 +701,7 @@ services:
 
     App\Controller\API\TokensController:
         arguments:
+            $session: '@session'
             $topHolders: "%top_holders%"
             $expirationTime: "%token_deletion_confirm_code_expiration_time%"
 
@@ -574,15 +754,24 @@ services:
 
     App\EventSubscriber\TransactionSubscriber:
         arguments:
-            $mailer: '@app.instant.mailer'
+            $mailer: '@app.mailer'
 
     App\EventSubscriber\DeploySubscriber:
         arguments:
-            $mailer: '@app.instant.mailer'
+            $mailer: '@app.mailer'
+
+    App\Communications\CryptoRatesFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+            $cryptoIdsMapper: '@App\Communications\GeckoCoin\Config\GeckoCoinConfig'
+
+    App\Communications\ObservableCryptoRatesFetcher:
+        arguments:
+            $cryptoRatesFetcher: '@App\Communications\CryptoRatesFetcher'
 
     App\Communications\CachedCryptoRatesFetcher:
         arguments:
-            $rpc: '@coinmarketcap.rest_rpc'
+            $cryptoRatesFetcher: '@App\Communications\ObservableCryptoRatesFetcher'
 
     App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
 
@@ -597,11 +786,12 @@ services:
             $quickRegistrationPassword: '%quick_registration_password%'
 
     App\Controller\API\UsersController:
-         arguments:
+        arguments:
             $clientManager: '@fos_oauth_server.client_manager.default'
+            $session: '@session'
 
     App\Security\ApiKeyAuthenticator:
-         arguments:
+        arguments:
             $oAuthStorage: '@fos_oauth_server.storage.default'
 
     App\EventSubscriber\AuthenticationListener:
@@ -610,14 +800,17 @@ services:
 
     App\Utils\ServiceInfo\ServiceInfoBuilder:
         arguments:
-            $depositWorkDir: '%env(DEPOSIT_WORKDIR)%'
-            $withdrawWorkDir: '%env(WITHDRAW_WORKDIR)%'
-            $contractWorkDir: '%env(CONTRACT_WORKDIR)%'
+            $serviceContainerIp: '%env(SERVICE_CONTAINER_IP)%'
+            $gatewayWorkDir: '%env(GATEWAY_WORKDIR)%'
             $isTestingServer: '%env(bool:TESTING_SERVER_ENV)%'
 
     App\Exchange\Config\AirdropConfig:
         arguments:
             $airdropParams: '%airdrop_params%'
+
+    App\Exchange\Config\TokenSignupBonusConfig:
+        arguments:
+            $tokenSignupBonusParams: '%token_signup_bonus_params%'
 
     App\EventListener\NoCacheListener:
         tags:
@@ -641,6 +834,7 @@ services:
     App\Exchange\Config\QuickTradeConfig:
         arguments:
             $params: '%quick_trade%'
+            $minAmounts: '%quick_trade_min_amounts%'
 
     App\Logger\DonationProcessor:
         autowire: true
@@ -653,10 +847,21 @@ services:
             - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%message%%|%%context%%\n"
             - "Y-m-d H:i:s"
 
+    monolog.formatter.withdraw:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%level_name%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
     App\Logger\DonationLogger:
         autowire: true
         tags:
             - { name: monolog.logger, channel: donation }
+
+    App\Logger\WithdrawLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: withdraw }
 
     old_sound_rabbit_mq.consumer_command:
         class: App\Command\ConsumerCommand
@@ -672,14 +877,23 @@ services:
 
     App\Exchange\Config\DeployCostConfig:
         arguments:
-            $deployCostMintme: '%deploy_cost_mintme%'
-            $deployCostEth: '%deploy_cost_eth%'
-            $deployCostBnb: '%deploy_cost_bnb%'
-            $deployFeeEth: '%deploy_fee_eth%'
-            $deployFeeBnb: '%deploy_fee_bnb%'
-            $deployCostRewardMintme: '%deploy_cost_referral_reward_mintme%'
-            $deployCostRewardEth: '%deploy_cost_referral_reward_eth%'
-            $deployCostRewardBnb: '%deploy_cost_referral_reward_bnb%'
+            $deployCosts: '%deploy_costs%'
+            $deployFees: '%deploy_fees%'
+            $deployReferralRewards: '%deploy_referral_rewards%'
+
+    App\Exchange\Config\ConnectCostConfig:
+        arguments:
+            $connectCosts: '%connect_costs%'
+            $connectFees: '%connect_fees%'
+
+    App\Exchange\Config\TokenMarketConfig:
+        arguments:
+            $costs: '%market_costs%'
+
+    App\Exchange\Config\MarketPairsConfig:
+        arguments:
+            $enabledMarkets: '%market_pairs%'
+            $enabledTopListMarkets: '%market_pairs_top_list%'
 
     gedmo.listener.sortable:
         class: Gedmo\Sortable\SortableListener
@@ -693,11 +907,13 @@ services:
             filled_intervals: '%orders_filled_intervals%'
             cancelled_intervals: '%orders_cancelled_intervals%'
             token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            token_promotion_intervals: '%token_promotion_intervals%'
             marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Controller\API\WalletController:
         arguments:
             $coinifySharedSecret: '%env(COINIFY_SHARED_SECRET)%'
+            $session: '@session'
 
     Abraham\TwitterOAuth\TwitterOAuth:
         arguments:
@@ -713,12 +929,20 @@ services:
     App\Utils\ValidatorFactory:
         properties:
             minimalPriceOrder: '%minimum_order_value_usd%'
+            fallbackMinCryptoAmount: '%minimum_order_value_fallback%'
+
+    App\TwigExtension\SafeHtmlExtension:
+        arguments:
+            $cachePath: '%kernel.cache_dir%'
+            $internalLinks: '%internalLinks%'
+
+    App\TwigExtension\GeneratorUrlExtension:
+        arguments:
+            - '@token.url_generator'
 
     App\SmartContract\Config\ExplorerUrlsConfig:
         arguments:
-            $mintmeExplorerUrl: '%mintme_explorer_url%'
-            $ethExplorerUrl: '%eth_explorer_url%'
-            $bnbExplorerUrl: '%bnb_explorer_url%'
+            $explorerUrls: '%explorer_urls%'
 
     RestCord\DiscordClient:
         arguments:
@@ -772,3 +996,266 @@ services:
         arguments:
             $clientId: '%env(DISCORD_CLIENT_ID)%'
             $guzzleRestWrapper: '@discord.command.client'
+
+    App\Config\VotingConfig:
+        arguments:
+            $votingConfig: '%voting%'
+
+    App\Config\RewardsConfig:
+        arguments:
+            $rewardsConfig: '%rewards_bounties%'
+
+    App\Config\PostsConfig:
+        arguments:
+            $postCommentsTipConfig: '%post_comments_tip%'
+
+    App\Communications\SMS\Config\SmsConfig:
+        arguments:
+            $smsConfig: '%sms_providers%'
+            $disableSms: '%disable_sms%'
+
+    App\Config\FailedLoginConfig:
+        arguments:
+            $failedLoginConfig: '%failed_login%'
+
+    App\Config\CryptoConfig:
+        arguments:
+            $defaultNetworks: '%crypto_default_network%'
+
+    App\Config\TokenPromotionConfig:
+        arguments:
+            $tariffs: '%token_promotion_tariffs%'
+
+    App\Command\CheckTranslationFile:
+        public: true
+        arguments:
+            - '%locale%'
+        tags:
+            - { name: console.command, command: translation:check }
+
+    App\EventListener\SecurityInteractiveLoginListener:
+        tags:
+            - { name: kernel.event_listener, event: security.interactive_login }
+
+    App\EventListener\KernelRequestListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 0 }
+
+    App\EventListener\LoginListener:
+        arguments:
+            $userManager: '@fos_user.user_manager'
+            $requestStack: '@request_stack'
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure }
+
+    App\Config\ValidationCodeConfigs:
+        arguments:
+            $validationCodeConfigs: '%phone_codes%'
+
+    App\Config\EmailValidationCodeConfigs:
+        arguments:
+            $validationCodeConfigs: '%email_change_codes%'
+
+    App\Config\TFABackupCodesConfigs:
+        arguments:
+            $validationCodeConfigs: '%2fa_backup_codes%'
+
+    App\Config\UserLimitsConfig:
+        arguments:
+            $userLimit: '%user_limit%'
+
+    App\Config\PhoneNumberConfig:
+        arguments:
+            $editPhoneConfig: '%edit_phone%'
+
+    App\Config\TradingConfig:
+        arguments:
+            $tradingConfig: '%tokens_market_pagination%'
+
+    App\Config\BlacklistIpConfig:
+        arguments:
+            $blacklistIpConfig: '%failed_login%'
+
+    App\Config\HideFeaturesConfig:
+        arguments:
+            $newMarketsEnabled: '%feature_create_new_markets_enabled%'
+            $tokenConnectEnabled: '%feature_token_connect_enabled%'
+            $rewardsEnabled: '%feature_rewards_enabled%'
+            $enabledCryptos: '%enabled_cryptos%'
+
+    App\Config\LimitHistoryConfig:
+        arguments:
+            $limitMonths: '%limit_history_months%'
+
+    App\Config\MinWithdrawalConfig:
+        arguments:
+            $minWithdrawals: '%min_coin_withdrawal%'
+
+    gecko_coin.rest_api:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%coinbase_api_url%'
+            $timeoutSeconds: '%coinbase_api_timeout%'
+
+    App\Communications\GeckoCoin\GeckoCoinCommunicator:
+        arguments:
+            $guzzleRestWrapper: '@gecko_coin.rest_api'
+
+    App\Communications\GeckoCoin\Config\GeckoCoinConfig:
+        arguments:
+            $geckoCoinMethodConfig: '%coinbase_api_methods%'
+            $cryptosConfig: '%coinbase_cryptos%'
+
+    app.entity_subscriber:
+        class: App\EventSubscriber\EntitySubscriber
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+
+    App\EventSubscriber\EntitySubscriber:
+        arguments:
+            $session: '@session'
+
+    App\Services\BackendService\BackendContainerBuilder:
+        properties:
+            createServiceScript: '%env(CREATE_SERVICE_SCRIPT)%'
+            deleteServiceScript: '%env(DELETE_SERVICE_SCRIPT)%'
+
+    app.profanity_censor:
+        class: Snipe\BanBuilder\CensorWords
+
+    App\Validator\Constraints\NoBadWordsValidator:
+        arguments:
+            $censor: '@app.profanity_censor'
+            $languages: ['en-base', 'en-uk','en-us', 'es', 'fr']
+            $fullWords: true
+
+    App\Controller\API\DiscordController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\MediaController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\MessageController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\OrdersController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\PostsController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\ProfileController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\RewardController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\QuickTradeController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\ChatController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\TwitterController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\UserNotificationsController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\API\VotingController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\TokenController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\UserController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\WalletController:
+        arguments:
+            $session: '@session'
+
+    App\Controller\News\PostArchiveAction:
+        arguments:
+            $perPage: '%news_per_page%'
+
+    App\Config\PanelEnvConfig:
+        arguments:
+            $panelEnvironment: '%panel_environment%'
+
+    App\Services\TranslatorService\Translator:
+        parent: 'translator.default'
+        autowire: true
+        autoconfigure: false
+        public: true
+
+    App\Command\CreateBlockchainTokenCommand:
+        arguments:
+            $tokenCreateLimit: '%token_create_limit%'
+
+    App\Mercure\JwtProvider:
+        arguments:
+            $publish: '%mercure_default_publish_topics%'
+            $subscribe: '%mercure_default_subscribe_topics%'
+
+    App\Mercure\Authorization:
+        arguments:
+            $publish: '%mercure_public_publish_topics%'
+            $subscribe: '%mercure_public_subscribe_topics%'
+
+    Symfony\Component\Mercure\Jwt\TokenFactoryInterface:
+        alias: mercure.hub.public.jwt.factory
+
+    App\Config\WithdrawalDelaysConfig:
+        arguments:
+            $withdrawAfterLoginTime: '%withdraw_after_login_seconds%'
+            $withdrawAfterRegisterTime: '%withdraw_after_register_seconds%'
+            $withdrawalDelay: '%withdrawal_delay%'
+            $orderDelay: '%order_delay%'
+            $withdrawAfterUserChangeTime: '%withdraw_after_user_changes_seconds%'
+
+    App\Manager\Profit\BotsProfitsFetcher:
+        arguments:
+            $trackedAccountsEmails: '%tracked_accounts_emails%'
+    App\Manager\Profit\TradingProfitsFetcher:
+        arguments:
+            $marketFetcher: '@internal_market_fetcher.json_rpc'
+
+    App\EventListener\SessionResetListener:
+        arguments:
+            $session: '@session'
+            $sessionLifetime: '%session_cookie_lifetime_seconds%'
+        tags:
+            - { name: 'kernel.event_listener' }
+
+    App\Command\TradeInactiveAccountsAssets:
+        arguments:
+            $period: '%inactive_account_assets_period%'
+            $tradePercentage: '%min_inactive_account_trade%'
+            $tradeUsdLimit: '%min_inactive_account_trade_usd%'
+            $minOrderUsd: '%minimum_order_value_usd%'
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: cron }
+
+    App\Utils\Converter\NetworkSymbolConverter:
+        arguments:
+            $conversionMap: '%conversion_map%'
+
+    App\Exchange\Donation\DonationHandler:
+        arguments:
+            $referralFee: '%referral_fee%'

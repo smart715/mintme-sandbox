@@ -2,59 +2,67 @@
 @import "mixins"
 @import 'lang-menu'
 
+@include media-breakpoint-up(lg)
+  #footer
+    margin-top: 100px
+
+.logo-mintme
+  margin-bottom: 2rem
+
+  img
+    width: $logo-medium-width
+    filter: grayscale(100%)
+
+.icon-socialmedia
+  li a
+    font-size: 1.5rem
+
 #footer
   margin-top: 65px
   position: relative
-  background: $black
+  max-width: $page-content-width
+  margin-bottom: 0
 
-  @include media-breakpoint-up(md)
-    margin-top: 100px
-
-  &:before
-    content: ""
-    position: absolute
-    left: 0
-    top: -52px
-    width: 100%
-    height: 55px
-    background: url("./../img/grass.svg") repeat-x
-    background-size: auto 100%
-
-  .socialmedia
-    margin-top: 20px
-
-    img
-      width: 45px
-      height: 45px
-      transition: all .3s ease
+  ul li
+    a
+      color: $text-color-primary-darker
 
       &:hover
-        filter: brightness(1.2)
+        color: $text-color-primary
 
-  .currency-mode-switcher
-    bottom: 1px
+  .dropdown-toggle
+    border: 0
+    background: none
+    color: $text-color-primary-darker
 
-    .btn
-      border: none
+    &:focus
+      outline: none
+      color: $primary
 
-      &:hover, &:focus, &.active, &:active
-        background-color: transparent !important
-        color: $color-nav-hover !important
-        border: none
+.copyright
+  color: $text-color-primary-darker
 
-    .dropdown-menu
-      min-width: 7rem
+.font-weight-semibold
+  font-weight: 600
 
-  .drops-switcher
-    bottom: 12px
+.line-clamp-2
+    display: -webkit-box
+    overflow: hidden
+    -webkit-line-clamp: 2
+    -webkit-box-orient: vertical
 
-    @media (max-width: 346px)
-      padding: 0
+@media (min-width: 992px)
+  .col-seventh
+    width: calc(1/7 * 100%)
+    flex: 0 0 calc(1/7 * 100%)
+    -ms-flex: 0 0 calc(1/7 * 100%)
 
+  .check-tokens-column
+    width: calc(1.333/7 * 100%)
+    flex: 0 0 calc(1.333/7 * 100%)
+    -ms-flex: 0 0 calc(1.333/7 * 100%)
 
-  @media (max-width: 689px)
-    .cookies-term
-      display: block !important
-
-    .separator
-      display: none !important
+  .news-column
+    width: calc(1.667/7 * 100%)
+    flex: 0 0 calc(1.667/7 * 100%)
+    -ms-flex: 0 0 calc(1.667/7 * 100%)

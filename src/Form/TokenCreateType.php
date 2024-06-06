@@ -4,15 +4,16 @@ namespace App\Form;
 
 use App\Entity\Token\Token;
 use App\Form\DataTransformer\NameTransformer;
+use App\Services\TranslatorService\TranslatorInterface;
+use App\Validator\Constraints\NoBadWords;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class TokenCreateType extends AbstractType
 {
     /** @var NameTransformer  */
@@ -37,6 +38,9 @@ class TokenCreateType extends AbstractType
                     'pattern' => "[a-zA-Z0-9\s]*",
                     'title' => $this->translator->trans('form.token.name.invalid'),
                 ],
+                'constraints' => [
+                    new NoBadWords(),
+                ],
             ])
             ->add('description', TextareaType::class, [
                 'label' => $this->translator->trans('form.token.description'),
@@ -45,11 +49,9 @@ class TokenCreateType extends AbstractType
                     'max' => Token::DESC_MAX_LENGTH,
                 ],
                 'required' => true,
-            ])
-            ->add('initial_orders', CheckboxType::class, [
-                'label' => $this->translator->trans('form.token.initial_order'),
-                'attr' => ['checked' => true],
-                'mapped' => false,
+                'constraints' => [
+                    new NoBadWords(),
+                ],
             ]);
 
         $builder->get('name')

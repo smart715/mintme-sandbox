@@ -6,16 +6,17 @@ use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Exchange\Config\Config;
+use App\Exchange\Trade\PlaceOrderResult;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderFetcher;
+use App\Services\TranslatorService\TranslatorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TraderFetcherTest extends TestCase
 {
     /** @dataProvider placeOrderProvider */
-    public function testPlaceOrder(bool $hasError, array $error, int $tradeResult): void
+    public function testPlaceOrder(bool $hasError, array $error, int $tradeResult, ?array $jsonResult): void
     {
         $method = 'order.put_limit';
         $params = [1, 'TOK000000000001WEB', 1, '10', '5', '0.01', '0.01', '', 0, '0'];
@@ -23,6 +24,7 @@ class TraderFetcherTest extends TestCase
         $jsonResponse = $this->createMock(JsonRpcResponse::class);
         $jsonResponse->method('hasError')->willReturn($hasError);
         $jsonResponse->method('getError')->willReturn($error);
+        $jsonResponse->method('getResult')->willReturn($jsonResult);
 
         /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
@@ -41,9 +43,9 @@ class TraderFetcherTest extends TestCase
     public function placeOrderProvider(): array
     {
         return [
-            [false, [], TradeResult::SUCCESS],
-            [true, ['code' => 1, 'message' => 'invalid arguments'], TradeResult::FAILED],
-            [true, ['code' => 10, 'message' => 'balance not enough'], TradeResult::INSUFFICIENT_BALANCE],
+            [false, [], TradeResult::SUCCESS, ['id' => 333, 'amount' => '1', 'left' => '1']],
+            [true, ['code' => 1, 'message' => 'invalid arguments'], TradeResult::FAILED, null],
+            [true, ['code' => 10, 'message' => 'balance not enough'], TradeResult::INSUFFICIENT_BALANCE, null],
         ];
     }
 
@@ -86,7 +88,6 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $tradeResult,
-            /** @phpstan-ignore-next-line */
             $trader->cancelOrder(...$params)->getResult()
         );
     }
@@ -113,7 +114,6 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             TradeResult::FAILED,
-            /** @phpstan-ignore-next-line */
             $trader->cancelOrder(...$params)->getResult()
         );
     }
@@ -147,7 +147,6 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $finishedOrders,
-            /** @phpstan-ignore-next-line */
             $trader->getFinishedOrders(...$params)
         );
     }
@@ -171,7 +170,6 @@ class TraderFetcherTest extends TestCase
         $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
 
         $this->expectException(FetchException::class);
-        /** @phpstan-ignore-next-line */
         $trader->getFinishedOrders(...$params);
     }
 
@@ -204,7 +202,6 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $pendingOrders,
-            /** @phpstan-ignore-next-line */
             $trader->getPendingOrders(...$params)
         );
     }
@@ -214,6 +211,101 @@ class TraderFetcherTest extends TestCase
         return [
             [false, [], $this->getRawOrders(), $this->getOrders()],
             [true, ['code' => 1, 'message' => 'invalid arguments'], null, []],
+        ];
+    }
+
+    /** @dataProvider trueAndFalseProvider */
+    public function testGetFinishedOrderDetails(bool $hasError): void
+    {
+        $method = 'order.finished_detail';
+        $params = [1];
+        $result = [];
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($result);
+
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
+
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
+        $this->assertEquals(
+            $result,
+            $trader->getFinishedOrderDetails(...$params)
+        );
+    }
+
+    /** @dataProvider trueAndFalseProvider */
+    public function testGetPendingOrderDetails(bool $hasError): void
+    {
+        $method = 'order.pending_detail';
+        $params = ['TEST', 1];
+        $result = [];
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($result);
+
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
+
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
+        $this->assertEquals(
+            $result,
+            $trader->getPendingOrderDetails(...$params)
+        );
+    }
+
+    /** @dataProvider trueAndFalseProvider */
+    public function testGetOrderDetails(bool $hasError): void
+    {
+        $method = 'order.deals';
+        $params = [1, 1, 1];
+        $result = ['records' => []];
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($result);
+
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
+
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
+        $this->assertEquals(
+            $result['records'],
+            $trader->getOrderDetails(...$params)
+        );
+    }
+
+    public function trueAndFalseProvider(): array
+    {
+        return [
+            [false],
+            [true],
         ];
     }
 
@@ -228,7 +320,6 @@ class TraderFetcherTest extends TestCase
         $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
         $this->expectException(FetchException::class);
 
-        /** @phpstan-ignore-next-line */
         $trader->getPendingOrders(...$params);
     }
 

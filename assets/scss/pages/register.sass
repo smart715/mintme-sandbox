@@ -1,0 +1,152 @@
+@import '../variables'
+@import '../mixins'
+
+body
+  overflow-x: hidden
+  background-image: none !important
+
+.register
+  nav
+    position: relative
+    background-color: $bg-secondary-dark
+
+.margin-text-input
+  margin-top: 50px
+
+.mintme-logo-welcome
+  height: 50px
+
+.right-container
+  border-radius: 0 $form-radius $form-radius 0
+  background: url("../../img/signup-bg-triangles.webp") $bg-primary-dark bottom right no-repeat
+
+.left-container
+  background: $bg-secondary
+  border-radius: $form-radius 0 0 $form-radius
+
+.h-divider
+  height: 0.3rem
+  border-radius: $h-divider-size
+  width: 30%
+  margin: 0
+  background-color: $primary
+
+.icon-size
+  vertical-align: middle
+  font-size: 40px
+
+.login-container
+  width: 30%
+  border-radius: $form-radius
+  background-color: $bg-secondary
+
+.button-large
+  border-radius: $half-border-radius !important
+  color: $text-color-primary !important
+  text-transform: uppercase
+  font-weight: bold
+
+.header-background
+  background-color: $bg-secondary-dark
+
+.background-img
+  @include background-img-home-page
+  height: 100%
+  position: relative
+
+  &::before
+    content: ""
+    position: absolute
+    top: 0
+    width: 100%
+    height: 100%
+    opacity: .2
+    background-size: auto 130%
+    background-repeat: no-repeat
+    background-position: 70%
+    background-image: url('../../img/dots_grey_RFW.svg') !important
+
+.register-bg
+  max-width: 100%
+  min-height: 100vh
+
+.form-container
+  border-radius: $form-radius !important
+
+.py-7
+  padding: 7rem 0
+
+.color-section-title
+  color: $text-color-dark-primary
+
+.img-with-description
+  $img-height: 247px
+
+  max-height: $img-height
+
+.btn-register
+  background-color: $primary
+  color: $text-color-darkest-secondary
+  &:hover
+    background-color: $white !important
+    color: $text-color-secondary-dark !important
+
+.landing-font
+  font-size: 20px
+
+@include media-breakpoint-up(lg)
+  .title-header
+    @include font-scale(xxl)
+    line-height: 1.2
+
+@include media-breakpoint-down(lg)
+  .right-container
+    background-size: 15rem
+
+  .title-header
+    @include font-scale(ml)
+    line-height: 1.2
+
+  .sub-title
+    font-size: $font-size-sl
+
+  .background-img::before
+    background-size: auto 100%
+    background-repeat: no-repeat
+    background-position: 100%
+
+  .img-with-description
+    max-height: 160px
+
+@include media-breakpoint-down(md)
+  .mintme-logo-welcome
+    height: 30px
+
+  .background-img::before
+    background-image: none
+    background-size: auto 75%
+
+@include media-breakpoint-down(sm)
+  .btn-register
+    width: 100%
+
+  .title-header
+    font-size: $font-size-lg
+
+  .background-img::before
+    background-size: auto 50%
+    background-position: bottom
+
+  .right-container
+    border-radius: 0 0 $form-radius $form-radius
+    padding-bottom: 15rem
+    background-size: auto
+
+  .left-container
+    border-radius: $form-radius $form-radius 0 0
+
+  .welcome-title
+    font-size: 1.75rem !important
+
+  #form
+    padding: 0 .25rem !important

@@ -2,46 +2,46 @@
 
 namespace App\Manager;
 
+use App\Activity\ActivityTypes;
+use App\Communications\CryptoRatesFetcherInterface;
+use App\Config\HideFeaturesConfig;
 use App\Entity\Crypto;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\Activity\OrderEventActivity;
 use App\Events\OrderEvent;
-use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\MarketPairsConfig;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandler;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Market\Model\HighestPriceModel;
 use App\Exchange\Order;
 use App\Repository\MarketStatusRepository;
+use App\Security\Config\DisabledServicesConfig;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\Converter\RebrandingConverter;
+use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use InvalidArgumentException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Money\Money;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
-    public const FILTER_DEPLOYED_FIRST = 1;
-    public const FILTER_DEPLOYED_ONLY_MINTME = 2;
-    public const FILTER_AIRDROP_ONLY = 3;
-    public const FILTER_DEPLOYED_ONLY_ETH = 4;
-    public const FILTER_DEPLOYED_ONLY_BNB = 5;
+    public const FILTER_DEPLOYED_ONLY_PREFIX = 'deployed_only_';
+
+    public const FILTER_AIRDROP_ONLY = 'airdrop_only';
+    public const FILTER_DEPLOYED_TOKEN = 'deployed';
+    public const FILTER_USER_OWNS = 'user_owns';
+    public const FILTER_NEWEST_DEPLOYED = 'newest_deployed';
     public const FILTER_AIRDROP_ACTIVE = true;
-    public const FILTER_FOR_TOKENS = [
-            'deployed_first' => self::FILTER_DEPLOYED_FIRST,
-            'deployed_only_mintme' => self::FILTER_DEPLOYED_ONLY_MINTME,
-            'airdrop_only' => self::FILTER_AIRDROP_ONLY,
-            'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
-            'deployed_only_bnb' => self::FILTER_DEPLOYED_ONLY_BNB,
-        ];
 
     public const SORT_LAST_PRICE = 'lastPrice';
     public const SORT_MONTH_VOLUME = 'monthVolume';
@@ -54,320 +54,154 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const SORT_RANK = 'rank';
     public const SORT_HOLDERS = 'holders';
 
-    /** @var MarketStatusRepository */
-    protected $repository;
-
-    /** @var MarketNameConverterInterface */
-    protected $marketNameConverter;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var MarketFactoryInterface */
-    private $marketFactory;
-
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var int */
-    public $minVolumeForMarketcap;
-
-    private BalanceHandlerInterface $balanceHandler;
-
-    private ParameterBagInterface $bag;
-
-    private MoneyWrapperInterface $moneyWrapper;
-
+    private MarketStatusRepository $repository;
+    private MarketNameConverterInterface $marketNameConverter;
+    private CryptoManagerInterface $cryptoManager;
+    private MarketFactoryInterface $marketFactory;
+    private MarketHandlerInterface $marketHandler;
+    private EntityManagerInterface $em;
     private EventDispatcherInterface $eventDispatcher;
+    private MoneyWrapperInterface $moneyWrapper;
+    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
+    private ?QueryBuilder $queryBuilder;
+    private MarketPairsConfig $marketPairsConfig;
+    private HideFeaturesConfig $hideFeaturesConfig;
+    private DisabledServicesConfig $disabledServicesConfig;
+    private RebrandingConverterInterface $rebrandingConverter;
+    public int $minVolumeForMarketcap;
+
+    public static function buildDeployedOnlyFilter(string $symbol): string
+    {
+        $converter = new RebrandingConverter();
+
+        $symbol = $converter->convert($symbol);
+
+        return self::FILTER_DEPLOYED_ONLY_PREFIX . strtolower($symbol);
+    }
 
     public function __construct(
         EntityManagerInterface $em,
+        MarketStatusRepository $repository,
         MarketNameConverterInterface $marketNameConverter,
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler,
-        BalanceHandlerInterface $balanceHandler,
-        ParameterBagInterface $bag,
+        EventDispatcherInterface $eventDispatcher,
         MoneyWrapperInterface $moneyWrapper,
-        EventDispatcherInterface $eventDispatcher
+        CryptoRatesFetcherInterface $cryptoRatesFetcher,
+        MarketPairsConfig $marketPairsConfig,
+        HideFeaturesConfig $hideFeaturesConfig,
+        DisabledServicesConfig $disabledServicesConfig,
+        RebrandingConverterInterface $rebrandingConverter
     ) {
-        /** @var  MarketStatusRepository $repository */
-        $repository = $em->getRepository(MarketStatus::class);
+        $this->em = $em;
         $this->repository = $repository;
         $this->marketNameConverter = $marketNameConverter;
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
-        $this->em = $em;
-        $this->balanceHandler = $balanceHandler;
-        $this->bag = $bag;
-        $this->moneyWrapper = $moneyWrapper;
         $this->eventDispatcher = $eventDispatcher;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
+        $this->marketPairsConfig = $marketPairsConfig;
+        $this->hideFeaturesConfig = $hideFeaturesConfig;
+        $this->disabledServicesConfig = $disabledServicesConfig;
+        $this->rebrandingConverter = $rebrandingConverter;
     }
 
-    /** {@inheritDoc} */
-    public function getMarketsCount(int $filter = 0): int
+    public function getFilterForTokens(): array
     {
-        $queryBuilder = $this->repository->createQueryBuilder('ms')
-            ->select('COUNT(ms)')
-            ->join('ms.quoteToken', 'qt')
-            ->leftJoin('qt.crypto', 'c')
-            ->where('qt IS NOT NULL')
-            ->andWhere('qt.isBlocked=false')
-            ->andWhere('qt.isHidden=false');
+        $filters = [
+            self::FILTER_AIRDROP_ONLY => self::FILTER_AIRDROP_ONLY,
+            self::FILTER_USER_OWNS => self::FILTER_USER_OWNS,
+            self::FILTER_NEWEST_DEPLOYED => self::FILTER_NEWEST_DEPLOYED,
+        ];
 
-        switch ($filter) {
-            case self::FILTER_DEPLOYED_ONLY_MINTME:
-                $queryBuilder
-                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
-                    ->setParameter('web', Symbols::WEB)
-                ;
+        foreach ($this->disabledServicesConfig->getAllDeployBlockchains() as $symbol) {
+            if (!$this->hideFeaturesConfig->isCryptoEnabled($symbol)) {
+                continue;
+            }
 
-                break;
-            case self::FILTER_DEPLOYED_ONLY_ETH:
-                $queryBuilder
-                    ->andWhere("qt.deployed = 1 AND c.symbol = :eth")
-                    ->setParameter('eth', Symbols::ETH)
-                ;
+            $symbol = $this->rebrandingConverter->convert($symbol);
 
-                break;
-            case self::FILTER_DEPLOYED_ONLY_BNB:
-                $queryBuilder->andWhere("qt.deployed = 1 AND c.symbol = :bnb")
-                    ->setParameter('bnb', Symbols::BNB);
-
-                break;
-            case self::FILTER_AIRDROP_ONLY:
-                $queryBuilder
-                    ->innerJoin('qt.airdrops', 'a')
-                    ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
-                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
-                    ->setParameter('web', Symbols::WEB)
-                ;
-
-                break;
+            $filter = self::buildDeployedOnlyFilter($symbol);
+            $filters[$filter] = $filter;
         }
 
-        return (int)$queryBuilder->getQuery()->getSingleScalarResult();
+        return $filters;
     }
 
-    private function getMarketsInfoFilter(int $filter, QueryBuilder $queryBuilder): void
+    public function getMarketsCount(string $filter = '', ?string $crypto = ''): int
     {
-        switch ($filter) {
-            case self::FILTER_DEPLOYED_FIRST:
-                $queryBuilder
-                    ->addSelect('CASE WHEN qt.deployed = 1 AND c.symbol = :web THEN 1 ELSE 0 END AS HIDDEN deployed_on_mintme')
-                    ->setParameter('web', Symbols::WEB)
-                    ->addOrderBy('deployed_on_mintme', 'DESC')
-                ;
+        $this->initQueryBuilder(self::FILTER_DEPLOYED_TOKEN);
+        $this->setMarketsCrypto($crypto);
+        $this->setMarketsInfoFilters([$filter]);
 
-                break;
-            case self::FILTER_DEPLOYED_ONLY_MINTME:
-                $queryBuilder
-                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
-                    ->setParameter('web', Symbols::WEB)
-                ;
+        $this->queryBuilder->select('COUNT(DISTINCT ms.quoteToken)');
 
-                break;
-            case self::FILTER_DEPLOYED_ONLY_ETH:
-                $queryBuilder
-                    ->andWhere("qt.deployed = 1 AND c.symbol = :eth")
-                    ->setParameter('eth', Symbols::ETH)
-                ;
-
-                break;
-            case self::FILTER_DEPLOYED_ONLY_BNB:
-                $queryBuilder
-                    ->andWhere("qt.deployed = 1 AND c.symbol = :bnb")
-                    ->setParameter('bnb', Symbols::BNB)
-                ;
-
-                break;
-            case self::FILTER_AIRDROP_ONLY:
-                $queryBuilder
-                    ->innerJoin('qt.airdrops', 'a')
-                    ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
-                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
-                    ->setParameter('web', Symbols::WEB)
-                ;
-
-                break;
-        }
-    }
-
-    private function getMarketsInfoSort(string $sort, QueryBuilder $queryBuilder): array
-    {
-        $result = [];
-
-        switch ($sort) {
-            case self::SORT_CHANGE:
-                $queryBuilder->addSelect('change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change');
-                $result[] = 'change';
-
-                break;
-            case self::SORT_MARKET_CAP:
-            case self::SORT_MARKET_CAP_USD:
-                $queryBuilder->setParameter('minvolume', $this->minVolumeForMarketcap * 10000);
-                $result[] = 'marketcap(ms.lastPrice, ms.monthVolume, :minvolume)';
-
-                break;
-            case self::SORT_LAST_PRICE:
-                $result[] = 'to_number(ms.lastPrice)';
-
-                break;
-            case self::SORT_DAY_VOLUME:
-                $result[] = 'to_number(ms.dayVolume)';
-
-                break;
-            case self::SORT_PAIR:
-                $result[] = 'qt.name';
-
-                break;
-            case self::SORT_BUY_DEPTH:
-                $result[] = 'to_number(ms.buyDepth)';
-
-                break;
-            case self::SORT_RANK:
-                $queryBuilder
-                    ->addSelect('CASE WHEN qt.deployed = 1 AND c.symbol = :web THEN 1 ELSE 0 END AS HIDDEN rank_deployed_on_mintme')
-                    ->setParameter('web', Symbols::WEB)
-                ;
-                $result[] = 'rank_deployed_on_mintme';
-                $result[] = 'to_number(ms.monthVolume)';
-
-                break;
-            case self::SORT_HOLDERS:
-                $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders');
-                $result[] = 'holders';
-
-                break;
-            default:
-                $result[] = 'to_number(ms.monthVolume)';
-        }
-
-        return $result;
-    }
-
-    private function getMarketsInfoOrder(array $sorts, string $order, QueryBuilder $queryBuilder): void
-    {
-        $order = 'ASC' === $order
-            ? 'ASC'
-            : 'DESC';
-
-        foreach ($sorts as $sort) {
-            $queryBuilder->addOrderBy($sort, $order);
-        }
-
-        $queryBuilder->addOrderBy('ms.id', $order);
-    }
-
-
-    /** {@inheritDoc} */
-    public function getUserRelatedMarketsCount(int $userId): int
-    {
-        return (int)$this->repository->createQueryBuilder('ms')
-            ->select('COUNT(ms)')
-            ->join('ms.quoteToken', 'qt')
-            ->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
-            ->where('qt IS NOT NULL')
-            ->andWhere('qt.isBlocked=false')
-            ->setParameter('id', $userId)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    /** {@inheritDoc} */
-    public function getMarketsInfo(
-        int $offset,
-        int $limit,
-        string $sort = "rank",
-        string $order = "DESC",
-        int $filter = 1,
-        ?int $userId = null
-    ): array {
-        $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
-
-        $queryBuilder = $this->repository->createQueryBuilder('ms')
-            ->join('ms.quoteToken', 'qt')
-            ->leftJoin('qt.crypto', 'c')
-            ->leftJoin('qt.users', 'u')
-            ->where('qt IS NOT NULL')
-            ->andWhere('qt.isBlocked=false')
-            ->andWhere('qt.isHidden=false')
-            ->groupBy('ms')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
-
-        if (null !== $userId) {
-            $queryBuilder->andWhere('u.user = :id')
-                ->setParameter('id', $userId);
-        }
-
-        $this->getMarketsInfoFilter($filter, $queryBuilder);
-        $sort = $this->getMarketsInfoSort($sort, $queryBuilder);
-        $this->getMarketsInfoOrder($sort, $order, $queryBuilder);
-
-        $result = $queryBuilder->getQuery()->getResult();
-
-        $this->setRanks($result);
-
-        return $this->parseMarketStatuses(
-            array_merge(
-                $predefinedMarketStatus,
-                $result
-            )
-        );
+        return (int)$this->queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     /** {@inheritDoc} */
     public function getCryptoAndDeployedMarketsInfo(?int $offset = null, ?int $limit = null): array
     {
-        return $this->repository->getCryptoAndDeployedTokenMarketStatuses($offset, $limit);
+        return array_filter(
+            $this->repository->getCryptoAndDeployedTokenMarketStatuses($offset, $limit),
+            fn (MarketStatus $ms) => !$ms->getQuote() instanceof Crypto
+                || $this->marketPairsConfig->isMarketPairEnabled(
+                    $ms->getCrypto()->getSymbol(),
+                    $ms->getQuote()->getSymbol()
+                )
+        );
     }
 
     /** {@inheritDoc} */
-    public function createMarketStatus(array $markets): void
+    public function createMarketStatus(array $markets): array
     {
-        /** @var Market $market */
-        foreach ($markets as $market) {
+        return array_map(function (Market $market) {
             $marketStatus = $this->repository->findByBaseQuoteNames(
                 $market->getBase()->getSymbol(),
                 $market->getQuote()->getSymbol()
             );
 
-            if ($marketStatus) {
-                continue;
+            if (!$marketStatus) {
+                $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
+
+                if (!$crypto) {
+                    throw new \Exception('Crypto not found ' . $market->getBase()->getSymbol());
+                }
+
+                $marketStatus = new MarketStatus($crypto, $market->getQuote());
+
+                $this->em->persist($marketStatus);
+                $this->em->flush();
+
+                $this->updateMarketStatus($market);
             }
 
-            $marketInfo = $this->marketHandler->getMarketInfo($market);
-            $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
+            return $marketStatus;
+        }, $markets);
+    }
 
-            if (!$crypto) {
-                continue;
-            }
+    public function getOrCreateMarketStatus(Market $market): MarketStatus
+    {
+        return $this->getMarketStatus($market)
+            ?? $this->createMarketStatus([$market])[0];
+    }
 
-            $this->em->persist(new MarketStatus($crypto, $market->getQuote(), $marketInfo));
-            $this->em->flush();
-        }
+    public function updateMarketStatusNetworks(Market $market): void
+    {
+        $marketStatus = $this->getOrCreateMarketStatus($market);
+        $marketStatus->setNetworks($this->getTokenNetworks($marketStatus));
+
+        $this->em->merge($marketStatus);
+        $this->em->flush();
     }
 
     /** {@inheritDoc} */
     public function updateMarketStatus(Market $market): void
     {
-        $marketStatus = $this->repository->findByBaseQuoteNames(
-            $market->getBase()->getSymbol(),
-            $market->getQuote()->getSymbol()
-        );
-
-        if (!$marketStatus) {
-            throw new InvalidArgumentException(
-                "Nonexistent market: {$market->getBase()->getSymbol()}/{$market->getQuote()->getSymbol()}"
-            );
-        }
+        $marketStatus = $this->getOrCreateMarketStatus($market);
 
         $this->em->refresh($marketStatus);
 
@@ -386,15 +220,53 @@ class MarketStatusManager implements MarketStatusManagerInterface
             }
 
             /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::COMPLETED);
+            $this->eventDispatcher->dispatch(
+                new OrderEventActivity($order, ActivityTypes::TOKEN_TRADED),
+                OrderEvent::COMPLETED
+            );
         }
 
         if (isset($orders[0])) {
             $marketStatus->setLastDealId($orders[0]->getId());
         }
 
+        $marketStatus->setNetworks($this->getTokenNetworks($marketStatus));
+        $marketStatus->setHolders($this->getHoldersCount($marketStatus));
+
         $this->em->merge($marketStatus);
         $this->em->flush();
+    }
+
+    private function getHoldersCount(MarketStatus $marketStatus): ?int
+    {
+        $quote = $marketStatus->getQuote();
+
+        if ($quote instanceof Token) {
+            return $quote->getHoldersCount();
+        }
+
+        return null;
+    }
+
+    private function getTokenNetworks(MarketStatus $marketStatus): ?array
+    {
+        $quote = $marketStatus->getQuote();
+
+        if ($quote instanceof Token) {
+            return array_reduce(
+                $quote->getDeploys(),
+                function ($networks, $deploy) {
+                    if (!$deploy->isPending()) {
+                        $networks[] = $deploy->getCrypto()->getSymbol();
+                    }
+
+                    return $networks;
+                },
+                []
+            );
+        }
+
+        return null;
     }
 
     /** {@inheritDoc} */
@@ -413,56 +285,23 @@ class MarketStatusManager implements MarketStatusManagerInterface
             }
         }
 
+        $userMarketStatuses = $this->convertMarketStatusKeys(
+            $this->repository->findBy(
+                ['quoteToken' => $userTokenIds],
+                ['lastPrice' => Criteria::DESC],
+                $limit - count($predefinedMarketStatus),
+                $offset
+            )
+        );
+
         return [
-            'markets' => $this->parseMarketStatuses(
+            'markets' =>
                 array_merge(
                     $predefinedMarketStatus,
-                    $this->repository->findBy(
-                        ['quoteToken' => $userTokenIds],
-                        ['lastPrice' => Criteria::DESC],
-                        $limit - count($predefinedMarketStatus),
-                        $offset
-                    )
-                )
-            ),
+                    $userMarketStatuses
+                ),
             'count' => count($markets),
         ];
-    }
-
-    /**
-     * @retrun array<MarketStatus>|null
-     */
-    private function getPredefinedMarketStatuses(): array
-    {
-        return array_map(function (Market $market) {
-            return $this->repository->findByBaseQuoteNames(
-                $market->getBase()->getSymbol(),
-                $market->getQuote()->getSymbol()
-            );
-        }, $this->marketFactory->getCoinMarkets());
-    }
-
-    /**
-     * @param array<MarketStatus> $marketStatuses
-     * @return array
-     */
-    private function parseMarketStatuses(array $marketStatuses): array
-    {
-        $info = [];
-
-        foreach ($marketStatuses as $marketStatus) {
-            $quote = $marketStatus->getQuote();
-
-            if (!$quote) {
-                continue;
-            }
-
-            $market = $this->marketFactory->create($marketStatus->getCrypto(), $quote);
-
-            $info[$this->marketNameConverter->convert($market)] = $marketStatus;
-        }
-
-        return $info;
     }
 
     /** {@inheritDoc} */
@@ -474,6 +313,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
     }
 
+    public function findByBaseQuoteNames(string $base, string $quote): ?MarketStatus
+    {
+        return $this->repository->findByBaseQuoteNames($base, $quote);
+    }
+
     /** {@inheritDoc} */
     public function isValid(Market $market, bool $reverseBaseQuote = false): bool
     {
@@ -481,17 +325,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $market = BaseQuote::reverseMarket($market);
         }
 
-        $base = $market->getBase();
-        $quote = $market->getQuote();
-
-        return
-            !(
-                ($base instanceof Crypto && !$base->isExchangeble()) ||
-                ($quote instanceof Crypto && !$quote->isTradable()) ||
-                ($base instanceof Token && $base->isBlocked()) ||
-                $quote instanceof Token ||
-                $base === $quote ||
-                ($base instanceof Token && !(Symbols::MINTME === $quote->getSymbol() || Symbols::WEB === $quote->getSymbol()))
+        return $this->isBaseValid($market) && $this->isQuoteValid($market)
+            && (!$market->getQuote() instanceof Crypto || !$market->getBase() instanceof Crypto
+                || $this->marketPairsConfig->isMarketPairEnabled(
+                    $market->getQuote()->getSymbol(),
+                    $market->getBase()->getSymbol(),
+                )
             );
     }
 
@@ -501,44 +340,383 @@ class MarketStatusManager implements MarketStatusManagerInterface
         return $this->repository->getExpired();
     }
 
-    public function setRanks(array $marketStatuses): void
+    /** {@inheritDoc} */
+    public function getPredefinedMarketStatuses(): array
     {
-        $ids = array_map(fn (MarketStatus $ms) => $ms->getId(), $marketStatuses);
+        $predefinedMarkets =  array_filter(array_map(function (Market $market) {
+            return $this->getOrCreateMarketStatus($market);
+        }, $this->marketFactory->getCoinMarkets()));
 
-        $sql = "SELECT * FROM (
-                    SELECT ms.id,
-                    qt.deployed = 1 AND c.symbol = :web AS deployed_on_mintme,
-                    RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume, :subunit, :showSubunit) DESC, ms.id DESC) AS rank
-                    FROM market_status AS ms
-                    INNER JOIN token AS qt ON ms.quote_token_id = qt.id
-                    LEFT JOIN crypto AS c ON qt.crypto_id = c.id
-                    WHERE qt.is_blocked = false
-                    AND qt.is_hidden = false
-                ) AS r
-                WHERE r.id IN (:ids)";
+        return $this->convertMarketStatusKeys($predefinedMarkets);
+    }
 
-        $rsm = new ResultSetMapping();
-        $rsm->addScalarResult('id', 'id', 'integer');
-        $rsm->addScalarResult('rank', 'rank', 'integer');
+    public function getFilteredPromotedMarketStatuses(): array
+    {
+        $this->initPromotedTokensQueryBuilder();
+        // @TODO Use getArrayResult instead to avoid performance issues because of n+1 queries
+        $marketsStatus = $this->queryBuilder->getQuery()->getResult();
 
-        $query = $this->em->createNativeQuery($sql, $rsm);
-        $query
-            ->setParameter('ids', $ids)
-            ->setParameter('subunit', MoneyWrapper::MINTME_SUBUNIT)
-            ->setParameter('showSubunit', MoneyWrapper::MINTME_SHOW_SUBUNIT)
-            ->setParameter('web', Symbols::WEB)
-        ;
+        $marketsStatus = $this->convertMarketStatusKeys($marketsStatus);
 
-        $result = $query->getResult();
+        return $marketsStatus;
+    }
 
-        $result = array_reduce($result, function (array $acc, array $resultRow) {
-            $acc[$resultRow['id']] = $resultRow['rank'];
+    /** {@inheritDoc} */
+    public function getFilteredMarketStatuses(
+        int $offset,
+        int $limit,
+        string $sort = "monthVolume",
+        string $order = "DESC",
+        array $filters = [],
+        ?int $userId = null,
+        ?string $crypto = Symbols::WEB,
+        ?string $searchPhrase = null
+    ): array {
+        $this->initQueryBuilder();
+        $this->setMarketsCrypto($crypto);
+        $this->setMarketsInfoFilters($filters, $userId, $searchPhrase);
+        $this->setMarketsInfoOrder($sort, $order);
+        $this->setOffsetAndLimit($offset, $limit);
+
+        // @TODO Use getArrayResult instead to avoid performance issues because of n+1 queries
+        $marketsStatus = $this->queryBuilder->getQuery()->getResult();
+
+        $marketsStatus = $this->convertMarketStatusKeys($marketsStatus);
+
+        return $marketsStatus;
+    }
+
+    /** @inheritDoc */
+    public function getTokenHighestPrice(array $markets): HighestPriceModel
+    {
+        $marketStatuses = [];
+
+        /** @var  array<Money> $lastPrices */
+        $lastPrices = array_reduce($markets, function (array $acc, Market $market) use (&$marketStatuses) {
+            $symbol = $market->getBase()->getSymbol();
+
+            $marketStatuses[$symbol] = $this->getOrCreateMarketStatus($market);
+            $lastPrice = $marketStatuses[$symbol]->getLastPrice();
+
+            $acc[$symbol] = $lastPrice;
 
             return $acc;
         }, []);
 
-        foreach ($marketStatuses as $marketStatus) {
-            $marketStatus->setRank($result[$marketStatus->getId()]);
+        $cryptoRates = $this->cryptoRatesFetcher->fetch();
+
+        $marketsStatusInUsd = [];
+
+        array_walk(
+            $lastPrices,
+            function (Money $price, string $symbol) use (&$marketsStatusInUsd, $cryptoRates): void {
+                $rate = $cryptoRates[$symbol][Symbols::USD];
+                $marketsStatusInUsd[$symbol] = $this->moneyWrapper->format($price->multiply($rate));
+            }
+        );
+
+        $highestLastPriceSymbol = array_search(
+            max($marketsStatusInUsd),
+            $marketsStatusInUsd,
+        );
+
+        $highestLastPriceSymbol = (string)$highestLastPriceSymbol ?: Symbols::WEB;
+        $highestLastPriceSubunit = $markets[$highestLastPriceSymbol]->getQuote()->getShowSubunit();
+        $highestLastPriceOpen = $this->moneyWrapper->format($marketStatuses[$highestLastPriceSymbol]->getOpenPrice());
+
+        $highestLastPrice = isset($lastPrices[$highestLastPriceSymbol])
+            ? $this->moneyWrapper->format($lastPrices[$highestLastPriceSymbol])
+            : '0';
+
+        return new HighestPriceModel(
+            $highestLastPriceSymbol,
+            $highestLastPrice,
+            $highestLastPriceSubunit,
+            $marketsStatusInUsd[$highestLastPriceSymbol] ?? '0',
+            $highestLastPriceOpen,
+        );
+    }
+
+    private function isBaseValid(Market $market): bool
+    {
+        $base = $market->getBase();
+        $quote = $market->getQuote();
+
+        return $base instanceof Token
+            ? !$base->isBlocked() && $quote instanceof Crypto && $base->containsExchangeCrypto($quote)
+            : $base instanceof Crypto && $base->isExchangeble();
+    }
+
+    private function isQuoteValid(Market $market): bool
+    {
+        $base = $market->getBase();
+        $quote = $market->getQuote();
+
+        return $base->getName() !== $quote->getName() || (
+            $quote instanceof Crypto
+                ? $quote->isTradable()
+                : $quote instanceof Token
+        );
+    }
+
+    private function initPromotedTokensQueryBuilder(): void
+    {
+        $this->queryBuilder = $this->repository->createQueryBuilder('ms')
+            ->join('ms.quoteToken', 'qt')
+            ->join('qt.promotions', 'tp', Join::WITH, 'tp.endDate > CURRENT_TIMESTAMP()')
+            ->leftJoin('qt.deploys', 'dp')
+            ->leftJoin('qt.rank', 'r')
+            ->leftJoin('dp.crypto', 'c')
+            ->addSelect(['qt', 'dp', 'c', 'r'])
+            ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false')
+            ->orderBy('tp.createdAt', Criteria::ASC);
+    }
+
+    private function initQueryBuilder(?string $filter = null): void
+    {
+        $this->queryBuilder = $this->repository->createQueryBuilder('ms')
+            ->join('ms.quoteToken', 'qt')
+            ->join('qt.profile', 'p')
+            ->leftJoin('qt.lockIn', 'li')
+            ->leftJoin('qt.image', 'i')
+            ->leftJoin('qt.discordConfig', 'disc')
+            ->leftJoin('qt.deploys', 'dp')
+            ->leftJoin('qt.rank', 'r')
+            ->leftJoin('qt.signUpBonusCode', 'qtsb')
+            ->leftJoin('dp.crypto', 'c')
+            ->leftJoin('qt.promotions', 'tp', Join::WITH, 'tp.endDate > CURRENT_TIMESTAMP()')
+            ->addSelect(['qt', 'msc','dp', 'c', 'p', 'li', 'i', 'disc', 'r', 'qtsb'])
+            ->where('qt IS NOT NULL')
+            ->andWhere('tp IS NULL')
+            ->andWhere('qt.isBlocked=false')
+            ->andWhere('dp.address IS NOT NULL');
+
+        if (self::FILTER_DEPLOYED_TOKEN !== $filter) {
+            $this->queryBuilder
+                ->andWhere('qt.isHidden=false');
         }
+
+        $deploySymbols = array_filter(
+            $this->disabledServicesConfig->getAllDeployBlockchains(),
+            fn($symbol) => $this->hideFeaturesConfig->isCryptoEnabled($symbol)
+        );
+
+        $this->queryBuilder
+            ->andWhere($this->queryBuilder->expr()->in('c.symbol', $deploySymbols));
+    }
+
+    private function setOffsetAndLimit(int $offset, int $limit): void
+    {
+        $this->queryBuilder
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
+    }
+
+    /**
+     * @param array<string> $filters
+     */
+    private function setMarketsInfoFilters(
+        array $filters,
+        ?int $userId = null,
+        ?string $searchPhrase = null
+    ): void {
+        if ($searchPhrase) {
+            $this->queryBuilder
+                ->andWhere("qt.deployed = true")
+                ->andWhere('LOWER(qt.name) LIKE LOWER(:like)')
+                ->setParameter('like', "%$searchPhrase%");
+
+            return;
+        }
+
+        $this->addFiltersToQuery($filters, $userId);
+    }
+
+    private function getSymbolFromDeployedOnlyFilter(string $filter): ?string
+    {
+        if (str_starts_with($filter, self::FILTER_DEPLOYED_ONLY_PREFIX)) {
+            return strtoupper(str_replace(self::FILTER_DEPLOYED_ONLY_PREFIX, '', $filter));
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string> $filters
+     */
+    private function addFiltersToQuery(array $filters, ?int $userId = null): void
+    {
+        $deployedBlockchains = [];
+
+        foreach ($filters as $filter) {
+            $symbol = $this->getSymbolFromDeployedOnlyFilter($filter);
+
+            if ($symbol && $this->hideFeaturesConfig->isCryptoEnabled($symbol)) {
+                $symbol = $this->rebrandingConverter->reverseConvert($symbol);
+
+                $deployedBlockchains[] = $symbol;
+
+                continue;
+            }
+
+            switch ($filter) {
+                case self::FILTER_AIRDROP_ONLY:
+                    $this->queryBuilder
+                        ->innerJoin('qt.airdrops', 'a')
+                        ->andWhere('a.status = :active')
+                        ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
+
+                    break;
+                case self::FILTER_USER_OWNS:
+                    $this->queryBuilder
+                        ->leftJoin('qt.users', 'u')
+                        ->andWhere('u.user = :id')
+                        ->setParameter('id', $userId);
+
+                    break;
+                case self::FILTER_NEWEST_DEPLOYED:
+                    $this->queryBuilder->addOrderBy(
+                        'dp.deployDate',
+                        Criteria::DESC
+                    );
+
+                    break;
+            }
+        }
+
+        if (count($deployedBlockchains)) {
+            $this->addDeployedFiltersToQuery($deployedBlockchains);
+        }
+    }
+
+    private function addDeployedFiltersToQuery(array $blockchains = [Symbols::WEB]): void
+    {
+        $expressionBuilder = $this->em->getExpressionBuilder();
+
+        $this->queryBuilder
+            ->leftJoin('dp.crypto', 'dc')
+            ->addSelect(['dc'])
+            ->andWhere(
+                $expressionBuilder->in(
+                    'dc.symbol',
+                    $blockchains
+                )
+            );
+    }
+
+    private function setMarketsInfoSort(string $sort): array
+    {
+        $result = [];
+
+        switch ($sort) {
+            case self::SORT_CHANGE:
+                $result[] = 'ms.changePercentage';
+
+                break;
+            case self::SORT_MARKET_CAP:
+                $result[] = 'ms.marketCap';
+
+                break;
+            case self::SORT_MARKET_CAP_USD:
+                $this->queryBuilder
+                     ->addSelect('
+                        CASE WHEN ms.monthVolume >= :min_volume 
+                        THEN ms.lastPrice 
+                        ELSE 0 END 
+                        AS HIDDEN min_volume_marketcap
+                    ')
+                     ->setParameter('min_volume', $this->minVolumeForMarketcap * 10000);
+
+                $result[] = 'min_volume_marketcap';
+
+                break;
+            case self::SORT_LAST_PRICE:
+                $result[] = 'ms.lastPrice';
+
+                break;
+            case self::SORT_DAY_VOLUME:
+                $result[] = 'ms.dayVolume';
+
+                break;
+            case self::SORT_MONTH_VOLUME:
+                $result[] = 'ms.monthVolume';
+
+                break;
+            case self::SORT_PAIR:
+                $result[] = 'qt.name';
+
+                break;
+            case self::SORT_BUY_DEPTH:
+                $result[] = 'ms.buyDepth';
+
+                break;
+            case self::SORT_RANK:
+                $result[] = 'r.rank';
+
+                break;
+            case self::SORT_HOLDERS:
+                $result[] = 'ms.holders';
+
+                break;
+            default:
+                $result[] = 'r.rank';
+        }
+
+        $this->queryBuilder->groupBy('ms');
+
+        return $result;
+    }
+
+    private function setMarketsInfoOrder(string $sort, string $order): void
+    {
+        $sortConfig = $this->setMarketsInfoSort($sort);
+        $order = Criteria::ASC === $order
+            ? Criteria::ASC
+            : Criteria::DESC;
+
+        foreach ($sortConfig as $sort) {
+            $this->queryBuilder->addOrderBy($sort, $order);
+        }
+
+        $this->queryBuilder->addOrderBy('ms.id', $order);
+    }
+
+    private function setMarketsCrypto(?string $crypto = ''): void
+    {
+        if (!$crypto) {
+            $this->queryBuilder->leftJoin('ms.crypto', 'msc')
+                ->addSelect(['msc']);
+
+            return;
+        }
+
+        $this->queryBuilder->leftJoin('ms.crypto', 'msc')
+            ->andWhere('msc.symbol=:cryptoSymbol')
+            ->addSelect(['msc'])
+            ->setParameter('cryptoSymbol', strtoupper($crypto));
+    }
+
+    /**
+     * @param array<MarketStatus|null> $marketStatuses
+     * @return array<MarketStatus|null>
+     */
+    public function convertMarketStatusKeys(array $marketStatuses): array
+    {
+        $info = [];
+
+        foreach (array_keys($marketStatuses) as $key) {
+            $quote = $marketStatuses[$key]->getQuote();
+
+            if (!$quote) {
+                continue;
+            }
+
+            $market = $this->marketFactory->create($marketStatuses[$key]->getCrypto(), $quote);
+
+            $info[$this->marketNameConverter->convert($market)] = $marketStatuses[$key];
+        }
+
+        return $info;
     }
 }

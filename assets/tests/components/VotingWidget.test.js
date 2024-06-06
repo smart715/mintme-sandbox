@@ -1,7 +1,12 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import VotingWidget from '../../js/components/voting/VotingWidget';
 import voting from '../../js/storage/modules/voting';
+import {NotificationMixin} from '../../js/mixins';
 import Vuex from 'vuex';
+import axios from 'axios';
+import moxios from 'moxios';
+
+const localVue = mockVue();
 
 /**
  * @return {VueConstructor}
@@ -9,10 +14,14 @@ import Vuex from 'vuex';
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(Vuex);
+    localVue.mixin(NotificationMixin);
     localVue.use({
         install(Vue) {
+            Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$t = (val) => val;
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$logger = {error: (val) => {}};
+            Vue.prototype.$toasted = {show: () => {}};
         },
     });
 
@@ -21,64 +30,97 @@ function mockVue() {
 
 /**
  * @param {Object} props
- * @param {Object} getters
- * @return {Wrapper<Vue>}
+ * @return {Object}
  */
-function createWrapper(props = {}, getters = {}) {
-    const localVue = mockVue();
-    const store = new Vuex.Store({
-        modules: {voting},
-    });
-    const wrapper = shallowMount(VotingWidget, {
-        propsData: {
-            tokenNameProp: 'foo',
-            votingsProp: [],
-            minAmount: 1,
-            ...props,
-        },
-        store,
-        localVue,
-    });
+function createSharedTestProps(props = {}) {
+    return {
+        tokenNameProp: 'foo',
+        votingsProp: [],
+        minAmount: 1,
+        tokenAvatar: 'jasm-avatar',
+        votingAmount: 22,
+        minAmountPropose: 100,
+        minAmountVote: 0,
+        activePageProp: '',
+        votingProp: {},
+        loggedIn: false,
+        ...props,
+    };
+}
 
-    return wrapper;
+/**
+ * @param {Object} store
+ * @return {Vuex.Store}
+ */
+function createSharedTestStore(store = {}) {
+    return new Vuex.Store({
+        modules: {
+            voting: {
+                ...voting,
+                getters: {
+                    getCurrentVoting: () => ({slug: 'show'}),
+                },
+            },
+        },
+    });
 }
 
 describe('VotingWidget', () => {
-   describe('activePage', () => {
-       it('should render list correctly', () => {
-           const wrapper = createWrapper();
+    let store;
+    let wrapper;
 
-           expect(wrapper.vm.activePage).toEqual({
-               list: true,
-               create: false,
-               show: false,
-           });
-       });
+    beforeEach(() => {
+        store = createSharedTestStore();
 
-       it('should render create correctly', () => {
-           const wrapper = createWrapper({activePageProp: 'create_voting'});
+        wrapper = shallowMount(VotingWidget, {
+            localVue: localVue,
+            store,
+            propsData: createSharedTestProps(),
+        });
 
-           expect(wrapper.vm.activePage).toEqual({
-               list: false,
-               create: true,
-               show: false,
-           });
-       });
+        moxios.install();
+    });
 
-       it('should render create correctly', () => {
-           const wrapper = createWrapper({activePageProp: 'show_voting'});
+    afterEach(() => {
+        moxios.uninstall();
+        wrapper.destroy();
+    });
 
-           expect(wrapper.vm.activePage).toEqual({
-               list: false,
-               create: false,
-               show: true,
-           });
-       });
-   });
+    describe('activePage', () => {
+        it('should render list correctly', () => {
+            expect(wrapper.vm.activePage).toEqual({
+                list: true,
+                create: false,
+                show: false,
+            });
+        });
+
+        it('should render create correctly', async () => {
+            await wrapper.setData({
+                activePageName: 'create_voting',
+            });
+
+            expect(wrapper.vm.activePage).toEqual({
+                list: false,
+                create: true,
+                show: false,
+            });
+        });
+
+        it('should render create correctly', async () => {
+            await wrapper.setData({
+                activePageName: 'show_voting',
+            });
+
+            expect(wrapper.vm.activePage).toEqual({
+                list: false,
+                create: false,
+                show: true,
+            });
+        });
+    });
 
     it('should go to create correctly', () => {
-        const wrapper = createWrapper();
-
         expect(wrapper.vm.activePage).toEqual({
             list: true,
             create: false,
@@ -95,15 +137,6 @@ describe('VotingWidget', () => {
     });
 
     it('should go to show correctly', () => {
-        const wrapper = createWrapper(
-            {},
-            {
-                getCurrentVoting: () => {
-                    return {slug: 'foo'};
-                },
-            },
-        );
-
         expect(wrapper.vm.activePage).toEqual({
             list: true,
             create: false,

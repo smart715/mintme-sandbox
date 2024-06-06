@@ -1,0 +1,66 @@
+{% macro pagination(total, current, url, nearbyPagesLimit = 4) %}
+
+    {# Create "main_url" variable with link for the first page #}
+    {% set foo = url|split('/') %}
+    {% set foo = foo|slice(0, -1) %}
+    {% set main_url = foo|join('/') ~ "/" %}
+
+    {% apply spaceless %}
+        {% if total > 1 %}
+            <div class="d-flex justify-content-center">
+                <nav>
+                <ul class="pagination">
+                    {% if current > 1 %}
+                        <li class="page-item">
+                            <a class="prev page-link" href="{{ (url ~ (current-1))|e }}">{{ 'previous' | trans }}</a>
+                        </li>
+                    {% endif %}
+
+                    {% for i in 1..total %}
+                        {% if 0 == (current - nearbyPagesLimit) - loop.index %}
+                            <li class="page-item"><a class="page-link" href="{{ (url ~ 1)|e }}">1</a></li>
+                            {% if 1 != loop.index %}
+                                <li class="page-item"><a href="#"><span class="page-link">...</span></a></li>
+                            {% endif %}
+                        {% elseif 0 == (current + nearbyPagesLimit) - loop.index  and (current + nearbyPagesLimit) < total %}
+                            <li class="page-item pointer-events-none"><a href="#"><span class="page-link">...</span></a></li>
+                        {% elseif 0 < (current - nearbyPagesLimit) - loop.index %}
+                            <!-- #1 -->
+                        {% elseif 0 > (current + nearbyPagesLimit) - loop.index %}
+                            <!-- #2 -->
+                        {% else %}
+                                {% if current == loop.index  %}
+                                    <li class="page-item active">
+                                        <a href="#">
+                                            <span class="page-link" aria-current="page">{{ loop.index }}</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    {% if loop.index == 1 %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url ~ 1 }}">{{ loop.index }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url ~ loop.index }}">{{ loop.index }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if current != total and (current + nearbyPagesLimit) < total %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ (url ~ total)|e }}">{{ total }}</a>
+                        </li>
+                    {% endif %}
+                    {% if current < total %}
+                        <li class="page-item">
+                            <a class="next page-link" href="{{ (url ~ (current+1))|e }}">{{ 'next' | trans }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                </nav>
+            </div>
+        {% endif %}
+    {% endapply %}
+{% endmacro %}

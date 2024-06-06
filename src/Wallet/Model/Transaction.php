@@ -2,50 +2,50 @@
 
 namespace App\Wallet\Model;
 
-use App\Entity\TradebleInterface;
+use App\Entity\Crypto;
+use App\Entity\TradableInterface;
+use App\Utils\Converter\RebrandingConverter;
+use Money\Currency;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /** @codeCoverageIgnore */
 class Transaction
 {
-    /** @var \DateTime */
-    private $date;
+    private \DateTimeInterface $date;
 
-    /** @var string */
-    private $hash;
+    private ?string $hash;
 
-    /** @var string|null */
-    private $from;
+    private ?Crypto $blockchain;
 
-    /** @var string */
-    private $to;
+    private ?string $from;
 
-    /** @var Money */
-    private $amount;
+    private string $to;
 
-    /** @var Money */
-    private $fee;
+    private Money $amount;
 
-    /** @var TradebleInterface|null */
-    private $tradable;
+    private ?Money $fee;
 
-    /** @var Status */
-    private $status;
+    private ?TradableInterface $tradable;
 
-    /** @var Type */
-    private $type;
+    private Status $status;
+
+    private Type $type;
+
+    private bool $isBonus;
 
     public function __construct(
-        \DateTime $date,
-        string $hash,
+        \DateTimeInterface $date,
+        ?string $hash,
         ?string $from,
         string $to,
         Money $amount,
-        Money $fee,
-        ?TradebleInterface $tradable,
+        ?Money $fee,
+        ?TradableInterface $tradable,
         Status $status,
-        Type $type
+        Type $type,
+        ?bool $isBonus = false,
+        ?Crypto $blockchain = null
     ) {
         $this->date = $date;
         $this->hash = $hash;
@@ -56,10 +56,12 @@ class Transaction
         $this->tradable = $tradable;
         $this->status = $status;
         $this->type = $type;
+        $this->isBonus = $isBonus;
+        $this->blockchain = $blockchain;
     }
 
-    /** @Groups({"API"}) */
-    public function getHash(): string
+    /** @Groups({"API", "dev"}) */
+    public function getHash(): ?string
     {
         return $this->hash;
     }
@@ -83,19 +85,19 @@ class Transaction
     }
 
     /** @Groups({"API", "dev"}) */
-    public function getFee(): Money
+    public function getFee(): ?Money
     {
         return $this->fee;
     }
 
     /** @Groups({"API", "dev"}) */
-    public function getDate(): \DateTime
+    public function getDate(): \DateTimeInterface
     {
         return $this->date;
     }
 
     /** @Groups({"API", "dev"}) */
-    public function getTradable(): ?TradebleInterface
+    public function getTradable(): ?TradableInterface
     {
         return $this->tradable;
     }
@@ -116,5 +118,32 @@ class Transaction
     public function getAddress(): string
     {
         return $this->to;
+    }
+
+    /** @Groups({"API", "dev"}) */
+    public function getIsBonus(): bool
+    {
+        return $this->isBonus;
+    }
+
+    /** @Groups({"API", "dev"}) */
+    public function getFeeCurrency(): ?Currency
+    {
+        $feeCurrency = $this->getFee()
+            ? $this->getFee()->getCurrency()
+            : null;
+
+        if ($feeCurrency) {
+            $rebranding = new RebrandingConverter();
+            $feeCurrency = new Currency($rebranding->convert($feeCurrency->getCode()));
+        }
+
+        return $feeCurrency;
+    }
+
+    /** @Groups({"API", "dev"}) */
+    public function getBlockchain(): ?Crypto
+    {
+        return $this->blockchain;
     }
 }

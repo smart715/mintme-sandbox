@@ -1,7 +1,7 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
 
-{% trans %} hello {% endtrans %}, {{ username }}!
+{% trans %} hello {% endtrans %} {{ nickname }}!
 {% trans %} mail.no_orders.msg {% endtrans %} {{ tokenName }}.
 
 {% trans %} mail.no_orders.add_them {% endtrans %}:

@@ -1,0 +1,48 @@
+<quick-trade
+    v-if="!isWideScreen"
+    :logged-in="{{ loggedIn }}"
+    :login-recaptcha-sitekey="'{{ google_recaptcha_site_key }}'"
+    :reg-recaptcha-sitekey="'{{ reg_google_recaptcha_site_key }}'"
+    :params="{{ quick_trade_params | json_encode }}"
+    :min-amounts="{{ quick_trade_min_amounts | json_encode }}"
+    websocket-url="{{ global_websocket_url }}"
+    disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+    :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+    :is-mobile-screen="isMobileScreen"
+    :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+    :is-owner="{{ isOwner }}"
+    :is-user-blocked="{{ app.user.isBlocked|default(false) ? 'true' : 'false'}}"
+    :disabled-cryptos="{{ disabledBlockchain|json_encode }}"
+    is-horizontal
+    is-trade-page
+    class="mt-4"
+    :tab="activeTab"
+    :trades-disabled="{{ isTokenPage and token.tradesDisabled ? 'true' : 'false'}}"
+    @go-to-trade="goToTrade"
+></quick-trade>
+<trade
+    :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+    :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+    websocket-url="{{ global_websocket_url }}"
+    hash="{{ hash }}"
+    login-url="{{ path('fos_user_security_login') }}"
+    signup-url="{{ path('fos_user_registration_register') }}"
+    :logged-in="{{ loggedIn }}"
+    :is-owner="{{ isOwner }}"
+    :precision="{{ precision }}"
+    :user-id="{{ app.user ? app.user.id : 0 }}"
+    mintme-supply-url="{{ mintme_supply }}"
+    :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+    disabled-services-config="{{ disabledServicesConfig|json_encode }}"
+    :is-user-blocked="{{ app.user.isBlocked|default(false) ? 'true' : 'false'}}"
+    :disabled-cryptos="{{ disabledBlockchain|json_encode }}"
+    minimum-order="{{ global_minimum_order_usd }}"
+    {% if isTokenPage %}
+        :taker-fee="{{ taker_fee }}"
+    {% endif %}
+    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+    :new-markets-enabled="{{ new_markets_enabled ? 'true' : 'false' }}"
+    :trades-disabled="{{ isTokenPage and token.tradesDisabled ? 'true' : 'false'}}"
+    token-name="{{ token.name }}"
+></trade>

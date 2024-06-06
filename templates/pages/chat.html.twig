@@ -5,21 +5,24 @@
     {{ encore_entry_link_tags('pages/chat') }}
 {% endblock %}
 
+{% set currentLocale = app.session.get('_locale') %}
+
 {% block content %}
-    <div id="chat" class="container">
+    <div id="chat">
         <chat-widget
-            class="pt-4"
+            class="mt-5"
             nickname="{{ app.user.profile.nickname }}"
-            :threads="{{ threads | json_encode }}"
+            :threads-prop="{{ threads | json_encode }}"
             :thread-id-prop="{{ threadId }}"
             :d-m-min-amount="{{ dMMinAmount }}"
             user-token-name="{{ app.user.profile.hasTokens ? app.user.profile.firstToken.name : '' }}"
             :token-precision="{{ precision }}"
             websocket-url="{{ global_websocket_url }}"
             user-hash="{{ hash }}"
-        />
+            current-lang="{{ currentLocale }}"
+            :top-holders="{{ topHolders | json_encode }}"
+        ></chat-widget>
     </div>
-<p style="display: none;">Hello World</p>
 {% endblock %}
 
 {% block pagescripts %}

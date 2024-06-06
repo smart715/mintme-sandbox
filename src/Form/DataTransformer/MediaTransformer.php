@@ -4,7 +4,10 @@ namespace App\Form\DataTransformer;
 
 use Sonata\MediaBundle\Form\DataTransformer\ProviderDataTransformer;
 
-/** @codeCoverageIgnore */
+/**
+ * @codeCoverageIgnore
+ * @phpstan-ignore-next-line
+ */
 class MediaTransformer extends ProviderDataTransformer
 {
     protected function getOptions(array $options): array

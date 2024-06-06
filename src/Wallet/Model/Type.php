@@ -5,10 +5,14 @@ namespace App\Wallet\Model;
 use App\Wallet\Model\Exception\TypeException;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class Type
 {
     public const DEPOSIT = 'deposit';
     public const WITHDRAW = 'withdraw';
+
+    // new gateway only
+    public const WITHDRAWAL = 'withdrawal';
 
     /** @var string[] */
     protected static $available = [
@@ -25,6 +29,11 @@ class Type
 
     public static function fromString(string $type): self
     {
+        // new gateway support
+        if (self::WITHDRAWAL === $type) {
+            return new self(self::WITHDRAW);
+        }
+
         if (in_array($type, self::$available)) {
             return new self($type);
         }

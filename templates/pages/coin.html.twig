@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% trans %}page.coin.title{% endtrans %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/coin') }}
+{% endblock %}
+
+{% block content %}
+    <div id="coin">
+        <div class="main-section container py-5 px-0">
+            <div class="row m-0">
+                <div class="col-sm-12 col-xl-6 py-3 mx-auto">
+                    <h1 class="header font-weight-bold m-0">
+                        <span class="d-block">
+                            {% trans %} page.coin.main_section.main_text {% endtrans %}
+                        </span>
+                        <span class="d-block text-primary">
+                            {% trans %} page.coin.main_section.secondary_text {% endtrans %}
+                        </span>
+                    </h1>
+                    <div class="container py-3">
+                        <div class="row">
+                            <div class="col-12 col-md-4 text-center text-xl-left px-0 py-3">
+                                <a
+                                    href="{{ urls['whitePaperUrl'] }}"
+                                    class="px-4 py-2"
+                                >
+                                    {% trans %} page.coin.main_section.button.white_paper {% endtrans %}
+                                </a>
+                            </div>
+                            <div class="col-12 col-md-4 text-center text-xl-left px-0 py-3">
+                                <a
+                                    href="{{ urls['bitcoinTalkUrl'] }}"
+                                    class="px-4 py-2"
+                                >
+                                    {% trans %} page.coin.main_section.button.bitcoin_talk {% endtrans %}
+                                </a>
+                            </div>
+                            <div class="col-12 col-md-4 text-center text-xl-left px-0 py-3">
+                                <a
+                                    href="{{ urls['getWalletUrl'] }}"
+                                    class="px-4 py-2"
+                                >
+                                    {% trans %} page.coin.main_section.button.get_wallet {% endtrans %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6 py-3 text-center">
+                    <img
+                        class="w-100 h-100 coin-processor"
+                        src="{{ asset('build/images/main_coin_processor.svg') }}"
+                        alt="coin-processor"
+                        loading="lazy"
+                    />
+                </div>
+            </div>
+        </div>
+        {{ include('spinners/coin/intro.html.twig') }}
+        <intro></intro>
+        {{ include('spinners/coin/key_facts.html.twig') }}
+        <key-facts></key-facts>
+        <div class="tradable py-5 px-3">
+            <h2 class="section-header tradable-header mb-3 text-center">
+                {% trans %} page.coin.tradable.header {% endtrans %}
+            </h2>
+            <div class="mintme-logo-container p-3 text-center row justify-content-center">
+                <a
+                    href="{{ path('coin', {quote: 'MINTME', base: 'BTC'}) }}"
+                    target="_blank"
+                    class="logo mx-5"
+                >
+                    <img
+                        src="{{ asset('build/images/logo.svg') }}"
+                        alt="mintme-logo"
+                        loading="lazy"
+                    />
+                </a>
+            </div>
+            <h5 class="text-center pt-3 px-3">
+                {% trans %} page.coin.classic_exchange {% endtrans %}
+            </h5>
+            <div class="p-3 container justify-content-around">
+                <div class="row trade-logos justify-content-center">
+                    <div class="col-12 col-sm-6 col-lg-4 p-3 text-center">
+                        <a
+                            href="{{ lbank_link }}"
+                            target="_blank"
+                            class="logo"
+                        >
+                            <img
+                                src="{{ asset('build/images/lbank.png') }}"
+                                alt="lbank-logo"
+                                loading="lazy"
+                            />
+                        </a>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4 p-3 text-center">
+                        <a
+                            href="{{ bitmart_link }}"
+                            target="_blank"
+                            class="logo"
+                        >
+                            <img
+                                src="{{ asset('build/images/bitmart.png') }}"
+                                alt="bitmart-logo"
+                                loading="lazy"
+                            />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="what-are-mintme w-100 py-5">
+            <div class="container">
+                <div class="row mx-0">
+                    <div class="col-12 col-xl-6 text-center">
+                        <img
+                            src="{{ asset('build/images/mintme-coin-laptop.png') }}"
+                            class="mintme-coin-laptop w-100"
+                            alt="mintme-coin-laptop"
+                            loading="lazy"
+                        />
+                    </div>
+                    <div class="col-12 col-xl-6 align-self-center">
+                        <div class="what-are-mintme-text mx-auto">
+                            <h2 class="section-header what-are-mintme-header mb-3 text-left">
+                                {% trans %} page.coin.what_are_mintme.header {% endtrans %}
+                            </h2>
+                            <div class="pb-5 pt-3">
+                                <div>
+                                    <span>
+                                        {% trans %} page.coin.what_are_mintme.text {% endtrans %}
+                                    </span>
+                                </div>
+                                <div class="mt-5">
+                                    <a
+                                        href="{{ mintme_link }}"
+                                        class="btn button-primary mintme-link px-3 py-2"
+                                        target="_blank"
+                                    >
+                                        {% trans %} page.coin.monetization.monetize_yourself {% endtrans %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="monetization w-100 py-5 px-2">
+            <div class="container py-5">
+                <div class="row mx-0">
+                    <div class="col-12 col-xl-6 monetization-text align-self-center mx-auto">
+                        <h2 class="section-header monetization-header mb-3 text-left text-break">
+                            {% trans %} page.coin.monetization.header {% endtrans %}
+                        </h2>
+                        <div class="pb-5 pt-3">
+                            <div>
+                                <span>
+                                    {% trans %} page.coin.monetization.text {% endtrans %}
+                                </span>
+                            </div>
+                            <div class="mt-5">
+                                <a
+                                    href="{{ urls['coinimpUrl'] }}"
+                                    class="btn button-primary coinimp-link px-4 py-2"
+                                >
+                                    {% trans %} page.coin.monetization.visit_coinimp {% endtrans %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-6 mx-auto text-center">
+                        <img
+                            src="{{ asset('build/images/mintme-coin-monetization-illustration.png') }}"
+                            class="mintme-coin-monetization-illustration w-100"
+                            alt="mintme-coin-monetization-illustration"
+                            loading="lazy"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="roadmap w-100 py-5">
+            {{ include('spinners/coin/road_map.html.twig') }}
+            <road-map></road-map>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/coin') }}
+{% endblock %}

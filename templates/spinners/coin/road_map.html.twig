@@ -1,0 +1,24 @@
+<div v-if="false">
+    <h2 class="section-header text-center">
+        {% trans %} page.coin.roadmap.header {% endtrans %}
+    </h2>
+    <div class="container">
+        <div class="row timeline mx-auto">
+            {% for key, value in translations['roadMapCheckPoints'] %}
+                <div class="col-12 my-2 my-md-0 p-0 text-left">
+                    <h5 class="text-primary">
+                        {{ translations['roadMapCheckPoints'][key]['header'] }}
+                    </h5>
+                    <ul>
+                        {{ translations['roadMapCheckPoints'][key]['body'] | raw }}
+                    </ul>
+                </div>
+            {% endfor %}
+            <div class="col-12 my-2 my-md-0 p-0 text-left">
+                <h5 class="text-primary">
+                    {% trans %} page.coin.roadmap.last_part {% endtrans %}
+                </h5>
+            </div>
+        </div>
+    </div>
+</div>

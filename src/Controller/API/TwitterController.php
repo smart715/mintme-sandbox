@@ -3,9 +3,10 @@
 namespace App\Controller\API;
 
 use Abraham\TwitterOAuth\TwitterOAuth;
+use App\Controller\Traits\ViewOnlyTrait;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
-use App\Exception\ApiUnauthorizedException;
+use App\Exception\ApiForbiddenException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -15,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/twitter")
@@ -23,23 +23,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TwitterController extends AbstractFOSRestController
 {
     private TwitterOAuth $twitter;
-    private SessionInterface $session;
+    protected SessionInterface $session;
     private EntityManagerInterface $entityManager;
     private LoggerInterface $logger;
-    private TranslatorInterface $translator;
+
+    use ViewOnlyTrait;
 
     public function __construct(
         TwitterOAuth $twitter,
         SessionInterface $session,
         EntityManagerInterface $entityManager,
-        LoggerInterface $logger,
-        TranslatorInterface $translator
+        LoggerInterface $logger
     ) {
         $this->twitter = $twitter;
         $this->session = $session;
         $this->entityManager = $entityManager;
         $this->logger = $logger;
-        $this->translator = $translator;
     }
 
     /**
@@ -48,8 +47,8 @@ class TwitterController extends AbstractFOSRestController
      */
     public function requestToken(): View
     {
-        if (!$this->getUser()) {
-            throw new ApiUnauthorizedException('Unauthorized');
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
         }
 
         try {
@@ -77,15 +76,14 @@ class TwitterController extends AbstractFOSRestController
      */
     public function callback(Request $request): Response
     {
-        /** @var User|null $user */
-        $user = $this->getUser();
-
-        if (!$user) {
-            throw new ApiUnauthorizedException($this->translator->trans('api.tokens.unathorized'));
-        }
+        $twitterCallbackView = new Response(
+            $this->render('pages/twitter_callback.html.twig'),
+            Response::HTTP_OK,
+            ['Content-Type' => 'text/html']
+        );
 
         if ($request->get('denied', false)) {
-            return $this->render('pages/twitter_callback.html.twig');
+            return $twitterCallbackView;
         }
 
         $oauth_token = $this->session->get('twitter_oauth_token');
@@ -99,13 +97,25 @@ class TwitterController extends AbstractFOSRestController
 
         $response = $this->twitter->oauth("oauth/access_token", ["oauth_verifier" => $request->get('oauth_verifier')]);
 
-        $user->setTwitterAccessToken($response['oauth_token'])
-            ->setTwitterAccessTokenSecret($response['oauth_token_secret']);
+        /** @var User|null $user */
+        $user = $this->getUser();
 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        if ($user) {
+            $user
+                ->setTwitterAccessToken($response['oauth_token'])
+                ->setTwitterAccessTokenSecret($response['oauth_token_secret']);
 
-        return $this->render('pages/twitter_callback.html.twig');
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        } else {
+            $this->session->remove('twitter_oauth_token');
+            $this->session->remove('twitter_oauth_token_secret');
+
+            $this->session->set('twitter_oauth_token', $response['oauth_token']);
+            $this->session->set('twitter_oauth_token_secret', $response['oauth_token_secret']);
+        }
+
+        return $twitterCallbackView;
     }
 
     /**
@@ -113,13 +123,17 @@ class TwitterController extends AbstractFOSRestController
      */
     public function check(): View
     {
+        if ($this->isViewOnly()) {
+            throw new ApiForbiddenException('View only');
+        }
+
         /** @var User|null $user */
         $user = $this->getUser();
 
-        if (!$user) {
-            throw new ApiUnauthorizedException($this->translator->trans('api.tokens.unathorized'));
-        }
+        $isSignedIn = $user
+            ? $user->isSignedInWithTwitter()
+            : $this->session->has('twitter_oauth_token') && $this->session->has('twitter_oauth_token_secret');
 
-        return $this->view(['isSignedInWithTwitter' => $user->isSignedInWithTwitter()]);
+        return $this->view(['isSignedInWithTwitter' => $isSignedIn]);
     }
 }

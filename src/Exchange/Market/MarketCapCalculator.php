@@ -3,6 +3,7 @@
 namespace App\Exchange\Market;
 
 use App\Communications\CryptoRatesFetcherInterface;
+use App\Communications\Exception\FetchException;
 use App\Communications\RestRpcInterface;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
@@ -13,33 +14,29 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class MarketCapCalculator
 {
     /** @var array<string> */
-    private $supplyLinks;
+    private array $supplyLinks;
 
-    /** @var int */
-    private $tokenSupply;
+    private int $tokenSupply;
 
-    /** @var MarketStatusRepository */
-    private $repository;
+    private MarketStatusRepository $repository;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
 
-    /** @var RestRpcInterface */
-    private $rpc;
+    private RestRpcInterface $rpc;
 
-    /** @var FixedExchange */
-    private $exchange;
+    private FixedExchange $exchange;
 
-    /** @var CryptoRatesFetcherInterface */
-    private $cryptoRatesFetcher;
+    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
 
-    /** @var int */
-    private $minimumVolumeForMarketcap;
+    private int $minimumVolumeForMarketcap;
+    
+    private LoggerInterface $logger;
 
     public function __construct(
         array $supplyLinks,
@@ -48,6 +45,7 @@ class MarketCapCalculator
         MoneyWrapperInterface $moneyWrapper,
         RestRpcInterface $rpc,
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
+        LoggerInterface $logger,
         int $minimumVolumeForMarketcap
     ) {
         $this->supplyLinks = $supplyLinks;
@@ -55,37 +53,46 @@ class MarketCapCalculator
         $this->moneyWrapper = $moneyWrapper;
         $this->rpc = $rpc;
 
-        /** @var MarketStatusRepository $newRepository */
         $newRepository = $em->getRepository(MarketStatus::class);
 
         $this->repository = $newRepository;
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
         $this->minimumVolumeForMarketcap = $minimumVolumeForMarketcap;
+        $this->logger = $logger;
     }
 
     public function calculate(string $base = Symbols::BTC): string
     {
         if (Symbols::USD === $base) {
-            # We'll calculate it as if it was BTC, and will convert the final amount to USD. Pretty nice hack, not so obvious, but I liked it
+            # We'll calculate it as if it was BTC, and will convert the final amount to USD.
+            # Pretty nice hack, not so obvious, but I liked it
             $calculatingUSD = Symbols::BTC;
-        } elseif (Symbols::BTC !== $base &&
-            Symbols::WEB !== $base &&
-            Symbols::ETH !== $base &&
-            Symbols::USDC !== $base
-        ) {
-            throw new \DomainException('Parameter $base can only be WEB, BTC, ETH, USDC or USD');
+        } elseif (!in_array($base, [Symbols::BTC, Symbols::WEB, Symbols::ETH, Symbols::USDC, Symbols::CRO, Symbols::AVAX, Symbols::SOL])) {
+            throw new \DomainException('Parameter $base can only be WEB, BTC, ETH, USDC, CRO, AVAX, SOL or USD');
         }
 
         # Calculate MarketCap for WEB/token markets
         $tokenMarketCap = $this->calculateTokenMarketCap();
 
-        # Convert to Base
-        $tokenMarketCap = $this->moneyWrapper->convert(
-            $tokenMarketCap,
-            new Currency($base),
-            $this->getExchange()
-        );
+        try {
+            # Convert to Base
+            $tokenMarketCap = $this->moneyWrapper->convert(
+                $tokenMarketCap,
+                new Currency($base),
+                $this->getExchange()
+            );
+        } catch (\Throwable $exception) {
+            if ($exception instanceof FetchException) {
+                $this->logger->error(
+                    'Set token market cap to zero. FetchException error: ' . $exception->getMessage()
+                );
 
+                $tokenMarketCap = new Money('0', new Currency($base));
+            } else {
+                throw $exception;
+            }
+        }
+        
         # Calculate MarketCap for Base/ExchangeableCryptos
         $marketCap = $this->getExchangeableCryptosMarketCap($calculatingUSD ?? $base);
 

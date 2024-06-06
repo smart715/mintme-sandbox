@@ -3,35 +3,41 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 
-class UserRepository extends EntityRepository
+/**
+ * @extends ServiceEntityRepository<User>
+ * @codeCoverageIgnore
+ */
+class UserRepository extends ServiceEntityRepository
 {
-    /** @codeCoverageIgnore */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, User::class);
+    }
+
     public function findByEmail(string $email): ?User
     {
         return $this->findOneBy(['email' => $email]);
     }
 
-    /** @codeCoverageIgnore */
     public function findByHash(string $hash): ?User
     {
         return $this->findOneBy(['hash' => $hash]);
     }
 
-    /** @codeCoverageIgnore */
     public function findByReferralCode(?string $referralCode): ?User
     {
         return $this->findOneBy([ 'referralCode' => $referralCode ]);
     }
 
-    /** @codeCoverageIgnore */
     public function findReferences(?int $userId): ?array
     {
         return $this->findBy([ 'referencerId' => $userId ]);
     }
 
-    /** @codeCoverageIgnore */
     public function findByDomain(string $domain): array
     {
         return $this->createQueryBuilder('u')
@@ -41,7 +47,6 @@ class UserRepository extends EntityRepository
             ->execute();
     }
 
-    /** @codeCoverageIgnore */
     public function checkExistCanonicalEmail(string $email): bool
     {
         $user = $this->createQueryBuilder('u')

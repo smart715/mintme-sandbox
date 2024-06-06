@@ -1,22 +1,48 @@
-.posts
-  align-items: center
-  display: flex
-  flex-direction: column
-  padding: 10px
-
 .post-title
   font-size: 1.5rem
   color: $dark-white
 
+.post-content-short
+  max-height: 465px
+  overflow: hidden
+  position: relative
+  word-break: break-all
+  &:before
+    content: ''
+    width: 100%
+    height: 100%
+    position: absolute
+    left: 0
+    top: 0
+    pointer-events: none
+  .bbcode-content
+    margin-bottom: 0 !important
+
 .post
-  background-color: $odd-item-color
-  border-color: $post-border-color
-  border-style: solid
-  border-width: 1px
-  margin: 5px auto
-  padding: 7px
-  padding-bottom: 0
-  width: 100%
+  color: $post-content-color
+  word-break: break-word
+
+  .post-icons
+    flex: none
+
+  .avatar-img
+    width: 60px
+    height: 60px
+    min-width: 60px
+
+  .post-author-info
+    display: flex
+    align-items: center
+
+    .author-nickname
+      font-weight: bold
+      margin-right: 4px
+      font-size: 16px
+      display: inline-flex
+      align-items: center
+
+      img
+        margin-right: 4px
 
   button:focus
     outline: 1px dotted
@@ -25,9 +51,17 @@
     @media (min-width: 1200px)
       font-size: 1.8rem
 
-.post-content
-  .bbcode-content
-    margin-bottom: 0 !important
+  .post-badges
+    display: flex
+    justify-content: space-between
+    padding: 8px
+
+    .comments-count-wrp
+      display: flex
+      align-items: center
+
+      svg
+        margin-right: 4px
 
 .post-title:hover
   color: $white
@@ -41,9 +75,6 @@
   .post-title
     font-size: 2.5rem
 
-.post .post-date, .comment .comment-date
-  color:  $grey
-
 .comments
   width: 100%
 
@@ -51,11 +82,44 @@
     min-height: 50px
 
 .comment
-  background-color: #183251
-  border-color: #0e3956
-  border-style: solid
-  border-width: 1px
-  margin: 5px auto
-  padding: 7px
-  padding-bottom: 0
-  width: 100%
+  color:  $grey
+
+  .btn-disabled
+    color: $grey
+    cursor: default
+
+    &:hover
+      color: $grey
+
+  .avatar-img
+    width: 60px
+    height: 60px
+
+  .tips-wrp
+    overflow: hidden
+    position: relative
+
+    .overflow-limiter
+      position: absolute
+      height: 100%
+      width: 10px
+      right: 0px
+      background: linear-gradient(90deg, rgba(0,0,0,0) 0%, $text-color-secondary-dark 100%)
+
+  .comment-date
+    color: $text-color-primary-darker
+
+    &:hover
+      color: $text-color-primary
+
+  .tip-avatar
+    height: 12px
+    width: 12px
+    cursor: pointer
+    border-radius: 50%
+
+.font-size-sm
+  font-size: $font-size-sm
+
+.comment-mb-n
+  margin-bottom: -2px

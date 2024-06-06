@@ -132,7 +132,7 @@ class BlockTokenCommand extends Command
             /** @var User $user */
             $user = $entityToBlock;
             /** @var Token|null $token */
-            $token = $user->getProfile()->getMintmeToken();
+            $token = $user->getProfile()->getFirstToken();
         } else {
             /** @var Token $token */
             $token = $entityToBlock;
@@ -151,36 +151,39 @@ class BlockTokenCommand extends Command
             } else {
                 $token->setIsBlocked(!$unblock);
                 $this->em->persist($token);
+                $entityExecutedMsg = $this->generateEntityExecutedMsg($token, null);
             }
         } elseif ($userOption) {
-            if ($this->isExecuted($token, $user, $unblock, $io, self::OPTION_USER)) {
+            if ($this->isExecuted(null, $user, $unblock, $io, self::OPTION_USER)) {
                 return 1;
             } else {
                 $user->setIsBlocked(!$unblock);
+                $entityExecutedMsg = $this->generateEntityExecutedMsg(null, $user);
             }
-        } else {
-            if ($this->isExecuted(
-                $token,
-                $user,
-                $unblock,
-                $io,
-                $token ? self::OPTION_BOTH : self::OPTION_USER
-            )) {
-                return 1;
-            } else {
-                $user->setIsBlocked(!$unblock);
-
-                if ($token) {
-                    $token->setIsBlocked(!$unblock);
-                    $this->em->persist($token);
+        } elseif ($isEmailProvided) {
+            foreach ($user->getProfile()->getTokens() as $token) {
+                if ($this->isExecuted($token, $user, $unblock, $io, self::OPTION_BOTH)) {
+                    return 1;
                 }
+
+                $token->setIsBlocked(!$unblock);
+                $this->em->persist($token);
             }
+
+            $user->setIsBlocked(!$unblock);
+            $entityExecutedMsg = $this->generateExecutedMsg($user);
+        } elseif ($this->isExecuted($token, $user, $unblock, $io, self::OPTION_TOKEN)) {
+            return 1;
+        } else {
+            $token->setIsBlocked(!$unblock);
+            $this->em->persist($token);
+            $entityExecutedMsg = $this->generateEntityExecutedMsg($token, null);
         }
 
-        $entityExecutedMsg = $this->generateEntityExecutedMsg($token, $userOption ? $user : null);
-
-        if (!$unblock && $token) {
-            $this->cancelOrders($token, $tokenOption, $userOption, $io);
+        if (!$unblock && $user->getProfile()->hasTokens()) {
+            foreach ($user->getProfile()->getTokens() as $token) {
+                $this->cancelOrders($token, $tokenOption, $userOption, $io);
+            }
         }
 
         $this->em->persist($user);
@@ -236,12 +239,12 @@ class BlockTokenCommand extends Command
             $token
         );
 
-        if ((!$userOption && $tokenOption) || (!$userOption && !$tokenOption)) {
+        if (!$userOption) {
             $this->cancelTokenOrders($tokenMarket, Order::SELL_SIDE);
             $this->cancelTokenOrders($tokenMarket, Order::BUY_SIDE);
         }
 
-        if (($userOption && !$tokenOption) || (!$userOption && !$tokenOption)) {
+        if (!$tokenOption) {
             $this->cancelCoinOrders($user, $coinMarkets);
         }
     }
@@ -289,6 +292,19 @@ class BlockTokenCommand extends Command
         if ($user) {
             $optionsTxt[] = 'User '.$user->getUsername();
         }
+
+        return implode(' and ', $optionsTxt);
+    }
+
+    private function generateExecutedMsg(User $user): string
+    {
+        $optionsTxt = [];
+
+        foreach ($user->getProfile()->getTokens() as $token) {
+            $optionsTxt[] = 'Token ' . $token->getName();
+        }
+
+        $optionsTxt[] = 'User ' . $user->getUsername();
 
         return implode(' and ', $optionsTxt);
     }

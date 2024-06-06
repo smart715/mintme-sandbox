@@ -4,6 +4,10 @@
 {% set loggedIn = app.user ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
+{% set tokenAvatarUrl = token is not defined or token.image is null or token.image.url == '/media/default_token.png'
+                        ? asset('build/images/default_token_avatar.svg')
+                        : token.image.url | imagine_filter('avatar_large')
+%}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -17,12 +21,14 @@
             :logged-in="{{ loggedIn }}"
             :is-owner="{{ isOwner }}"
             :token-name="'{{ token.name | default }}'"
+            token-avatar="{{ tokenAvatarUrl }}"
             :user-already-claimed="{{ userAlreadyClaimed }}"
             youtube-client-id="{{ global_youtube_client_id }}"
             current-locale="{{ currentLocale }}"
             :show-airdrop-modal="true"
             profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
-            :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+            :login-recaptcha-sitekey="'{{ google_recaptcha_site_key }}'"
+            :reg-recaptcha-sitekey="'{{ reg_google_recaptcha_site_key }}'"
             :airdrop-campaign-prop="{{ airdrop | json_encode }}"
             referral-code-prop="{{ referralCode }}"
             embeded
@@ -34,13 +40,13 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="https://apis.google.com/js/platform.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script defer src="https://apis.google.com/js/platform.js"></script>
+    <script defer src="https://apis.google.com/js/api.js"></script>
     {% if not app.user %}
         <script defer src="https://www.google.com/recaptcha/api.js"></script>
     {% endif %}
     {{ encore_entry_script_tags('pages/airdrop_embeded') }}
-    <script defer>
+    <script>
         window.fbAsyncInit = () => {
             FB.init({
                 appId: '{{ global_facebook_app_id }}',

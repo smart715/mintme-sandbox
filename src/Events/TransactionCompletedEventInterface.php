@@ -2,10 +2,11 @@
 
 namespace App\Events;
 
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
+use App\Events\Activity\ActivityEventInterface;
 
-interface TransactionCompletedEventInterface extends UserEventInterface
+interface TransactionCompletedEventInterface extends UserEventInterface, ActivityEventInterface
 {
-    public function getTradable(): TradebleInterface;
+    public function getTradable(): TradableInterface;
     public function getAmount(): string;
 }

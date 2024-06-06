@@ -24,8 +24,8 @@ sonata_news:
     # comment options
     comment:
         notification:
-            emails: [ swiftmailer.username ]
-            from: swiftmailer.username
+            emails: [ '%env(MAILER_USER)%' ]
+            from: '%env(MAILER_USER)%'
             template: 'SonataNewsBundle:Mail:comment_notification.txt.twig'
 
 

@@ -1,6 +1,6 @@
 nelmio_api_doc:
     resource: "@NelmioApiDocBundle/Resources/config/routing/swaggerui.xml"
-    prefix: /dev/documentation/v1
+    prefix: /dev/documentation/v2
     options:
         2fa_progress: false
 
@@ -11,12 +11,19 @@ nelmio_security:
 
 fos_user_security:
     resource: "@FOSUserBundle/Resources/config/routing/security.xml"
+    options:
+      expose: true
 
 fos_user_security_login:
     controller: App\Controller\SecurityController:loginAction
     path: /login
     options:
         sitemap: true
+
+fos_user_security_logout:
+    path: /logout
+    options:
+        expose: true
 
 fos_user_change_password:
     resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"
@@ -46,6 +53,12 @@ fos_user_resetting_request:
     path: /resetting/request
     schemes: [https]
 
+fos_user_resetting_check_email:
+    controller: App\Controller\ResettingController:checkEmailAction
+    path: /resetting/check-email
+    schemes: [https]
+    methods: [POST]
+
 2fa_login:
     path: /2fa
     controller: "scheb_two_factor.form_controller::form"
@@ -55,11 +68,15 @@ fos_user_resetting_request:
 
 api_controllers:
     resource: ../src/Controller/API/
-    type: rest
+    type: annotation
 
 sonata_news_home:
-  path: '/news'
-  controller: Sonata\NewsBundle\Action\PostArchiveAction
+  path: '/news/{page}'
+  controller: App\Controller\News\PostArchiveAction
+  defaults:
+    page: 1
+  requirements:
+    page: '\d+'
   options:
     2fa_progress: false
 
@@ -141,12 +158,12 @@ sonata_news_add_comment:
 
 admin:
     resource: '@SonataAdminBundle/Resources/config/routing/sonata_admin.xml'
-    prefix: /admin
+    prefix: /admin-r8bn
 
 _sonata_admin:
     resource: .
     type: sonata_admin
-    prefix: /admin
+    prefix: /admin-r8bn
 
 controllers:
     resource: ../src/Controller/
@@ -161,11 +178,13 @@ media:
     prefix: /media
 
 PrestaSitemapBundle:
-    resource: "@PrestaSitemapBundle/Resources/config/routing.yml"
+    resource: "@PrestaSitemapBundle/config/routing.yml"
     prefix: /
 
 pageNotFound:
     path:  /{path}
+    prefix: /{_locale}
     controller: App\Controller\SecurityController:pageNotFoundAction
     requirements:
         path: .*
+        _locale: '%translation_requirements%'

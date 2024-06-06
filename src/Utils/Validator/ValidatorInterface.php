@@ -4,6 +4,7 @@ namespace App\Utils\Validator;
 
 interface ValidatorInterface
 {
+    /** @throws \Exception */
     public function validate(): bool;
     public function getMessage(): string;
 }

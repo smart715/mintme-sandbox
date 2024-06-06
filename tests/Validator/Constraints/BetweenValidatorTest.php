@@ -2,7 +2,7 @@
 
 namespace App\Tests\Validator\Constraints;
 
-use App\Tests\MockMoneyWrapper;
+use App\Tests\Mocks\MockMoneyWrapper;
 use App\Validator\Constraints\Between;
 use App\Validator\Constraints\BetweenValidator;
 use Money\Currency;

@@ -3,29 +3,36 @@ export default {
         return {
             tableData: null,
             loading: false,
-            _scrollListenerStarted: false,
+            scrollListenerStarted: false,
+            scrollListenerAutoStart: true,
+            perPage: 20,
         };
+    },
+    computed: {
+        showSeeMoreButton: function() {
+            return !this.scrollListenerStarted && this.tableData.length >= this.perPage;
+        },
     },
     methods: {
         updateTableData: function(attach = false) {},
         startScrollListening: function() {
             const table = this.$refs.table;
 
-            if (typeof table === 'undefined') {
+            if ('undefined' === typeof table) {
                 return;
             }
 
-            let tableEl = this.$refs.table.$el;
+            const tableEl = this.$refs.table.$el;
             let tbodyEl;
 
-            if (typeof tableEl !== 'undefined') {
+            if ('undefined' !== typeof tableEl) {
                 tbodyEl = tableEl.tBodies[0];
             } else {
                 tbodyEl = this.$refs.table;
             }
 
             tbodyEl.onscroll = (evt) => {
-                let boundings = evt.target.getBoundingClientRect();
+                const boundings = evt.target.getBoundingClientRect();
 
                 if (evt.target.scrollTop && evt.target.scrollTop + boundings.height >=
                     evt.target.scrollHeight - 1 && !this.loading) {
@@ -35,24 +42,26 @@ export default {
             };
         },
         scrollDown: function() {
-            let parentDiv = this.$refs.table.$el.tBodies[0];
+            const parentDiv = this.$refs.table.$el.tBodies[0];
             parentDiv.scrollTop = parentDiv.scrollHeight;
-            let parentDivFirefox = this.$refs.table.$el.parentElement;
+            const parentDivFirefox = this.$refs.table.$el.parentElement;
             parentDivFirefox.scrollTop = parentDivFirefox.scrollHeight;
         },
         startScrollListeningOnce: function(val) {
-            if (!this._scrollListenerStarted && Array.isArray(val) && val.length) {
+            if (!this.scrollListenerStarted && Array.isArray(val) && val.length) {
                 // Hack to execute code when table actually appears
                 // TODO: get rid of this
                 setTimeout(this.startScrollListening, 500);
-                this._scrollListenerStarted = true;
+                this.scrollListenerStarted = true;
             }
         },
     },
     watch: {
         tableData: {
             handler(val) {
-                this.startScrollListeningOnce(val);
+                if (this.scrollListenerAutoStart) {
+                    this.startScrollListeningOnce(val);
+                }
             },
             deep: true,
         },

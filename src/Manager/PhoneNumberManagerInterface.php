@@ -4,7 +4,7 @@ namespace App\Manager;
 
 use App\Entity\PhoneNumber;
 use App\Entity\Profile;
-use App\Manager\Model\SendCodeDiffModel;
+use libphonenumber\PhoneNumber as LibphonenumberPhoneNumber;
 
 interface PhoneNumberManagerInterface
 {
@@ -14,9 +14,10 @@ interface PhoneNumberManagerInterface
 
     public function findVerifiedPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber;
 
+    /** @return PhoneNumber[] */
+    public function findAllVerified(): array;
+
     public function findByCode(string $code): ?PhoneNumber;
 
-    public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): PhoneNumber;
-
-    public function isPhoneNumberAbleToSendCode(PhoneNumber $phoneNumber): SendCodeDiffModel;
+    public function isPhoneNumberBlacklisted(LibphonenumberPhoneNumber $phoneNumber): bool;
 }

@@ -4,6 +4,7 @@ namespace App\Wallet\Model;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class Address
 {
     /**

@@ -1,20 +1,211 @@
+@import '../variables'
+@import '../mixins'
+
 #chat
-  min-height: 500px
+  min-height: 600px
+
+  .card-fixed-large
+    border-radius: $border-radius-large
+    overflow: hidden
+
+  .card-header
+    font-size: 1.71rem
+    line-height: 2rem
+    background: $bg-primary-darker
+
   .chat-avatar
-    width: 40px
-    height: 40px
+    width: 60px
+    height: 60px
+    background: $bg-avatar-primary
+
+  .contacts-box
+    min-width: 220px !important
+    max-height: 650px
+
+    .contacts-dropdown
+      flex-flow: row
+
+    .contacts-list
+      background: $bg-primary-dark !important
+      width: fit-content
+
+      table tr td
+        padding-right: 0
+
+      .contact-badge
+        border-radius: 50%
+        background-color: $unread-message-icon
+
+        span
+          color: $bg-secondary
+
+      .nickname
+        font-size: 18px
+        line-height: 28px
+        color: $bg-primary-dark
+        overflow: hidden
+        white-space: nowrap
 
   .chat-box
-    .table-responsive
-      min-height: 400px
-    table
-      tr
-        background-color: transparent !important
+    max-height: 650px
 
-  .contact-badge
-    border-radius: 50%
-    width: 15px
-    height: 15px
-    bottom: 0
-    right: 0
-    background-color: red
+    @include media-breakpoint-up(lg)
+      border-left: 1px $bg-primary-light solid
+
+    .card
+      border: 0
+      border-radius: 0
+      background: $bg-secondary
+
+      .card-header
+        font-size: 2.14rem
+        font-weight: 600
+        border: 0
+        border-radius: 0
+
+      .chat-box-medal
+        height: 38px
+        width: auto
+
+      .card-body
+        background-image: url('../../img/dm-messages_bg.svg')
+        background-color: $bg-primary !important
+
+
+        .table-responsive
+          height: inherit
+          max-height: 550px
+
+          .message
+            background-color: $bg-secondary-hover
+            color: $text-color-secondary
+            display: inline-block
+            position: relative
+            font-size: $font-size-sm
+            width: auto
+            max-width: 75%
+            padding: 15px
+
+            &::after
+              $arrowSize: 12px
+              content: ''
+              position: absolute
+              left: 5px
+              bottom: -$arrowSize
+              display: block
+              width: 0
+              height: 0
+              border-left: $arrowSize solid transparent
+              border-right: $arrowSize solid transparent
+              border-top: $arrowSize solid $bg-secondary-hover
+
+          .message-hour
+            font-size: $small-font-size
+            color: $text-color-secondary-semilight
+
+          .message-sended
+            margin-left: auto
+            background-color: $bg-primary-light
+            color: $text-color-primary
+
+            &::after
+              content: ''
+              left: auto
+              right: 5px
+              border-top-color: $bg-primary-light
+
+            .message-hour
+              color: $text-color-secondary-light
+
+            .nickname
+              font-size: 1.28rem
+              color: $bg-primary-dark
+
+      .card-footer
+        background-color: $bg-primary-light
+        color: $text-color-primary !important
+        border-radius: 0 !important
+
+        input
+          border-color: $message-box-border
+          line-height: 1.5rem
+          color: $bg-primary-dark
+          height: auto
+          cursor: url('../../img/input-cursor-black.png'), auto
+
+          &::placeholder
+            color: $white-input-placeholder-color
+
+        .telegram-icon
+          color: $bg-secondary
+
+  table
+    tr
+      font-size: 1rem
+      background-color: transparent !important
+
+.chat-block-menu
+  button
+    background-color: inherit
+    border-color: transparent
+    color: $text-color-secondary-semilight
+
+    &:hover, &:active, &focus, &:visited, &.show
+      background-color: inherit !important
+      border-color: transparent !important
+      color: $primary !important
+
+  .btn-secondary.dropdown-toggle
+    background-color: inherit !important
+    border-color: transparent !important
+
+.chat-block-menu.show
+  background-color: inherit !important
+  border-color: transparent !important
+
+  .btn-secondary.dropdown-toggle
+    color: $primary !important
+
+.contact
+  width: 80%
+
+.contact-nickname
+  flex: 0 0 auto !important
+  color: $text-color-secondary-light !important
+  font-size: $font-size-md
+
+.contact-nickname-selected
+  color: $primary !important
+
+.contact-last-msg
+  font-size: $font-size-sm
+  font-weight: 400
+  color: $text-color-secondary-semilight
+
+.chat-td
+  width: 65px !important
+
+.chat-icons-container
+    display: flex
+    justify-content: space-around
+    align-items: center
+    gap: 1rem
+
+.chat-input
+    background-color: transparent !important
+    color: $text-color-primary !important
+    -webkit-text-fill-color: $text-color-primary !important
+    resize: none !important
+    cursor: auto !important
+    line-height: 1.5rem
+    box-sizing: border-box
+
+.chat-input:focus
+    border: none !important
+
+.pre-line
+    white-space: pre-line
+
+.message-subtitle
+    font-size: map-get($font-scales, sm)
+    color: $messages-subtitle-color

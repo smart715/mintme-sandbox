@@ -1,40 +1,118 @@
 @import '../variables'
+@import '../mixins'
 @import '~aos/dist/aos.css'
+@import '../mixins'
 
 .news
-  .news-box
-    position: relative
-    background-color: $primary
+  background-color: $bg-secondary
+  color: $bg-primary-dark
+  transition: transform 0s
+  border-top-left-radius: $border-radius * 1.25 !important // white pixels fix
+  border-top-right-radius: $border-radius * 1.25 !important
 
-    header
-      h1, h2
-        border-bottom: 2px solid #eee
-        padding-bottom: 5px
+  &:hover
+    outline: $half-border-radius solid $primary
 
-    img
-      max-width: 750px
-      width: 100%
-      display: block
-      margin-left: auto
-      margin-right: auto
+  .news-article-preview a, .container a
+    color: $link-color-highlight
+    @include link-highlight-selection
 
-    &::before,
-    &::after
-      content: ''
-      position: absolute
-      width: 0
-      height: 1px
-      background-color: #c4c4c4
-      transition: all ease 1.2s
+    &:hover
+      color: $bg-primary-dark
 
-    &::before
-      top: -5px
-      left: 0
+  .card-body
+    .container ul
+      margin-top: 4px
+      @include media-breakpoint-up(sm)
+        margin-top: -5px
 
-    &::after
-      right: 0
-      bottom: -5px
+.posts-width-height
+  @include media-breakpoint-up(md)
+    height: 80%
+    width: 80%
 
-    &:hover::before,
-    &:hover::after
-      width: 100%
+  @include media-breakpoint-up(lg)
+    height: $page-news-post-height
+    width: $page-news-post-width
+
+.news-img-area
+  height: 190px !important
+  width: auto
+  overflow: hidden
+  text-align: center
+  border-top-left-radius: $border-radius
+  border-top-right-radius: $border-radius
+
+  .main-image-wrp
+    z-index: 1
+
+    .main-image
+      height: auto
+      width: auto
+      border-top-left-radius: 0px
+      border-top-right-radius: 0px
+      max-width: 100%
+      max-height: 100%
+
+  .blurred-bg-image
+    filter: blur(25px)
+    transform: scale(2)
+
+.news-img-thumbnail
+  height: 100%
+  width: 100%
+  border-top-left-radius: $border-radius
+  border-top-right-radius: $border-radius
+
+.object-fit-cover
+  object-fit: cover
+
+.right-side-img
+  height: 150px
+  width: 100%
+
+.news-title
+  font-weight: 600
+  color: $white
+
+.news-article-title
+  font-weight: 600
+  color: $text-color-secondary-dark
+
+.news-article-date
+  color: $text-color-secondary-dark
+
+.news-article-preview
+  color: $text-color-secondary-semilight
+
+.card-img-top
+  img
+    width: 100% !important
+    max-height: $page-post-image-max-height
+    border-top-left-radius: $border-radius
+    border-top-right-radius: $border-radius
+
+.separator-line
+  background-color: $primary
+  height: 5px
+
+.space-height
+  line-height: 25px
+
+.line-clamp
+  margin: 0
+  overflow: hidden
+  display: -webkit-box
+  -webkit-line-clamp: 3
+  -webkit-box-orient: vertical
+
+  &.news-article-title
+    -webkit-line-clamp: 2
+    height: 45px
+  &.news-article-preview
+    -webkit-line-clamp: 3
+    height: 80px
+
+[data-aos]
+  opacity: 1 !important
+  transform: translate(0) scale(1) !important

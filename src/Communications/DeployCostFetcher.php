@@ -3,75 +3,95 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
+use App\Config\HideFeaturesConfig;
 use App\Exchange\Config\DeployCostConfig;
+use App\Manager\CryptoManagerInterface;
+use App\Security\Config\DisabledServicesConfig;
+use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\CryptoCalculator;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
-use Money\Exchange\FixedExchange;
 use Money\Money;
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
-class DeployCostFetcher implements DeployCostFetcherInterface
+class DeployCostFetcher extends AbstractCostFetcher implements DeployCostFetcherInterface
 {
-    private const CRYPTO_IDS = [
-        Symbols::WEB => 'webchain',
-        Symbols::ETH => 'ethereum',
-        Symbols::BNB => 'binancecoin',
-    ];
-
-    private RestRpcInterface $rpc;
-    private DeployCostConfig $deployCostConfig;
-    private MoneyWrapperInterface $moneyWrapper;
+    private DeployCostConfig $config;
+    private CryptoCalculator $cryptoCalculator;
 
     public function __construct(
+        DeployCostConfig $config,
+        CryptoCalculator $cryptoCalculator,
         RestRpcInterface $rpc,
-        DeployCostConfig $deployCostConfig,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoManagerInterface $cryptoManager,
+        CacheInterface $cache,
+        DisabledServicesConfig $disabledServicesConfig,
+        ExternalServiceIdsMapperInterface $cryptoIdsMapper,
+        HideFeaturesConfig $hideFeaturesConfig,
+        LoggerInterface $logger,
+        RebrandingConverterInterface $rebrandingConverter
     ) {
-        $this->rpc = $rpc;
-        $this->deployCostConfig = $deployCostConfig;
-        $this->moneyWrapper = $moneyWrapper;
+        $this->config = $config;
+        $this->cryptoCalculator = $cryptoCalculator;
+
+        parent::__construct(
+            $rpc,
+            $moneyWrapper,
+            $cache,
+            $cryptoManager,
+            $disabledServicesConfig,
+            $cryptoIdsMapper,
+            $hideFeaturesConfig,
+            $logger,
+            $rebrandingConverter
+        );
     }
 
-    public function getDeployCost(string $symbol): Money
+    public function getCost(string $symbol): Money
     {
-        $ids = implode(',', self::CRYPTO_IDS);
-        $response = $this->rpc->send(
-            "simple/price?ids=${ids}&vs_currencies=usd",
-            Request::METHOD_GET
-        );
+        $prices = $this->fetchPrices();
+        $crypto = $this->cryptoManager->findBySymbol($symbol);
 
-        $response = json_decode($response, true);
-
-        foreach (self::CRYPTO_IDS as $cryptoId) {
-            if (!isset($response[$cryptoId]['usd'])) {
-                throw new FetchException();
-            }
+        if (null === $crypto) {
+            throw new \RuntimeException('Crypto not found');
         }
 
-        return $this->rate($symbol, $response);
+        $cost = $this->rate(
+            (string)$this->config->getDeployCost($crypto->getSymbol()),
+            $crypto->getMoneySymbol(),
+            $prices
+        );
+
+        $fee = $this->moneyWrapper->parse(
+            (string)$this->config->getDeployFee($symbol),
+            $crypto->getMoneySymbol(),
+        );
+
+        return $cost->add($fee);
     }
 
-    public function getDeployCosts(): array
+    public function getCosts(): array
     {
-        $ids = implode(',', self::CRYPTO_IDS);
-        $response = $this->rpc->send(
-            "simple/price?ids=${ids}&vs_currencies=usd",
-            Request::METHOD_GET
-        );
-
-        $response = json_decode($response, true);
-
-        foreach (self::CRYPTO_IDS as $cryptoId) {
-            if (!isset($response[$cryptoId]['usd'])) {
-                throw new FetchException();
-            }
-        }
+        $prices = $this->fetchPrices();
 
         $costs = [];
 
-        foreach (array_keys(self::CRYPTO_IDS) as $symbol) {
-            $costs[$symbol] = $this->rate($symbol, $response);
+        foreach ($this->cryptos as $crypto) {
+            $cost = $this->rate(
+                (string)$this->config->getDeployCost($crypto->getSymbol()),
+                $crypto->getMoneySymbol(),
+                $prices
+            );
+
+            $fee = $this->moneyWrapper->parse(
+                (string)$this->config->getDeployFee($crypto->getSymbol()),
+                $crypto->getMoneySymbol(),
+            );
+
+            $costs[$crypto->getSymbol()] = $cost->add($fee);
         }
 
         return $costs;
@@ -83,26 +103,19 @@ class DeployCostFetcher implements DeployCostFetcherInterface
      */
     public function getDeployCostReferralReward(string $symbol): Money
     {
-        $deployCostReward = $this->deployCostConfig->getDeployCostReward($symbol);
-        $deployWebCost = $this->getDeployCost($symbol);
+        $deployCostRewardMultiplier = $this->config->getDeployCostReward($symbol);
+        $deployCost = $this->getCost($symbol);
 
-        if ($deployCostReward > 0 && $deployWebCost->isPositive()) {
-            return $deployWebCost->multiply($deployCostReward);
+        if ($deployCostRewardMultiplier <= 0 || !$deployCost->isPositive()) {
+            return new Money(0, new Currency(Symbols::WEB));
         }
 
-        return new Money(0, new Currency($symbol));
-    }
+        $deployCostReferralReward = $deployCost->multiply($deployCostRewardMultiplier);
 
-    private function rate(string $symbol, array $response): Money
-    {
-        return $this->moneyWrapper->convert(
-            $this->moneyWrapper->parse((string)$this->deployCostConfig->getDeployCost($symbol), Symbols::USD),
-            new Currency($symbol),
-            new FixedExchange([
-                Symbols::USD => [ $symbol => 1 / $response[self::CRYPTO_IDS[$symbol]]['usd'] ],
-            ])
-        )->add(
-            $this->moneyWrapper->parse((string)$this->deployCostConfig->getDeployFee($symbol), $symbol)
-        );
+        if (Symbols::WEB !== $symbol) {
+            return $this->cryptoCalculator->getMintmeWorth($deployCostReferralReward);
+        }
+
+        return $deployCostReferralReward;
     }
 }

@@ -1,0 +1,16 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ nickname }}!
+
+{% trans with {
+    'profileNickname': profileNickname,
+    'profileUrl': absolute_url(path('profile-view', {'nickname': profileNickname}))
+} %}
+    mail.new_buy_order.msg
+{% endtrans %}
+
+{{ absolute_url(path('token_show', {'name': tokenName, 'crypto': cryptoSymbol | rebranding, 'tab': 'trade' })) }}
+
+{% endblock %}
+

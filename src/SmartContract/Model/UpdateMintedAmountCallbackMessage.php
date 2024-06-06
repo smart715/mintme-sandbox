@@ -5,23 +5,28 @@ namespace App\SmartContract\Model;
 /** @codeCoverageIgnore */
 class UpdateMintedAmountCallbackMessage
 {
-    /** @var string */
-    private $tokenName;
-
-    /** @var string */
-    private $value;
+    private string $tokenName;
+    private string $cryptoSymbol;
+    private string $value;
 
     private function __construct(
         string $tokenName,
+        string $cryptoSymbol,
         string $value
     ) {
         $this->tokenName = $tokenName;
+        $this->cryptoSymbol = $cryptoSymbol;
         $this->value = $value;
     }
 
     public function getTokenName(): string
     {
         return $this->tokenName;
+    }
+
+    public function getCryptoSymbol(): string
+    {
+        return $this->cryptoSymbol;
     }
 
     public function getValue(): string
@@ -33,6 +38,7 @@ class UpdateMintedAmountCallbackMessage
     {
         return new self(
             $data['token'],
+            $data['crypto'],
             $data['value']
         );
     }
@@ -41,6 +47,7 @@ class UpdateMintedAmountCallbackMessage
     {
         return [
             'token' => $this->getTokenName(),
+            'crypto' => $this->getCryptoSymbol(),
             'value' => $this->getValue(),
         ];
     }

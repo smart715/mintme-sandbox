@@ -3,6 +3,10 @@
 
 {% block title %} {% trans %}page.login.title{% endtrans %} | mintMe{% endblock %}
 
+{% block head %}
+    <meta name="robots" content="noindex, follow">
+{% endblock %}
+
 {% block fos_user_content %}
     {{ include('@FOSUser/Security/login_content.html.twig') }}
 {% endblock fos_user_content %}
@@ -10,5 +14,6 @@
 {% block messageContainer %} {% endblock %}
 
 {% block pagescripts %}
+    {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
     {{ encore_entry_script_tags('pages/login') }}
 {% endblock %}

@@ -3,6 +3,7 @@ import VotingOption from '../../js/components/voting/VotingOption';
 import voting from '../../js/storage/modules/voting';
 import Vuex from 'vuex';
 import Vuelidate from 'vuelidate';
+import {MInput} from '../../js/components/UI';
 
 /**
  * @return {VueConstructor}
@@ -50,9 +51,8 @@ function createWrapper(props = {}) {
 
 describe('VotingOption', () => {
     it('should emit update-option on input', () => {
-        let wrapper = createWrapper();
-        const textInput = wrapper.find('input');
-        textInput.setValue('foo');
+        const wrapper = createWrapper();
+        wrapper.findComponent(MInput).vm.$emit('input', 'foo');
         expect(wrapper.emitted('update-option')).toEqual([
             [
                 {
@@ -64,7 +64,7 @@ describe('VotingOption', () => {
     });
 
     it('should validate max length correctly', () => {
-        let wrapper = createWrapper({
+        const wrapper = createWrapper({
             option: {
                 title: 'a'.repeat(33),
             },

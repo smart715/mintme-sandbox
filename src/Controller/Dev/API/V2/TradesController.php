@@ -63,7 +63,7 @@ class TradesController extends AbstractFOSRestController
         $base = $this->rebrandingConverter->reverseConvert($base);
         $quote = $this->rebrandingConverter->reverseConvert($quote);
 
-        $market = $this->marketFinder->find($base, $quote);
+        $market = $this->marketFinder->find($base, $quote, true);
 
         if (!$market || !$this->marketStatusManager->isValid($market)) {
             throw new ApiNotFoundException('Market pair not found');

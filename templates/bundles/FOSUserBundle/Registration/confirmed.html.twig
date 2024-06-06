@@ -3,31 +3,38 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% block messageClass %}d-none{% endblock %}
 
+{% block header %}
+    <meta http-equiv="refresh" content="5; url={{ path('homepage') }}">
+{% endblock %}
+
+{% block pagestyles %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('security_pages') }}
+{% endblock %}
+
 {% block fos_user_content %}
-    <div class="container">
+<div class="container">
         <div class="row pt-4 justify-content-center notification">
             <div class="col-12">
-                <div class="card card-fixed-small mx-auto">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-lg-4">{% trans %}register.confirmed.header{% endtrans %}</div>
-                            <div class="col-lg-8 card-header-description text-lg-right align-self-center">
-                                <span class="align-middle">
-                                    {% trans %}register.confirmed.body{% endtrans %}
-                                </span>
-                            </div>
-                        </div>
+                <div class="card py-3 py-md-5 card-fixed-lg mx-auto">
+                    <div class="d-flex justify-content-center">
+                        <img
+                            src="{{ asset('build/images/circle-check-regular.svg') }}"
+                            class="my-4 paper-plane-img"
+                        />
                     </div>
-                    <div class="card-body py-2 text-center">
-                        <h1 class="title">{{ user.username }}</h1>
-                        <p class="text">{% trans %}register.confirmed.activated{% endtrans %}</p>
-                        <p class="mt-1 pb-0 mb-0">
-                            {% if targetUrl is empty %}
-                                <a href="{{ path('trading') }}" class="link">{% trans from 'messages' %}go_trading{% endtrans %}</a>
-                            {% else %}
-                                <a href="{{ targetUrl }}" class="link">{% trans %}registration.back{% endtrans %}</a>
-                            {% endif %}
-                        </p>
+                    <div class="h1 font-weight-semibold text-center">
+                        {% trans %} register.confirmed.header {% endtrans %}
+                    </div>
+                    <div class="card-body card-body-limited py-2 text-center w-100 m-auto">
+                        <div class="font-size-1 text-primary">{{ user.username }}</div>
+                        <div class="font-size-1">{% trans %}register.confirmed.activated{% endtrans %}</div>
+                        <a
+                            href="{{ path('homepage') }}"
+                            class="btn btn-primary py-3 mt-4 col-12 col-sm-6"
+                        >
+                            {% trans from 'messages' %}go_home{% endtrans %}
+                        </a>
                     </div>
                 </div>
             </div>

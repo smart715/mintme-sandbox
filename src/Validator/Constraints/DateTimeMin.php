@@ -15,6 +15,8 @@ class DateTimeMin extends Constraint
 
     /**
      * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
      */
     public function getRequiredOptions()
     {

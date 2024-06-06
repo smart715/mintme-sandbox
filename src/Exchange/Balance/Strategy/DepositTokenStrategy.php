@@ -2,9 +2,11 @@
 
 namespace App\Exchange\Balance\Strategy;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
+use App\Exception\InvalidTokenDeploy;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Symbols;
@@ -24,23 +26,31 @@ class DepositTokenStrategy implements BalanceStrategyInterface
 
     private CryptoManagerInterface $cryptoManager;
 
+    private Crypto $cryptoDeploy;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         WalletInterface $wallet,
         MoneyWrapperInterface $moneyWrapper,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        Crypto $cryptoDeploy
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->wallet = $wallet;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
+        $this->cryptoDeploy = $cryptoDeploy;
     }
 
-    /** @param Token $tradeble */
-    public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
+    /** @param Token $tradable */
+    public function deposit(User $user, TradableInterface $tradable, string $amount): void
     {
-        $this->withdrawBaseFee($user, $tradeble);
-        $this->depositTokens($user, $tradeble, $amount);
+        if (!$tradable->getDeployByCrypto($this->cryptoDeploy)) {
+            throw new InvalidTokenDeploy();
+        }
+
+        $this->withdrawBaseFee($user, $tradable);
+        $this->depositTokens($user, $tradable, $amount);
     }
 
     private function depositTokens(User $user, Token $token, string $amount): void
@@ -54,7 +64,13 @@ class DepositTokenStrategy implements BalanceStrategyInterface
 
     private function withdrawBaseFee(User $user, Token $token): void
     {
-        $tokenDepositFee = $this->wallet->getDepositInfo($token)->getFee();
+        $tokenDeposit = $this->wallet->getDepositInfo($token, $this->cryptoDeploy);
+
+        if (!$tokenDeposit) {
+            return;
+        }
+
+        $tokenDepositFee = $tokenDeposit->getFee();
 
         if ($tokenDepositFee->isNegative() || $tokenDepositFee->isZero()) {
             return;

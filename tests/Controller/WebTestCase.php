@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\Token\TokenDeploy;
 use App\Entity\User;
 use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,11 +19,9 @@ class WebTestCase extends BaseWebTestCase
     protected const LOCALHOST = 'https://localhost';
     protected const DEFAULT_USER_PASS = 'Foo123456';
 
-    /** @var EntityManagerInterface */
-    protected $em;
+    protected EntityManagerInterface $em;
 
-    /** @var Client */
-    protected $client;
+    protected Client $client;
 
     public function setUp(): void
     {
@@ -76,7 +75,7 @@ class WebTestCase extends BaseWebTestCase
         ]);
 
         /** @var Crypto $crypto */
-        $crypto = new Crypto();
+        $crypto = new Crypto('WEB', 'WEB', 8, 8, 8, true, true, false, '0');
         $crypto->setSymbol($currency);
 
         $balanceHandler->deposit(
@@ -159,9 +158,15 @@ class WebTestCase extends BaseWebTestCase
         $token = $this->em->getRepository(Token::class)->findOneBy([
             'name' => $tokenName,
         ]);
-        $token->setAddress('0x123');
+
+        $deploy = (new TokenDeploy())
+            ->setAddress('0x123')
+            ->setDeployDate(new \DateTimeImmutable());
+
         $token->setDeployed(true);
-        $token->setDeployedDate(new \DateTimeImmutable());
+        $token->addDeploy($deploy);
+        
+        $this->em->persist($deploy);
         $this->em->persist($token);
         $this->em->flush();
     }

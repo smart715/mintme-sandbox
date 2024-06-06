@@ -2,11 +2,15 @@
 
 namespace App\Repository;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserNotificationConfig;
+use App\Utils\NotificationChannels;
+use App\Utils\NotificationTypes;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/** @codeCoverageIgnore */
 class UserNotificationConfigRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -43,5 +47,15 @@ class UserNotificationConfigRepository extends ServiceEntityRepository
             ->setParameter('id', $userNotificationConfigId)
             ->getQuery()
             ->execute();
+    }
+    public function getDisabledUserPostNotificationConfigByToken(User $user, Token $token): array
+    {
+        return $this->findBy([
+            'user' => $user,
+            'type' => NotificationTypes::TOKEN_NEW_POST,
+            'channel' => NotificationChannels::ADVANCED,
+            'token' => $token,
+            'tokenPostEnabled' => false,
+        ]);
     }
 }

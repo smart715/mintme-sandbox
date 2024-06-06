@@ -68,10 +68,10 @@ export default {
                 / 24);
         },
         isEndDate: function() {
-            return ((this.days <= 0) &&
-                    (this.hours <= 0) &&
-                    (this.minutes <=0) &&
-                    (this.seconds <= 0));
+            return ((0 >= this.days) &&
+                    (0 >= this.hours) &&
+                    (0 >=this.minutes) &&
+                    (0 >= this.seconds));
         },
         isDisabled: function() {
             return this.disabled;
@@ -79,10 +79,10 @@ export default {
     },
     filters: {
         twoDigits: function(value) {
-            if (value <= 0) {
+            if (0 >= value) {
                 return '00';
             }
-            if (value.toString().length <= 1) {
+            if (1 >= value.toString().length) {
                 return '0' + String(value);
             }
             return value;

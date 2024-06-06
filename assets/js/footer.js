@@ -1,11 +1,27 @@
 import i18n from './utils/i18n/i18n';
 import LocaleSwitcher from './components/LocaleSwitcher';
-import CurrencyModeSwitcher from './components/CurrencyModeSwitcher';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCookieBite} from '@fortawesome/free-solid-svg-icons';
+import {
+    faDiscord,
+    faRedditAlien,
+    faXTwitter,
+    faTelegramPlane,
+    faFacebookF,
+    faInstagram,
+} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {OpenPageMixin} from './mixins';
 
-library.add(faCookieBite);
+library.add(
+    faCookieBite,
+    faRedditAlien,
+    faXTwitter,
+    faTelegramPlane,
+    faDiscord,
+    faFacebookF,
+    faInstagram,
+);
 
 if (document.getElementById('footer')) {
     new Vue({
@@ -14,7 +30,9 @@ if (document.getElementById('footer')) {
         components: {
             FontAwesomeIcon,
             LocaleSwitcher,
-            CurrencyModeSwitcher,
         },
+        mixins: [
+            OpenPageMixin,
+        ],
     });
 }

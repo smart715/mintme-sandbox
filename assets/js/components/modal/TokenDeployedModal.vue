@@ -6,6 +6,11 @@
             :no-close="false"
         >
             <template v-slot:body>
+                <div class="mb-3">
+                    <h1 class="text-bold">
+                        {{ $t('token.intro.deployed_modal.title') }}
+                    </h1>
+                </div>
                 <div class="overflow-wrap-break-word">
                     <p>
                         {{ $t('token.intro.deployed_modal.paragraph_1.head') }}
@@ -29,40 +34,45 @@
                         <ul>
                             <li>
                                 <a
-                                    href="https://www.mintme.com/kb/Time-for-token-sales-how-can-I-make-a-difference"
+                                    :href="`${url}kb/Time-for-token-sales-how-can-I-make-a-difference`"
                                     target="_blank"
+                                    class="link highlight"
                                 >
                                     {{ $t('token.intro.created_modal.list_1.item_1') }}
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="https://www.mintme.com/kb/Aiming-at-a-strong-token"
+                                    :href="`${url}kb/Aiming-at-a-strong-token`"
                                     target="_blank"
+                                    class="link highlight"
                                 >
                                     {{ $t('token.intro.created_modal.list_1.item_2') }}
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="https://www.mintme.com/kb/Ideas-to-promote-and-sell-your-token"
+                                    :href="`${url}kb/Ideas-to-promote-and-sell-your-token`"
                                     target="_blank"
+                                    class="link highlight"
                                 >
                                     {{ $t('token.intro.created_modal.list_1.item_3') }}
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="https://www.mintme.com/kb/Stuck-not-knowing-what-to-do-next"
+                                    :href="`${url}kb/Stuck-not-knowing-what-to-do-next`"
                                     target="_blank"
+                                    class="link highlight"
                                 >
                                     {{ $t('token.intro.created_modal.list_1.item_4') }}
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="https://www.mintme.com/kb/Talking-to-your-followers-about-MintMe-we-got-some-ideas"
+                                    :href="`${url}kb/Talking-to-your-followers-about-MintMe-we-got-some-ideas`"
                                     target="_blank"
+                                    class="link highlight"
                                 >
                                     {{ $t('token.intro.created_modal.list_1.item_5') }}
                                 </a>
@@ -77,6 +87,7 @@
 
 <script>
 import Modal from './Modal';
+import {mintmeUrl} from '../../utils/constants';
 
 export default {
     name: 'TokenDeployedModal',
@@ -89,6 +100,11 @@ export default {
             default: true,
         },
         tokenName: String,
+    },
+    data() {
+        return {
+            url: mintmeUrl,
+        };
     },
 };
 </script>

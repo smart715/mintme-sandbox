@@ -4,7 +4,7 @@ namespace App\Tests\Command\Blacklist;
 
 use App\Command\Blacklist\SynchronizeTokenBlacklist;
 use App\Communications\CryptoSynchronizerInterface;
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -31,7 +31,7 @@ class SynchronizeTokenBlacklistTest extends KernelTestCase
 
         $output = $commandTester->getDisplay();
 
-        $this->assertContains("Synchronization completed.", $output);
+        $this->assertStringContainsString("Synchronization completed.", $output);
     }
 
     private function mockEm(): EntityManagerInterface

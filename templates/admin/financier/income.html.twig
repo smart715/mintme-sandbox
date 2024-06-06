@@ -1,0 +1,79 @@
+{% extends 'admin/custom_layout.html.twig' %}
+
+{% set label = 'page.finance.income.title' | trans %}
+
+{% block sonata_head_title %}
+    {% spaceless %}
+        {{ label }} | mintMe
+    {% endspaceless %}
+{% endblock %}
+
+{% block logo %}
+    {% spaceless %}
+        <a class="logo" href="{{ path('sonata_admin_dashboard') }}">
+            <img src="{{ asset('build/images/logo.png') }}" alt="imp-logo">
+        </a>
+    {% endspaceless %}
+{% endblock %}
+
+{% block sonata_breadcrumb %}
+    {% include 'admin/financier/breadcrumb.html.twig' with {label: label} %}
+{% endblock sonata_breadcrumb %}
+
+{% block content %}
+    <form class="form-inline" action="{{ path('show_income') }}" method="POST">
+        <div class="form-group">
+            <label for="start_date">{% trans %} mintme.api.finance.start_date {% endtrans %}:</label>
+            <input type="text"  id="start_date" name="start_date" value="{{ startDate }}" required>
+        </div>
+        <div class="form-group">
+            <label for="end_date">{% trans %} mintme.api.finance.end_date {% endtrans %}:</label>
+            <input type="text" id="end_date" name="end_date" value="{{ endDate }}" required>
+        </div>
+        <button type="submit" class="btn btn-default">{% trans %} mintme.api.finance.filter {% endtrans %}</button>
+    </form>
+    <br>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+        <tr class="sonata-ba-list-field-header">
+            <th class="sonata-ba-list-field-header-text">{% trans %}mintme.api.finance.crypto{% endtrans %}</th>
+            <th class="sonata-ba-list-field-header-text">{% trans %}mintme.api.finance.start_date{% endtrans %}</th>
+            <th class="sonata-ba-list-field-header-text">{% trans %}mintme.api.finance.end_date{% endtrans %}</th>
+            <th class="sonata-ba-list-field-header-text">{% trans %}mintme.api.finance.start_amount{% endtrans %}</th>
+            <th class="sonata-ba-list-field-header-text">{% trans %}mintme.api.finance.end_amount{% endtrans %}</th>
+            <th class="sonata-ba-list-field-header-text">{% trans %}mintme.api.finance.income{% endtrans %}</th>
+            <th class="sonata-ba-list-field-header-text">{% trans %}mintme.api.finance.usd_value{% endtrans %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items.incomes %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-text">
+                    {{ item.cryptoSymbol }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ item.startDate }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ item.endDate }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ item.startAmount | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ item.endAmount | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ item.income | toMoney(8) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-actions">
+                    {{ item.usdValue | toMoney(2) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div>
+        {% trans %} mintme.api.finance.total_usd {% endtrans %} {{ items.totalUsd | toMoney(2) }}
+    </div>
+{% endblock %}

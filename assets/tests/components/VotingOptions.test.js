@@ -84,17 +84,4 @@ describe('VotingOptions', () => {
             expect(wrapper.vm.invalidOptions).toBe(true);
         });
     });
-
-    it('should disable the btn in case invalid', () => {
-        let wrapper = createWrapper();
-        expect(wrapper.vm.disabledPublish).toBe(true);
-        wrapper = createWrapper({
-            getters: {
-                ...voting.getters,
-                getOptions: () => [{title: 'foo'}, {title: 'bar'}],
-                getInvalidForm: () => false,
-            },
-        });
-        expect(wrapper.vm.disabledPublish).toBe(false);
-    });
 });

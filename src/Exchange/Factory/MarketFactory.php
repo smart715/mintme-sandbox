@@ -4,8 +4,10 @@ namespace App\Exchange\Factory;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TokenCrypto;
+use App\Entity\TradableInterface;
 use App\Entity\User;
+use App\Exchange\Config\MarketPairsConfig;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -13,21 +15,36 @@ use App\Utils\Symbols;
 
 class MarketFactory implements MarketFactoryInterface
 {
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
+    private MarketPairsConfig $marketPairsConfig;
 
     public function __construct(
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        MarketPairsConfig $marketPairsConfig
     ) {
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->marketPairsConfig = $marketPairsConfig;
     }
 
-    public function create(TradebleInterface $crypto, TradebleInterface $token): Market
+    public function createBySymbols(string $baseSymbol, string $quoteSymbol): Market
+    {
+        $base = $this->cryptoManager->findBySymbol($baseSymbol)
+            ?? $this->tokenManager->findByName($baseSymbol);
+
+        $quote = $this->cryptoManager->findBySymbol($quoteSymbol)
+            ?? $this->tokenManager->findByName($quoteSymbol);
+
+        if (!$base || !$quote) {
+            throw new \Exception("Cryptos or Tokens not found $baseSymbol/$quoteSymbol");
+        }
+
+        return $this->create($base, $quote);
+    }
+
+    public function create(TradableInterface $crypto, TradableInterface $token): Market
     {
         return new Market($crypto, $token);
     }
@@ -56,6 +73,20 @@ class MarketFactory implements MarketFactoryInterface
         );
     }
 
+    /** {@inheritdoc} */
+    public function createTokenMarkets(Token $token): array
+    {
+        $tokenMarkets = [];
+
+        /** @var TokenCrypto $tokenCrypto */
+        foreach ($token->getExchangeCryptos()->toArray() as $tokenCrypto) {
+            $crypto = $tokenCrypto->getCrypto();
+            $tokenMarkets[$crypto->getSymbol()] = $this->create($crypto, $token);
+        }
+
+        return $tokenMarkets;
+    }
+
     /** @return Crypto[] */
     private function getExchangableCryptos(): array
     {
@@ -64,6 +95,7 @@ class MarketFactory implements MarketFactoryInterface
         });
     }
 
+    /** @return Crypto[] */
     private function getTradableCryptos(): array
     {
         return array_filter($this->cryptoManager->findAll(), function (Crypto $crypto) {
@@ -75,27 +107,59 @@ class MarketFactory implements MarketFactoryInterface
     public function getCoinMarkets(): array
     {
         $markets = [];
+        $enabledPairs = $this->marketPairsConfig->getParsedEnabledPairs();
+        $tradableCryptosMap = array_reduce($this->getTradableCryptos(), function ($acc, $crypto) {
+            $acc[$crypto->getSymbol()] = $crypto;
 
-        $bases = $this->getTradableCryptos();
-        $quote = $this->cryptoManager->findBySymbol(Symbols::WEB);
+            return $acc;
+        }, []);
 
-        if (!$quote) {
-            return $markets;
+        foreach ($enabledPairs as $pair) {
+            if (!isset($tradableCryptosMap[$pair['base']], $tradableCryptosMap[$pair['quote']])) {
+                continue;
+            }
+
+            $markets[] = $this->create(
+                $tradableCryptosMap[$pair['base']],
+                $tradableCryptosMap[$pair['quote']]
+            );
         }
 
-        /** @var Crypto $base */
-        foreach ($bases as $base) {
-            if ($base->getSymbol() !== $quote->getSymbol()) {
-                $markets[] = $this->create($base, $quote);
+        return $markets;
+    }
+
+    /** {@inheritdoc} */
+    public function getMintMeCoinMarkets(): array
+    {
+        $markets = [];
+        $enabledPairs = $this->marketPairsConfig->getParsedEnabledPairs();
+        $tradableCryptosMap = array_reduce($this->getTradableCryptos(), static function ($acc, $crypto) {
+            $acc[$crypto->getSymbol()] = $crypto;
+
+            return $acc;
+        }, []);
+
+        foreach ($enabledPairs as $pair) {
+            if (!isset($tradableCryptosMap[$pair['base']], $tradableCryptosMap[$pair['quote']])) {
+                continue;
             }
+
+            if (Symbols::WEB !== $pair['quote'] && Symbols::WEB !== $pair['base']) {
+                continue;
+            }
+
+            $markets[] = $this->create(
+                $tradableCryptosMap[$pair['base']],
+                $tradableCryptosMap[$pair['quote']]
+            );
         }
 
         return $markets;
     }
 
     /**
-     * @param TradebleInterface[] $cryptos
-     * @param TradebleInterface[] $tokens
+     * @param TradableInterface[] $cryptos
+     * @param TradableInterface[] $tokens
      * @return Market[]
      */
     private function getTokenMarkets(array $cryptos, array $tokens): array
@@ -110,11 +174,16 @@ class MarketFactory implements MarketFactoryInterface
 
         /** @var Token $token */
         foreach ($tokens as $token) {
-            if (isset($cryptosBySymbol[$token->getExchangeCryptoSymbol()])) {
-                $markets[] = $this->create(
-                    $cryptosBySymbol[$token->getExchangeCryptoSymbol()],
-                    $token
-                );
+            /** @var TokenCrypto $tokensCrypto */
+            foreach ($token->getExchangeCryptos()->toArray() as $tokensCrypto) {
+                $exchangeSymbol = $tokensCrypto->getCrypto()->getSymbol();
+
+                if (isset($cryptosBySymbol[$exchangeSymbol])) {
+                    $markets[] = $this->create(
+                        $cryptosBySymbol[$exchangeSymbol],
+                        $token
+                    );
+                }
             }
         }
 

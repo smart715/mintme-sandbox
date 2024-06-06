@@ -1,0 +1,65 @@
+<div class="intro w-100 py-5 px-3" v-if="false">
+    <div class="dotted-map container">
+        <div class="row pb-5 mx-0 align-items-center">
+            <div class="col-12 col-xl-6 pt-5 pb-2 pt-xl-0 text-center">
+                <img
+                    class="w-100 mintme-logo"
+                    src="{{ asset('build/images/logo-coin-white-v2.svg') }}"
+                    alt="mintme-logo"
+                    loading="lazy"
+                />
+            </div>
+            <div class="col-12 col-xl-6 pb-5 pt-2 pb-xl-0">
+                <div class="text mx-auto">
+                    <span>
+                        {% trans %} page.coin.intro.main_text {% endtrans %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="numbers container">
+        <div class="row mx-0">
+            <div class="col-12 col-md-6 col-xl-3 py-4 px-2">
+                <div class="number mx-auto">
+                    <span class="text-primary d-block">
+                        0
+                    </span>
+                    <span class="text-uppercase d-block">
+                        {% trans %} page.coin.intro.number.wallets_created {% endtrans %}
+                    </span>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3 py-4 px-2">
+                <div class="number mx-auto">
+                    <span class="text-primary d-block">
+                        0
+                    </span>
+                    <span class="text-uppercase d-block">
+                        {% trans %} page.coin.intro.number.transactions {% endtrans %}
+                    </span>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3 py-4 px-2">
+                <div class="number mx-auto">
+                    <span class="text-primary d-block">
+                        0.00 H
+                    </span>
+                    <span class="text-uppercase d-block">
+                        {% trans %} page.coin.intro.number.current_hashrate {% endtrans %}
+                    </span>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3 py-4 px-2">
+                <div class="number mx-auto">
+                    <span class="text-primary d-block">
+                        0
+                    </span>
+                    <span class="text-uppercase d-block">
+                        {% trans %} page.coin.intro.number.users_mining {% endtrans %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

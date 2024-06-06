@@ -12,12 +12,22 @@ const tableSortPlugin = {
                         return a[key].localeCompare(b[key]);
                     case 'numeric':
                         return Vue.prototype.$numericCompare(a[key], b[key]);
+                    case 'totalcost':
+                        return Vue.prototype.$numericCompareWithSpaces(a[key]['value'], b[key]['value']);
+                    case 'fee':
+                        return Vue.prototype.$numericCompareWithSpaces(a[key]['money'], b[key]['money']);
                 }
             };
         },
         Vue.prototype.$numericCompare = function(a, b) {
             a = parseFloat(a);
             b = parseFloat(b);
+
+            return a < b ? -1 : (a > b ? 1 : 0);
+        },
+        Vue.prototype.$numericCompareWithSpaces = function(a, b) {
+            a = parseFloat(a.replace(/ /g, ''));
+            b = parseFloat(b.replace(/ /g, ''));
 
             return a < b ? -1 : (a > b ? 1 : 0);
         },

@@ -20,18 +20,16 @@ class BalanceFetcherTest extends TestCase
     public function testBalance(): void
     {
         $rpc = $this->mockRpc();
-        $rpc
-            ->expects($this->once())->method('send')->with(
-                'balance.query',
-                [ 1, 'TOK999' ]
-            )
-            ->willReturn($this->mockResponse(false, [
-                'TOK999' => [
-                    'available' => '1000000',
-                    'freeze' => '100',
-                    'referral' => '495',
-                ],
-            ]));
+        $rpc->expects($this->once())->method('send')->with(
+            'balance.query',
+            [ 1, 'TOK999' ]
+        )->willReturn($this->mockResponse(false, [
+            'TOK999' => [
+                'available' => '1000000',
+                'freeze' => '100',
+                'referral' => '495',
+            ],
+        ]));
 
         $handler = new BalanceFetcher(
             $rpc,
@@ -49,6 +47,49 @@ class BalanceFetcherTest extends TestCase
         $this->assertEquals('1000000', $result->getAvailable()->getAmount());
         $this->assertEquals('100', $result->getFreeze()->getAmount());
         $this->assertEquals('495', $result->getReferral()->getAmount());
+    }
+
+    public function testHistory(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc->expects($this->once())->method('send')->with(
+            'balance.history',
+            [ 1, 'TEST', 'TEST', 0, 0, 0, 0]
+        )->willReturn($this->mockResponse(false, [
+            'offset' => 0,
+            'limit' => 0,
+            'records' => [],
+        ]));
+
+        $handler = new BalanceFetcher(
+            $rpc,
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
+        );
+
+        $result = $handler->history(
+            1,
+            'TEST',
+            'TEST',
+            0,
+            0,
+            0,
+            0,
+        );
+
+        $this->assertEquals(
+            [
+                'offset' => 0,
+                'limit' => 0,
+                'records' => [],
+            ],
+            [
+                'offset' => $result->getOffset(),
+                'limit' => $result->getLimit(),
+                'records' => $result->getRecords(),
+            ]
+        );
     }
 
     public function testBalanceWithException(): void
@@ -101,16 +142,14 @@ class BalanceFetcherTest extends TestCase
     public function testTopBalances(): void
     {
         $rpc = $this->mockRpc();
-        $rpc
-            ->expects($this->once())->method('send')->with(
-                'balance.top',
-                [ 'TOK999', 3 ]
-            )
-            ->willReturn($this->mockResponse(false, [
-                [1, 999],
-                [2, 99],
-                [3, 9],
-            ]));
+        $rpc->expects($this->once())->method('send')->with(
+            'balance.top',
+            [ 'TOK999', 3, 0, false ]
+        )->willReturn($this->mockResponse(false, [
+            [1, 999],
+            [2, 99],
+            [3, 9],
+        ]));
 
         $handler = new BalanceFetcher(
             $rpc,
@@ -121,7 +160,8 @@ class BalanceFetcherTest extends TestCase
 
         $result = $handler->topBalances(
             'TOK999',
-            3
+            3,
+            0
         );
 
         $this->assertEquals($result, [
@@ -134,16 +174,14 @@ class BalanceFetcherTest extends TestCase
     public function testTopBalancesWithErrors(): void
     {
         $rpc = $this->mockRpc();
-        $rpc
-            ->expects($this->once())->method('send')->with(
-                'balance.top',
-                [ 'TOK999', 3 ]
-            )
-            ->willReturn($this->mockResponse(true, [
-                [1, 999],
-                [2, 99],
-                [3, 9],
-            ]));
+        $rpc->expects($this->once())->method('send')->with(
+            'balance.top',
+            [ 'TOK999', 3, 0, false]
+        )->willReturn($this->mockResponse(true, [
+            [1, 999],
+            [2, 99],
+            [3, 9],
+        ]));
 
         $handler = new BalanceFetcher(
             $rpc,
@@ -156,26 +194,25 @@ class BalanceFetcherTest extends TestCase
 
         $handler->topBalances(
             'TOK999',
-            3
+            3,
+            0
         );
     }
 
     public function testSummary(): void
     {
         $rpc = $this->mockRpc();
-        $rpc
-            ->expects($this->once())->method('send')->with(
-                'asset.summary',
-                [ 'TOK999' ]
-            )
-            ->willReturn($this->mockResponse(false, [
-                'name' => 'Foo',
-                'total_balance' => '1000000',
-                'available_balance' => 500000,
-                'available_count' => 10,
-                'freeze_balance' => 500000,
-                'freeze_count' => 10,
-            ]));
+        $rpc->expects($this->once())->method('send')->with(
+            'asset.summary',
+            [ 'TOK999' ]
+        )->willReturn($this->mockResponse(false, [
+            'name' => 'Foo',
+            'total_balance' => '1000000',
+            'available_balance' => 500000,
+            'available_count' => 10,
+            'freeze_balance' => 500000,
+            'freeze_count' => 10,
+        ]));
 
         $handler = new BalanceFetcher(
             $rpc,
@@ -212,12 +249,10 @@ class BalanceFetcherTest extends TestCase
     public function testSummaryWithError(): void
     {
         $rpc = $this->mockRpc();
-        $rpc
-            ->expects($this->once())->method('send')->with(
-                'asset.summary',
-                [ 'TOK999' ]
-            )
-            ->willReturn($this->mockResponse(true));
+        $rpc->expects($this->once())->method('send')->with(
+            'asset.summary',
+            [ 'TOK999' ]
+        )->willReturn($this->mockResponse(true));
 
         $handler = new BalanceFetcher(
             $rpc,
@@ -250,11 +285,18 @@ class BalanceFetcherTest extends TestCase
 
     public function testUpdate(): void
     {
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn(false);
+        $jsonResponse->method('getResult')->willReturn([
+            'change' => '-1000000',
+            'status' => 'success',
+        ]);
+
         $rpc = $this->mockRpc();
         $rpc->expects($this->once())->method('send')->with(
             'balance.update',
             [ 11, 'TOK999', 'withdraw', 21, '1000000', [ 'extra' => 1 ] ]
-        );
+        )->willReturn($jsonResponse);
 
         $handler = new BalanceFetcher(
             $rpc,

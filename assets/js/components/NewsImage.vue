@@ -26,7 +26,7 @@ export default {
     },
     watch: {
         query() {
-            if (0 == this.queryNumber) {
+            if (0 === this.queryNumber) {
                 this.loadImage = this.src;
             }
             if ((this.queryNumber) === this.query[0]) {

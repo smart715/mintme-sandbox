@@ -2,56 +2,204 @@
 
 namespace App\Tests\Manager;
 
-use App\Entity\TradebleInterface;
+use App\Entity\Profile;
+use App\Entity\TradableInterface;
+use App\Entity\User;
 use App\Entity\Voting\Voting;
 use App\Manager\VotingManager;
+use App\Repository\CryptoVotingRepository;
+use App\Repository\TokenVotingRepository;
 use App\Repository\VotingRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class VotingManagerTest extends TestCase
 {
+    public function testGetRepository(): void
+    {
+        $votingRepository  = $this->mockVotingRepository();
+        $votingManger = new VotingManager(
+            $votingRepository,
+            $this->mockTokenVotingRepository(),
+            $this->mockCryptoVotingRepository()
+        );
+
+        $this->assertEquals($votingRepository, $votingManger->getRepository());
+    }
+
+    public function testGetById(): void
+    {
+        $votingId = 1;
+
+        $voting = $this->mockVoting();
+
+        $votingRepository = $this->mockVotingRepository();
+        $votingRepository
+            ->expects($this->once())
+            ->method('find')
+            ->with($votingId)
+            ->willReturn($voting);
+
+        $votingManger = new VotingManager(
+            $votingRepository,
+            $this->mockTokenVotingRepository(),
+            $this->mockCryptoVotingRepository()
+        );
+
+        $this->assertEquals($voting, $votingManger->getById($votingId));
+    }
+
+    public function testGetBySlug(): void
+    {
+        $slug = 'some-random-slug';
+
+        $voting = $this->mockVoting();
+
+        $votingRepository = $this->mockVotingRepository();
+        $votingRepository
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with(['slug' => $slug])
+            ->willReturn($voting);
+
+        $votingManger = new VotingManager(
+            $votingRepository,
+            $this->mockTokenVotingRepository(),
+            $this->mockCryptoVotingRepository()
+        );
+
+        $this->assertEquals($voting, $votingManger->getBySlug($slug));
+    }
+
+    public function testGetByOptionId(): void
+    {
+        $optionId = 1;
+
+        $voting = $this->mockVoting();
+
+        $votingRepository = $this->mockVotingRepository();
+        $votingRepository
+            ->expects($this->once())
+            ->method('getByOptionId')
+            ->with($optionId)
+            ->willReturn($voting);
+
+        $votingManger = new VotingManager(
+            $votingRepository,
+            $this->mockTokenVotingRepository(),
+            $this->mockCryptoVotingRepository()
+        );
+
+        $this->assertEquals($voting, $votingManger->getByOptionId($optionId));
+    }
+
     public function testGetByIdForTradableExist(): void
     {
         $slug = 'some-random-slug';
 
-        $tradable = $this->mockTradable([
-            $this->mockVoting($slug),
-        ]);
+        $voting = $this->mockVoting();
+        $voting
+            ->method('getSlug')
+            ->willReturn($slug);
 
-        $vm = new VotingManager($this->mockRepo());
+        $tradable = $this->mockTradable([$voting]);
 
-        $this->assertEquals($vm->getBySlugForTradable($slug, $tradable)->getSlug(), $slug);
+        $votingManger = new VotingManager(
+            $this->mockVotingRepository(),
+            $this->mockTokenVotingRepository(),
+            $this->mockCryptoVotingRepository()
+        );
+
+        $this->assertEquals($slug, $votingManger->getBySlugForTradable($slug, $tradable)->getSlug());
     }
 
     public function testGetByIdForTradableNotExist(): void
     {
-        $tradable = $this->mockTradable([
-            $this->mockVoting('another-ramdom-slug'),
-        ]);
+        $voting = $this->mockVoting();
+        $voting
+            ->method('getSlug')
+            ->willReturn('another-ramdom-slug');
 
-        $vm = new VotingManager($this->mockRepo());
+        $tradable = $this->mockTradable([$voting]);
 
-        $this->assertEquals($vm->getBySlugForTradable('i-am-not-the-same', $tradable), null);
+        $votingManger = new VotingManager(
+            $this->mockVotingRepository(),
+            $this->mockTokenVotingRepository(),
+            $this->mockCryptoVotingRepository()
+        );
+
+        $this->assertNull($votingManger->getBySlugForTradable('i-am-not-the-same', $tradable));
     }
 
-    private function mockVoting(string $slug): Voting
+    public function testGetAllCreatedByUserAndTokenOwner(): void
     {
-        $voting = $this->createMock(Voting::class);
-        $voting->method('getSlug')->willReturn($slug);
+        $blockedUser = $this->mockUser();
+        $user = $this->mockUser();
+        $votingRepository = $this->mockVotingRepository();
+        $votings = [$this->mockVoting()];
 
-        return $voting;
+        $tokenVotingRepository = $this->mockTokenVotingRepository();
+        $tokenVotingRepository
+            ->expects($this->once())
+            ->method('getVotingsByCreatorIdAndProfileId')
+            ->with($user->getId(), $blockedUser->getProfile()->getId())
+            ->willReturn($votings);
+
+        $votingManger = new VotingManager(
+            $votingRepository,
+            $tokenVotingRepository,
+            $this->mockCryptoVotingRepository()
+        );
+
+        $this->assertEquals($votings, $votingManger->getAllCreatedByUserAndTokenOwner($blockedUser, $user));
     }
 
-    private function mockTradable(array $votings): TradebleInterface
+    /** @return MockObject|Voting */
+    private function mockVoting(): Voting
     {
-        $tradable = $this->createMock(TradebleInterface::class);
+        return $this->createMock(Voting::class);
+    }
+
+    private function mockTradable(array $votings): TradableInterface
+    {
+        $tradable = $this->createMock(TradableInterface::class);
         $tradable->method('getVotings')->willReturn($votings);
 
         return $tradable;
     }
 
-    private function mockRepo(): VotingRepository
+    /** @return MockObject|VotingRepository */
+    private function mockVotingRepository(): VotingRepository
     {
         return $this->createMock(VotingRepository::class);
+    }
+
+    private function mockUser(): User
+    {
+        $mock = $this->createMock(User::class);
+        $mock->method('getId')->willReturn(1);
+        $mock->method('getProfile')->willReturn($this->mockProfile(1));
+
+        return $mock;
+    }
+
+    private function mockProfile(int $id): Profile
+    {
+        $mock = $this->createMock(Profile::class);
+        $mock->method('getId')->willReturn($id);
+
+        return $mock;
+    }
+
+    /** @return MockObject|TokenVotingRepository */
+    private function mockTokenVotingRepository(): TokenVotingRepository
+    {
+        return $this->createMock(TokenVotingRepository::class);
+    }
+
+    /** @return MockObject|CryptoVotingRepository */
+    private function mockCryptoVotingRepository(): CryptoVotingRepository
+    {
+        return $this->createMock(CryptoVotingRepository::class);
     }
 }

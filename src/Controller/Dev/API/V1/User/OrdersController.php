@@ -2,61 +2,61 @@
 
 namespace App\Controller\Dev\API\V1\User;
 
+use App\Communications\Exception\FetchException;
 use App\Controller\Dev\API\V1\DevApiController;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Exception\NotDeployedTokenException;
+use App\Exchange\Config\MarketPairsConfig;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\Trade\Config\IgnoreRequestDelay;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Security\DisabledServicesVoter;
+use App\Services\TranslatorService\TranslatorInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\LockFactory;
 use App\Utils\Validator\MarketValidator;
 use App\Utils\Validator\MaxAllowedOrdersValidator;
-use App\Utils\Validator\TradebleDigitsValidator;
+use App\Utils\Validator\TradableDigitsValidator;
+use App\Utils\ValidatorFactoryInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route(path="/dev/api/v1/user/orders")
  */
 class OrdersController extends DevApiController
 {
-    /** @var MarketFactoryInterface */
-    private $marketFactory;
-
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
-    /** @var TraderInterface */
-    private $trader;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
+    private ValidatorFactoryInterface $validatorFactory;
+    private MarketFactoryInterface $marketFactory;
+    private MarketHandlerInterface $marketHandler;
+    private UserActionLogger $userActionLogger;
+    private TraderInterface $trader;
+    private RebrandingConverterInterface $rebrandingConverter;
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
     private TranslatorInterface $translator;
+    private LockFactory $lockFactory;
+    private LoggerInterface $logger;
+    private MarketPairsConfig $marketPairsConfig;
 
     public function __construct(
         MarketFactoryInterface $marketFactory,
@@ -66,7 +66,11 @@ class OrdersController extends DevApiController
         RebrandingConverterInterface $rebrandingConverter,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        TranslatorInterFace $translator
+        TranslatorInterFace $translator,
+        LockFactory $lockFactory,
+        ValidatorFactoryInterface $validatorFactory,
+        LoggerInterface $logger,
+        MarketPairsConfig $marketPairsConfig
     ) {
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
@@ -76,6 +80,10 @@ class OrdersController extends DevApiController
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->translator = $translator;
+        $this->lockFactory = $lockFactory;
+        $this->validatorFactory = $validatorFactory;
+        $this->logger = $logger;
+        $this->marketPairsConfig = $marketPairsConfig;
     }
 
     /**
@@ -226,16 +234,19 @@ class OrdersController extends DevApiController
      * ),
      * @SWG\Response(response="201",description="Returns success message",)
      * @SWG\Response(response="404",description="Market not found")
+     * @SWG\Response(response="403", description="Access denied or Please wait at least some seconds before placing a new order")
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="User Orders")
      */
     public function placeOrder(
+        Request $httpRequest,
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger,
+        IgnoreRequestDelay $ignoreRequestDelay,
         bool $reverseBaseQuote = false
     ): View {
-        $this->denyAccessUnlessGranted('new-trades');
-        $this->denyAccessUnlessGranted('trading');
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::NEW_TRADES);
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::TRADING);
 
         $base = $request->get('base');
         $quote = $request->get('quote');
@@ -252,12 +263,29 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
+        $market = new Market($base, $quote);
+
+        if (!$this->isGranted('all-orders-enabled', $market)) {
+            return $this->view([
+                'message' => $this->translator->trans('token.not_deployed_response'),
+            ], Response::HTTP_OK);
+        }
+
         if (!$base || !$quote
-            || !(new MarketValidator($market = new Market($base, $quote)))->validate()) {
+            || !(new MarketValidator($market))->validate()
+            || ($quote instanceof Crypto
+                && !$this->marketPairsConfig->isMarketPairEnabled($base->getSymbol(), $quote->getSymbol()))
+        ) {
             throw new ApiNotFoundException('Market not found');
         }
 
         $this->denyAccessUnlessGranted('not-blocked', $quote);
+
+        if (!$this->isGranted('trades-enabled', $market)) {
+            return $this->view([
+                'message' => $this->translator->trans('trade.orders.disabled'),
+            ], Response::HTTP_OK);
+        }
 
         if (!$this->isGranted('make-order', $market)
             ||(Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
@@ -270,37 +298,76 @@ class OrdersController extends DevApiController
         /** @var User $user*/
         $user = $this->getUser();
 
-        $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
-        $maxAllowedValidator = new MaxAllowedOrdersValidator(
-            $maxAllowedOrders,
-            $user,
-            $this->marketHandler,
-            $this->marketFactory,
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+        $orderDelay = (int)$this->getParameter('order_delay');
+        $lockOrder = $this->lockFactory->createLock(
+            LockFactory::LOCK_ORDER.$user->getId(),
+            $orderDelay,
+            false
         );
 
-        if (!$maxAllowedValidator->validate()) {
-            throw new ApiBadRequestException($maxAllowedValidator->getMessage());
+        if (!$lock->acquire()) {
+            throw $this->createAccessDeniedException();
         }
 
-        $amount = (string)$request->get('amountInput');
-        $price = (string)$request->get('priceInput');
-
-        if (!($validator = new TradebleDigitsValidator($price, $base))->validate()
-            || !($validator = new TradebleDigitsValidator($amount, $quote))->validate()) {
-            throw new ApiBadRequestException($validator->getMessage());
+        if (!$lockOrder->acquire() && !$ignoreRequestDelay->hasIp($httpRequest->getClientIp())) {
+            return $this->view([
+                'error' => $this->translator->trans('place_order.delay', ['%seconds%' => $orderDelay]),
+            ], Response::HTTP_FORBIDDEN);
         }
 
-        $tradeResult = $exchanger->placeOrder(
-            $user,
-            $market,
-            $amount,
-            $price,
-            filter_var($request->get('marketPrice'), FILTER_VALIDATE_BOOLEAN),
-            Order::SIDE_MAP[$request->get('action')]
-        );
+        try {
+            $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
+            $maxAllowedValidator = new MaxAllowedOrdersValidator(
+                $maxAllowedOrders,
+                $user,
+                $this->marketHandler,
+                $this->marketFactory,
+            );
+
+            if (!$maxAllowedValidator->validate()) {
+                throw new ApiBadRequestException($maxAllowedValidator->getMessage());
+            }
+
+            $amount = (string)$request->get('amountInput');
+            $price = (string)$request->get('priceInput');
+
+            $validators = [
+                $this->validatorFactory->createTradableDigitsValidator($price, $base),
+                $this->validatorFactory->createTradableDigitsValidator($amount, $quote),
+            ];
+
+            foreach ($validators as $validator) {
+                if (!$validator->validate()) {
+                    throw new ApiBadRequestException($validator->getMessage());
+                }
+            }
+
+            $tradeResult = $exchanger->placeOrder(
+                $user,
+                $market,
+                $amount,
+                $price,
+                filter_var($request->get('marketPrice'), FILTER_VALIDATE_BOOLEAN),
+                Order::SIDE_MAP[$request->get('action')]
+            );
+        } catch (\Throwable $exception) {
+            if ($exception instanceof FetchException) {
+                $this->logger->error('Fetch exception (API place_order) : ' . $exception->getMessage());
+
+                return $this->view([
+                    'error' => $this->translator->trans('toasted.error.external'),
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            throw $exception;
+        } finally {
+            $lock->release();
+        }
 
         return $this->view([
             'result' => $tradeResult->getResult(),
+            'orderId' => $tradeResult->getId(),
             'message' => $tradeResult->getMessage(),
         ], Response::HTTP_ACCEPTED);
     }
@@ -312,7 +379,7 @@ class OrdersController extends DevApiController
      * @Rest\Delete("/{id}", requirements={"id"="\d+"})
      * @SWG\Response(response="202", description="Order successfully removed")
      * @SWG\Response(response="400", description="Invalid request")
-     * @SWG\Response(response="403", description="Access denied")
+     * @SWG\Response(response="403", description="Access denied or Please wait at least some seconds before canceling an order")
      * @SWG\Response(response="404", description="Market not found")
      * @Rest\QueryParam(name="base", allowBlank=false, strict=true)
      * @Rest\QueryParam(name="quote", allowBlank=false, strict=true)
@@ -321,10 +388,15 @@ class OrdersController extends DevApiController
      * @SWG\Parameter(name="id", in="path", description="Order identifier", type="integer", required=true)
      * @SWG\Tag(name="User Orders")
      */
-    public function cancelOrder(ParamFetcherInterface $request, int $id, bool $reverseBaseQuote = false): View
-    {
-        $this->denyAccessUnlessGranted('new-trades');
-        $this->denyAccessUnlessGranted('trading');
+    public function cancelOrder(
+        Request $httpRequest,
+        ParamFetcherInterface $request,
+        IgnoreRequestDelay $ignoreRequestDelay,
+        int $id,
+        bool $reverseBaseQuote = false
+    ): View {
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::NEW_TRADES);
+        $this->denyAccessUnlessGranted(DisabledServicesVoter::TRADING);
 
         $base = $request->get('base');
         $quote = $request->get('quote');
@@ -341,35 +413,64 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
+        if ($quote instanceof Token && !$quote->isDeployed()) {
+            throw new NotDeployedTokenException();
+        }
+
         if (!$base || !$quote
-            || !(new MarketValidator($market = new Market($base, $quote)))->validate()) {
+            || !(new MarketValidator($market = new Market($base, $quote)))->validate()
+            || ($quote instanceof Crypto
+                && !$this->marketPairsConfig->isMarketPairEnabled($base->getSymbol(), $quote->getSymbol()))
+        ) {
             throw new ApiNotFoundException('Market not found');
         }
 
         /** @var User $user*/
         $user = $this->getUser();
 
-        if ($quote instanceof Token && $user === $quote->getOwner()) {
-            $this->denyAccessUnlessGranted('not-blocked', $quote);
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$quote->getId());
+        $orderDelay = (int)$this->getParameter('order_delay');
+        $lockOrder = $this->lockFactory->createLock(
+            LockFactory::LOCK_ORDER.$user->getId(),
+            $orderDelay,
+            false
+        );
+
+        if (!$lock->acquire()) {
+            throw $this->createAccessDeniedException();
         }
 
-        $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
-
-        $tradeResult = $this->trader->cancelOrder($order);
-
-        if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
-            throw new ApiBadRequestException('Invalid request');
-        }
-
-        if ($tradeResult->getResult() === $tradeResult::USER_NOT_MATCH) {
-            $this->userActionLogger->info('[API] Access denied for cancel order', ['id' => $order->getId()]);
-
+        if (!$lockOrder->acquire() && !$ignoreRequestDelay->hasIp($httpRequest->getClientIp())) {
             return $this->view([
-                'message' => 'Access denied',
+                'error' => $this->translator->trans('cancel_order.delay', ['%seconds%' => $orderDelay]),
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+        try {
+            if ($quote instanceof Token && $user === $quote->getOwner()) {
+                $this->denyAccessUnlessGranted('not-blocked', $quote);
+            }
+
+            $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
+
+            $tradeResult = $this->trader->cancelOrder($order);
+
+            if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
+                throw new ApiBadRequestException('Invalid request');
+            }
+
+            if ($tradeResult->getResult() === $tradeResult::USER_NOT_MATCH) {
+                $this->userActionLogger->info('[API] Access denied for cancel order', ['id' => $order->getId()]);
+
+                return $this->view([
+                    'message' => 'Access denied',
+                ], Response::HTTP_FORBIDDEN);
+            }
+
+            $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+        } finally {
+            $lock->release();
+        }
 
         return $this->view([
             'message' => 'Order successfully removed',

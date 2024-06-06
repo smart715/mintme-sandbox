@@ -10,8 +10,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class MoneyNormalizer implements NormalizerInterface
 {
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(MoneyWrapperInterface $moneyWrapper)
     {

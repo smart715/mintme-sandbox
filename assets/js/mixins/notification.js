@@ -1,19 +1,24 @@
 export default {
+    data() {
+        return {
+            notifyDuration: 10000,
+        };
+    },
     methods: {
-        notifyError: function(message) {
-            this.sendNotification(message, 'error');
+        notifyError: function(message, duration = this.notifyDuration) {
+            return this.sendNotification(message, 'error', duration);
         },
-        notifyInfo: function(message) {
-            this.sendNotification(message, 'info');
+        notifyInfo: function(message, duration = this.notifyDuration) {
+            return this.sendNotification(message, 'info', duration);
         },
-        notifySuccess: function(message) {
-            this.sendNotification(message, 'success');
+        notifySuccess: function(message, duration = this.notifyDuration) {
+            return this.sendNotification(message, 'success', duration);
         },
-        notifyWarning: function(message) {
-            this.sendNotification(message, 'warning');
+        notifyWarning: function(message, duration = this.notifyDuration) {
+            return this.sendNotification(message, 'warning', duration);
         },
-        sendNotification: function(message, type, duration = 5000) {
-            this.$toasted.show(
+        sendNotification: function(message, type, duration = this.notifyDuration ) {
+            return this.$toasted.show(
                 `<span class="toast-text">${message}</span>`,
                 {
                     type,

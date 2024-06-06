@@ -19,7 +19,6 @@ class ReciprocalLinks
      */
     protected $id;
 
-
     /**
      * @ORM\Column(type="string", nullable=false)
      * @var string
@@ -40,7 +39,7 @@ class ReciprocalLinks
 
     public function getTitle(): string
     {
-        return $this->title ?? '';
+        return $this->title;
     }
 
     public function setTitle(string $title): void
@@ -50,7 +49,7 @@ class ReciprocalLinks
 
     public function getUrl(): string
     {
-        return $this->url ?? '';
+        return $this->url;
     }
 
     public function setUrl(string $url): void

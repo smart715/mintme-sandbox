@@ -19,7 +19,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class UserAdmin extends AbstractAdmin
 {
-    /** @var UserManagerInterface */
+    /**
+     * @var UserManagerInterface
+     * @phpstan-ignore-next-line
+     */
     private $userManager;
 
     protected function configureRoutes(RouteCollection $collection): void
@@ -57,6 +60,8 @@ class UserAdmin extends AbstractAdmin
                     'ADMIN' => 'ROLE_ADMIN',
                     'SUPPORTER' => 'ROLE_SUPPORTER',
                     'COPYWRITER' => 'ROLE_COPYWRITER',
+                    'FINANCIER' => 'ROLE_FINANCIER',
+                    'PROFIT_VIEWER' => 'ROLE_PROFIT_VIEWER',
                     'SUPER_ADMIN' => 'ROLE_SUPER_ADMIN',
                 ],
                 'help' => '<p>Roles description:</p>'
@@ -64,7 +69,9 @@ class UserAdmin extends AbstractAdmin
                     . '<p>ADMIN: It has \'view\' permission only</p>'
                     . '<p>SUPPORTER: It has \'view\' and limited \'edit\' permissions (supporter can edit only user status, not roles; and reset password)</p>'
                     . '<p>SUPER_ADMIN: It has \'view\' and \'edit\' permissions.</p>'
-                    . '<p>COPYWRITER: it has \'view\' and \'edit\' permissions of the Content and Classification panels, it also has \'view\' permissions in the Users Administration panel.</p>',
+                    . '<p>COPYWRITER: it has \'view\' and \'edit\' permissions of the Content and Classification panels, it also has \'view\' permissions in the Users Administration panel.</p>'
+                    . '<p>FINANCIER: It has \'view\' permissions for balance and income</p>'
+                    . '<p>PROFIT_VIEWER: It has \'view\' permissions for profits and losses</p>',
             ]);
         }
     }
@@ -87,6 +94,8 @@ class UserAdmin extends AbstractAdmin
                     'ROLE_SUPPORTER' => 'SUPPORTER',
                     'ROLE_COPYWRITER' => 'COPYWRITER',
                     'ROLE_SUPER_ADMIN' => 'SUPER_ADMIN',
+                    'FINANCIER' => 'ROLE_FINANCIER',
+                    'PROFIT_VIEWER' => 'ROLE_PROFIT_VIEWER',
                 ],
             ])
             ->add('enabled');
@@ -135,10 +144,12 @@ class UserAdmin extends AbstractAdmin
 
     private function setUserManager(UserManagerInterface $userManager): void
     {
+        /** @phpstan-ignore-next-line */
         if (isset($this->userManager)) {
             throw new Exception('UserManager Dependency is already set');
         }
 
+        /** @phpstan-ignore-next-line */
         $this->userManager = $userManager;
     }
 

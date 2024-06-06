@@ -23,8 +23,8 @@ class CurrenciesController extends DevApiController
      * @Rest\Get()
      * @SWG\Response(
      *     response="200",
-     *     description="Returns deployed mintme currencies and eth tokens list",
-     *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Сurrency"))
+     *     description="Returns deployed mintme currencies, eth and bnb tokens list",
+     *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Currency"))
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @Rest\QueryParam(
@@ -67,7 +67,7 @@ class CurrenciesController extends DevApiController
      * @SWG\Response(
      *     response="200",
      *     description="Returns tokens info",
-     *     @SWG\Schema(ref="#/definitions/Сurrency")
+     *     @SWG\Schema(ref="#/definitions/Currency")
      * )
      * @SWG\Response(response="404",description="Currency not found")
      * @SWG\Response(response="400",description="Bad request")

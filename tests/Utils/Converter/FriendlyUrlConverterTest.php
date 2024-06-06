@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 class FriendlyUrlConverterTest extends TestCase
 {
     /**
-     * @var string $fileName
-     * @var string $friendlyUrl
+     * @param string $fileName
+     * @param string $friendlyUrl
      * @dataProvider convertProvider
      */
     public function testConvert(string $fileName, string $friendlyUrl): void

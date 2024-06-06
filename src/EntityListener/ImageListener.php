@@ -5,20 +5,24 @@ namespace App\EntityListener;
 use App\Entity\Image;
 use App\Manager\ImageManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 
 class ImageListener
 {
-    /** @var ImageManagerInterface */
-    private $imageManager;
+    private ImageManagerInterface $imageManager;
+    private CacheManager $imagineCacheManager;
 
     /**
      * ImageListener constructor.
      *
      * @param ImageManagerInterface $imageManager
      */
-    public function __construct(ImageManagerInterface $imageManager)
-    {
+    public function __construct(
+        ImageManagerInterface $imageManager,
+        CacheManager $imagineCacheManager
+    ) {
         $this->imageManager = $imageManager;
+        $this->imagineCacheManager = $imagineCacheManager;
     }
 
     public function postPersist(Image $image, LifecycleEventArgs $args): void
@@ -33,6 +37,7 @@ class ImageListener
 
     public function preRemove(Image $image, LifecycleEventArgs $args): void
     {
+        $this->imagineCacheManager->remove($image->getUrl(), ['avatar_large', 'avatar_middle', 'avatar_small']);
         @unlink($this->imageManager->getFileDir() . DIRECTORY_SEPARATOR . $image->getFileName());
     }
 

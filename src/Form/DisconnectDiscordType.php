@@ -2,12 +2,13 @@
 
 namespace App\Form;
 
+use App\Services\TranslatorService\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
+/** @codeCoverageIgnore */
 class DisconnectDiscordType extends AbstractType
 {
     private TranslatorInterface $translator;

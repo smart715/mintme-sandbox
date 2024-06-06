@@ -31,6 +31,7 @@ security:
                 handlers: [logout_listener]
                 target: logout_success
                 path: fos_user_security_logout
+                invalidate_session: false
                 csrf_token_generator: security.csrf.token_manager
             anonymous: true
             form_login:
@@ -39,7 +40,7 @@ security:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
                 default_target_path: login_success
-                always_use_default_target_path: false
+                always_use_default_target_path: true
             two_factor:
                 provider: fos_userbundle
                 auth_form_path: 2fa_login
@@ -47,8 +48,9 @@ security:
                 default_target_path: login_success
                 always_use_default_target_path: true
                 multi_factor: true
-                csrf_token_generator: security.csrf.token_manager
+                enable_csrf: true
                 authentication_required_handler: two_factor.auth_require_handler
+            switch_user: { provider: fos_userbundle, role: ROLE_ADMIN }
         oauth_token:
             pattern:    ^/oauth/v2/token
             security:   false
@@ -81,6 +83,8 @@ security:
         ROLE_SUPPORTER: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPPORT]
         ROLE_COPYWRITER: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPER, ROLE_COPYWRITER]
+        ROLE_FINANCIER: [ ROLE_ADMIN ]
+        ROLE_PROFIT_VIEWER: [ ROLE_ADMIN ]
 
     access_control:
         - { path: ^(%translation_prefixes%)/dev/api/(v1|v2/auth),                            role: ROLE_API, requires_channel: https }
@@ -90,27 +94,55 @@ security:
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/deploy,                  role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/contract/update,         role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/posts/comments/delete/[0-9]+,                role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/token/promotions,                            role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/users,                                       role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/users/download-tfa-backupcodes,              role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/message,                                     role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/voting/store,                                role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/voting/vote,                                 role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/voting/delete,                               role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+,     role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/rewards,                                     role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/send-phone-verification-code,        role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/send-mail-phone-verification-code,   role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/send-2fa-sms-verification-code,      role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/can-send-phone-code,                 role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/token$,                                          role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/chat,                                            role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/voting/create,                                   role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/profile/phone/verify,                            role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/check-phone-in-use,                  role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/add-phone-number,                    role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/block,                               role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/profile/unblock,                             role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/profile$,                                        role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/settings,                                        role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/wallet,                                          role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/notifications,                               role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/wallet,                                      role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/chat,                                        role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/referral-program,                                role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/post/feed,                                       role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/logout$,                                         roles: [ROLE_USER, IS_AUTHENTICATED_2FA_IN_PROGRESS], requires_channel: https }
         - { path: ^(%translation_prefixes%)/api,                                             role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         - { path: ^(%translation_prefixes%)/dev/api/v2/open,                                 role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         - { path: ^(%translation_prefixes%)/register,                                        role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         - { path: ^(%translation_prefixes%)/resetting,                                       role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         - { path: ^(%translation_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS, requires_channel: https }
-        - { path: ^(%translation_prefixes%)/admin,                                           role: ROLE_ADMIN, requires_channel: https }
-        - { path: ^(%translation_prefixes%)/admin/_trans,                                    role: ROLE_ADMIN, requires_channel: https}
+        - { path: ^(%translation_prefixes%)/admin-r8bn,                                      role: ROLE_ADMIN, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/admin-r8bn/_trans,                               role: ROLE_ADMIN, requires_channel: https}
+        - { path: ^(%translation_prefixes%)/admin-r8bn/finance-balance,                      role: ROLE_FINANCIER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/admin-r8bn/finance-income,                       role: ROLE_FINANCIER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/admin-r8bn/view,                                 role: ROLE_ADMIN, requires_channel: https}
         - { path: ^(%translation_prefixes%)/post/home,                                       role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/settings,                                        role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/settings/update,                                 role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/referral-program,                                role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/settings/2fa,                                    role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/settings/2fa/backupcodes/download,               role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/settings/2fa/backupcodes/generate,               role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/manifest.json,                                   role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/token,                                       role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/posts/recent-posts-and-comments/[0-9]+,      role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/posts/hashtags/search,                       role: ROLE_USER, requires_channel: https }
+

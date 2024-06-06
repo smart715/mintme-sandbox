@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\ScheduledNotification;
+use App\Entity\Token\Token;
 use App\Entity\User;
 
 interface ScheduledNotificationManagerInterface
@@ -11,6 +12,11 @@ interface ScheduledNotificationManagerInterface
     public function createScheduledNotification(
         String $notificationType,
         User $user,
+        bool $flush = true
+    ): ScheduledNotification;
+    public function createScheduledTokenNotification(
+        String $notificationType,
+        Token $token,
         bool $flush = true
     ): ScheduledNotification;
     public function updateScheduledNotification(

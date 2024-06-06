@@ -22,31 +22,31 @@ export default {
     },
     methods: {
         mouseoverHandler: function(fullOrdersList, basePrecision, price) {
-            if (fullOrdersList.lenght === 0 || !price) {
+            if (0 === fullOrdersList.lenght || !price) {
                 return;
             }
 
             let moreCount = 0;
             let tradersArray = [];
-            let tradersIdsArray = [];
-            let orders = JSON.parse(JSON.stringify(fullOrdersList));
+            const tradersIdsArray = [];
+            const orders = JSON.parse(JSON.stringify(fullOrdersList));
 
             orders.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
             orders.forEach((order) => {
-                let makerId = parseInt(order.maker.id);
+                const makerId = parseInt(order.maker.id);
                 if (price === toMoney(order.price, basePrecision) && !tradersIdsArray.includes(makerId)) {
                     tradersIdsArray.push(makerId);
                     tradersArray.push(this.createTraderLinkFromOrder(order));
                 }
             });
 
-            if (tradersArray.length > 5) {
+            if (5 < tradersArray.length) {
                 moreCount = tradersArray.length - 5;
                 tradersArray = tradersArray.slice(0, 5);
             }
 
             let content = tradersArray.join(', ');
-            if (moreCount > 0) {
+            if (0 < moreCount) {
                 content += ' and ' + moreCount + ' more.';
             }
 
@@ -57,7 +57,7 @@ export default {
                 return 'Anonymous';
             }
 
-            let link = this.$routing.generate('profile-view', {
+            const link = this.$routing.generate('profile-view', {
                 nickname: order.maker.profile.nickname,
             });
 

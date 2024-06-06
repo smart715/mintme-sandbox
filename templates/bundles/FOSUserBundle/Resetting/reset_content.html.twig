@@ -3,17 +3,47 @@
 
 {% set formHeader = "resetting.header"|trans %}
 {% block formBody %}
-    {{ form_start(resettingForm, { 'action': path('fos_user_resetting_reset', {'token': token}), 'attr': { 'class': 'fos_user_resetting_reset', 'id': 'reset' } }) }}
+    {{ form_start(
+        resettingForm,
+        {
+            'action': path('fos_user_resetting_reset', {'token': token}),
+            'attr': {
+                'class': 'fos_user_resetting_reset',
+                'id': 'reset'
+            }
+        }
+    )}}
         <div>
-            <passwordmeter :password="password" @toggle-error="toggleError">
-                <span @click="togglePassword()" class="show-password">
-                    <font-awesome-icon icon="eye"></font-awesome-icon>
-                </span>
-                {{ form_row(resettingForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
+            <passwordmeter
+                :password="password"
+                :is-forgot-password="true"
+                token="{{ token }}"
+                @toggle-error="toggleError"
+            >
+                <div class="position-relative">
+                    <span class="show-password" @click="togglePassword()">
+                        <font-awesome-icon icon="eye"></font-awesome-icon>
+                    </span>
+                </div>
+                {{ form_row(resettingForm.plainPassword,
+                    {
+                        'class': 'input-password',
+                        'attr': {
+                            'v-model': 'password',
+                            'autocomplete' : 'new-password',
+                            'loading': true
+                        }
+                    }
+                ) }}
             </passwordmeter>
         </div>
         <div class="form-group text-center">
-            <input type="submit" :disabled="disabled" class="btn btn-primary" value="{{ 'resetting.reset.submit'|trans }}" />
+            <input
+                type="submit"
+                :disabled="disabled"
+                class="btn btn-primary"
+                value="{{ 'resetting.reset.submit'|trans }}"
+            />
         </div>
     {{ form_end(resettingForm) }}
 {% endblock %}

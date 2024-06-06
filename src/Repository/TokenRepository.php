@@ -3,9 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Token>
+ * @codeCoverageIgnore
+ */
 class TokenRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -13,35 +19,35 @@ class TokenRepository extends ServiceEntityRepository
         parent::__construct($registry, Token::class);
     }
 
-    /** @codeCoverageIgnore */
     public function findByName(string $name): ?Token
     {
         return $this->findOneBy(['name' => $name]);
     }
 
-    /** @codeCoverageIgnore */
+    public function findByIdsWithDeploys(array $ids): array
+    {
+        return $this->createQueryBuilder('token')
+            ->where('token.id IN (:ids)')
+            ->leftJoin('token.deploys', 'td')
+            ->addSelect(['td'])
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findByUrl(string $name): ?Token
     {
         return $this->createQueryBuilder('token')
             ->where('REPLACE(token.name, \' \', \'-\' ) = (:name)')
             ->orWhere('REPLACE(token.name, \'-\', \' \' ) = (:name)')
+            ->leftJoin('token.exchangeCryptos', 'ec')
+            ->addSelect(['ec'])
             ->setParameter('name', $name)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
-    /** @codeCoverageIgnore */
-    public function findByAddress(string $address): ?Token
-    {
-        return $this->createQueryBuilder('token')
-            ->where('token.address=:name')
-            ->setParameter(':name', $address)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
     /**
-     * @codeCoverageIgnore
      * @return Token[]
      */
     public function findTokensByPattern(string $pattern): array
@@ -57,15 +63,15 @@ class TokenRepository extends ServiceEntityRepository
     }
 
     /**
-     * @codeCoverageIgnore
      * @return Token[]
      */
     public function getDeployedTokens(?int $offset = null, ?int $limit = null): array
     {
         $query = $this->createQueryBuilder('token')
-            ->leftJoin('token.crypto', 'crypto')
+            ->leftJoin('token.deploys', 'deploys')
             ->where('token.deployed = true')
-            ->orderBy('token.crypto', 'ASC');
+            ->andWhere('token.isBlocked = false')
+            ->orderBy('deploys.crypto', 'ASC');
 
         if (is_int($offset)) {
             $query->setFirstResult($offset);
@@ -80,8 +86,24 @@ class TokenRepository extends ServiceEntityRepository
             ->execute();
     }
 
-    /** @codeCoverageIgnore */
-    public function findAllTokensWithEmptyDescription(int $numberOfReminder = 14): ?array
+    public function getRandomTokens(int $limit): array
+    {
+        return $this->createQueryBuilder('token')
+            ->select('token.name, token.id')
+            ->leftJoin('token.deploys', 'deploys')
+            ->where('token.deployed = true')
+            ->andWhere('token.isBlocked = false')
+            ->andWhere('token.isHidden = false')
+            ->orderBy('RAND()')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Token[]
+     */
+    public function findAllTokensWithEmptyDescription(int $numberOfReminder = 14): array
     {
         $query = $this->createQueryBuilder('t')
             ->select('t, p, u')
@@ -98,7 +120,6 @@ class TokenRepository extends ServiceEntityRepository
     }
 
     /**
-     * @codeCoverageIgnore
      * @return Token[]
      */
     public function getTokensWithoutAirdrops(): array
@@ -112,7 +133,6 @@ class TokenRepository extends ServiceEntityRepository
     }
 
     /**
-     * @codeCoverageIgnore
      * @return Token[]
      */
     public function getTokensWithAirdrops(): array
@@ -123,5 +143,40 @@ class TokenRepository extends ServiceEntityRepository
             ->where('a.id IS NOT NULL')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return Token[]
+     */
+    public function getNotOwnTokens(User $user): array
+    {
+        return $this->createQueryBuilder('token')
+            ->join('token.users', 'u')
+            ->where('token.profile <> :profile')
+            ->andWhere('u.user = :user')
+            ->andWhere('u.isHolder = 1')
+            ->setParameter('user', $user)
+            ->setParameter('profile', $user->getProfile())
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @param int[] $excludedIds
+     */
+    public function findNotDeployedRandomTokenWithExcludedIDs(array $excludedIds): ?Token
+    {
+        if (!$excludedIds) {
+            $excludedIds = [-1]; // should be not empty array in any case
+        }
+
+        return $this->createQueryBuilder('t')
+            ->where('t.id NOT IN (:excludedIds)')
+            ->andWhere('t.deployed = false')
+            ->orderBy('RAND()')
+            ->setMaxResults(1)
+            ->setParameter('excludedIds', $excludedIds)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

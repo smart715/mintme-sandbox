@@ -38,7 +38,7 @@ class ProfileFetcherTest extends TestCase
     }
 
     /**
-     * @var Profile|MockObject $profile
+     * @param Profile|MockObject $profile
      * @return MockObject|ProfileManagerInterface
      */
     private function mockProfileManager(Profile $profile): ProfileManagerInterface
@@ -51,7 +51,7 @@ class ProfileFetcherTest extends TestCase
     }
 
     /**
-     * @var bool $authenticated
+     * @param bool $authenticated
      * @return MockObject|TokenStorageInterface
      */
     private function mockTokenStorage(bool $authenticated): TokenStorageInterface

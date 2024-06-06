@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class ThreadNormalizer implements NormalizerInterface
 {
     private ObjectNormalizer $normalizer;
-
+    private TokenStorageInterface $tokenStorage;
     /** @var mixed|User */
     private $user;
 
@@ -22,11 +22,7 @@ class ThreadNormalizer implements NormalizerInterface
         TokenStorageInterface $tokenStorage
     ) {
         $this->normalizer = $objectNormalizer;
-
-        $token = $tokenStorage->getToken();
-        $this->user =  $token
-            ? $token->getUser()
-            : null;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -36,6 +32,10 @@ class ThreadNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        $token = $this->tokenStorage->getToken();
+        $this->user = $token
+            ? $token->getUser()
+            : null;
         /**
          * @var array $thread
          */
@@ -43,6 +43,8 @@ class ThreadNormalizer implements NormalizerInterface
 
         /** @var Message|null $lastMessage */
         $lastMessage = array_slice($object->getMessages(), -1)[0] ?? null;
+
+        $thread['lastMessage'] = $this->getLastMessageReceived($object->getMessages());
 
         $thread['lastMessageTimestamp'] = $lastMessage
             ? $lastMessage->getCreatedAt()->getTimestamp()
@@ -92,5 +94,26 @@ class ThreadNormalizer implements NormalizerInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param Message[] $messages
+     * @return string
+     */
+    private function getLastMessageReceived(array $messages): string
+    {
+        if (!$this->user instanceof User) {
+            return '';
+        }
+
+        $reverseSortMessages = array_reverse($messages);
+
+        foreach ($reverseSortMessages as $message) {
+            if ($this->user->getId() !== $message->getSender()->getId()) {
+                return $message->getBody();
+            }
+        }
+
+        return '';
     }
 }

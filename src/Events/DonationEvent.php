@@ -2,35 +2,24 @@
 
 namespace App\Events;
 
+use App\Activity\ActivityTypes;
 use App\Entity\Donation;
-use App\Entity\Token\Token;
-use App\Entity\User;
-use Symfony\Contracts\EventDispatcher\Event;
+use App\Events\Activity\UserTokenEventActivity;
 
-class DonationEvent extends Event implements TokenUserEventInterface, DonationEventInterface
+/** @codeCoverageIgnore */
+class DonationEvent extends UserTokenEventActivity implements DonationEventInterface
 {
     protected Donation $donation;
 
     public function __construct(Donation $donation)
     {
         $this->donation = $donation;
+
+        parent::__construct($donation->getDonor(), $donation->getToken(), ActivityTypes::DONATION);
     }
 
     public function getDonation(): Donation
     {
         return $this->donation;
-    }
-
-    public function getToken(): Token
-    {
-        /** @var Token $token */
-        $token = $this->donation->getToken();
-
-        return $token;
-    }
-
-    public function getUser(): User
-    {
-        return $this->donation->getDonor();
     }
 }

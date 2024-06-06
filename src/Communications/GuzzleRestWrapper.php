@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Communications\Factory\HttpClientFactoryInterface;
 use Exception;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -56,6 +57,12 @@ class GuzzleRestWrapper implements RestRpcInterface
             $response = $this->sendRequest($path, $method, $requestParams);
 
             return $response->getBody()->getContents();
+        } catch (ClientException $e) {
+            $this->logger->error(
+                "Error: " . $e->getCode() .". ". $e->getMessage() . " with params: " . json_encode($requestParams)
+            );
+
+            return $e->getResponse()->getBody()->getContents();
         } catch (Throwable $e) {
             $this->logger->error(
                 "Failed to get response from '{}' with method '$method' and params: " .

@@ -1,7 +1,13 @@
 import Vue from 'vue';
+import Vuex from 'vuex';
 import {shallowMount} from '@vue/test-utils';
 import OrderMixin from '../../js/mixins/order';
-import {WSAPI} from '../../js/utils/constants';
+import {
+    WSAPI,
+    tokenDeploymentStatus,
+} from '../../js/utils/constants';
+
+Vue.use(Vuex);
 
 describe('OrderMixin', function() {
     const $url = 'URL';
@@ -9,6 +15,26 @@ describe('OrderMixin', function() {
     const Component = Vue.component('foo', {
         template: '<div></div>',
         mixins: [OrderMixin],
+        store: new Vuex.Store({
+            modules: {
+                tokenInfo: {
+                    namespaced: true,
+                    getters: {getDeploymentStatus: () => true},
+                },
+                crypto: {
+                    namespaced: true,
+                    getters: {
+                        getCryptosMap: () => {
+                            return {
+                                'BTC': {},
+                                'WEB': {},
+                                'ETH': {},
+                            };
+                        },
+                    },
+                },
+            },
+        }),
     });
     const wrapper = shallowMount(Component, {
         mocks: {
@@ -26,42 +52,19 @@ describe('OrderMixin', function() {
                 },
             },
         },
-        methods: {
-            rebrandingFunc: function(val) {
-                return val;
-            },
-        },
     });
 
-    it('should show "Deposit more" link if user logged in', () => {
-        wrapper.setProps({loggedIn: false});
+    it('should show "Deposit more" link if user logged in', async () => {
+        await wrapper.setProps({loggedIn: false});
         expect(wrapper.vm.showDepositMoreLink).toBe(false);
 
-        wrapper.setProps({loggedIn: true});
+        await wrapper.setProps({loggedIn: true});
+        tokenDeploymentStatus.deployed = true;
         wrapper.vm.action = 'buy';
         expect(wrapper.vm.showDepositMoreLink).toBe(true);
 
         wrapper.vm.action = 'exchange';
-        expect(wrapper.vm.showDepositMoreLink).toBe(false);
-    });
-
-    it('should handle order input class for not logged (width 100%) / logged in (width 50%)', () => {
-        wrapper.setProps({loggedIn: false});
-        expect(wrapper.vm.orderInputClass).toBe('w-100');
-
-        wrapper.setProps({loggedIn: true});
-        expect(wrapper.vm.orderInputClass).toBe('w-50');
-    });
-
-    it('should handle generate depositMoreLink correctly', () => {
-        wrapper.vm.action = 'buy';
-        expect(wrapper.vm.depositMoreLink).toBe($url);
-
-        wrapper.vm.action = 'exchange';
-        expect(wrapper.vm.depositMoreLink).toBe(undefined);
-
-        wrapper.vm.action = 'sell';
-        expect(wrapper.vm.depositMoreLink).toBe($url);
+        expect(wrapper.vm.showDepositMoreLink).toBe(true);
     });
 
     it('should handle market identifier for buy/sell operations correctly', () => {

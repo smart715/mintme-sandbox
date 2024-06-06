@@ -4,85 +4,140 @@ namespace App\Tests\Command;
 
 use App\Command\UpdateDisposableEmailDomains;
 use App\Communications\DisposableEmailCommunicatorInterface;
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Manager\BlacklistManagerInterface;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Lock\LockInterface;
 
 class UpdateDisposableEmailDomainsTest extends KernelTestCase
 {
-    public function testExecute(): void
-    {
-        $this->markTestSkipped('Confliction class exists');
-
+    /** @dataProvider executeDataProvider */
+    public function testExecute(
+        bool $isLockAcquired,
+        string $expected,
+        int $statusCode
+    ): void {
         $kernel = self::bootKernel();
-        $app = new Application($kernel);
-        $app->add(new UpdateDisposableEmailDomains(
-            $this->createMock(LoggerInterface::class),
-            $this->mockBlacklistManager(),
-            $this->mockDomainsSynchronizer(),
-            $this->mockEm()
+        $application = new Application($kernel);
+
+        $application ->add(new UpdateDisposableEmailDomains(
+            $this->mockLogger(),
+            $this->mockBlacklistManager($isLockAcquired),
+            $this->mockDisposableEmailCommunicator($isLockAcquired),
+            $this->mockEntityManager($isLockAcquired),
+            $this->mockLockFactory($isLockAcquired)
         ));
 
-        $command = $app->find('app:synchronize-domains');
+        $command = $application->find('app:synchronize-domains');
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        $output = $commandTester->getDisplay();
-
-        $this->assertContains("Synchronization completed.", $output);
+        $this->assertStringContainsString($expected, $commandTester->getDisplay());
+        $this->assertEquals($statusCode, $commandTester->getStatusCode());
     }
 
-    private function mockEm(): EntityManagerInterface
+    public function executeDataProvider(): array
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-
-        $em->expects($this->exactly(2))->method('flush');
-
-        return $em;
+        return  [
+            'if isLockAcquired equal false, return an empty message' => [
+                'isLockAcquired' => false,
+                'expected' => '',
+                'statusCode' => 0,
+            ],
+            'if isLockAcquired equal true, return an expected message' => [
+                'isLockAcquired' => true,
+                'expected' => 'Synchronization completed',
+                'statusCode' => 0,
+            ],
+        ];
     }
 
-    private function mockBlacklistManager(): BlacklistManagerInterface
+    private function mockEntityManager(bool $isLockAcquired): EntityManagerInterface
     {
-        $manager = $this->createMock(BlacklistManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager
+            ->expects($isLockAcquired ? $this->exactly(2) : $this->never())
+            ->method('flush');
 
-        $manager->expects($this->exactly(2))->method('getList')->willReturn([
-            $this->mockBlacklist('foo', 'bar'),
-            $this->mockBlacklist('foo', 'qux'),
-        ]);
-
-        $manager->expects($this->exactly(2))->method('addToBlacklist');
-
-        return $manager;
+        return $entityManager;
     }
 
-    private function mockDomainsSynchronizer(): DisposableEmailCommunicatorInterface
+    private function mockBlacklistManager(bool $isLockAcquired): BlacklistManagerInterface
     {
-        $syn = $this->createMock(DisposableEmailCommunicatorInterface::class);
+        $blacklistManager = $this->createMock(BlacklistManagerInterface::class);
+        $blacklistManager
+            ->expects($isLockAcquired ? $this->exactly(2) : $this->never())
+            ->method('add');
+        $blacklistManager
+            ->expects($isLockAcquired ? $this->exactly(2) : $this->never())
+            ->method('getList')
+            ->willReturn([
+                $this->mockBlacklist('foo', 'bar'),
+                $this->mockBlacklist('foo', 'qux'),
+            ]);
 
-        $syn->expects($this->once())->method('fetchDomainsIndex')->willReturn([
-            $this->mockBlacklist('foo', 'bar'),
-            $this->mockBlacklist('foo', 'baz'),
-        ]);
+        return $blacklistManager;
+    }
 
-        $syn->expects($this->once())->method('fetchDomainsWildcard')->willReturn([
-            $this->mockBlacklist('foo', 'bar'),
-            $this->mockBlacklist('foo', 'baz'),
-        ]);
+    private function mockDisposableEmailCommunicator(
+        bool $isLockAcquired
+    ): DisposableEmailCommunicatorInterface {
+        $disposableEmailCommunicator = $this->createMock(DisposableEmailCommunicatorInterface::class);
+        $disposableEmailCommunicator
+            ->expects($isLockAcquired ? $this->once() : $this->never())
+            ->method('fetchDomainsIndex')
+            ->willReturn(['foo', 'bar']);
+        $disposableEmailCommunicator
+            ->expects($isLockAcquired ? $this->once() : $this->never())
+            ->method('fetchDomainsWildcard')
+            ->willReturn(['foo', 'bar']);
 
-        return $syn;
+        return $disposableEmailCommunicator;
     }
 
     private function mockBlacklist(string $type, string $value): Blacklist
     {
         $blacklist = $this->createMock(Blacklist::class);
-
-        $blacklist->expects($this->once())->method('getType')->willReturn($type);
-        $blacklist->expects($this->once())->method('getValue')->willReturn($value);
+        $blacklist
+            ->method('getType')
+            ->willReturn($type);
+        $blacklist
+            ->method('getValue')
+            ->willReturn($value);
 
         return $blacklist;
+    }
+
+    private function mockLock(bool $isLockAcquired): LockInterface
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock
+            ->method('acquire')
+            ->willReturn($isLockAcquired);
+        $lock
+            ->expects($isLockAcquired ? $this->once() : $this->never())
+            ->method('release');
+
+        return $lock;
+    }
+
+    private function mockLockFactory(bool $isLockAcquired): LockFactory
+    {
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory
+            ->method('createLock')
+            ->willReturn($this->mockLock($isLockAcquired));
+
+        return $lockFactory;
+    }
+
+    private function mockLogger(): LoggerInterface
+    {
+        return $this->createMock(LoggerInterface::class);
     }
 }

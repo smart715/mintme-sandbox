@@ -2,36 +2,39 @@
 
 namespace App\Communications;
 
+use App\Communications\Exception\FetchException;
 use App\Entity\Crypto;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Symbols;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class CryptoRatesFetcher implements CryptoRatesFetcherInterface
 {
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var RestRpcInterface */
-    private $rpc;
+    private CryptoManagerInterface $cryptoManager;
+    private RestRpcInterface $rpc;
+    private ExternalServiceIdsMapperInterface $cryptoIdsMapper;
+    private LoggerInterface $logger;
 
     public function __construct(
         CryptoManagerInterface $cryptoManager,
-        RestRpcInterface $rpc
+        RestRpcInterface $rpc,
+        LoggerInterface $logger,
+        ExternalServiceIdsMapperInterface $cryptoIdsMapper
     ) {
         $this->cryptoManager = $cryptoManager;
         $this->rpc = $rpc;
+        $this->cryptoIdsMapper = $cryptoIdsMapper;
+        $this->logger = $logger;
     }
 
+    /** @inheritDoc */
     public function fetch(): array
     {
         $cryptos = $this->cryptoManager->findAllIndexed('name');
-        $binanceKey = 'binancecoin';
 
-        $names = implode(',', array_map(function (Crypto $crypto) use ($binanceKey) {
-            return Symbols::BNB === $crypto->getSymbol()
-                ? $binanceKey
-                : str_replace(' ', '-', $crypto->getName());
+        $names = implode(',', array_map(function (Crypto $crypto) {
+            return $this->getCryptoId($crypto);
         }, $cryptos));
 
         $symbols = implode(',', array_map(function ($crypto) {
@@ -40,26 +43,41 @@ class CryptoRatesFetcher implements CryptoRatesFetcherInterface
 
         $symbols .= ','.Symbols::USD;
 
-        $response = $this->rpc->send("simple/price?ids={$names}&vs_currencies={$symbols}", Request::METHOD_GET);
+        try {
+            $response = $this->rpc->send("simple/price?ids={$names}&vs_currencies={$symbols}", Request::METHOD_GET);
+            $response = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            /** @var mixed $response */
+            $this->logger->error('Invalid response from API', ['response' => $response ?? null, 'exception' => $e]);
 
-        $response = json_decode($response, true);
+            throw new FetchException('Invalid response from API');
+        }
 
-        $keys = array_map(function ($key) use ($cryptos, $binanceKey) {
-            return 'usd-coin' === $key
-                ? $cryptos['USD Coin']->getSymbol()
-                : ($binanceKey === $key
-                    ? $cryptos['Binance Coin']->getSymbol()
-                    : $cryptos[ucfirst((string)$key)]->getSymbol()
-                );
+        if (array_key_exists('error', $response)) {
+            throw new FetchException($response['error']);
+        }
+
+        $keys = array_map(function ($key) use ($cryptos) {
+            return $this->getCryptoKeyFromId(strval($key), $cryptos);
         }, array_keys($response));
 
         $values = array_map(function ($value) {
             return array_combine(
-                array_map('strtoupper', array_keys($value)),
+                array_map(fn($a) => strtoupper((string)$a), array_keys($value)),
                 array_values($value)
             );
         }, array_values($response));
 
         return array_combine($keys, $values) ?: [];
+    }
+
+    private function getCryptoId(Crypto $crypto): string
+    {
+        return $this->cryptoIdsMapper->getCryptoId($crypto->getSymbol()) ?? str_replace(' ', '-', $crypto->getName());
+    }
+
+    private function getCryptoKeyFromId(string $cryptoId, array $cryptos): string
+    {
+        return $this->cryptoIdsMapper->getSymbolFromId($cryptoId) ?? $cryptos[ucfirst((string)$cryptoId)]->getSymbol();
     }
 }

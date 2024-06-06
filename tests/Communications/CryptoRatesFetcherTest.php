@@ -3,10 +3,14 @@
 namespace App\Tests\Communications;
 
 use App\Communications\CryptoRatesFetcher;
+use App\Communications\ExternalServiceIdsMapperInterface;
+use App\Communications\GeckoCoin\Config\GeckoCoinConfig;
 use App\Communications\RestRpcInterface;
 use App\Entity\Crypto;
 use App\Manager\CryptoManagerInterface;
+use App\Utils\Symbols;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class CryptoRatesFetcherTest extends TestCase
@@ -15,7 +19,9 @@ class CryptoRatesFetcherTest extends TestCase
     {
         $crf = new CryptoRatesFetcher(
             $this->mockCryptoManager(),
-            $this->mockRpc()
+            $this->mockRpc(),
+            $this->mockLogger(),
+            $this->mockIdsMapper()
         );
 
         $expectedResult = [
@@ -56,7 +62,7 @@ class CryptoRatesFetcherTest extends TestCase
     {
         $rpc = $this->createMock(RestRpcInterface::class);
         $rpc->method('send')->with(
-            "simple/price?ids=Webchain,Bitcoin&vs_currencies=WEB,BTC,USD",
+            "simple/price?ids=webchain,Bitcoin&vs_currencies=WEB,BTC,USD",
             Request::METHOD_GET
         )->willReturn(json_encode([
             'webchain' => [
@@ -70,5 +76,20 @@ class CryptoRatesFetcherTest extends TestCase
         ]));
 
         return $rpc;
+    }
+
+    private function mockIdsMapper(): ExternalServiceIdsMapperInterface
+    {
+        return new GeckoCoinConfig([], [
+            Symbols::WEB => 'webchain',
+            Symbols::BNB => 'binancecoin',
+            Symbols::ETH => 'ethereum',
+            Symbols::CRO => 'crypto-com-chain',
+        ]);
+    }
+
+    protected function mockLogger(): LoggerInterface
+    {
+        return $this->createMock(LoggerInterface::class);
     }
 }

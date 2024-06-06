@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\ScheduledNotification;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Repository\ScheduledNotificationRepository;
 use DateTimeImmutable;
@@ -13,6 +14,7 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
     public array $filled_intervals;
     public array $cancelled_intervals;
     public array $token_marketing_tips_intervals;
+    public array $token_promotion_tips_intervals;
     public array $marketing_airdrop_feature;
 
     private EntityManagerInterface $em;
@@ -31,9 +33,36 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
         return $this->scheduledNotificationRepository->findAll();
     }
 
+    public function createScheduledTokenNotification(
+        string $notificationType,
+        Token $token,
+        bool $flush = true
+    ): ScheduledNotification {
+        return $this->performCreateScheduledNotification(
+            $notificationType,
+            $token->getOwner(),
+            $token,
+            $flush,
+        );
+    }
+
     public function createScheduledNotification(
         string $notificationType,
         User $user,
+        bool $flush = true
+    ): ScheduledNotification {
+        return $this->performCreateScheduledNotification(
+            $notificationType,
+            $user,
+            null,
+            $flush,
+        );
+    }
+
+    private function performCreateScheduledNotification(
+        string $notificationType,
+        User $user,
+        ?Token $token = null,
         bool $flush = true
     ): ScheduledNotification {
         $existScheduleNotifications = $this->scheduledNotificationRepository->findBy(['user' => $user->getId()]);
@@ -51,6 +80,10 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
             ->setUser($user)
             ->setDateToBeSend($this->setDate($notificationType))
             ->setTimeInterval((string)$this->{strtolower($notificationType) . '_intervals'}[0]);
+
+        if ($token) {
+            $scheduledNotification->setToken($token);
+        }
 
         if ($flush) {
             $this->em->persist($scheduledNotification);

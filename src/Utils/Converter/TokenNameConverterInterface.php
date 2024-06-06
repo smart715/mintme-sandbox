@@ -2,10 +2,10 @@
 
 namespace App\Utils\Converter;
 
-use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 
 interface TokenNameConverterInterface
 {
-    public function convert(TradebleInterface $tradable): string;
+    public function convert(TradableInterface $tradable): string;
+    public function convertId(int $tokenId): string;
 }

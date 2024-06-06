@@ -15,7 +15,7 @@ class KnowledgeBaseSubcategoryAdmin extends AbstractAdmin
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
 
-    /** @var mixed overriding $datagridValues */
+    /** {@inheritdoc} */
     protected $datagridValues = [
         '_page' => 1,
         '_sort_order' => 'ASC',
@@ -50,6 +50,9 @@ class KnowledgeBaseSubcategoryAdmin extends AbstractAdmin
                 'required' => false,
             ])
             ->add('uaName', TextType::class, [
+                'required' => false,
+            ])
+            ->add('deName', TextType::class, [
                 'required' => false,
             ]);
     }

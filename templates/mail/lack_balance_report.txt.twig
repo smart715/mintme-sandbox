@@ -1,0 +1,35 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% set currencyRebranded = currency | rebranding %}
+{% set blockchainRebranded = blockchain | rebranding %}
+
+A user performed an action but there is insufficient funds in our wallets to process it.
+Please transfer the currencies needed.
+
+User: {{ username }} 
+Email: {{ email }}
+Currency: {{ currencyRebranded }}
+Blockchain: {{ blockchainRebranded }}
+Action: {{ action }}
+Amount: {{ amount }} {{ currencyRebranded }}
+{% if isWMM %}
+    Note: This is Wrapped Mintme (WMM)
+{% endif %}
+
+Currency balance: {{ currencyBalance }} {{ currencyRebranded }}
+Currency amount needed to be transferred: {{ currencyAmount }} {{ currencyRebranded }}
+
+{% if isToken %}
+    To pay fees:
+
+    Blockchain crypto balance: {{ blockchainBalance }} {{ blockchainRebranded }}
+    Blockchain crypto needed to be transferred: {{ blockchainAmount }} {{ blockchainRebranded }}
+{% else %}
+    Note: The blockchain fee is included (always transfer a little more)
+{% endif %}
+
+
+
+{% endblock %}
+

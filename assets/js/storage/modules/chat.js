@@ -6,6 +6,7 @@ const storage = {
         userTokenName: null,
         currentThreadId: 0,
         dMMinAmount: null,
+        rankImg: null,
     },
     getters: {
         getContactName: function(state) {
@@ -23,6 +24,9 @@ const storage = {
         getDMMinAmount: function(state) {
             return state.dMMinAmount;
         },
+        getRankImg: function(state) {
+            return state.rankImg;
+        },
     },
     mutations: {
         setContactName: function(state, n) {
@@ -39,6 +43,9 @@ const storage = {
         },
         setDMMinAmount: function(state, n) {
             state.dMMinAmount = n;
+        },
+        setRankImg: function(state, n) {
+            state.rankImg = n;
         },
     },
 };

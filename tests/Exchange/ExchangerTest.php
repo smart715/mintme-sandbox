@@ -6,7 +6,7 @@ use App\Communications\AMQP\MarketAMQPInterface;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Factory\BalanceView;
@@ -16,21 +16,22 @@ use App\Exchange\Exchanger;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\TokenManagerInterface;
-use App\Tests\MockMoneyWrapper;
+use App\Services\TranslatorService\TranslatorInterface;
+use App\Tests\Mocks\MockMoneyWrapper;
 use App\Utils\Symbols;
 use App\Utils\Validator\ValidatorInterface;
 use App\Utils\ValidatorFactoryInterface;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\MockObject\Matcher\InvokedCount;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExchangerTest extends TestCase
 {
@@ -53,7 +54,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok, null),
             $this->mockValidator(true),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockLimitOrderConfig()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -87,7 +89,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok, null),
             $this->mockValidator(false),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockLimitOrderConfig()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -105,7 +108,6 @@ class ExchangerTest extends TestCase
         self::assertEquals(
             TradeResult::SMALL_AMOUNT,
             $result->getResult(),
-            $result->getMessage()
         );
     }
 
@@ -125,7 +127,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok, null),
             $this->mockValidator(true),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockLimitOrderConfig()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -138,6 +141,40 @@ class ExchangerTest extends TestCase
             '5',
             false,
             Order::SELL_SIDE,
+        );
+
+        $this->assertEquals($tradeResult, $result);
+    }
+
+    public function testExecuteOrder(): void
+    {
+        $user = $this->mockUser();
+        $tok = $this->mockToken(Symbols::TOK, $user);
+        $tradeResult = $this->mockTradeResult();
+        $exchanger = new Exchanger(
+            $this->mockTrader($tradeResult, 'executeOrder'),
+            $this->mockMoneyWrapper(),
+            $this->mockMarketProducer($this->once()),
+            $this->mockBalanceHandler($this->once(), $user, $tok, null),
+            $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
+            $this->mockLogger(),
+            $this->mockParameterBag(),
+            $this->mockMarketHandler([$this->mockOrder(2)], []),
+            $this->mockTokenManager($tok, null),
+            $this->mockValidator(true),
+            $this->mockTranslator(),
+            $this->mockLimitOrderConfig()
+        );
+        $result = $exchanger->executeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '4',
+            1,
+            '1'
         );
 
         $this->assertEquals($tradeResult, $result);
@@ -164,7 +201,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandlerForConsecutiveCalls(),
             $this->mockTokenManager($tok, $this->mockBalanceResult()),
             $this->mockValidator(true),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockLimitOrderConfig()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -200,7 +238,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandlerForConsecutiveCalls(),
             $this->mockTokenManager($tok, $this->mockBalanceResult()),
             $this->mockValidator(false),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockLimitOrderConfig()
         );
 
         $trader->expects($this->never())->method('placeOrder');
@@ -240,7 +279,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandlerForConsecutiveCalls(),
             $this->mockTokenManager($tok, $this->mockBalanceResult()),
             $this->mockValidator(true),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockLimitOrderConfig()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -262,7 +302,10 @@ class ExchangerTest extends TestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->method('validate')->willReturn($res);
         $validatorFactory = $this->createMock(ValidatorFactoryInterface::class);
-        $validatorFactory->method('createOrderValidator')->willReturn($validator);
+        $validatorFactory->method('createMinTradableValidator')->willReturn($validator);
+        $validatorFactory->method('createMinAmountValidator')->willReturn($validator);
+        $validatorFactory->method('createMinUsdValidator')->willReturn($validator);
+        $validatorFactory->method('createOrderMinUsdValidator')->willReturn($validator);
 
         return $validatorFactory;
     }
@@ -275,10 +318,10 @@ class ExchangerTest extends TestCase
     /**
      * @return TraderInterface|MockObject
      */
-    private function mockTrader(TradeResult $result): TraderInterface
+    private function mockTrader(TradeResult $result, string $method = 'placeOrder'): TraderInterface
     {
         $trader = $this->createMock(TraderInterface::class);
-        $trader->method('placeOrder')->willReturn($result);
+        $trader->method($method)->willReturn($result);
 
         return $trader;
     }
@@ -414,7 +457,7 @@ class ExchangerTest extends TestCase
         return $this->createMock(User::class);
     }
 
-    private function mockMarket(TradebleInterface $base, TradebleInterface $quote, bool $isTokMarket): Market
+    private function mockMarket(TradableInterface $base, TradableInterface $quote, bool $isTokMarket): Market
     {
         $market = $this->createMock(Market::class);
         $market->method('getBase')->willReturn($base);
@@ -453,5 +496,15 @@ class ExchangerTest extends TestCase
         ], []);
 
         return $mh;
+    }
+
+    private function mockLimitOrderConfig(): LimitOrderConfig
+    {
+        $config = $this->createMock(LimitOrderConfig::class);
+        $config
+            ->method('getFeeRateByMarket')
+            ->willReturn('0.02');
+
+        return $config;
     }
 }

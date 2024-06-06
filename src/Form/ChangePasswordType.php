@@ -2,14 +2,14 @@
 
 namespace App\Form;
 
+use App\Services\TranslatorService\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class ChangePasswordType extends AbstractType
 {
     /** @var TranslatorInterface */
@@ -33,7 +33,7 @@ class ChangePasswordType extends AbstractType
         $builder
             ->remove('plainPassword')
             ->add('current_password', PasswordType::class, [
-                'label' => false,
+                'label' => $this->translator->trans('form.change_password.current_password'),
                 'translation_domain' => 'FOSUserBundle',
                 'mapped' => false,
                 'constraints' => [

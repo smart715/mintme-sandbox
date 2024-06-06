@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Config;
 
+use App\Exchange\Market;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Money;
@@ -11,73 +12,73 @@ class QuickTradeConfig
 {
     /** @var array<int|float> */
     private array $params;
+    private array $minAmounts;
     private MoneyWrapperInterface $moneyWrapper;
 
-    public function __construct(array $params, MoneyWrapperInterface $moneyWrapper)
-    {
+    public function __construct(
+        array $params,
+        array $minAmounts,
+        MoneyWrapperInterface $moneyWrapper
+    ) {
         $this->params = $params;
+        $this->minAmounts = $minAmounts;
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function getDonationFee(): string
+    public function getBuyFeeByMarket(Market $market): string
     {
-        $fee = $this->params['donation_fee'] ?? 0;
+        if ($market->isTokenMarket()) {
+            return $this->getBuyTokenFee();
+        }
 
-        return (string)$fee;
+        return $this->getBuyCryptoFee();
     }
 
-    public function getSellFee(): string
+    public function getSellFeeByMarket(Market $market): string
     {
-        $fee = $this->params['sell_fee'] ?? 0;
+        if ($market->isTokenMarket()) {
+            return $this->getSellTokenFee();
+        }
 
-        return (string)$fee;
+        return $this->getSellCryptoFee();
     }
 
-    public function getMinBtcAmount(): Money
+    public function getBuyTokenFee(): string
+    {
+        return (string)$this->getBuyFees()['token'];
+    }
+
+    public function getBuyCryptoFee(): string
+    {
+        return (string)$this->getBuyFees()['coin'];
+    }
+
+    public function getSellTokenFee(): string
+    {
+        return (string)$this->getSellFees()['token'];
+    }
+
+    public function getSellCryptoFee(): string
+    {
+        return (string)$this->getSellFees()['coin'];
+    }
+
+
+    private function getBuyFees(): array
+    {
+        return (array)$this->params['buy_fee'];
+    }
+
+    private function getSellFees(): array
+    {
+        return (array)$this->params['sell_fee'];
+    }
+
+    public function getMinAmountBySymbol(string $symbol): Money
     {
         return $this->moneyWrapper->parse(
-            (string)($this->params['minBtcAmount'] ?? 0),
-            Symbols::BTC
-        );
-    }
-
-    public function getMinMintmeAmount(): Money
-    {
-        return $this->moneyWrapper->parse(
-            (string)($this->params['minMintmeAmount'] ?? 0),
-            Symbols::WEB
-        );
-    }
-
-    public function getMinEthAmount(): Money
-    {
-        return $this->moneyWrapper->parse(
-            (string)($this->params['minEthAmount'] ?? 0),
-            Symbols::ETH
-        );
-    }
-
-    public function getMinUsdcAmount(): Money
-    {
-        return $this->moneyWrapper->parse(
-            (string)($this->params['minUsdcAmount'] ?? 0),
-            Symbols::USDC
-        );
-    }
-
-    public function getMinBnbAmount(): Money
-    {
-        return $this->moneyWrapper->parse(
-            (string)($this->params['minBnbAmount'] ?? 0),
-            Symbols::BNB
-        );
-    }
-
-    public function getMinTokensAmount(): Money
-    {
-        return $this->moneyWrapper->parse(
-            (string)($this->params['minTokensAmount'] ?? 0),
-            Symbols::WEB
+            (string)($this->minAmounts[$symbol] ?? 0),
+            $symbol
         );
     }
 

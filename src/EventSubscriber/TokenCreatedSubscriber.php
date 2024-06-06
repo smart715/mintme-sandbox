@@ -31,7 +31,13 @@ class TokenCreatedSubscriber implements EventSubscriberInterface
 
         $this->scheduledNotificationManager->createScheduledNotification(
             NotificationTypes::MARKETING_AIRDROP_FEATURE,
-            $token->getOwner()
+            $token->getOwner(),
+            false,
+        );
+
+        $this->scheduledNotificationManager->createScheduledTokenNotification(
+            NotificationTypes::TOKEN_PROMOTION,
+            $token,
         );
     }
 }

@@ -12,4 +12,6 @@ interface KnowledgeBaseManagerInterface
     public function getAll(): array;
 
     public function getByUrl(string $shortUrl): ?KnowledgeBase;
+
+    public function getRelated(KnowledgeBase $kb): array;
 }

@@ -2,28 +2,26 @@
 
 namespace App\Exchange\Donation\Model;
 
-/** @codeCoverageIgnore */
+use Money\Money;
+
 class CheckDonationResult
 {
-    /** @var string */
-    private $expectedTokens;
+    private Money $expectedTokensAmount;
+    private Money $expectedTokensWorth;
 
-    /** @var string */
-    private $tokensWorth;
-
-    public function __construct(string $expectedTokens = '0', string $tokensWorth = '0')
+    public function __construct(Money $expectedTokensAmount, Money $expectedTokensWorth)
     {
-        $this->expectedTokens = $expectedTokens;
-        $this->tokensWorth = $tokensWorth;
+        $this->expectedTokensAmount = $expectedTokensAmount;
+        $this->expectedTokensWorth = $expectedTokensWorth;
     }
 
-    public function getExpectedTokens(): string
+    public function getExpectedTokensAmount(): Money
     {
-        return $this->expectedTokens;
+        return $this->expectedTokensAmount;
     }
 
-    public function getTokensWorth(): string
+    public function getExpectedTokensWorth(): Money
     {
-        return $this->tokensWorth;
+        return $this->expectedTokensWorth;
     }
 }

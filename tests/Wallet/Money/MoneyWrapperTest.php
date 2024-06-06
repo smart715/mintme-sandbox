@@ -2,7 +2,6 @@
 
 namespace App\Tests\Wallet\Money;
 
-use App\Entity\Crypto;
 use App\Manager\CryptoManager;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
@@ -27,6 +26,7 @@ class MoneyWrapperTest extends TestCase
         $this->assertEquals('22000000000000000000', $moneyWrapper->parse('2.2e7', 'TOK')->getAmount());
         $this->assertEquals('1000000000000000000000000', $moneyWrapper->parse('1e12', 'TOK')->getAmount());
         $this->assertEquals('1', $moneyWrapper->parse('1e-12', 'TOK')->getAmount());
+        $this->assertEquals('1000000000000', $moneyWrapper->parse('001', 'TOK')->getAmount());
     }
 
     public function testConvertWithoutExchange(): void
@@ -62,22 +62,13 @@ class MoneyWrapperTest extends TestCase
     private function mockCryptoManager(): CryptoManager
     {
         $cryptos = [
-            $this->mockCrypto('BTC', 8),
-            $this->mockCrypto('WEB', 18),
+            ['symbol' => 'BTC', 'subunit' => 8],
+            ['symbol' => 'WEB', 'subunit' => 18],
         ];
 
         $cm = $this->createMock(CryptoManager::class);
-        $cm->method('findAll')->willReturn($cryptos);
+        $cm->method('findSymbolAndSubunitArr')->willReturn($cryptos);
 
         return $cm;
-    }
-
-    private function mockCrypto(string $symbol, int $subunit): Crypto
-    {
-        $crypto = $this->createMock(Crypto::class);
-        $crypto->method('getSymbol')->willReturn($symbol);
-        $crypto->method('getSubunit')->willReturn($subunit);
-
-        return $crypto;
     }
 }

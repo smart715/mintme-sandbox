@@ -1,0 +1,28 @@
+{% extends 'mail/layout.html.twig' %}
+{% block content %}
+    {{ parent() }}
+    <div class="box-table">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border" bgcolor="#ffffff">
+            <tr>
+                <td align="center" width="600" class="td-body" bgcolor="#ffffff">
+                    <img alt="Description" src="{{ absolute_url(asset('build/images/mail-reward.png')) }}" width="120" class="img-build-v0" />
+                    <p class="p-hello">{% trans %} hello {% endtrans %} {{ nickname }}</p>
+                    <p class="p-second-line">{% trans %} mail.reward.volunteer.new.msg {% endtrans %} 
+                        <a
+                            href="{{ absolute_url(path('token_show', {'name': rewardToken, 'tab': 'intro', 'modal': 'reward-summary', 'slug': slug })) }}"
+                            class="p-a-link text-break"
+                            target="_blank"
+                        >
+                            {{ rewardTitle }}
+                        </a>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" class="prev-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

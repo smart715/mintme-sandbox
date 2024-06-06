@@ -9,7 +9,7 @@ use App\Exchange\Balance\Strategy\DepositCryptoStrategy;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 
 class DepositCryptoStrategyTest extends TestCase
@@ -28,7 +28,7 @@ class DepositCryptoStrategyTest extends TestCase
         );
     }
 
-    private function mockBalanceHandler(Invocation $invocation): BalanceHandlerInterface
+    private function mockBalanceHandler(InvokedCount $invocation): BalanceHandlerInterface
     {
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->expects($invocation)->method('deposit');
@@ -36,7 +36,7 @@ class DepositCryptoStrategyTest extends TestCase
         return $handler;
     }
 
-    private function mockMoneyWrapper(Invocation $parseInv): MoneyWrapperInterface
+    private function mockMoneyWrapper(InvokedCount $parseInv): MoneyWrapperInterface
     {
         $wrapper = $this->createMock(MoneyWrapperInterface::class);
         $wrapper->expects($parseInv)->method('parse')

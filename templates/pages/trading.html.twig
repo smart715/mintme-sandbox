@@ -5,32 +5,78 @@
     {{ encore_entry_link_tags('pages/trading') }}
 {% endblock %}
 
-{% block title %}{% trans %}page.trading.title{% endtrans %} | mintMe{% endblock %}
+{% block title %}
+    {% trans with {'%type%' : type} %} page.trading.title_without_page {% endtrans %}
+{% endblock %}
 
 {% block bodyclass %}trading{% endblock %}
 
 {% block content %}
-    <div id="trading" class="container-fluid" data-val="some value">
-    <div id="trading" class="container-fluid">
+    <div id="trading" class="px-3 px-xl-0">
+        <crypto-init :cryptos="{{ cryptos | json_encode }}"></crypto-init>
         {{ include('spinners/trading.html.twig') }}
-        <div class="row pt-4 justify-content-center">
+        <div v-show="isPageReady" class="row pt-4 justify-content-center">
             <div class="col-12">
                 <trading
-                        websocket-url="{{ global_websocket_url }}"
-                        coinbase-url="{{ global_coinbase_url }}"
-                        :page="{{ page }}"
-                        :tokens-count="{{ tokensCount }}"
-                        :user-id="{{ app.user ? app.user.id : 0 }}"
-                        mintme-supply-url="{{ mintme_supply }}"
-                        :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
-                        sort="{{ sort }}"
-                        :markets-prop="{{ markets | json_encode }}"
-                        :order="{{ order == 'DESC' ? 'true' : 'false' }}"
-                        :filter-for-tokens="{{ filterForTokens | json_encode() }}"
-                        :per-page="{{ perPage }}"
-                        :rows-prop="{{ rows }}"
-                >
-                </trading>
+                    :deploy-blockchains="{{ allDeployBlockchains | json_encode }}"
+                    websocket-url="{{ global_websocket_url }}"
+                    coinbase-url="{{ global_coinbase_url }}"
+                    :tokens-count="{{ tokensCount }}"
+                    :user-id="{{ app.user ? app.user.id : 0 }}"
+                    mintme-supply-url="{{ mintme_supply }}"
+                    :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                    sort="{{ sort }}"
+                    :markets-prop="{{ markets | json_encode }}"
+                    :promoted-markets="{{ promotedMarkets | json_encode }}"
+                    :crypto-top-list-market-keys="{{ cryptoTopListMarketKeys | json_encode }}"
+                    :order="{{ order == 'DESC' ? 'true' : 'false' }}"
+                    :filter-for-tokens="{{ filterForTokens | json_encode }}"
+                    :page={{ page }}
+                    :last-page-prop="{{ lastPage | json_encode }}"
+                    type="{{ type }}"
+                    :new-markets-enabled="{{ new_markets_enabled ? 'true' : 'false' }}"
+                    :token-promotions="{{ tokenPromotions | json_encode }}"
+                    @ready="isPageReady = true"
+                ></trading>
+            </div>
+        </div>
+    </div>
+    <div class="description-background mt-5">
+        <div class="row d-flex align-items-center justify-content-center m-0">
+            <div class="col-12 col-md-6 pr-0 position-relative d-flex align-items-center justify-content-center">
+                <img
+                    class="w-100 img-map"
+                    src="{{ asset('build/images/dots-map.webp') }}"
+                    alt="{% trans %} img.tok_trading {% endtrans %}"
+                />
+                <img
+                    class="w-60 img-top"
+                    src="{{ asset('build/images/logo-coin-white-v2.svg') }}"
+                    alt="{% trans %} img.tok_trading {% endtrans %}"
+                />
+                <div class="button-top">
+                    <span
+                        id="buy-mintme-button"
+                        class="btn rounded-pill btn-primary btn-not-focusable font-weight-bold py-3 c-pointer"
+                        @click="scrollToTop"
+                    >
+                        {% trans %} trading.text_button_buy_mintme {% endtrans %}
+                    </span>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
+                <div class="text-paragraph-description">
+                    <h2 class="text-title">
+                        {% trans %} trading.fueled_by {% endtrans %}
+                        <span class="text-primary">
+                            {% trans %} trading.Mintme {% endtrans %}
+                            {% trans %} trading.coin {% endtrans %}
+                        </span>
+                    </h2>
+                    <p class="text-paragraph text-primary-darker">
+                        {% trans %} trading.description.fueled {% endtrans %}
+                    </p>
+                </div>
             </div>
         </div>
     </div>

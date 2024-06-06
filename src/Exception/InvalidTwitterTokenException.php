@@ -2,7 +2,7 @@
 
 namespace App\Exception;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class InvalidTwitterTokenException extends \Exception
 {
     /** @var string  */

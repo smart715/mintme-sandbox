@@ -19,4 +19,6 @@ interface PendingWithdrawInterface
     public function getSymbol(): string;
 
     public function getFee(): Money;
+
+    public function getCryptoNetwork(): Crypto;
 }

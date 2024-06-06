@@ -1,89 +1,194 @@
 import '../../scss/pages/pair.sass';
+import '../../scss/pages/voting.sass';
+import '../../scss/pages/dw_modal.sass';
 import BalanceInit from '../components/trade/BalanceInit';
+import MarketInit from '../components/trade/MarketInit';
 import QuickTrade from '../components/QuickTrade';
-import Posts from '../components/posts/Posts';
-import Post from '../components/posts/Post';
+import PostsInit from '../components/posts/PostsInit';
+import TokenPosts from '../components/token/TokenPosts';
+import TokenGeneralInformation from '../components/token/TokenGeneralInformation';
 import TokenIntroductionDescription from '../components/token/introduction/TokenIntroductionDescription';
-import TokenIntroductionStatistics from '../components/token/introduction/TokenIntroductionStatistics';
 import TokenSocialMediaIcons from '../components/token/TokenSocialMediaIcons';
+import TokenShare from '../components/token/TokenShare';
 import TokenAvatar from '../components/token/TokenAvatar';
 import TopHolders from '../components/trade/TopHolders';
-import {NotificationMixin, LoggerMixin} from '../mixins/';
+import BountiesAndRewards from '../components/bountiesAndRewards/BountiesAndRewards';
+import TokenCoverImage from '../components/token/TokenCoverImage';
+import {NotificationMixin, RebrandingFilterMixin, StringMixin} from '../mixins/';
 import Trade from '../components/trade/Trade';
-import {tokenDeploymentStatus, HTTP_OK, tabs, tabsArr, webSymbol} from '../utils/constants';
+import {
+    tabs,
+    MEDIA_BREAKPOINTS,
+    MINTME,
+    TOKEN_NAME_TRUNCATE_LENGTH,
+    ScreenMediaSize,
+    WEB,
+    logoWithText,
+} from '../utils/constants';
+import {getScreenMediaSize} from '../utils';
 import {mapGetters, mapMutations} from 'vuex';
-import {BTabs, BTab, VBTooltip} from 'bootstrap-vue';
+import {VBTooltip} from 'bootstrap-vue';
 import Avatar from '../components/Avatar';
-import Envelope from '../components/chat/Envelope';
+import TokenDirectMessage from '../components/chat/TokenDirectMessage';
 import i18n from '../utils/i18n/i18n';
-import VotingList from '../components/voting/VotingList';
-import VotingCreate from '../components/voting/VotingCreate';
-import VotingShow from '../components/voting/VotingShow';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faAngleUp, faAngleDown, faCog, faUser, faCaretDown} from '@fortawesome/free-solid-svg-icons';
+import {faPlusSquare, faThumbsUp} from '@fortawesome/free-regular-svg-icons';
+import {faDiscord, faTelegramPlane, faFacebookF, faYoutube} from '@fortawesome/fontawesome-free-brands';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import ImageUploader from '../components/ImageUploader';
+import TokenReleaseChart from '../components/token/TokenReleaseChart';
+import TokenPriceOverviewChart from '../components/token/TokenPriceOverviewChart';
+import TokenExchangePrice from '../components/token/TokenExchangePrice';
+import {MButton} from '../components/UI';
+import {initializeApp} from 'firebase/app';
+import {
+    TwitterAuthProvider,
+    getAuth,
+    signInWithPopup,
+} from 'firebase/auth';
+import FetchableCounter from '../components/FetchableCounter';
+import TokenContractAddresses from '../components/token/TokenContractAddresses';
+import TokenName from '../components/token/TokenName';
+import StickySidebar from '../utils/sticky-sidebar';
+import TokenSinglePostPage from '../components/token/TokenSinglePostPage';
+import TokenFollowButton from '../components/token/TokenFollowButton';
+import TruncateFilterMixin from '../mixins/filters/truncate';
+import CryptoInit from '../components/CryptoInit';
+
+library.add(
+    faAngleUp,
+    faAngleDown,
+    faCog,
+    faTelegramPlane,
+    faDiscord,
+    faFacebookF,
+    faUser,
+    faYoutube,
+    faPlusSquare,
+    faThumbsUp,
+    faCaretDown,
+);
 
 new Vue({
     el: '#token',
     components: {
-        BTabs,
-        BTab,
+        FontAwesomeIcon,
         Avatar,
-        Envelope,
+        TokenDirectMessage,
         BalanceInit,
-        CreatePost: () => import('../components/posts/CreatePost').then((data) => data.default),
-        Comments: () => import('../components/posts/Comments').then((data) => data.default),
+        MarketInit,
+        PostsInit,
         QuickTrade,
-        Post,
-        Posts,
+        TokenPosts,
         TokenAvatar,
         TokenCreatedModal: () => import('../components/modal/TokenCreatedModal').then((data) => data.default),
         TokenDeployedModal: () => import('../components/modal/TokenDeployedModal').then((data) => data.default),
         TokenIntroductionDescription,
-        TokenIntroductionStatistics,
-        TokenOngoingAirdropCampaign: () => import('../components/token/airdrop_campaign/TokenOngoingAirdropCampaign').then((data) => data.default),
+        TokenGeneralInformation,
+        TokenCoverImage,
+        TokenOngoingAirdropCampaign: () => import('../components/token/airdrop_campaign/TokenOngoingAirdropCampaign')
+            .then((data) => data.default),
         TokenSocialMediaIcons,
+        TokenShare,
         TopHolders,
         Trade,
-        VotingList,
-        VotingCreate,
-        VotingShow,
+        TokenVotingWidget: () => import('../components/token/TokenVotingWidget').then((data) => data.default),
+        BountiesAndRewards,
+        ImageUploader,
+        TokenReleaseChart,
+        MButton,
+        TokenPriceOverviewChart,
+        TokenExchangePrice,
+        FetchableCounter,
+        TokenContractAddresses,
+        TokenName,
+        TokenSinglePostPage,
+        TokenFollowButton,
+        CryptoInit,
     },
     directives: {
         'b-tooltip': VBTooltip,
     },
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [
+        NotificationMixin,
+        RebrandingFilterMixin,
+        StringMixin,
+        TruncateFilterMixin,
+    ],
     i18n,
     data() {
         return {
             tabIndex: 0,
             tokenDescription: null,
-            tokenWebsite: null,
-            tokenFacebook: null,
-            tokenYoutube: null,
-            tokenDiscord: null,
-            tokenTelegram: null,
             editingName: false,
             tokenName: null,
-            tokenPending: null,
-            tokenDeployed: null,
+            cryptoSymbol: null,
             deployInterval: null,
-            retryCount: 0,
-            retryCountLimit: 15,
-            tokenAddress: null,
-            posts: null,
             postFromUrl: null,
             showCreatedModal: true,
             singlePost: null,
             comments: null,
             showDeployedOnBoard: null,
-            tokenDeployedDate: null,
-            tokenTxHashAddress: null,
-            tokenCrypto: null,
+            shouldUnfoldDescription: true,
+            isMobileScreen: null,
+            isWideScreen: null,
+            isAirdropComponentLoaded: false,
+            votingWidgetLoaded: false,
+            currentTokenAvatar: null,
+            timeOutStickySidebar: null,
+            activeTab: tabs.intro,
+            activeVotingTab: tabs.voting,
+            tabsWithSidebar: [],
+            initialized: false,
+            ownDeployedTokens: false,
+            scrollPosition: null,
+            maxLengthToTruncate: TOKEN_NAME_TRUNCATE_LENGTH,
+            logoWithText: require(`../../img/${logoWithText.icon}`),
+            logoWithoutText: require(`../../img/${WEB.icon}`),
+            bounties: [],
+            rewards: [],
+            statisticsOpened: false,
         };
     },
-    mounted: function() {
-        let divEl = document.createElement('div');
-        let tabsEl = document.querySelectorAll('.nav.nav-tabs');
+    created: function() {
+        const navLinks = document.querySelectorAll('.token-nav .navbar-nav a');
+
+        if (navLinks) { // remove static class from nav links
+            navLinks.forEach((el) => el.classList.remove('active'));
+        }
+    },
+    beforeMount: function() {
+        this.checkScreenSize();
+
+        window.addEventListener('resize', () => {
+            this.checkScreenSize();
+            clearTimeout(this.timeOutStickySidebar);
+            this.startTimeOutStickySidebar();
+        });
+
+        this.tabsWithSidebar = JSON.parse(document.getElementById('tabs-with-sidebar').value) || [];
+
+        const tab = document.getElementById('tab-name').value;
+        const isVotingSubTab = [tabs.create_voting, tabs.show_voting].includes(tab);
+
+        this.activeVotingTab = isVotingSubTab ? tab : tabs.voting;
+        this.activeTab = isVotingSubTab ? tabs.voting : tab;
+
+        const postData = document.getElementById('posts-data')?.value;
+        this.posts = postData ? JSON.parse(postData) : [];
+        this.setPosts(this.posts);
+
+        const rewardsData = document.getElementById('rewards-data')?.value;
+        this.rewards = rewardsData ? JSON.parse(rewardsData) : [];
+
+        const bountiesData = document.getElementById('bounties-data')?.value;
+        this.bounties = bountiesData ? JSON.parse(bountiesData) : [];
+    },
+    mounted() {
         this.postFromUrl = (/(?:posts#)(\d+)/g.exec(window.location.href) || [])[1] || null;
-        if (this.postFromUrl !== null) {
+
+        if (null !== this.postFromUrl) {
             // Prevent browser from restoring previous scroll height (if page was raloaded)
             if ('scrollRestoration' in window.history) {
                 window.history.scrollRestoration = 'manual';
@@ -91,28 +196,42 @@ new Vue({
             document.getElementById(this.postFromUrl).scrollIntoView();
         }
 
-        divEl.className = 'tabs-left-margin-container';
-        document.getElementsByClassName('tabs-wrapper')[0].insertBefore(divEl, tabsEl[0]);
+        const aux = this.$refs['tokenAvatar'];
 
-        let aux = this.$refs['tokenAvatar'];
         if (aux && aux.$attrs['showsuccess']) {
             this.notifySuccess(this.$t('page.pair.token_created'));
         }
 
-        let tokenName = this.tokenName;
-        if (tokenName) {
-            tokenName = tokenName.replace(/\s/g, '-');
-            document.addEventListener('DOMContentLoaded', () => {
-                let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
-                introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.intro});
-                let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
-                postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.posts});
-                let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
-                tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.trade});
-                let votingLink = document.querySelectorAll('a.token-voting-tab-link')[0];
-                votingLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.voting});
-            });
+        this.initFireBase();
+        this.initTwitterAuthPopUp();
+
+        if (window.location.href.includes('saveSuccess=true')) {
+            this.showRedirectMessage();
         }
+
+        this.initStickySidebar();
+
+        this.initialized = true;
+
+        this.setOwnDeployedTokens(this.ownDeployedTokens);
+        window.addEventListener('scroll', this.updateScroll);
+    },
+    computed: {
+        ...mapGetters('market', {
+            currentMarket: 'getCurrentMarket',
+        }),
+        ...mapGetters('tradeBalance', [
+            'getQuoteBalance',
+        ]),
+        ...mapGetters('voting', {
+            currentVoting: 'getCurrentVoting',
+        }),
+        tabHasSidebar() {
+            return this.tabsWithSidebar.includes(this.activeTab);
+        },
+        isPostTab: function() {
+            return this.tabIndex === tabsArr.indexOf(tabs.post);
+        },
     },
     methods: {
         ...mapMutations('tradeBalance', [
@@ -120,216 +239,179 @@ new Vue({
             'setBuyAmountInput',
             'setSubtractQuoteBalanceFromBuyAmount',
         ]),
+        ...mapMutations('tokenInfo', [
+            'setTokenAvatar',
+        ]),
+        ...mapMutations('posts', [
+            'setSinglePost',
+            'setPosts',
+        ]),
+        ...mapMutations('user', [
+            'setOwnDeployedTokens',
+        ]),
+        setImage: function(avatarUrl) {
+            this.currentTokenAvatar = avatarUrl;
+        },
+        initFireBase: function() {
+            initializeApp(window.firebaseConfig);
+        },
+        initTwitterAuthPopUp: function() {
+            window.twitterProvider = new TwitterAuthProvider();
+            window.auth = getAuth();
+            window.auth.useDeviceLanguage();
+            window.signInWithPopup = signInWithPopup;
+        },
         closeDeployedModal: function() {
             this.showDeployedOnBoard = false;
-            this.$axios.single.patch(this.$routing.generate('token_update_deployed_modal', {tokenName: this.tokenName}));
-        },
-        fetchAddress: function() {
-            this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
-                .then((response) => {
-                    if (response.status === HTTP_OK) {
-                        this.tokenAddress = response.data.address;
-                    }
-                }, (error) => {
-                    this.notifyError(this.$t('toasted.error.try_later'));
-                });
-        },
-        getTxHash: function() {
-            this.$axios.retry.get(this.$routing.generate('token_tx_hash', {
-                name: this.tokenName,
-            }))
-                .then(({data}) => {
-                    this.tokenTxHashAddress = data.txHash;
-                })
-                .catch((err) => {
-                    this.sendLogs('error', 'Can not get token tx_hash', err);
-                });
-        },
-        getDeployedDate: function() {
-            this.$axios.retry.get(this.$routing.generate('token_deployed_date', {
-                name: this.tokenName,
-            }))
-                .then(({data}) => {
-                    this.tokenDeployedDate = {
-                        date: data.deployedDate,
-                    };
-                })
-                .catch((err) => {
-                    this.sendLogs('error', 'Can not get token deployed date', err);
-                });
-        },
-        checkTokenDeployment: function() {
-            clearInterval(this.deployInterval);
-            this.deployInterval = setInterval(() => {
-                this.$axios.single.get(this.$routing.generate('token_deployment_status', {name: this.tokenName}))
-                    .then((response) => {
-                        if (response.data.status === tokenDeploymentStatus.deployed) {
-                            this.tokenDeployed = true;
-                            this.tokenPending = false;
-                            this.showDeployedOnBoard = true;
-                            this.tokenCrypto = response.data.crypto;
-                            this.fetchAddress();
-                            this.getTxHash();
-                            this.getDeployedDate();
-                            clearInterval(this.deployInterval);
-                        }
-                        this.retryCount++;
-                        if (this.retryCount >= this.retryCountLimit) {
-                            this.notifyError(this.$t('toasted.error.can_not_be_deployed'));
-                            this.tokenPending = false;
-                            this.tokenDeployed = false;
-                            clearInterval(this.deployInterval);
-                        }
-                    })
-                    .catch((error) => {
-                        this.notifyError(this.$t('toasted.error.try_later'));
-                    });
-            }, 60000);
+            this.$axios.single.patch(
+                this.$routing.generate('token_update_deployed_modal', {tokenName: this.tokenName})
+            );
         },
         descriptionUpdated: function(val) {
             this.tokenDescription = val;
         },
-        tabUpdated: function(i) {
-            if (window.history.replaceState) {
-                // prevents browser from storing history with each change:
-                let url = '';
-                switch (i) {
-                    case tabsArr.indexOf(tabs.posts):
-                        url = this.$routing.generate('new_show_post', {
-                            name: this.tokenName,
-                            slug: null,
-                        });
-
-                        break;
-                    case tabsArr.indexOf(tabs.post):
-                        url = this.$routing.generate('new_show_post', {
-                            name: this.tokenName,
-                            slug: this.singlePost.slug,
-                        });
-
-                        break;
-                    case tabsArr.indexOf(tabs.show_voting):
-                        url = this.$routing.generate('token_show_voting', {
-                            name: this.tokenName,
-                            slug: this.currentVoting.slug,
-                        });
-
-                        break;
-                    default:
-                        url = this.$routing.generate('token_show', {
-                            name: this.tokenName,
-                            tab: tabsArr[i],
-                        });
-                }
-
-                window.history.replaceState({}, '', url);
-            }
-        },
-        setTokenPending: function() {
-            this.tokenPending = true;
-            this.checkTokenDeployment();
-        },
-        getTokenStatus: function(status) {
-            return this.tokenDeployed
-                ? tokenDeploymentStatus.deployed
-                : (this.tokenPending ? tokenDeploymentStatus.pending : status);
-        },
-        getTokenCrypto: function(crypto) {
-            return this.tokenCrypto ?? crypto;
-        },
-        getIsMintmeToken: function(isMintmeToken) {
-            return this.tokenCrypto
-                ? webSymbol === this.tokenCrypto.symbol
-                : isMintmeToken;
-        },
-        facebookUpdated: function(val) {
-            this.tokenFacebook = val;
-        },
-        websiteUpdated: function(val) {
-            this.tokenWebsite = val;
-        },
-        youtubeUpdated: function(val) {
-            this.tokenYoutube = val;
-        },
-        discordUpdated: function(val) {
-            this.tokenDiscord = val;
-        },
-        telegramUpdated: function(val) {
-            this.tokenTelegram = val;
-        },
-        updatePost: function({post, i}) {
-            this.$set(this.posts, i, post);
-        },
-        updateComment: function({comment, i}) {
-            this.$set(this.comments, i, comment);
-        },
-        updatePosts: function() {
-            if (!this.tokenName) {
-                return;
-            }
-            this.$axios.single.get(this.$routing.generate('list_posts', {tokenName: this.tokenName}))
-                .then((res) => {
-                    this.posts = res.data;
-                });
-        },
-        goToPosts: function() {
-            this.tabIndex = tabsArr.indexOf(tabs.posts);
-        },
-        deletePost: function(index) {
-            this.posts.splice(index, 1);
-        },
-        coalesce: function(a, b) {
-            return null !== a ? a : b;
-        },
         goToTrade: function(amount) {
-            this.tabIndex = tabsArr.indexOf(tabs.trade);
-            this.setUseBuyMarketPrice(true);
-            this.setBuyAmountInput(amount);
-            this.setSubtractQuoteBalanceFromBuyAmount(true);
+            this.changeTab(tabs.trade);
+
+            if (amount) {
+                this.setUseBuyMarketPrice(true);
+                this.setBuyAmountInput(amount);
+                this.setSubtractQuoteBalanceFromBuyAmount(true);
+            }
         },
-        deleteComment: function(index) {
-            this.comments.splice(index, 1);
-        },
-        newComment: function(comment) {
-            this.comments.unshift(comment);
+        singlePostDeleted: function() {
+            this.changeTab(tabs.intro);
         },
         goToPost: function(post) {
-            this.singlePost = post;
-            this.tabIndex = tabsArr.indexOf(tabs.post);
-            this.comments = [];
+            const postUrl = post.slug
+                ? this.$routing.generate('token_show_post', {name: post.token.name, slug: post.slug}, true)
+                : this.$routing.generate('show_post', {id: post.id}, true);
 
-            this.loadComments(post.id);
+            window.history.replaceState({}, '', postUrl);
+
+            this.setSinglePost(post);
+            this.changeTab('post', post);
         },
-        loadComments: function(postId) {
-            this.$axios.single.get(this.$routing.generate('get_post_comments', {id: postId}))
-                .then((res) => this.comments = res.data)
-                .catch((err) => {
-                    this.notifyError($t('comment.load_error'));
-                    this.sendLogs('error', err);
+        checkScreenSize: function() {
+            // if screen < lg bootstrap breakpoint
+            this.isMobileScreen = window.matchMedia(
+                `screen and (max-width: ${MEDIA_BREAKPOINTS.max_width.md}px)`
+            ).matches;
+            this.isWideScreen = window.matchMedia(
+                `screen and (min-width: ${MEDIA_BREAKPOINTS.min_width.xlg}px)`
+            ).matches;
+        },
+        showRedirectMessage: function() {
+            this.notifySuccess(this.$t('page.profile.tokens.save_changes'));
+            window.history.replaceState(
+                {},
+                '',
+                window.location.href.replace('?saveSuccess=true', ''),
+            );
+        },
+        initStickySidebar() {
+            new StickySidebar('.sticky-bar',
+                {
+                    topSpacing: 20,
+                    bottomSpacing: 20,
                 });
         },
-        deleteSinglePost: function(index, postId) {
-            this.posts = this.posts.filter((post) => post.id !== postId);
-            this.goToPosts();
+        startTimeOutStickySidebar() {
+            this.timeOutStickySidebar = setTimeout(() => this.initStickySidebar(), 500);
         },
-        goToCreateVoting() {
-            this.tabIndex = tabsArr.indexOf(tabs.create_voting);
+        changeTab(tab, data) {
+            this.activeTab = tab;
+            let title = '';
+
+            switch (tab) {
+                case tabs.intro:
+                    title = this.$t('page.pair.title_info', {name: this.tokenName, description: this.tokenDescription});
+                    break;
+                case tabs.voting:
+                    this.activeVotingTab = tabs.voting;
+                    title = this.$t('page.pair.title_voting', {name: this.tokenName});
+                    break;
+                case tabs.post:
+                    title = this.$t('page.pair.title_post', {postTitle: data.title, tokenName: this.tokenName});
+                    break;
+                case tabs.trade:
+                    title = this.$t('page.pair.title_market_tab', {name: this.tokenName});
+                    break;
+                default:
+                    break;
+            }
+
+            const url = this.getUrlByTab(tab, data);
+
+            document.title = title;
+            window.scrollTo({top: 0});
+            window.history.replaceState({}, '', url);
         },
-        goToShowVoting() {
-            this.tabIndex = tabsArr.indexOf(tabs.show_voting);
+        getUrlByTab(tab, data) {
+            if (tabs.voting === tab) {
+                return this.$routing.generate('token_list_voting', {name: this.tokenName});
+            }
+
+            if (tabs.trade === tab) {
+                const crypto = this.rebrandingFunc(this.currentMarket.base.symbol) || MINTME.symbol;
+                return this.$routing.generate('token_show_trade', {name: this.tokenName, crypto});
+            }
+
+            if (tabs.post === tab) {
+                return data.slug
+                    ? this.$routing.generate('token_show_post', {name: data.token.name, slug: data.slug}, true)
+                    : this.$routing.generate('show_post', {id: data.id}, true);
+            }
+
+            return this.$routing.generate('token_show_intro', {name: this.tokenName});
         },
-    },
-    computed: {
-        ...mapGetters('tradeBalance', [
-            'getQuoteBalance',
-        ]),
-        ...mapGetters('voting', {
-            currentVoting: 'getCurrentVoting',
-        }),
-    },
-    watch: {
-        getQuoteBalance: function() {
-            this.updatePosts();
+        getTabLinkClass(tab) {
+            if (
+                (tabs.trade === tab && this.activeTab === tabs.trade)
+                || (tabs.voting === tab && this.activeTab === tabs.voting)
+                || (tab === tabs.intro && this.activeTab !== tabs.trade && this.activeTab !== tabs.voting)
+            ) {
+                return 'active';
+            }
+
+            return '';
+        },
+        votingPageChanged(page) {
+            this.activeVotingTab = page;
+        },
+        votingCreated() {
+            if (this.$refs['votingCounter']) {
+                this.$refs['votingCounter'].refreshCounter();
+            }
+        },
+        counterRefreshed: function() {
+            this.votingCreated();
+        },
+        updateScroll: function() {
+            this.scrollPosition = window.scrollY;
+
+            const tokenName = document.getElementById('nav-token-name');
+            const mintmeLogo = document.getElementById('mintme-logo');
+
+            if (getScreenMediaSize() > ScreenMediaSize.XXS) {
+                if (50 < this.scrollPosition) {
+                    mintmeLogo.src = this.logoWithoutText;
+                    tokenName.innerHTML = this.truncateFunc(this.tokenName, this.maxLengthToTruncate);
+                } else {
+                    tokenName.innerHTML = '';
+                    mintmeLogo.src = this.logoWithText;
+                }
+                tokenName.classList.remove('h4');
+                tokenName.classList.add('h6');
+            }
+
+            if (getScreenMediaSize() >= ScreenMediaSize.MD) {
+                tokenName.classList.remove('h6');
+                tokenName.classList.add('h4');
+            }
+        },
+        openStatistics() {
+            this.statisticsOpened = true;
         },
     },
     store,

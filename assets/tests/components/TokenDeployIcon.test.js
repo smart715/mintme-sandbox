@@ -9,6 +9,8 @@ function mockVue() {
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$te = () => false;
+            Vue.prototype.$routing = {generate: (val) => val};
         },
     });
     return localVue;
@@ -23,9 +25,9 @@ describe('TokenDeployIcon', () => {
                 statusProp: 'not-deployed',
             },
         });
-        expect(wrapper.find('.deployed-icon').exists()).toBe(false);
-        expect(wrapper.find('.loading-spinner').exists()).toBe(false);
-        expect(wrapper.find('.not-deployed-icon').exists()).toBe(true);
+        expect(wrapper.findComponent('.deployed-icon').exists()).toBe(false);
+        expect(wrapper.findComponent('.loading-spinner').exists()).toBe(false);
+        expect(wrapper.findComponent('.not-deployed-icon').exists()).toBe(true);
     });
 
     it('do not show if not owner & not deployed', () => {
@@ -36,9 +38,9 @@ describe('TokenDeployIcon', () => {
                 statusProp: 'not-deployed',
             },
         });
-        expect(wrapper.find('.deployed-icon').exists()).toBe(false);
-        expect(wrapper.find('.loading-spinner').exists()).toBe(false);
-        expect(wrapper.find('.not-deployed-icon').exists()).toBe(true);
+        expect(wrapper.findComponent('.deployed-icon').exists()).toBe(false);
+        expect(wrapper.findComponent('.loading-spinner').exists()).toBe(false);
+        expect(wrapper.findComponent('.not-deployed-icon').exists()).toBe(true);
     });
 
     it('show pending icon if owner & pending', () => {
@@ -49,9 +51,9 @@ describe('TokenDeployIcon', () => {
                 statusProp: 'pending',
             },
         });
-        expect(wrapper.find('.deployed-icon').exists()).toBe(false);
+        expect(wrapper.findComponent('.deployed-icon').exists()).toBe(false);
         expect(wrapper.findAll('.loading-spinner').exists()).toBe(true);
-        expect(wrapper.find('.not-deployed-icon').exists()).toBe(false);
+        expect(wrapper.findComponent('.not-deployed-icon').exists()).toBe(false);
     });
 
     it('do not show pending icon if not owner & pending', () => {
@@ -62,9 +64,9 @@ describe('TokenDeployIcon', () => {
                 statusProp: 'pending',
             },
         });
-        expect(wrapper.find('.deployed-icon').exists()).toBe(false);
-        expect(wrapper.find('.loading-spinner').exists()).toBe(false);
-        expect(wrapper.find('.not-deployed-icon').exists()).toBe(false);
+        expect(wrapper.findComponent('.deployed-icon').exists()).toBe(false);
+        expect(wrapper.findComponent('.loading-spinner').exists()).toBe(false);
+        expect(wrapper.findComponent('.not-deployed-icon').exists()).toBe(false);
     });
 
     it('show deployed icon if deployed', () => {
@@ -77,8 +79,8 @@ describe('TokenDeployIcon', () => {
                 },
             },
         });
-        expect(wrapper.find('.deployed-icon').exists()).toBe(true);
-        expect(wrapper.find('.loading-spinner').exists()).toBe(false);
-        expect(wrapper.find('.not-deployed-icon').exists()).toBe(false);
+        expect(wrapper.findComponent('.deployed-icon').exists()).toBe(true);
+        expect(wrapper.findComponent('.loading-spinner').exists()).toBe(false);
+        expect(wrapper.findComponent('.not-deployed-icon').exists()).toBe(false);
     });
 });

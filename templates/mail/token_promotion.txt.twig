@@ -1,0 +1,15 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+{% trans %}hello{% endtrans %} {{ nickname }}
+{% trans with {'%url%': url} %} mail.token_promotion.text_1 {% endtrans %}
+{% trans %} mail.token_promotion.text_2 {% endtrans %}
+{% trans %} mail.token_promotion.text_3 {% endtrans %}
+{% trans %} mail.token_promotion.text_4 {% endtrans %}
+{% trans %} mail.token_promotion.text_5 {% endtrans %}
+{% trans %} mail.token_promotion.text_6 {% endtrans %}
+{% trans %} mail.token_promotion.text_7 {% endtrans %}
+{% trans %} mail.token_promotion.text_8 {% endtrans %}
+{% trans %} mail.token_promotion.text_9 {% endtrans %}
+{% trans with {'%url%': url} %} mail.token_promotion.text_10 {% endtrans %}
+{% trans %} mail.token_promotion.text_11 {% endtrans %}
+{% endblock %}

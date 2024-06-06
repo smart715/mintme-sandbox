@@ -1,0 +1,33 @@
+{% extends 'mail/layout.html.twig' %}
+{% block content %}
+    {{ parent() }}
+    {% set token_link = absolute_url(path('token_show', {'name': tokenName})) %}
+    <div class="box-table">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border" bgcolor="#ffffff">
+            <tr>
+                <td align="center" width="600" class="td-body" bgcolor="#ffffff">
+                    <img alt="Token" src="{{ absolute_url(asset('build/images/Token.png')) }}" width="120" class="img-build-v0" />
+                    <p class="p-second-line-removed-info">{% trans %} email.removed_from_trading.body {% endtrans %}</p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" class="td-presentation-layout-v4" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+        {% set url = absolute_url(path('token_show', {'name': tokenName })) %}
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border-v3" bgcolor="#2199e8">
+            <tr>
+                <td align="center" width="600" class="td-code-v2" bgcolor="#2199e8">
+                    <p class="p-fiveteenth-line"><a href="{{ url }}" class="a-link-text" style="mso-padding-alt:0;">{% trans %} email.removed_from_trading.text_link {% endtrans %}</a></p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" class="td-presentation-layout-v5" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

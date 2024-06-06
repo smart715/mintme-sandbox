@@ -2,6 +2,8 @@
 
 namespace App\Exchange\Market;
 
+use App\Entity\Token\Token;
+use App\Exception\NotDeployedTokenException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
@@ -28,10 +30,17 @@ class MarketFinder implements MarketFinderInterface
         $this->marketFactory = $marketFactory;
     }
 
-    public function find(string $base, string $quote): ?Market
+    public function find(string $base, string $quote, bool $onlyDeployed = false): ?Market
     {
         $base = $this->cryptoManager->findBySymbol($base) ?? $this->tokenManager->findByName($base);
         $quote =  $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        $isTokenAndNotDeployed = ($base instanceof Token && !$base->isDeployed()) ||
+            ($quote instanceof Token && !$quote->isDeployed());
+
+        if ($onlyDeployed && $isTokenAndNotDeployed) {
+            throw new NotDeployedTokenException();
+        }
 
         return ($base && $quote) && ($base !== $quote)
             ? $this->marketFactory->create($base, $quote)

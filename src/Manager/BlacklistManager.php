@@ -2,9 +2,12 @@
 
 namespace App\Manager;
 
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Repository\BlacklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use libphonenumber\PhoneNumber;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 
 class BlacklistManager implements BlacklistManagerInterface
 {
@@ -14,15 +17,16 @@ class BlacklistManager implements BlacklistManagerInterface
         '-',
     ];
 
-    /** @var BlacklistRepository */
-    private $repository;
+    private BlacklistRepository $repository;
+    private EntityManagerInterface $em;
+    private PhoneNumberUtil $phoneUtil;
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        PhoneNumberUtil $phoneUtil
+    ) {
         $this->em = $em;
+        $this->phoneUtil = $phoneUtil;
 
         /** @var BlacklistRepository $repository */
         $repository = $this->em->getRepository(Blacklist::class);
@@ -55,6 +59,7 @@ class BlacklistManager implements BlacklistManagerInterface
         array_shift($matches);
 
         $blacklistedNames = array_merge(
+            $this->getList(Blacklist::NICKNAME),
             $this->getList(Blacklist::TOKEN),
             $this->getList(Blacklist::CRYPTO_NAME),
             $this->getList(Blacklist::CRYPTO_SYMBOL)
@@ -138,13 +143,37 @@ class BlacklistManager implements BlacklistManagerInterface
             return $this->repository->findAll();
         }
 
-        return $this->repository->findBy([
-            'type' => $type,
-        ]);
+        return $this->repository->findBy(['type' => $type]);
+    }
+
+    public function getValues(string $type): array
+    {
+        return $this->repository->getValues($type);
     }
 
     private function nameMatches(string $name, string $val): bool
     {
         return (bool)preg_match('/^' . preg_quote($val, '/') . '('. implode('|', self::TOKEN_NAME_APPEND) . ')*$/', mb_strtolower($name));
+    }
+
+    public function isBlackListedNumber(PhoneNumber $phoneNumber): bool
+    {
+        $phoneNumber = $this->phoneUtil->format($phoneNumber, PhoneNumberFormat::E164);
+        $phoneNumber = trim(ltrim($phoneNumber, '+'));
+
+        return $this->repository->matchValue($phoneNumber, Blacklist::PHONE, false);
+    }
+
+    public function isBlacklistedCodeCountry(PhoneNumber $phoneNumber, string $providerName): bool
+    {
+        $codeCountry = $phoneNumber->getCountryCode();
+
+        if (null === $codeCountry) {
+            return false;
+        }
+
+        $blacklistType = 'sms-' . $providerName;
+
+        return $this->repository->matchValue((string)$codeCountry, $blacklistType);
     }
 }

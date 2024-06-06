@@ -16,8 +16,8 @@ describe('TraderHoveredMixin', () => {
         },
     });
 
-    let timestamp = Date.now();
-    let orders = [
+    const timestamp = Date.now();
+    const orders = [
         {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {nickname: 'user1'}}},
         {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {nickname: 'user1'}}},
         {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {nickname: 'user1'}}},
@@ -48,20 +48,20 @@ describe('TraderHoveredMixin', () => {
     });
 
     it('should create link to trader\'s profile from order data', () => {
-        let order = {
+        const order = {
             maker: {
                 profile: {
                     nickname: 'foo',
                 },
             },
         };
-        let link = '<a href="' + $url + '">foo</a>';
+        const link = '<a href="' + $url + '">foo</a>';
 
         expect(wrapper.vm.createTraderLinkFromOrder(order)).toBe(link);
     });
 
     it('should contain link to trader\'s profile that is owner of three orders with same price', () => {
-        let link = '<a href="' + $url + '">user1</a>';
+        const link = '<a href="' + $url + '">user1</a>';
         wrapper.vm.mouseoverHandler(
             orders.slice(0, 3),
             basePrecision,
@@ -72,12 +72,12 @@ describe('TraderHoveredMixin', () => {
     });
 
     it('should contain five links to trader\'s profiles `and 1 more.` for price 0.01', () => {
-        let link1 = '<a href="' + $url + '">user1</a>';
-        let link6 = '<a href="' + $url + '">user6</a>';
-        let link7 = '<a href="' + $url + '">user7</a>';
-        let link8 = '<a href="' + $url + '">user8</a>';
-        let link9 = '<a href="' + $url + '">user9</a>';
-        let link11 = '<a href="' + $url + '">user11</a>';
+        const link1 = '<a href="' + $url + '">user1</a>';
+        const link6 = '<a href="' + $url + '">user6</a>';
+        const link7 = '<a href="' + $url + '">user7</a>';
+        const link8 = '<a href="' + $url + '">user8</a>';
+        const link9 = '<a href="' + $url + '">user9</a>';
+        const link11 = '<a href="' + $url + '">user11</a>';
 
         wrapper.vm.mouseoverHandler(
             orders.slice(0, 13),
@@ -99,13 +99,13 @@ describe('TraderHoveredMixin', () => {
     });
 
     it('should contain five links to trader\'s profiles `and 2 more.` for price 0.01', () => {
-        let link1 = '<a href="' + $url + '">user1</a>';
-        let link6 = '<a href="' + $url + '">user6</a>';
-        let link7 = '<a href="' + $url + '">user7</a>';
-        let link8 = '<a href="' + $url + '">user8</a>';
-        let link9 = '<a href="' + $url + '">user9</a>';
-        let link11 = '<a href="' + $url + '">user11</a>';
-        let link13 = '<a href="' + $url + '">user13</a>';
+        const link1 = '<a href="' + $url + '">user1</a>';
+        const link6 = '<a href="' + $url + '">user6</a>';
+        const link7 = '<a href="' + $url + '">user7</a>';
+        const link8 = '<a href="' + $url + '">user8</a>';
+        const link9 = '<a href="' + $url + '">user9</a>';
+        const link11 = '<a href="' + $url + '">user11</a>';
+        const link13 = '<a href="' + $url + '">user13</a>';
 
         wrapper.vm.mouseoverHandler(
             orders,

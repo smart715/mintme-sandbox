@@ -1,21 +1,17 @@
 <template>
     <div
-        class="avatar"
+        class="avatar overflow-hidden"
         :class="classObject"
-        @click="upload"
         :tabindex="isTabIndex"
-        @keyup.enter="upload"
     >
-        <img :src="imageUrl"
-             class="rounded-circle img-fluid"
-        >
         <ImageUploader
-            ref="uploader"
             v-if="editable"
             :type="type"
+            purpose="avatar"
             :token="token"
             @upload="setImage"
         />
+        <img :src="imageUrl" class="avatar-img rounded-circle img-fluid" :class="imgClass">
     </div>
 </template>
 
@@ -48,6 +44,10 @@ export default {
             type: String,
             default: '',
         },
+        imgClass: {
+            type: String,
+            default: '',
+        },
     },
     data() {
         return {
@@ -56,10 +56,11 @@ export default {
     },
     computed: {
         classObject: function() {
-            return {
-                [`avatar__${this.size}`]: true,
-                'c-pointer avatar_owner': this.editable,
-            };
+            return this.token
+                ? {}
+                : {
+                    [`avatar__${this.size}`]: true,
+                };
         },
         imageUrl: function() {
             return this.currentImage ? this.currentImage : this.fallback;
@@ -71,13 +72,6 @@ export default {
     methods: {
         setImage(image) {
             this.currentImage = image;
-        },
-        upload() {
-            if (!this.editable) {
-                return;
-            }
-
-            this.$refs.uploader.chooseImage();
         },
     },
 };

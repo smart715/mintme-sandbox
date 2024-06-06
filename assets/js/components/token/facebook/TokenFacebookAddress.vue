@@ -1,20 +1,33 @@
 <template>
     <div class="row">
-        <div class="col text-truncate">
+        <div
+            class="col text-truncate"
+            :class="{'token-facebook-address': isAirdrop}"
+        >
             <span
                 id="address-link"
-                class="c-pointer text-white hover-icon"
                 @click="addPage"
             >
-                <span class="token-introduction-profile-icon text-center d-inline-block">
+                <span
+                    class="token-introduction-profile-icon text-white text-center d-inline-block c-pointer mr-2"
+                >
                     <font-awesome-icon
+                        v-if="isAirdrop"
+                        :icon="{prefix: 'fab', iconName: 'facebook-f'}"
+                        size="lg"
+                        transform="right-3 down-1 shrink-1"
+                        class="text-white"
+                    />
+                    <font-awesome-icon
+                        v-else
                         :icon="{prefix: 'fab', iconName: 'facebook-square'}"
                         size="lg"
+                        class="text-white"
                     />
                 </span>
-                <a href="#" class="text-reset">
+                <span class="text-reset text-nowrap d-inline link highlight" tabindex="0">
                     {{ computedAddress }}
-                </a>
+                </span>
                 <font-awesome-icon
                     v-if="submitting"
                     icon="circle-notch"
@@ -23,11 +36,6 @@
                     fixed-width
                 />
             </span>
-            <b-tooltip
-                v-if="address"
-                target="address-link"
-                :title="computedAddress"
-            />
         </div>
         <div class="col-auto">
             <a
@@ -95,8 +103,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {BTooltip} from 'bootstrap-vue';
-import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
+import {FiltersMixin, NotificationMixin} from '../../../mixins';
 import Modal from '../../modal/Modal';
 import {HTTP_OK} from '../../../utils/constants';
 
@@ -105,18 +112,17 @@ library.add(faFacebookSquare, faTimes);
 export default {
     name: 'TokenFacebookAddress',
     components: {
-        BTooltip,
         FontAwesomeIcon,
         Modal,
     },
     mixins: [
         FiltersMixin,
         NotificationMixin,
-        LoggerMixin,
     ],
     props: {
         address: String,
         tokenName: String,
+        isAirdrop: Boolean,
     },
     data() {
         return {
@@ -145,18 +151,18 @@ export default {
 
             this.submitting = true;
             let {status} = await this.getLoginStatus();
-            if (status !== 'connected') {
+            if ('connected' !== status) {
                 ({status} = await this.login());
             }
 
-            if (status !== 'connected') {
+            if ('connected' !== status) {
                 return;
             }
 
             FB.api('/me/accounts?type=page&fields=name,link', (accountsData) => {
                 if (accountsData.error) {
                     this.notifyError(this.$t('toasted.error.try_later'));
-                    this.sendLogs('error', 'An error has occurred, please try again later', accountsData.error);
+                    this.$logger.error('An error has occurred, please try again later', accountsData.error);
                     return;
                 }
                 this.pages = accountsData.data;
@@ -188,7 +194,7 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_OK) {
-                        let state = this.selectedUrl ? `added` : 'deleted';
+                        const state = this.selectedUrl ? `added` : 'deleted';
                         this.notifySuccess(this.$t(
                             'toasted.success.facebook.' + state,
                             {address: this.selectedUrl}
@@ -198,13 +204,13 @@ export default {
                 }, (error) => {
                     if (!error.response) {
                         this.notifyError(this.$t('toasted.error.network'));
-                        this.sendLogs('error', 'Save facebook address network error', error);
+                        this.$logger.error('Save facebook address network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not save facebook', error);
+                        this.$logger.error('Can not save facebook', error);
                     } else {
                         this.notifyError(this.$t('toasted.error.try_later'));
-                        this.sendLogs('error', 'An error has occurred, please try again later', error);
+                        this.$logger.error('An error has occurred, please try again later', error);
                     }
                 })
                 .then(() => {

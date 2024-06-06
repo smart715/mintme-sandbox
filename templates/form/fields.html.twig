@@ -1,3 +1,6 @@
+{% block stylesheets %}
+    {{ encore_entry_link_tags('pages/login') }}
+{% endblock %}
 {% block form_row %}
     {% spaceless %}
         {% if inline is defined and inline == true %}
@@ -18,10 +21,28 @@
                 </div>
             </div>
         {% else %}
-            <div class="form-group">
-                {{ form_label(form) }}
-                {{ form_errors(form) }}
-                {{ form_widget(form) }}
+            <div class="form-control-container {{ class is defined ? class : ''}}">
+                <div
+                    class="form-control-field {{ errors|length > 0 ? 'invalid' : ''}}"
+                >
+                    {{ form_widget(form, {
+                        'attr': widgetAttr is defined ? widgetAttr : [],
+                    }) }}
+                    <div class="outline">
+                        <div class="left-outline"></div>
+                        <div class="label-outline">
+                            {{ form_label(form, null) }}
+                        </div>
+                        <div class="right-outline"></div>
+                    </div>
+                </div>
+                {% if errors|length > 0 %}
+                    <div class="assistive d-flex">
+                            <div class="errors flex-1">
+                                {{ form_errors(form) }}
+                            </div>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     {% endspaceless %}
@@ -30,20 +51,35 @@
 {%- block form_errors -%}
     {% set break = false %}
     {%- if errors|length > 0 -%}
-    <div class="py-2 mb-2 bg-danger text-white text-center">
-        <ul class="pl-3 pr-3 m-0 list-unstyled">
-            {%- for error in errors if not break  -%}
-                <li>{{ error.message }}</li>
-                {% set break = true %}
-            {%- endfor -%}
-        </ul>
-    </div>
+        {% if isFormField is defined %}
+            <div>
+                {%- for error in errors-%}
+                    <div>{{ error.message }}</div>
+                {%- endfor -%}
+            </div>
+        {% else %}
+        <div class="py-2 mb-2 bg-danger text-white text-center">
+            <ul class="pl-3 pr-3 m-0 list-unstyled">
+                {%- for error in errors if not break -%}
+                    <li>{{ error.message }}</li>
+                    {% set break = true %}
+                {%- endfor -%}
+            </ul>
+        </div>
+        {% endif %}
     {%- endif -%}
 {%- endblock form_errors -%}
 
 {%- block form_widget_simple -%}
     {%- set type = type|default('text') -%}
-    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} class="form-control form-control-md"/>
+    <input
+        type="{{ type }}"
+        {{ block('widget_attributes') }}
+        {% if value is not empty %}
+            value="{{ value }}"
+        {% endif %}
+        class="form-control form-control-md pr-5"
+    />
 {%- endblock form_widget_simple -%}
 
 {%- block form_widget_compound -%}
@@ -82,32 +118,32 @@
 {%- endblock button_widget -%}
 
 {%- block choice_widget_collapsed -%}
-{%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
-    {% set required = false %}
-{%- endif -%}
-<select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %} class="custom-select form-control form-control-md">
-    {%- if placeholder is not none -%}
-        <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+        {% set required = false %}
     {%- endif -%}
-    {%- if preferred_choices|length > 0 -%}
-        {% set options = preferred_choices %}
-        {{- block('choice_widget_options') -}}
-        {%- if choices|length > 0 and separator is not none -%}
-            <option disabled="disabled">{{ separator }}</option>
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %} class="custom-select form-control form-control-md">
+        {%- if placeholder is not none -%}
+            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
         {%- endif -%}
-    {%- endif -%}
-    {%- set options = choices -%}
-    {{- block('choice_widget_options') -}}
-</select>
+        {%- if preferred_choices|length > 0 -%}
+            {% set options = preferred_choices %}
+            {{- block('choice_widget_options') -}}
+            {%- if choices|length > 0 and separator is not none -%}
+                <option disabled="disabled">{{ separator }}</option>
+            {%- endif -%}
+        {%- endif -%}
+        {%- set options = choices -%}
+        {{- block('choice_widget_options') -}}
+    </select>
 {%- endblock choice_widget_collapsed -%}
 
 {%- block textarea_widget -%}
 {%- if  (attr.max is defined) -%}
     <limited-textarea
-            {{ block('widget_attributes') }}
-            value="{{ value }}"
-            rows="5"
-            cols="30"
+        {{ block('widget_attributes') }}
+        value="{{ value }}"
+        rows="5"
+        cols="30"
     ></limited-textarea>
 {%- else -%}
     <textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
@@ -116,16 +152,24 @@
 
 {%- block bbcode_editor_row -%}
     {% spaceless %}
-        <div class="form-group">
-            {{ form_label(form) }}
-            <bbcode-help class="float-right"></bbcode-help>
-            {{ form_errors(form) }}
-            <bbcode-editor
-                    value="{{ value }}"
-                    rows="5"
-                    cols="30"
-                    {{ block('widget_attributes') }}
-            ></bbcode-editor>
+        <div>
+            <counted-textarea
+                value="{{ value }}"
+                name="{{ form.vars.full_name }}"
+                :rows="5"
+                cols="30"
+                label-pointer-events
+                {{ block('widget_attributes') }}
+            >
+                <template v-slot:label>
+                    <div class="d-flex align-items-center label-bg-primary-dark">
+                        {{ form.vars.label }}
+                    </div>
+                </template>
+                <template v-slot:errors>
+                    {{ form_errors(form) }}
+                </template>
+            </counted-textarea>
         </div>
     {% endspaceless %}
 {%- endblock bbcode_editor_row -%}

@@ -14,7 +14,7 @@ interface TraderFetcherInterface
         string $makerFee,
         int $referralId,
         string $referralFee
-    ): TradeResult;
+    ): PlaceOrderResult;
 
     public function executeOrder(
         int $userId,
@@ -47,4 +47,13 @@ interface TraderFetcherInterface
         int $limit,
         int $side
     ): array;
+
+    /** @return mixed[] */
+    public function getFinishedOrderDetails(int $orderId): array;
+
+    /** @return mixed[] */
+    public function getPendingOrderDetails(string $marketName, int $orderId): array;
+
+    /** @return mixed[] */
+    public function getOrderDetails(int $orderId, int $offset, int $limit): array;
 }

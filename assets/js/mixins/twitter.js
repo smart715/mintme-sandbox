@@ -27,7 +27,7 @@ export default {
                             reject(new Error(this.$t('twitter.must_sign_in')));
                         }
                     })
-                    .catch((err) => reject(new Error(err.response.data.message)));
+                    .catch((err) => reject(err));
             });
         },
         checkSignedInWithTwitter() {

@@ -5,7 +5,7 @@ monolog:
             type: fingers_crossed
             action_level: error
             handler: nested
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end', '!donation', '!unsubscribe']
+            channels: ['!cron', '!rabbitmq', '!exchange', '!user_action', '!front_end', '!donation', '!unsubscribe', '!withdraw']
             excluded_404s:
                 # regex: exclude all 404 errors from the logs
                 - ^/
@@ -33,21 +33,11 @@ monolog:
             path: "%kernel.logs_dir%/rabbitmq.log"
             level: info
             channels: ['rabbitmq']
-        rabbitmq_stdout:
-            type: stream
-            path: "php://stdout"
-            level: debug
-            channels: ['rabbitmq']
-        rabbitmq_stderr:
-            type: stream
-            path: "php://stderr"
-            level: warning
-            channels: ['rabbitmq']
-        payments:
-            type: stream
-            path: "%kernel.logs_dir%/payments.log"
+        syslog:
+            type: syslog
             level: info
-            channels: ['payments']
+            process_psr_3_messages: false
+            channels: [ "rabbitmq", "app" ]
         exchange:
             type: stream
             path: "%kernel.logs_dir%/exchange.log"
@@ -76,3 +66,9 @@ monolog:
             level: info
             channels: ['unsubscribe']
             formatter: monolog.formatter.unsubscribe
+        withdraw:
+            type: stream
+            path: "%kernel.logs_dir%/withdraws.log"
+            level: info
+            channels: ['withdraw']
+            formatter: monolog.formatter.withdraw

@@ -5,10 +5,12 @@ namespace App\Tests\EventSubscriber;
 use App\Entity\User;
 use App\EventSubscriber\KernelSubscriber;
 use App\Manager\ProfileManagerInterface;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
+use App\Mercure\Authorization as MercureAuthorization;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -23,7 +25,8 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->once()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockMercureAuthorization()
         );
 
         $sub->onRequest(
@@ -37,7 +40,8 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockMercureAuthorization()
         );
 
         $event = $this->mockEvent(null, '/foo/bar', true, true);
@@ -52,7 +56,8 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(false)
+            $this->mockCsrfTokenManager(false),
+            $this->mockMercureAuthorization()
         );
 
         $event = $this->mockEvent('foo', '/api/bar', true, true);
@@ -76,13 +81,16 @@ class KernelSubscriberTest extends TestCase
         $event = $this->createMock(RequestEvent::class);
         $req = $this->createMock(Request::class);
 
+        $attrs = $this->createMock(ParameterBag::class);
+        $attrs->method('get')->willReturn($isImgFilter);
+
         $hb = $this->createMock(HeaderBag::class);
         $hb->method('get')->willReturn($csrf);
 
+        $req->attributes = $attrs;
         $req->headers = $hb;
         $req->method('getPathInfo')->willReturn($path);
         $req->method('isXmlHttpRequest')->willReturn($isXml);
-        $req->method('isImgFilterRequest')->willReturn($isImgFilter);
 
         $event->method('getRequest')->willReturn($req);
 
@@ -90,7 +98,7 @@ class KernelSubscriberTest extends TestCase
     }
 
     /** @return ProfileManagerInterface|MockObject */
-    private function mockProfileManager(Invocation $invocation): ProfileManagerInterface
+    private function mockProfileManager(InvokedCount $invocation): ProfileManagerInterface
     {
         $pm = $this->createMock(ProfileManagerInterface::class);
         $pm->expects($invocation)->method('createHash');
@@ -114,5 +122,11 @@ class KernelSubscriberTest extends TestCase
         $ctm->method('isTokenValid')->willReturn($isValid);
 
         return $ctm;
+    }
+
+    /** @return MercureAuthorization|MockObject */
+    private function mockMercureAuthorization(): MercureAuthorization
+    {
+        return $this->createMock(MercureAuthorization::class);
     }
 }

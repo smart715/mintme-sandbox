@@ -1,9 +1,7 @@
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
-import LoggerMixin from './logger';
 
 export default {
-    mixins: [LoggerMixin],
     props: {
         websocketUrl: {type: String, required: true},
         hash: {type: String},
@@ -29,7 +27,7 @@ export default {
             _initClient: 'init',
         }),
         _authCallback: function() {
-            let auth = this._getClient(this.websocketUrl).auth;
+            const auth = this._getClient(this.websocketUrl).auth;
 
             if (auth === status.FAILED) {
                 this.sendMessage(JSON.stringify({
@@ -43,7 +41,7 @@ export default {
         authorize: function() {
             return new Promise((resolve, reject) => {
                 this._initClient(this.websocketUrl);
-                let auth = this._getClient(this.websocketUrl).auth;
+                const auth = this._getClient(this.websocketUrl).auth;
 
                 switch (auth) {
                     case status.SUCCESS: return resolve();
@@ -59,22 +57,24 @@ export default {
                 this.addOnOpenHandler(this._authCallback);
                 this.addMessageHandler((result) => {
                     if (result.id === this.requestId) {
-                        let auth = this._getClient(this.websocketUrl).auth;
+                        const auth = this._getClient(this.websocketUrl).auth;
 
                         if (auth === status.SUCCESS) {
                             return resolve();
                         }
 
-                        if (result.error !== null ||
-                            (result.result !== null && result.result.status !== 'success')) {
+                        if (null !== result.error ||
+                            (null !== result.result && 'success' !== result.result.status)) {
                             this._logoutClient(this.websocketUrl);
-                            return reject(new Error(this.$t('mixin.websocket.authorize_failed') + JSON.stringify(result.error)));
+                            return reject(
+                                new Error(this.$t('mixin.websocket.authorize_failed') + JSON.stringify(result.error))
+                            );
                         }
 
                         this._authorizeClient(this.websocketUrl);
                         return resolve();
                     }
-                });
+                }, null, 'WebSocket');
             });
         },
         /**
@@ -84,7 +84,7 @@ export default {
          * @param {*} message - message from vue component
          * @return {*}
          */
-        addMessageHandler: function(handler, id = null, message = 'WebSocket') {
+        addMessageHandler: function(handler, id, message) {
             return this._addMessageHandler({
                 url: this.websocketUrl,
                 id,
@@ -110,7 +110,7 @@ export default {
         },
         sendLogsIfWsError: function(result, message = '') {
             if (null !== result.error && 'object' === typeof result.error) {
-                this.sendLogs('error', message, result.error);
+                this.$logger.error(message, result.error);
             }
         },
     },

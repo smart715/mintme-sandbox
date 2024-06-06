@@ -1,23 +1,19 @@
 import Passwordmeter from './components/PasswordMeter';
 import i18n from './utils/i18n/i18n';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEye} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faEye);
+import {TogglePassword} from './mixins';
 
 new Vue({
     el: '#reset',
     i18n,
     components: {
         Passwordmeter,
-        FontAwesomeIcon,
     },
+    mixins: [TogglePassword],
     data: {
         password: '',
         disabled: false,
         passwordInput: null,
-        isPass: true,
+        isPassVisible: true,
         eyeIcon: null,
     },
     mounted() {
@@ -27,17 +23,6 @@ new Vue({
     methods: {
         toggleError: function(val) {
             this.disabled = val;
-        },
-        togglePassword: function() {
-            if (this.isPass) {
-                this.passwordInput.type = 'text';
-                this.eyeIcon.className = 'show-password-active';
-                this.isPass = false;
-            } else {
-                this.passwordInput.type = 'password';
-                this.eyeIcon.className = 'show-password';
-                this.isPass = true;
-            }
         },
     },
 });

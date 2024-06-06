@@ -4,8 +4,8 @@
             ref="input"
             v-model="newValue"
             type="text"
-            class="form-control price-converter-input__input"
-            :class="{ 'price-converter-input__input--overflow': overflow, ...inputClass }"
+            class="form-control price-converter-input__input pr-1"
+            :class="computedInputClass"
             :id="inputId"
             :disabled="disabled"
             :tabindex="tabindex"
@@ -14,17 +14,22 @@
             @input="onInput"
             @change="$emit('change', $event)"
             @keyup="$emit('keyup', $event)"
+            @focus="$emit('focus', $event)"
+            @focusout="$emit('focusout', $event)"
+            placeholder="0"
         >
-        <price-converter v-if="showConverter"
-            class="position-absolute top-0 right-0 h-100 mr-3 d-flex align-items-center text-white"
+        <price-converter
+            v-if="showConverter"
+            ref="priceConverter"
+            class="position-absolute top-0 right-0 h-100 d-flex align-items-center text-white"
             :class="{ 'price-converter-input__converter--overflow': overflow }"
-            :amount="newValue"
-            :converted-amount-prop.sync="convertedValue"
+            :amount="amountToConvert"
             :from="from"
             :to="to"
             :symbol="symbol"
             :subunit="subunit"
-            :delay="1000"
+            :is-token="isToken"
+            :hasParentheses="true"
         />
     </div>
 </template>
@@ -46,18 +51,26 @@ export default {
         to: String,
         symbol: String,
         subunit: Number,
+        convert: {
+            type: [String, Number],
+            default: null,
+        },
         showConverter: {
             type: Boolean,
             default: true,
         },
         inputClass: Object,
+        overflowClass: Object,
+        isToken: Boolean,
     },
     data() {
         return {
             newValue: this.value,
-            convertedValue: '0',
             inputWidth: 100,
             resizeObserver: null,
+            inputOverflowClass: {
+                'price-converter-input__input--overflow': true,
+            },
         };
     },
     mounted() {
@@ -68,10 +81,28 @@ export default {
         this.resizeObserver.disconnect();
     },
     computed: {
+        amountToConvert() {
+            return null !== this.convert
+                ? this.convert
+                : this.newValue;
+        },
+        computedInputClass() {
+            if (this.overflow) {
+                return {
+                    ...this.inputClass,
+                    ...this.inputOverflowClass,
+                    ...this.overflowClass,
+                };
+            }
+
+            return this.inputClass;
+        },
         overflow() {
-            // maximum amount of characters in a single line, 9 is the width of every number (when font-size is 15px)
-            let max = this.inputWidth / 9;
-            return this.newValue.toString().length + this.convertedValue.toString().length + this.symbol.length > max;
+            const convertedValue = this.$refs.priceConverter?.convertedAmount ?? '';
+            const max = this.inputWidth / 12;
+
+            // maximum amount of characters in a single line, 12 is the width of every number (when font-size is 15px)
+            return this.newValue.toString().length + convertedValue.toString().length + this.symbol.length > max;
         },
     },
     methods: {
@@ -79,10 +110,10 @@ export default {
             this.$emit('input', this.newValue);
         },
         updateInputWidth() {
-            let styles = window.getComputedStyle(this.$refs.input, null);
-            let width = parseFloat(styles.getPropertyValue('width'));
-            let rightPadding = parseFloat(styles.getPropertyValue('padding-right'));
-            let leftPadding = parseFloat(styles.getPropertyValue('padding-left'));
+            const styles = window.getComputedStyle(this.$refs.input, null);
+            const width = parseFloat(styles.getPropertyValue('width'));
+            const rightPadding = parseFloat(styles.getPropertyValue('padding-right'));
+            const leftPadding = parseFloat(styles.getPropertyValue('padding-left'));
             this.inputWidth = width - rightPadding - leftPadding;
         },
     },

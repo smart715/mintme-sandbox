@@ -2,10 +2,12 @@
 
 namespace App\Manager;
 
+use App\Activity\ActivityTypes;
 use App\Entity\DiscordRole;
 use App\Entity\DiscordRoleUser;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\Activity\UserTokenEventActivity;
 use App\Exception\Discord\DiscordException;
 use App\Exception\Discord\MissingPermissionsException;
 use App\Exception\Discord\UnknownRoleException;
@@ -15,7 +17,7 @@ use GuzzleHttp\Command\Exception\CommandClientException;
 use Psr\Log\LoggerInterface;
 use RestCord\DiscordClient;
 use RestCord\Model\Guild\Guild;
-use RestCord\Model\Permissions\Role;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DiscordManager implements DiscordManagerInterface
 {
@@ -30,6 +32,8 @@ class DiscordManager implements DiscordManagerInterface
     private DiscordRoleManagerInterface $discordRoleManager;
     private DiscordConfigManagerInterface $discordConfigManager;
     private EntityManagerInterface $entityManager;
+    private UserTokenManagerInterface $userTokenManager;
+    private EventDispatcherInterface $eventDispatcher;
     private string $publicKey;
     private string $clientId;
 
@@ -40,6 +44,8 @@ class DiscordManager implements DiscordManagerInterface
         DiscordRoleManagerInterface $discordRoleManager,
         DiscordConfigManagerInterface $discordConfigManager,
         EntityManagerInterface $entityManager,
+        UserTokenManagerInterface $userTokenManager,
+        EventDispatcherInterface $eventDispatcher,
         string $publicKey,
         string $clientId
     ) {
@@ -49,6 +55,8 @@ class DiscordManager implements DiscordManagerInterface
         $this->discordRoleManager = $discordRoleManager;
         $this->discordConfigManager = $discordConfigManager;
         $this->entityManager = $entityManager;
+        $this->userTokenManager = $userTokenManager;
+        $this->eventDispatcher = $eventDispatcher;
         $this->publicKey = $publicKey;
         $this->clientId = $clientId;
     }
@@ -146,6 +154,25 @@ class DiscordManager implements DiscordManagerInterface
         }
     }
 
+    public function removeAllGuildMembersRole(Token $token, DiscordRole $role): void
+    {
+        $holders = $this->userTokenManager->getHoldersWithDiscord($token);
+        $guildId = $role->getToken()->getDiscordConfig()->getGuildId();
+        $roleDiscordId = $role->getDiscordId();
+
+        foreach ($holders as $holder) {
+            try {
+                $this->discord->guild->removeGuildMemberRole([
+                    'guild.id' => $guildId,
+                    'role.id' => $roleDiscordId,
+                    'user.id' => $holder->getUser()->getDiscordId(),
+                ]);
+            } catch (CommandClientException $e) {
+                $this->errorHandler($e, $role);
+            }
+        }
+    }
+
     public function removeGuildMemberRole(User $user, DiscordRole $role): void
     {
         $guildId = $role->getToken()->getDiscordConfig()->getGuildId();
@@ -216,8 +243,23 @@ class DiscordManager implements DiscordManagerInterface
         return $result;
     }
 
-    public function updateRoleOfUser(User $user, Token $token, bool $updateOnDiscordIfSame = false): void
+    public function updateRolesOfUsers(Token $token): void
     {
+        $holders = $this->userTokenManager->getHoldersWithDiscord($token);
+
+        foreach ($holders as $holder) {
+            $this->updateRoleOfUser($holder->getUser(), $token, false, true);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function updateRoleOfUser(
+        User $user,
+        Token $token,
+        bool $updateOnDiscordIfSame = false,
+        bool $dontFlush = false
+    ): void {
         if (!$token->getDiscordConfig()->getEnabled()
             || !$token->getDiscordConfig()->getSpecialRolesEnabled()
             || !$user->isSignedInWithDiscord()
@@ -272,7 +314,14 @@ class DiscordManager implements DiscordManagerInterface
             $this->entityManager->remove($dru);
         }
 
-        $this->entityManager->flush();
+        $this->eventDispatcher->dispatch(
+            new UserTokenEventActivity($user, $token, ActivityTypes::DISCORD_REWARD_RECEIVED),
+            UserTokenEventActivity::NAME
+        );
+
+        if (!$dontFlush) {
+            $this->entityManager->flush();
+        }
     }
 
     private function getError(CommandClientException $e): array

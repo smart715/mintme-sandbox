@@ -15,11 +15,14 @@ interface PostManagerInterface
     public function getBySlug(string $slug): ?Post;
 
     /**
-     * @param User $user
-     * @param int $page
      * @return Post[]
      */
-    public function getRecentPost(User $user, int $page): array;
+    public function getRecentPostsByUserFeed(User $user, int $page): array;
+
+    /**
+     * @return Post[]
+     */
+    public function getRecentPosts(int $page, int $max): array;
 
     /**
      * @return Post[]
@@ -29,5 +32,25 @@ interface PostManagerInterface
     /**
      * @return Post[]
      */
-    public function getPostsCreatedAtByToken(Token $token, \DateTimeImmutable $date): array;
+    public function getPostsCreatedAtByToken(
+        Token $token,
+        \DateTimeImmutable $date,
+        bool $includeDeleted = false
+    ): array;
+
+    /**
+     * @return Post[]
+     */
+    public function getPostsByToken(Token $token, int $offset, int $limit): array;
+
+    public function getTokenPostsCount(Token $token): int;
+
+    public function getActivePostsByToken(Token $token, int $offset, int $limit): array;
+
+    public function getActivePostsCountByToken(Token $token): int;
+
+    /**
+     * @return Post[]
+     */
+    public function getPostsByHashtag(string $hashtag, int $page): array;
 }

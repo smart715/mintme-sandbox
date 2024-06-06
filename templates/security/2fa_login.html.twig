@@ -2,44 +2,61 @@
 
 {% block contentClass %}wrap-main-form py-4{% endblock %}
 
-{% set formHeader = '2fa.auth.title'|trans %}
+{% set formHeader = '2fa.auth.page_title'|trans %}
 
 {% block title %}{{ formHeader }} | mintMe{% endblock %}
 
+{% block messageContainer %}{% endblock %}
 {% block content %}
-    <div class="container text-center">
+    <div id="check_code" class="container text-center">
         <div class="row pt-4 justify-content-center">
-            <div class="col-lg-4 col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        {{ formHeader }}
+            <div class="col-12">
+                <div class="card card-fixed-small mx-auto">
+                    <div class="card-title px-3 pt-2 mb-0 font-weight-semibold font-size-2">
+                        {% trans %}2fa.auth.title{% endtrans %}
                     </div>
                     <div class="card-body">
-                        {% if authenticationError  and 'error.csrf'|trans != authenticationError  %}
+                        {% if authenticationError and 'error.csrf'|trans != authenticationError %}
                             <div class="p-2 mb-2 bg-danger text-center text-white">
-                                {{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}
+                                {% for type, messages in app.session.flashbag.all %}
+                                    {% if type == 'danger' %}
+                                        {% for message in messages %}
+                                            {{ message }}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         {% endif %}
                         {% block formBody %}
-                            <form action="{{ path("2fa_login_check") }}" method="post">
-                                <div class="form-group">
-                                    <label for="code">{% trans %}page.login_2fa.header{% endtrans %}</label>
-                                    <input
-                                        type="text" name="{{ authCodeParameterName }}" required="required"
-                                        class="form-control form-control-md" id="code" autofocus
-                                        >
-                                </div>
-                                <div class="form-group mb-0" style="line-height: 0.8em;">
+                            <form action="{{ path("2fa_login_check") }}" method="post" id="form_code">
+                                <div>{% trans %}page.login_2fa.header{% endtrans %}</div>
+                                <div class="form-group mb-2 line-height-1">
                                     <small>
                                         {% trans %}page.login_2fa.body{% endtrans %}
                                     </small>
                                 </div>
+                                <div class="form-group">
+                                    {{ include("spinners/verify_code_inputs.html.twig", {
+                                        hide_send_code: true,
+                                        backup_code: true
+                                    }) }}
+                                    <verify-code-with-backup
+                                        :disabled="loading"
+                                        @code-entered="onVerifyCodeEntered"
+                                    ></verify-code-with-backup>
+                                    <input type="hidden" ref="code_input" name="{{ authCodeParameterName }}"/>
+                                </div>
                                 {{ block('trusted_device', 'form/fields.html.twig') }}
                                 <div class="form-group">
                                     <input
-                                        type="submit" id="_submit" name="_submit"
-                                        class="btn btn-primary" value="Verify Code"
-                                        >
+                                        v-show="!loading"
+                                        type="submit"
+                                        id="_submit"
+                                        name="_submit"
+                                        class="btn btn-primary showButtons"
+                                        value="{% trans %} 2fa_modal.submit {% endtrans %}"
+                                    >
+                                    <div id="loading" v-cloak v-show="loading" class="icon-loading"></div>
                                 </div>
                                 {% if isCsrfProtectionEnabled %}
                                     <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
@@ -52,3 +69,6 @@
         </div>
     </div>
 {% endblock %}
+{% block pagescripts %}
+    {{ encore_entry_script_tags('check_code') }}
+{% endblock pagescripts %}

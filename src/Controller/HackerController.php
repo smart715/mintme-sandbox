@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Profile;
-use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Exception\BalanceException;
 use App\Form\QuickRegistrationType;
 use App\Form\RegistrationType;
 use App\Manager\CryptoManagerInterface;
@@ -32,11 +32,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  */
 class HackerController extends AbstractController
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /** @var string */
-    private $quickRegistrationPassword;
+    private string $quickRegistrationPassword;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -47,10 +45,11 @@ class HackerController extends AbstractController
     }
 
     /**
-     * @Route("/crypto/{crypto}", name="hacker-add-crypto", options={"expose"=true})
+     * @Route("/crypto/{crypto}/{amount}", name="hacker-add-crypto", options={"expose"=true})
      */
     public function addCrypto(
         string $crypto,
+        string $amount,
         Request $request,
         BalanceHandlerInterface $balanceHandler,
         CryptoManagerInterface $cryptoManager,
@@ -61,41 +60,26 @@ class HackerController extends AbstractController
         $crypto  = $cryptoManager->findBySymbol($crypto);
         $user    = $this->getUser();
 
-        if (!$crypto || !$user) {
+        if (!$crypto || !$user || !$amount || intval($amount) > 100) {
             return $this->redirect($referer);
         }
 
         $symbol = $crypto->getSymbol();
 
-        switch ($symbol) {
-            case Symbols::BTC:
-                $amount = '0.001';
-
-                break;
-            case Symbols::ETH:
-                $amount = '0.05';
-
-                break;
-            case Symbols::USDC:
-                $amount = '10';
-
-                break;
-            case Symbols::BNB:
-                $amount = '0.1';
-
-                break;
-            default:
-                $amount = '100';
-        }
-
         /** @var User $user*/
         $user = $this->getUser();
 
-        $balanceHandler->deposit(
-            $user,
-            $crypto,
-            $moneyWrapper->parse($amount, $symbol)
-        );
+        try {
+            $balanceHandler->beginTransaction();
+            $balanceHandler->deposit(
+                $user,
+                $crypto,
+                $moneyWrapper->parse($amount, $symbol)
+            );
+        } catch (BalanceException $e) {
+            $balanceHandler->rollback();
+            $this->addFlash('error', $e->getMessage());
+        }
 
         return $this->redirect($referer);
     }

@@ -6,9 +6,11 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
+use App\Entity\Token\TokenPromotion;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use FOS\UserBundle\Model\User as BaseUser;
@@ -25,7 +27,53 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()
- * @ORM\Table(name="user")
+ * @ORM\Table(
+ *     name="user",
+ *     indexes={
+ *         @ORM\Index(name="session_id_index", columns={"session_id"}),
+ *         @ORM\Index(name="FK_AirdropReferrer", columns={"airdrop_referrer_id"}),
+ *         @ORM\Index(name="FK_AirdropReferrerUser", columns={"airdrop_referrer_user_id"}),
+ *     },
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="uq_discordid", columns={"discord_id"})
+ *     }
+  * )
+ * @ORM\AttributeOverrides({
+ *     @ORM\AttributeOverride(name="emailCanonical",
+ *         column=@ORM\Column(
+ *             name="email_canonical",
+ *             type="string",
+ *             length=320,
+ *             nullable=false,
+ *             unique=true
+ *         )
+ *     ),
+ *     @ORM\AttributeOverride(name="usernameCanonical",
+ *         column=@ORM\Column(
+ *             name="username_canonical",
+ *             type="string",
+ *             length=320,
+ *             nullable=false,
+ *             unique=true
+ *         )
+ *      ),
+ *     @ORM\AttributeOverride(name="email",
+ *         column=@ORM\Column(
+ *             name="email",
+ *             type="string",
+ *             length=320,
+ *             nullable=false,
+ *         )
+ *      ),
+ *     @ORM\AttributeOverride(name="username",
+ *         column=@ORM\Column(
+ *             name="username",
+ *             type="string",
+ *             length=320,
+ *             nullable=false,
+ *         )
+ *     )
+ * })
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_group")
  */
@@ -37,8 +85,11 @@ class User extends BaseUser implements
     TrustedDeviceInterface
 {
     public const ROLE_API = 'ROLE_API';
+    public const ROLE_FINANCIER = 'ROLE_FINANCIER';
+    public const ROLE_PROFIT_VIEWER = 'ROLE_PROFIT_VIEWER';
     public const ROLE_AUTHENTICATED = 'ROLE_AUTHENTICATED';
     public const ROLE_SEMI_AUTHENTICATED = 'ROLE_SEMI_AUTHENTICATED';
+    public const DEFAULT_LOCALE = 'en';
 
     /**
      * @ORM\Id
@@ -51,7 +102,7 @@ class User extends BaseUser implements
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
-     * @Groups({"API", "Default"})
+     * @Groups({"API", "Default", "API_BASIC"})
      */
     protected $id;
 
@@ -84,6 +135,11 @@ class User extends BaseUser implements
     protected $email;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $sessionId = null; // phpcs:ignore
+
+    /**
      * @Assert\Length(min="8", max="72")
      * @Assert\Regex(
      *     pattern="/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/",
@@ -91,7 +147,7 @@ class User extends BaseUser implements
      *     message="The password must contain minimum eight symbols,
      *     at least one uppercase letter, a lowercase letter, and a number"
      * )
-     * @var string|null
+     * @var string
      */
     protected $plainPassword;
 
@@ -100,6 +156,11 @@ class User extends BaseUser implements
      * @var Profile|null
      */
     protected $profile;
+
+    /**
+     * @ORM\OneToOne(targetEntity="AuthAttempts", mappedBy="user", cascade={"persist", "remove"})
+     */
+    protected ?AuthAttempts $authAttempts;
 
     /**
      * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist", "remove"})
@@ -151,6 +212,12 @@ class User extends BaseUser implements
     protected $pendingWithdrawals;
 
     /**
+     * @ORM\OneToMany(targetEntity="PendingTokenWithdraw", mappedBy="user")
+     * @var ArrayCollection
+     */
+    protected $pendingTokenWithdrawals;
+
+    /**
      * @ORM\Column(type="integer", nullable=true, options={"default": 0})
      * @var int
      */
@@ -189,10 +256,9 @@ class User extends BaseUser implements
     protected $comments;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Comment", mappedBy="likes", fetch="EXTRA_LAZY")
-     * @var ArrayCollection
+     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="usersLiked", fetch="EXTRA_LAZY")
      */
-    protected $likes;
+    protected Collection $likedPosts;
 
     /**
      * @ORM\Column(type="string", nullable=true, unique=true)
@@ -201,7 +267,7 @@ class User extends BaseUser implements
     protected $coinifyOfflineToken;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction")
+     * @ORM\ManyToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction", mappedBy="users")
      * @var ArrayCollection
      */
     protected $airdropActions;
@@ -217,12 +283,8 @@ class User extends BaseUser implements
     protected ?string $twitterAccessTokenSecret;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="rewardedUsers")
-     */
-    protected Collection $rewardClaimedPosts;
-
-    /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="airdropReferrals")
+     * @ORM\JoinColumn(name="airdrop_referrer_user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected ?User $airdropReferrerUser;
 
@@ -233,16 +295,17 @@ class User extends BaseUser implements
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\AirdropCampaign\Airdrop")
+     * @ORM\JoinColumn(name="airdrop_referrer_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected ?Airdrop $airdropReferrer;
 
     /**
-     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable=false)
      */
     private bool $exchangeCryptoMailSent = false; // phpcs:ignore
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="bigint", nullable=true, unique=true)
      */
     protected ?int $discordId;
 
@@ -250,6 +313,72 @@ class User extends BaseUser implements
      * @ORM\OneToMany(targetEntity="App\Entity\DiscordRoleUser", mappedBy="user", indexBy="token_id")
      */
     protected PersistentCollection $discordRoles;
+
+    /**
+     * @ORM\Column(type="string", nullable=false, options={"default":User::DEFAULT_LOCALE})
+     */
+    protected string $locale = self::DEFAULT_LOCALE; // phpcs:ignore
+
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $tradingFee = null; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="datetime_immutable", options={"default": "CURRENT_TIMESTAMP"})
+     */
+    private \DateTimeImmutable $lastNotificationCheck;
+
+    /**
+     * @ORM\OneToMany(targetEntity=TokenInitOrder::class, mappedBy="user", fetch="EXTRA_LAZY")
+     */
+    private Collection $tokenInitOrders;
+
+    /** @ORM\OneToMany(
+     *   targetEntity=Like::class,
+     *   mappedBy="user",
+     *   cascade={"persist","remove"},
+     *   fetch="EXTRA_LAZY"
+     *)
+     */
+    private ?Collection $likes;
+
+    /** @ORM\OneToMany(targetEntity=CommentTip::class, mappedBy="commentAuthor", fetch="EXTRA_LAZY") */
+    private ?Collection $tips; // phpcs:ignore
+
+    /** @ORM\OneToMany(targetEntity=TokenPromotion::class, mappedBy="user", fetch="EXTRA_LAZY") */
+    private Collection $tokenPromotions;
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\TopHolder",
+     *     mappedBy="user",
+     *     orphanRemoval=true,
+     *     fetch="EXTRA_LAZY"
+     * )
+     */
+    protected Collection $topHolders; // phpcs:ignore
+
+    /**
+     * @ORM\OneToMany(
+     *   targetEntity=UserChangeEmailRequest::class,
+     *   mappedBy="user",
+     *   cascade={"persist", "remove"},
+     *   fetch="EXTRA_LAZY"
+     * )
+     */
+    protected Collection $userChangeEmailRequests;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->tokenInitOrders = new ArrayCollection();
+        $this->likes = new ArrayCollection();
+        $this->tips = new ArrayCollection();
+        $this->tokenPromotions = new ArrayCollection();
+        $this->lastNotificationCheck = new \DateTimeImmutable();
+    }
 
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
@@ -280,6 +409,10 @@ class User extends BaseUser implements
      */
     public function getTokens(): array
     {
+        if (null === $this->tokens) {
+            return [];
+        }
+
         return array_map(function (UserToken $userToken) {
             return $userToken->getToken();
         }, $this->tokens->toArray());
@@ -309,9 +442,16 @@ class User extends BaseUser implements
         return $this;
     }
 
+    public function containsUserCrypto(Crypto $crypto): bool
+    {
+        return $this->cryptos->exists(function ($key, UserCrypto $userCrypto) use ($crypto) {
+            return $crypto === $userCrypto->getCrypto();
+        });
+    }
+
     /**
      * @codeCoverageIgnore
-     * @Groups({"API", "Default"})
+     * @Groups({"API", "Default", "API_BASIC"})
      */
     public function getProfile(): Profile
     {
@@ -362,9 +502,7 @@ class User extends BaseUser implements
     {
         $googleAuth = $this->googleAuthenticatorEntry;
 
-        return null !== $googleAuth
-            ? in_array($code, $googleAuth->getBackupCodes())
-            : false;
+        return null !== $googleAuth && in_array($code, $googleAuth->getBackupCodes());
     }
 
     /** @codeCoverageIgnore */
@@ -439,7 +577,6 @@ class User extends BaseUser implements
 
     /**
      * @codeCoverageIgnore
-     * @var string
      * @return string
      */
     public function getNickname(): string
@@ -518,7 +655,7 @@ class User extends BaseUser implements
         $this->authCodeExpirationTime = $authCodeExpirationTime;
     }
 
-    private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
+    public function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
     {
         if (null === $this->googleAuthenticatorEntry) {
             $this->googleAuthenticatorEntry = new GoogleAuthenticatorEntry();
@@ -627,6 +764,12 @@ class User extends BaseUser implements
         return $this->twitterAccessTokenSecret;
     }
 
+    /** @codeCoverageIgnore */
+    public function getPendingTokenWithdrawals(): ?object
+    {
+        return $this->pendingTokenWithdrawals;
+    }
+
     /**
      * @Groups({"Default"})
      */
@@ -710,5 +853,137 @@ class User extends BaseUser implements
     public function getDiscordRoleUser(Token $token): ?DiscordRoleUser
     {
         return $this->discordRoles->get($token->getId());
+    }
+
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): self
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getTradingFee(): ?string
+    {
+        return $this->tradingFee;
+    }
+
+    public function setTradingFee(?string $tradingFee): self
+    {
+        $this->tradingFee = $tradingFee;
+
+        return $this;
+    }
+
+    public function getTokenInitOrders(): Collection
+    {
+        return $this->tokenInitOrders;
+    }
+
+    public function addTokenInitOrder(TokenInitOrder $tokenInitOrder): self
+    {
+        if (!$this->tokenInitOrders->contains($tokenInitOrder)) {
+            $this->tokenInitOrders->add($tokenInitOrder);
+            $tokenInitOrder->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTokenInitOrder(TokenInitOrder $tokenInitOrder): self
+    {
+        if ($this->tokenInitOrders->contains($tokenInitOrder)) {
+            $this->tokenInitOrders->removeElement($tokenInitOrder);
+        }
+
+        return $this;
+    }
+
+    public function setSessionId(string $sessionId): self
+    {
+        $this->sessionId = $sessionId;
+
+        return $this;
+    }
+
+    public function getSessionId(): ?string
+    {
+        return $this->sessionId;
+    }
+
+    public function setAuthAttempts(AuthAttempts $authAttempts): self
+    {
+        $this->authAttempts = $authAttempts;
+
+        return $this;
+    }
+
+    public function getAuthAttempts(): ?AuthAttempts
+    {
+        return $this->authAttempts;
+    }
+
+    public function getTips(): ?Collection
+    {
+        return $this->tips;
+    }
+
+    public function getTokenPromotions(): Collection
+    {
+        return $this->tokenPromotions;
+    }
+
+    public function getLikes(): ?Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(Like $like): self
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+            $like->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(Like $like): self
+    {
+        if ($this->likes->contains($like)) {
+            $this->likes->removeElement($like);
+
+            if ($like->getUser() === $this) {
+                $like->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTopHolders(): Collection
+    {
+        return $this->topHolders;
+    }
+
+    public function getUserChangeEmailRequests(): Collection
+    {
+        return $this->userChangeEmailRequests;
+    }
+
+    public function getLastNotificationCheck(): \DateTimeImmutable
+    {
+        return $this->lastNotificationCheck;
+    }
+
+    public function setLastNotificationCheck(\DateTimeImmutable $lastNotificationCheck): self
+    {
+        $this->lastNotificationCheck = $lastNotificationCheck;
+
+        return $this;
     }
 }

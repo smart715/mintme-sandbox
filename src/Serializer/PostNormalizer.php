@@ -44,6 +44,18 @@ class PostNormalizer implements NormalizerInterface
             ? $object->isUserAlreadyRewarded($user)
             : false;
 
+        $post['isUserAlreadyLiked'] = $user instanceof User
+            ? $object->isUserAlreadyLiked($user)
+            : false;
+
+        if ($object->getToken()) {
+            $post['token'] = $this->normalizer->normalize($object->getToken(), $format, ['groups' => 'API_BASIC']);
+        }
+
+        if ($object->getAuthor()) {
+            $post['author'] = $this->normalizer->normalize($object->getAuthor(), $format, ['groups' => 'API_BASIC']);
+        }
+
         return $post;
     }
 

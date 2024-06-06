@@ -1,0 +1,38 @@
+<div class="key-facts w-100 py-5 px-2" v-if="false">
+    <img src="{{ asset('build/images/main_dots.webp') }}" class="key-facts-dots first-dots" />
+    <img src="{{ asset('build/images/main_dots.webp') }}" class="key-facts-dots second-dots" />
+    <img src="{{ asset('build/images/main_dots.webp') }}" class="key-facts-dots third-dots" />
+    <div class="key-facts-content mx-auto">
+        <h2
+            class="section-header key-facts-header text-center mb-4"
+        >
+            {% trans %} page.coin.key_facts.header {% endtrans %}
+        </h2>
+        <div class="body container py-5">
+            <div class="row mx-0 justify-content-around">
+                {% for key, value in translations['keyFacts'] %}
+                    <div class="col-12 col-xl-4 p-3 key-fact text-center">
+                        <img
+                            src="{{ key <= 7
+                                ? asset('build/images/mintme-coin-illustration-' ~ key ~ '.svg')
+                                : asset('build/images/mintme-coin-illustration-' ~ key ~ '.png')
+                            }}"
+                            alt="{{ 'mintme-coin-illustration-' ~ key }}"
+                            loading="lazy"
+                        />
+                        <h4 class="key-fact-header pb-4 mb-0">
+                            <span>
+                                {{ translations['keyFacts'][key]['header']}}
+                            </span>
+                        </h4>
+                        <div class="key-fact-text text-left mx-auto">
+                            <span>
+                                {{ translations['keyFacts'][key]['body'] }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

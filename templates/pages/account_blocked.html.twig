@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% trans %}page.blocked.account.title{% endtrans %} - {{ error_message | default('')}} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/error') }}
+{% endblock %}
+
+{% block bodyclass %}errorpage{% endblock %}
+
+{% block messageClass %}d-none{% endblock %}
+
+{% block content %}
+    <div class="container top-4 h-100">
+        <div class="row justify-content-center align-content-center text-center text-white h-100">
+            <div class="col-12 py-5">
+                <div class="error-text">
+                    {{ 'page.blocked.account'| trans({'%email%': email}) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

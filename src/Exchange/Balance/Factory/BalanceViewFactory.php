@@ -2,90 +2,140 @@
 
 namespace App\Exchange\Balance\Factory;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\TradableInterface;
 use App\Entity\User;
+use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
-use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserTokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 
 class BalanceViewFactory implements BalanceViewFactoryInterface
 {
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var TokenNameConverterInterface */
-    private $tokenNameConverter;
-
-    /** @var int */
-    private $tokenSubunit;
+    private TokenManagerInterface $tokenManager;
+    private UserTokenManagerInterface $userTokenManager;
+    private TokenNameConverterInterface $tokenNameConverter;
+    private int $tokenSubunit;
 
     public function __construct(
-        CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
+        UserTokenManagerInterface $userTokenManager,
         TokenNameConverterInterface $tokenNameConverter,
         int $tokenSubunit
     ) {
-        $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->userTokenManager = $userTokenManager;
         $this->tokenNameConverter = $tokenNameConverter;
         $this->tokenSubunit = $tokenSubunit;
     }
 
     /** {@inheritdoc} */
-    public function create(BalanceResultContainer $container, User $user): array
-    {
+    public function create(
+        array $tradablesProp,
+        BalanceResultContainer $container,
+        User $user
+    ): array {
+        /** @var TradableInterface[] $tradables */
+        $tradables = [];
+
+        foreach ($tradablesProp as $tradable) {
+            $key = $this->tokenNameConverter->convert($tradable);
+            $tradables[$key] = $tradable;
+        }
+
+        /** @var BalanceView[] $result */
         $result = [];
 
         foreach ($container as $key => $balanceResult) {
-            $token = $this->tokenManager->findByName($key) ?? $this->tokenManager->findByHiddenName($key);
-            $crypto = $this->cryptoManager->findBySymbol($key);
+            $tradable = $tradables[$key] ?? null;
 
-            if (!$token && !$crypto) {
+            if (!$tradables) {
                 continue;
             }
 
-            if ($token) {
-                $name = $token->getName();
-                $fee = $token->getFee();
-                $subunit = $this->tokenSubunit;
-
-                $owner = null !== $token->getProfile() && $user->getId() === $token->getProfile()->getUser()->getId();
-            } else {
-                $name = $crypto->getSymbol();
-                $fee = $crypto->getFee();
-                $subunit = $crypto->getShowSubunit();
-
-                $owner = false;
+            if ($tradable instanceof Token) {
+                $result[$tradable->getSymbol()] = $this->setUpTokenBalanceView(
+                    $tradable,
+                    $balanceResult,
+                    $user
+                );
             }
 
-            $result[$name] = new BalanceView(
-                $this->tokenNameConverter->convert($token ?? $crypto),
-                $token
-                    ? $this->tokenManager->getRealBalance(
-                        $token,
-                        $balanceResult,
-                        $user
-                    )->getAvailable()
-                    : $balanceResult->getAvailable(),
-                $token && $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
-                $name,
-                $fee,
-                $token
-                    ? null === $token->getDecimals() || $token->getDecimals() > $subunit ? $subunit : $token->getDecimals()
-                    : $subunit,
-                $token && $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
-                $token && $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
-                $token ? Token::DEPLOYED === $token->getDeploymentStatus() : false,
-                $owner,
-                $token ? $token->isBlocked() : false,
-                $token ? $token->getCryptoSymbol() : $name,
-            );
+            if ($tradable instanceof Crypto) {
+                $result[$tradable->getSymbol()] = $this->setUpCryptoBalanceView(
+                    $tradable,
+                    $balanceResult
+                );
+            }
         }
 
         return $result;
+    }
+
+    private function setUpTokenBalanceView(
+        Token $token,
+        BalanceResult $balanceResult,
+        User $user
+    ): BalanceView {
+        $realBalance = $this->tokenManager->getRealBalance(
+            $token,
+            $balanceResult,
+            $user
+        )->getAvailable();
+
+        $subunit = null === $token->getDecimals() || $token->getDecimals() > $this->tokenSubunit
+            ? $this->tokenSubunit
+            : $token->getDecimals();
+
+        $owner = null !== $token->getProfile() && $user->getId() === $token->getProfile()->getUser()->getId();
+        $isRemoved = $this->userTokenManager->findByUserToken($user, $token)->isRemoved();
+
+        return new BalanceView(
+            $this->tokenNameConverter->convert($token),
+            $realBalance,
+            $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
+            $balanceResult->getBonus(),
+            $token->getName(),
+            $token->getFee(),
+            $subunit,
+            false,
+            false,
+            $token->isDeployed(),
+            $owner,
+            $token->isBlocked(),
+            true,
+            $token->getCryptoSymbol(),
+            $token->isCreatedOnMintmeSite(),
+            $isRemoved,
+            $token->getHasTax(),
+            $token->getIsPausable()
+        );
+    }
+    private function setUpCryptoBalanceView(
+        Crypto $crypto,
+        BalanceResult $balanceResult
+    ): BalanceView {
+        return new BalanceView(
+            $this->tokenNameConverter->convert($crypto),
+            $balanceResult->getAvailable(),
+            null,
+            $balanceResult->getBonus(),
+            $crypto->getName(),
+            $crypto->getFee(),
+            $crypto->getShowSubunit(),
+            $crypto->isExchangeble(),
+            $crypto->isTradable(),
+            false,
+            false,
+            false,
+            $crypto->isToken(),
+            $crypto->getSymbol(),
+            false,
+            false,
+            false,
+            false,
+        );
     }
 }

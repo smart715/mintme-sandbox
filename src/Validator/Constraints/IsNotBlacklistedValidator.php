@@ -2,9 +2,10 @@
 
 namespace App\Validator\Constraints;
 
-use App\Entity\Blacklist;
+use App\Entity\Blacklist\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\TokenManagerInterface;
+use libphonenumber\PhoneNumber;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -34,15 +35,17 @@ class IsNotBlacklistedValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
+        if (!is_string($value) && !$value instanceof PhoneNumber) {
+            throw new UnexpectedTypeException($value, 'string|PhoneNumber');
         }
 
         if ((Blacklist::EMAIL === $constraint->type &&
-            $this->blacklistManager->isBlacklistedEmail($value, $constraint->caseSensetive)) ||
-            (in_array($constraint->type, Blacklist::TOKEN_TYPES, true) &&
-            $this->blacklistManager->isBlackListedToken($value, $constraint->caseSensetive)) &&
-            !$this->tokenManager->findByName($value)
+            $this->blacklistManager->isBlacklistedEmail($value, $constraint->caseSensetive))
+            || ((in_array($constraint->type, Blacklist::TOKEN_TYPES, true)
+                && $this->blacklistManager->isBlackListedToken($value, $constraint->caseSensetive))
+                && !$this->tokenManager->findByName($value))
+            || ($value instanceof PhoneNumber && Blacklist::PHONE === $constraint->type
+                && $this->blacklistManager->isBlackListedNumber($value))
         ) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }

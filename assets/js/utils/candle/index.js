@@ -1,13 +1,32 @@
 /*eslint-disable*/
 (function(global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('echarts/lib/echarts'), require('echarts/lib/component/tooltip'), require('echarts/lib/component/legend'), require('echarts/lib/chart/bar'), require('echarts/lib/chart/line'), require('echarts/lib/chart/candlestick'), require('echarts/lib/component/visualMap'), require('echarts/lib/component/dataZoom')) :
-        typeof define === 'function' && define.amd ? define(['echarts/lib/echarts', 'echarts/lib/component/tooltip', 'echarts/lib/component/legend', 'echarts/lib/chart/bar', 'echarts/lib/chart/line', 'echarts/lib/chart/candlestick', 'echarts/lib/component/visualMap', 'echarts/lib/component/dataZoom'], factory) :
+    typeof exports === 'object' && typeof module !== 'undefined' ?
+        module.exports = factory(
+            require('echarts/lib/echarts'),
+            require('echarts/lib/component/tooltip'),
+            require('echarts/lib/component/legend'),
+            require('echarts/lib/chart/bar'),
+            require('echarts/lib/chart/line'),
+            require('echarts/lib/chart/candlestick'),
+            require('echarts/lib/component/visualMap'),
+            require('echarts/lib/component/dataZoom'),
+            require('echarts/lib/component/grid')
+        ) : typeof define === 'function' && define.amd ? define([
+            'echarts/lib/echarts',
+            'echarts/lib/component/tooltip',
+            'echarts/lib/component/legend',
+            'echarts/lib/chart/bar',
+            'echarts/lib/chart/line',
+            'echarts/lib/chart/candlestick',
+            'echarts/lib/component/visualMap',
+            'echarts/lib/component/dataZoom',
+            'echarts/lib/component/grid'
+        ], factory) :
             (global.VeCandle = factory(global.echarts));
 }(this, (function(echartsLib) {
     'use strict';
-    const merge = require('lodash/merge');
 
-    echartsLib = echartsLib && echartsLib.hasOwnProperty('default') ? echartsLib['default'] : echartsLib;
+    const merge = require('lodash/merge');
 
     let DEFAULT_THEME = {
         categoryAxis: {
@@ -1078,6 +1097,9 @@
                 canvasDiv.addEventListener('mouseover', mouseOverHandler);
             },
             dataHandler: function dataHandler() {
+                if (this.loading) {
+                    return;
+                }
                 if (!this.chartHandler) {
                     return;
                 }

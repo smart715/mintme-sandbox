@@ -4,7 +4,7 @@ namespace App\Tests\Exchange;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Exchange\Market;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ class MarketTest extends TestCase
     }
 
     /** @dataProvider isTokenMarketProvider */
-    public function testIsTokenMarket(TradebleInterface $base, TradebleInterface $quote, bool $isTokenMarket): void
+    public function testIsTokenMarket(TradableInterface $base, TradableInterface $quote, bool $isTokenMarket): void
     {
         $market = new Market($base, $quote);
 

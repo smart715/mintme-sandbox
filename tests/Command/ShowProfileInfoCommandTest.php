@@ -36,13 +36,13 @@ class ShowProfileInfoCommandTest extends KernelTestCase
 
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('First name       first name', $output);
-        $this->assertContains('Last name        last name', $output);
-        $this->assertContains('Email            info@coinimp.com', $output);
-        $this->assertContains('Changes locked   No', $output);
+        $this->assertStringContainsString('First name       first name', $output);
+        $this->assertStringContainsString('Last name        last name', $output);
+        $this->assertStringContainsString('Email            info@coinimp.com', $output);
+        $this->assertStringContainsString('Changes locked   No', $output);
     }
 
-    public function testExecuteWithUnesistentEmail(): void
+    public function testExecuteWithNonexistentEmail(): void
     {
         $this->app->add(new ShowProfileInfoCommand(
             $this->profileManagerMock(true)
@@ -56,7 +56,7 @@ class ShowProfileInfoCommandTest extends KernelTestCase
 
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Profile of \'info@coinimp.com\' not found', $output);
+        $this->assertStringContainsString('Profile of \'info@coinimp.com\' not found', $output);
     }
 
     private function profileManagerMock(bool $null = false): ProfileManagerInterface

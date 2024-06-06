@@ -1,7 +1,8 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
-import Trading from '../../js/components/trading/Trading';
-import moxios from 'moxios';
+import Trading, {tradingColumnsSort, tradingTableColumns} from '../../js/components/trading/Trading';
 import axios from 'axios';
+import moxios from 'moxios';
+import Vuex from 'vuex';
 
 // TODO: Improve tests and add more tests
 
@@ -10,21 +11,64 @@ const filterForTokens = {
     deployed_only_mintme: 2,
     airdrop_only: 3,
     deployed_only_eth: 4,
+    search_by_phrase: 7,
 };
+
+const web = {
+    symbol: 'WEB',
+    image: {avatar_small: ''},
+};
+const btc = {
+    symbol: 'BTC',
+    image: {avatar_small: ''},
+};
+const markets = {
+    TOK000000000001WEB: {
+        base: web,
+        quote: {
+            symbol: 'tok1',
+            image: {avatar_small: ''},
+        },
+        monthVolume: '0',
+        buyDepth: '0',
+        supply: '0',
+    }, // ['tok1', 'WEB'],
+    TOK000000000002WEB: {
+        base: web,
+        quote: {
+            symbol: 'tok2',
+            image: {avatar_small: ''},
+        },
+        monthVolume: '0',
+        buyDepth: '0',
+        supply: '0',
+    }, // ['tok2', 'WEB'],
+    TOK000000000003BTC: {
+        base: btc,
+        quote: web,
+        monthVolume: '0',
+        buyDepth: '0',
+        supply: '0',
+    }, // ['WEB', 'BTC'],
+};
+
+const $logger = {error: (val, params) => val, success: (val, params) => val};
 
 /**
  * @return {VueConstructor}
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.use(Vuex);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
-            Vue.prototype.$routing = {generate: (val, params) => {
-                    return val + Object.entries(params).reduce((acc, param) => acc + `?${param[0]}=${param[1]}`, '');
-                }};
+            Vue.prototype.$routing = {generate: (val, params = {}) => {
+                return val;
+            }};
             Vue.prototype.$toasted = {show: () => false};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = $logger;
         },
     });
     return localVue;
@@ -32,227 +76,74 @@ function mockVue() {
 
 /**
  * @param {Object} props
+ * @param {Object} data
  * @return {Wrapper<Vue>}
  */
-function mockTrading(props = {}) {
+function mockTrading(props = {}, data = {}) {
+    Trading.methods.fetchConversionRates = () => false;
+    Trading.methods.updateSanitizedMarkets = () => false;
+    Trading.methods.listenForMarketsUpdate = () => false;
+
     return shallowMount(Trading, {
         localVue: mockVue(),
-        stubs: ['b-table', 'b-pagination', 'font-awesome-icon', 'b-dropdown', 'b-dropdown-item', 'b-link'],
         propsData: {
             websocketUrl: 'testWebsocketUrl',
             enableUsd: true,
             filterForTokens: filterForTokens,
+            sortBy: 'rank',
+            cryptos: {
+                'WEB': {
+                    symbol: 'WEB',
+                },
+                'ETH': {
+                    symbol: 'ETH',
+                },
+            },
+            deployBlockchains: ['WEB', 'BNB', 'CRO', 'ETH'],
+            sort: 'rank',
+            marketsProp: {},
             ...props,
+            cryptoTopListMarketKeys: ['BTC'],
         },
-        methods: {
-            initialLoad: () => false,
+
+        data() {
+            return {
+                updateMarketsDelay: 0,
+                ...data,
+            };
         },
+        store: new Vuex.Store({
+            modules: {
+                crypto: {
+                    namespaced: true,
+                    getters: {
+                        getCryptosMap: () => {
+                            return {
+                                'BTC': {},
+                                'WEB': {},
+                                'ETH': {},
+                            };
+                        },
+                    },
+                },
+                websocket: {
+                    namespaced: true,
+                    actions: {
+                        addOnOpenHandler: () => {},
+                        addMessageHandler: () => {},
+                    },
+                },
+            },
+        }),
     });
 }
 
 describe('Trading', () => {
-    beforeEach(() => {
-        moxios.install();
-    });
-    afterEach(() => {
-        moxios.uninstall();
-    });
-
-    let market = {
-        position: undefined,
-        pair: 'MobCoin',
-        change: '0%',
-        lastPrice: '0.5 WEB',
-        volume: '0 WEB',
-        monthVolume: '0 WEB',
-        tokenUrl: '/token/MobCoin',
-        lastPriceUSD: '0.0002 USD',
-        volumeUSD: '0 USD',
-        monthVolumeUSD: '0 USD',
-        marketCap: '0 WEB',
-        marketCapUSD: '0 USD',
-        tokenized: false,
-        base: 'WEB',
-        quote: 'MobCoin',
-    };
-    it('show message if there are not deployed tokens yet', () => {
-        const wrapper = mockTrading();
-        wrapper.vm.marketFilters.selectedFilter = 'deployed';
-        wrapper.vm.marketFilters.userSelected = true;
-        wrapper.vm.sanitizedMarkets = {};
-        wrapper.vm.markets = {};
-        wrapper.vm.loading = false;
-
-        expect(wrapper.html().includes('trading.no_one_deployed')).toBe(true);
-        wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('trading.no_one_deployed')).toBe(false);
-    });
-    it('show message if user has no any token yet', () => {
-        const wrapper = mockTrading();
-        wrapper.vm.sanitizedMarkets = {};
-        wrapper.vm.marketFilters.selectedFilter = 'user';
-        wrapper.vm.markets = {};
-        wrapper.vm.loading = false;
-
-        expect(wrapper.html().includes('trading.no_any_token')).toBe(true);
-        wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('trading.no_any_token')).toBe(false);
-    });
-    it('show rest of token link', () => {
-        const wrapper = mockTrading({page: 1});
-
-        wrapper.vm.marketFilters.selectedFilter = 'deployed';
-        wrapper.vm.sanitizedMarkets = {};
-        wrapper.vm.markets = {};
-        wrapper.vm.totalRows = 0;
-        wrapper.vm.perPage = 50;
-        wrapper.vm.loading = false;
-        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
-
-        wrapper.vm.sanitizedMarkets = market;
-        wrapper.vm.totalRows = 1;
-        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
-
-        wrapper.vm.totalRows = 60;
-        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
-
-        wrapper.vm.currentPage = 2;
-        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
-
-        wrapper.vm.marketFilters.selectedFilter = 'all';
-        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
-    });
-    it('make sure that expected "user=1" will be sent', (done) => {
-        const wrapper = mockTrading();
-        wrapper.vm.toggleFilter('user');
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            expect(request.url).toContain('user=1');
-            done();
-        });
-    });
-    it('make sure that expected "filter=2" will be sent', (done) => {
-        const wrapper = mockTrading();
-        wrapper.vm.toggleFilter('deployed');
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            expect(request.url).toContain('filter=2');
-            done();
-        });
-    });
-    it('make sure that "user=1" or "filter=2" is not will be sent when user selected "all tokens"', (done) => {
-        const wrapper = mockTrading();
-        wrapper.vm.toggleFilter('all');
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            expect(request.url).not.toContain('filter=2');
-            expect(request.url).not.toContain('user=1');
-            done();
-        });
-    });
-    describe('marketCapFormatter() function should return ', () => {
-        it('dash(-) if market is for token and monthVolume less than minimumVolumeForMarketcap', () => {
-            const wrapper = mockTrading({minimumVolumeForMarketcap: 10});
-            let item = {
-                base: 'MINTME',
-                monthVolume: 9,
-            };
-            expect(wrapper.vm.marketCapFormatter('9', 0, item)).toBe('-');
-        });
-
-        it('value if market is not for token', () => {
-            const wrapper = mockTrading({minimumVolumeForMarketcap: 10});
-            let item = {
-                base: 'foo',
-                monthVolume: 10,
-            };
-            expect(wrapper.vm.marketCapFormatter('10', 0, item)).toBe('10');
-        });
-
-        it('value if monthVolume not less than minimumVolumeForMarketcap', () => {
-            const wrapper = mockTrading({minimumVolumeForMarketcap: 10});
-            let item = {
-                base: 'MINTME',
-                monthVolume: 10,
-
-            };
-            expect(wrapper.vm.marketCapFormatter('9', 0, item)).toBe('9');
-        });
-    });
-
     describe('data field', () => {
         describe(':tokens', () => {
             describe('when fetch markets from server', () => {
-                const web = {
-                    symbol: 'WEB',
-                    image: {avatar_small: ''},
-                };
-                const btc = {
-                    symbol: 'BTC',
-                    image: {avatar_small: ''},
-                };
-                const markets = {
-                    TOK000000000001WEB: {
-                        base: web,
-                        quote: {
-                            symbol: 'tok1',
-                            image: {avatar_small: ''},
-                        },
-                        monthVolume: '0',
-                        buyDepth: '0',
-                        supply: '0',
-                    }, // ['tok1', 'WEB'],
-                    TOK000000000002WEB: {
-                        base: web,
-                        quote: {
-                            symbol: 'tok2',
-                            image: {avatar_small: ''},
-                        },
-                        monthVolume: '0',
-                        buyDepth: '0',
-                        supply: '0',
-                    }, // ['tok2', 'WEB'],
-                    TOK000000000003BTC: {
-                        base: btc,
-                        quote: web,
-                        monthVolume: '0',
-                        buyDepth: '0',
-                        supply: '0',
-                    }, // ['WEB', 'BTC'],
-                };
-
                 const wrapper = mockTrading({minimumVolumeForMarketcap: Infinity});
                 wrapper.vm.markets = Object.assign({}, markets);
-
-                it('should contain WEB/tok1', (done) => {
-                    wrapper.vm.sanitizeMarket({
-                        method: 'state.update',
-                        params: [
-                            'TOK000000000001WEB',
-                            {
-                                period: 86400,
-                                last: '123',
-                                open: '456',
-                                close: '789',
-                                high: '0',
-                                low: '0',
-                                volumeDonation: '0',
-                                deal: '321',
-                                dealDonation: '321',
-                            },
-                        ],
-                        id: null,
-                    });
-
-                    wrapper.vm.$nextTick(() => {
-                        wrapper.vm.$nextTick(() => {
-                            expect(wrapper.vm.tokens).toMatchObject([
-                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '642 MINTME'},
-                            ]);
-                            done();
-                        });
-                    });
-                });
 
                 it('should contain WEB/BTC in sanitizedMarketsOnTop', (done) => {
                     wrapper.vm.sanitizeMarket({
@@ -270,7 +161,7 @@ describe('Trading', () => {
                                 volumeDonation: '0',
                                 deal: '32',
                                 dealDonation: '32',
-                        },
+                            },
                         ],
                         id: null,
                     });
@@ -278,45 +169,332 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.sanitizedMarketsOnTop).toMatchObject([
-                                {pair: 'WEB/BTC', change: '-73%', lastPrice: '12 BTC', dayVolume: '64 BTC'},
+                                {pair: 'WEB/BTC', change: '-73', lastPrice: '12', dayVolume: '64'},
                             ]);
                             done();
                         });
                     });
                 });
+            });
+        });
+    });
 
-                it('should contain tok1 before tok2', (done) => {
-                    wrapper.vm.sanitizeMarket({
-                        method: 'state.update',
-                        params: [
-                            'TOK000000000002WEB',
-                            {
-                                period: 86400,
-                                last: '1230',
-                                open: '4560',
-                                close: '7890',
-                                high: '0',
-                                low: '0',
-                                volume: '0',
-                                volumeDonation: '0',
-                                deal: '3210',
-                                dealDonation: '3210',
-                        },
-                        ],
-                        id: null,
-                    });
+    describe('sortChanged', () => {
+        let wrapper;
+        const newSort = [
+            {
+                field: tradingTableColumns.change,
+                type: 'desc',
+            },
+        ];
 
-                    wrapper.vm.$nextTick(() => {
-                        wrapper.vm.$nextTick(() => {
-                            expect(wrapper.vm.tokens).toMatchObject([
-                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '642 MINTME'},
-                                {pair: 'tok2', change: '-73%', lastPrice: '1230 MINTME', dayVolume: '6420 MINTME'},
-                            ]);
-                            done();
-                        });
-                    });
-                });
-             });
-         });
-     });
+        beforeEach( () => {
+            wrapper = mockTrading();
+            wrapper.vm.updateMarkets = jest.fn();
+        });
+
+        it('should properly change sortBy and sortDesc', () => {
+            wrapper.vm.sortBy = tradingColumnsSort.pair;
+            wrapper.vm.sortDesc = false;
+            wrapper.vm.sortChanged(newSort);
+
+            expect(wrapper.vm.sortBy).toBe(tradingColumnsSort.change);
+            expect(wrapper.vm.sortDesc).toBe(true);
+        });
+
+        it('should discard \'newest deployed\' filter if it\'s selected', () => {
+            wrapper.vm.selectedFilters = [
+                wrapper.vm.marketFilters.options.deployedETH.key,
+                wrapper.vm.marketFilters.options.newest_deployed.key,
+            ];
+            wrapper.vm.sortChanged(newSort);
+
+            expect(wrapper.vm.selectedFilters).toEqual([
+                wrapper.vm.marketFilters.options.deployedETH.key,
+            ]);
+        });
+
+        it('should set page = 1', () => {
+            wrapper.vm.currentPage = 2;
+            wrapper.vm.sortChanged(newSort);
+
+            expect(wrapper.vm.currentPage).toBe(1);
+        });
+
+        it('should call updateMarkets', () => {
+            wrapper.vm.sortChanged(newSort);
+
+            expect(wrapper.vm.updateMarkets.mock.calls.length).toBe(1);
+        });
+    });
+
+    describe('toggleCrypto', () => {
+        let wrapper;
+
+        beforeEach( () => {
+            wrapper = mockTrading();
+            wrapper.vm.updateMarkets = jest.fn();
+        });
+
+        it('should properly change selected crypto', () => {
+            wrapper.vm.currentCrypto = btc.symbol;
+            wrapper.vm.toggleCrypto(web.symbol);
+
+            expect(wrapper.vm.currentCrypto).toEqual(web.symbol);
+        });
+
+        it('should set page = 1', () => {
+            wrapper.vm.currentPage = 2;
+            wrapper.vm.toggleCrypto(web.symbol);
+
+            expect(wrapper.vm.currentPage).toBe(1);
+        });
+
+        it('should clear searchPhrase', () => {
+            wrapper.vm.searchPhrase = 'moonpark';
+            wrapper.vm.toggleCrypto(web.symbol);
+
+            expect(wrapper.vm.searchPhrase).toBe('');
+        });
+
+        it('should call updateMarkets', () => {
+            wrapper.vm.toggleCrypto(web.symbol);
+
+            expect(wrapper.vm.updateMarkets.mock.calls.length).toBe(1);
+        });
+    });
+
+    describe('toggleFilter', () => {
+        let wrapper;
+
+        beforeEach( () => {
+            wrapper = mockTrading();
+            wrapper.vm.updateMarkets = jest.fn();
+        });
+
+        it('should add filter to selectedFilters if it`s not selected yet', () => {
+            wrapper.vm.selectedFilters = [wrapper.vm.marketFilters.options.deployedETH.key];
+            wrapper.vm.toggleFilter(wrapper.vm.marketFilters.options.deployedWEB.key);
+
+            expect(wrapper.vm.selectedFilters).toEqual(
+                [
+                    wrapper.vm.marketFilters.options.deployedETH.key,
+                    wrapper.vm.marketFilters.options.deployedWEB.key,
+                ]
+            );
+        });
+
+        it('should discard filter from selectedFilters if it`s already selected', () => {
+            wrapper.vm.selectedFilters = [
+                wrapper.vm.marketFilters.options.deployedETH.key,
+                wrapper.vm.marketFilters.options.deployedWEB.key,
+            ];
+            wrapper.vm.toggleFilter(wrapper.vm.marketFilters.options.deployedETH.key);
+
+            expect(wrapper.vm.selectedFilters)
+                .toEqual([wrapper.vm.marketFilters.options.deployedWEB.key]);
+        });
+
+        it('shouldn\'t unselect filter, if it\'s blockchain filter  and only 1 blockchain is selected', () => {
+            wrapper.vm.selectedBlockchains = 1;
+            wrapper.vm.selectedFilters = [wrapper.vm.marketFilters.options.deployedETH.key];
+
+            wrapper.vm.toggleFilter(wrapper.vm.marketFilters.options.deployedETH.key);
+
+            expect(wrapper.vm.selectedFilters)
+                .toEqual([wrapper.vm.marketFilters.options.deployedETH.key]);
+        });
+
+        it('should set page = 1', () => {
+            wrapper.vm.currentPage = 2;
+            wrapper.vm.toggleFilter(wrapper.vm.marketFilters.options.deployedWEB.key);
+
+            expect(wrapper.vm.currentPage).toBe(1);
+        });
+
+        it('should clear searchPhrase', () => {
+            wrapper.vm.searchPhrase = 'moonpark';
+            wrapper.vm.toggleFilter(wrapper.vm.marketFilters.options.deployedWEB.key);
+
+            expect(wrapper.vm.searchPhrase).toBe('');
+        });
+
+        it('should call updateMarkets', () => {
+            wrapper.vm.toggleFilter(wrapper.vm.marketFilters.options.deployedWEB.key);
+
+            expect(wrapper.vm.updateMarkets.mock.calls.length).toBe(1);
+        });
+    });
+
+    describe('toggleSearch', () => {
+        let wrapper;
+
+        beforeEach( () => {
+            wrapper = mockTrading();
+            wrapper.vm.updateMarkets = jest.fn();
+        });
+
+        it('should properly change searchPhrase', () => {
+            wrapper.vm.searchPhrase = '';
+            wrapper.vm.toggleSearch('moonpark');
+
+            expect(wrapper.vm.searchPhrase).toBe('moonpark');
+        });
+
+        it('should clear searchPhrase, if new searchPhrase is too short', () => {
+            wrapper.vm.searchPhraseMinLength = 3;
+            wrapper.vm.searchPhrase = 'moon';
+            wrapper.vm.toggleSearch('mo');
+
+            expect(wrapper.vm.searchPhrase).toBe('');
+        });
+
+        it('should set page = 1', () => {
+            wrapper.vm.currentPage = 2;
+            wrapper.vm.toggleSearch('moonpark');
+
+            expect(wrapper.vm.currentPage).toBe(1);
+        });
+
+        it('should call updateMarkets', () => {
+            wrapper.vm.toggleSearch('moonpark');
+
+            expect(wrapper.vm.updateMarkets.mock.calls.length).toBe(1);
+        });
+    });
+
+    describe('createParams', () => {
+        let wrapper;
+
+        beforeEach( () => {
+            wrapper = mockTrading();
+        });
+
+        it('should properly build params object without searchPhrase (1)', async () => {
+            wrapper.vm.searchPhrase = '';
+            wrapper.vm.sortBy = 'best sort';
+            wrapper.vm.sortDesc = true;
+            wrapper.vm.currentPage = 213;
+            wrapper.vm.currentCrypto = web.symbol;
+            wrapper.vm.selectedFilters = [
+                wrapper.vm.marketFilters.options.deployedETH.key,
+                wrapper.vm.marketFilters.options.newest_deployed.key,
+            ];
+            await wrapper.setProps({
+                filterForTokens: {
+                    deployed_only_eth: 400,
+                    newest_deployed: 221,
+                },
+            });
+
+            const expectedParams = {
+                page: 213,
+                sort: 'best sort',
+                crypto: 'WEB',
+                order: 'DESC',
+                filters: [400, 221],
+                type: 'tokens',
+            };
+
+            expect(wrapper.vm.createParams()).toEqual(expectedParams);
+        });
+
+        it('should properly build params object without searchPhrase (2)', async () => {
+            wrapper.vm.searchPhrase = '';
+            wrapper.vm.sortBy = wrapper.vm.fields.pair.key;
+            wrapper.vm.sortDesc = true;
+            wrapper.vm.currentPage = 1;
+            wrapper.vm.currentCrypto = btc.symbol;
+            wrapper.vm.selectedFilters = [
+                wrapper.vm.marketFilters.options.newest_deployed.key,
+                wrapper.vm.marketFilters.options.deployedETH.key,
+
+            ];
+            await wrapper.setProps({
+                filterForTokens: {
+                    deployed_only_eth: 300,
+                    newest_deployed: 100,
+                },
+            });
+
+            const expectedParams = {
+                page: 1,
+                sort: wrapper.vm.fields.pair.key,
+                crypto: 'BTC',
+                order: 'DESC',
+                filters: [100, 300],
+                type: 'tokens',
+            };
+
+            expect(wrapper.vm.createParams()).toEqual(expectedParams);
+        });
+
+        it('should properly build params object with searchPhrase', () => {
+            wrapper.vm.searchPhrase = 'moonpark';
+            wrapper.vm.sortBy = 'best sort';
+            wrapper.vm.sortDesc = false;
+            wrapper.vm.currentPage = 1;
+            wrapper.vm.currentCrypto = btc.symbol;
+            wrapper.vm.selectedFilters = [
+                wrapper.vm.marketFilters.options.newest_deployed.key,
+                wrapper.vm.marketFilters.options.deployedETH.key,
+
+            ];
+            wrapper.setProps({
+                filterForTokens: {
+                    deployed_only_eth: 300,
+                    newest_deployed: 100,
+                },
+            });
+
+            const expectedParams = {
+                page: 1,
+                sort: 'best sort',
+                order: 'ASC',
+                searchPhrase: 'moonpark',
+                type: 'tokens',
+            };
+
+            expect(wrapper.vm.createParams()).toEqual(expectedParams);
+        });
+    });
+
+    describe('updateMarkets', () => {
+        beforeEach( () => {
+            moxios.install();
+        });
+
+        afterEach(() => {
+            moxios.uninstall();
+        });
+
+        it('should set tableLoading to false after request is done', (done) => {
+            const wrapper = mockTrading();
+
+            wrapper.vm.updateMarkets();
+            moxios.stubRequest('markets_info', {
+                status: 200,
+                response: {
+                    markets: [1, 2, 3],
+                },
+            });
+
+            moxios.wait(() => {
+                expect(wrapper.vm.tableLoading).toBe(false);
+                done();
+            });
+        });
+    });
+
+    it('selectedBlockchainsAmount should return properly value', () => {
+        const wrapper = mockTrading();
+
+        wrapper.vm.selectedFilters = [
+            wrapper.vm.marketFilters.options.deployedWEB.key,
+            wrapper.vm.marketFilters.options.deployedETH.key,
+            wrapper.vm.marketFilters.options.user_owns.key,
+        ];
+
+        expect(wrapper.vm.selectedBlockchainsAmount).toBe(2);
+    });
 });

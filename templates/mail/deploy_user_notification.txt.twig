@@ -1,0 +1,12 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ tokenOwnerNickname }}
+
+{% trans with {'%userNickname%': notifierNickname} %} email.deploy_notification.p_1 {% endtrans %}
+{% trans with {'%price%': usdDeployPrice} %} email.deploy_notification.p_2 {% endtrans %}
+{% trans %} email.deploy_notification.p_3.txt {% endtrans %}
+{{ deployUrl }}
+
+{% endblock %}
+

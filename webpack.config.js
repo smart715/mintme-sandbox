@@ -12,8 +12,10 @@ Encore
     .addEntry('concord-bold', './assets/fonts/Concord-Bold.ttf')
     .addEntry('concord', './assets/fonts/Concord.otf')
     .addEntry('footer', './assets/js/footer.js')
+    .addEntry('check_code', './assets/js/check_code.js')
 
     // Entry pages
+    .addEntry('init-swagger-ui', './assets/js/init-swagger-ui.js')
     .addEntry('pages/home', './assets/js/pages/home.js')
     .addEntry('pages/error', './assets/js/pages/error.js')
     .addEntry('pages/knowledge_base', './assets/js/pages/knowledge_base.js')
@@ -27,6 +29,7 @@ Encore
     .addEntry('pages/referral', './assets/js/pages/referral.js')
     .addEntry('pages/register', './assets/js/pages/register.js')
     .addEntry('pages/settings', './assets/js/pages/settings.js')
+    .addEntry('pages/2fa_manager', './assets/js/pages/2fa_manager.js')
     .addEntry('pages/show_post', './assets/js/pages/show_post.js')
     .addEntry('pages/token_creation', './assets/js/pages/token_creation.js')
     .addEntry('pages/trading', './assets/js/pages/trading.js')
@@ -36,6 +39,12 @@ Encore
     .addEntry('pages/voting', './assets/js/pages/voting.js')
     .addEntry('pages/links', './assets/js/pages/links.js')
     .addEntry('pages/airdrop_embeded', './assets/js/pages/airdrop_embeded.js')
+    .addEntry('pages/token_settings', './assets/js/pages/token_settings.js')
+    .addEntry('pages/coin', './assets/js/pages/coin.js')
+    .addEntry('pages/coin_faq', './assets/js/pages/coin_faq.js')
+    .addEntry('pages/coin_start', './assets/js/pages/coin_start.js')
+    .addStyleEntry('mail', './assets/scss/mail.sass')
+    .addStyleEntry('security_pages', './assets/scss/pages/security_pages.sass')
 
     .splitEntryChunks()
 

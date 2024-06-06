@@ -18,3 +18,4 @@ services:
 twig:
     globals:
         google_recaptcha_site_key: '%google_recaptcha_site_key%'
+        reg_google_recaptcha_site_key: '%reg_google_recaptcha_site_key%'

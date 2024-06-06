@@ -1,8 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% set metaTitle = article.title ~ ' | mintMe' %}
+{% set metaTitle = article|translateArticle('title') ~ ' | mintMe' %}
 
-{% block title %}{{ article.title }} | mintMe{% endblock %}
+{% set knowledgeBaseDescription = article|translateArticle('description')|striptags|slice(0, 50) %}
+
+{% block title %}{{ article|translateArticle('title') }} | mintMe{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -10,14 +12,14 @@
 {% endblock %}
 
 {% block metaDescription %}
-    <meta property="og:description" content="{{ metaDescription }}">
-    <meta name="description" content="{{ metaDescription }}">
+    <meta property="og:description" content="{{ knowledgeBaseDescription }}">
+    <meta name="description" content="{{ knowledgeBaseDescription }}">
 {% endblock %}
 
 {% block content %}
     <div id="kb_show" class="container mt-5">
         <div class="row justify-content-center">
-            <div class="article col-md-9 card-fixed-large p-3">
+            <div class="article col-md-7 card-fixed-large p-3">
                 <header>
                     <h1 class="word-break">
                         {{ article|translateArticle('title') }}
@@ -26,11 +28,27 @@
                 <div class="pt-2 pb-4 text-break">
                     {{ article|translateArticle('description')|raw }}
                 </div>
-                <div id="back-btn">
-                    <a href="{{ path('homepage') }}">MintMe</a>
+                <div id="kb_nav">
+                    <a class="font-weight-bold" href="{{ path('homepage') }}">MintMe</a>
                     &gt;
-                    <a href="{{ path('kb') }}">{% trans %}page.kb.help{% endtrans %}</a>
+                    <a class="font-weight-bold" href="{{ path('kb') }}">{% trans %}page.kb.help{% endtrans %}</a>
                 </div>
+            </div>
+            <div id="kb_related" class="col-md-4 card-fixed-small p-3 related">
+                <header>
+                    <h4>
+                        {% trans %}page.kb.related{% endtrans %}
+                    </h4>
+                </header>
+                <ul>
+                    {% for rel in related %}
+                        <li>
+                            <a class="link highlight" href="{{ rel.url }}">
+                                {{ rel|translateArticle('title') }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>

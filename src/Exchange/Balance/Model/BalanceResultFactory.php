@@ -7,6 +7,7 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 
+/** @codeCoverageIgnore */
 class BalanceResultFactory
 {
     /** @var mixed[] */

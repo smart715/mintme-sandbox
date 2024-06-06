@@ -22,7 +22,7 @@ class TokenDescriptionValidator extends ConstraintValidator
         $min = $constraint->min;
         $max = $constraint->max;
 
-        if ($token->isControlledToken() && ($min > $descLength || $max < $descLength)) {
+        if ($token->isCreatedOnMintmeSite() && (($min > $descLength) || $max < $descLength)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{min}}', (string)$min)
                 ->setParameter('{{max}}', (string)$max)

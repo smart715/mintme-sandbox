@@ -4,6 +4,7 @@ namespace App\Controller\Dev\API\V1;
 
 use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
+use App\Exception\NotDeployedTokenException;
 use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -17,8 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class CurrenciesController extends DevApiController
 {
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    private TokenManagerInterface $tokenManager;
 
     public function __construct(TokenManagerInterface $tokenManager)
     {
@@ -32,8 +32,8 @@ class CurrenciesController extends DevApiController
      * @Rest\Get()
      * @SWG\Response(
      *     response="200",
-     *     description="Returns deployed mintme currencies and eth tokens list",
-     *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Сurrency"))
+     *     description="Returns deployed mintme currencies, eth and bnb tokens list",
+     *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Currency"))
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @Rest\QueryParam(
@@ -70,13 +70,13 @@ class CurrenciesController extends DevApiController
      * @SWG\Response(
      *     response="200",
      *     description="Returns tokens info",
-     *     @SWG\Schema(ref="#/definitions/Сurrency")
+     *     @SWG\Schema(ref="#/definitions/Currency")
      * )
      * @SWG\Response(response="404",description="Currency not found")
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Parameter(name="name", in="path", description="Currency name", type="string")
      * @SWG\Tag(name="Currencies")
-     * @throws ApiNotFoundException
+     * @throws ApiNotFoundException|NotDeployedTokenException
      */
     public function getCurrency(string $name): Token
     {
@@ -85,6 +85,10 @@ class CurrenciesController extends DevApiController
 
         if (!$token) {
             throw new ApiNotFoundException("Currency not found");
+        }
+
+        if (!$token->isDeployed()) {
+            throw new NotDeployedTokenException();
         }
 
         return $token;

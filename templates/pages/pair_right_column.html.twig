@@ -1,0 +1,42 @@
+{% if spinner is not defined or spinner %}
+    {{ include("spinners/pair_right_column.html.twig") }}
+{% endif %}
+{% include 'pages/pair_quick_trade.html.twig' with {class: 'd-none d-lg-block'} %}
+<token-price-overview-chart
+    class="mt-4"
+    :current-market="{{ currentMarket|json_encode }}"
+></token-price-overview-chart>
+<top-holders
+    {% if topHolders %}
+    :traders-prop="{{ topHolders | json_encode }}"
+    {% endif %}
+    :service-unavailable="{{ topHoldersServiceUnavailable ? 'true' : 'false' }}"
+    :token-name="{{ mintmeMarket.quote.symbol | json_encode }}"
+    token-avatar="{{ token.image.url }}"
+    websocket-url="{{ global_websocket_url }}"
+    :is-mobile-screen="isMobileScreen"
+    class="mt-4"
+></top-holders>
+{% if rewards_enabled %}
+    <bounties-and-rewards
+        is-token-page
+        token-name="{{ token.name }}"
+        token-avatar="{{ token.image.url }}"
+        :is-owner="{{ isOwner }}"
+        :is-mobile-screen="isMobileScreen"
+        :show-finalized="{{ showFinalizedRewardModal }}"
+        :show-summary="{{ showSummaryRewardModal }}"
+        :rewards="rewards"
+        :bounties="bounties"
+        :rewards-max-limit="{{ rewardsMaxLimit }}"
+        :bounties-max-limit="{{ bountiesMaxLimit }}"
+        :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+        disabled-services-config="{{ disabledServicesConfig|json_encode }}"
+        :is-user-blocked="{{ app.user.isBlocked|default(false) ? 'true' : 'false'}}"
+        :disabled-cryptos="{{ disabledBlockchain|json_encode }}"
+        hide-actions="true"
+        {% if reward is defined %}
+            :reward = "{{ reward | json_encode }}"
+        {% endif %}
+    ></bounties-and-rewards>
+{% endif %}

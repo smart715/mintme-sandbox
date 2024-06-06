@@ -22,7 +22,10 @@ class FacebookPostUrlValidator implements ValidatorInterface
             return false;
         }
 
-        return boolval(preg_match('/^(https?:\/\/)?(www\.)?facebook\.com\/[\S]+\/posts\/[\d]+$/', $this->facebookPost));
+        return boolval(preg_match(
+            '/^(https?:\/\/)?(www\.)?facebook\.com\/[\S]+\/posts\/[A-Za-z0-9]+$/',
+            $this->facebookPost
+        ));
     }
 
     public function getMessage(): string

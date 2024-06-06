@@ -2,8 +2,8 @@
 
 namespace App\Exchange\Trade;
 
+use App\Services\TranslatorService\TranslatorInterface;
 use Exception;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TradeResult
 {
@@ -46,8 +46,14 @@ class TradeResult
 
     private ?string $translatedMessage;
 
-    public function __construct(int $result, TranslatorInterface $translator, ?string $translatedMessage = null)
-    {
+    private ?int $id;
+
+    public function __construct(
+        int $result,
+        TranslatorInterface $translator,
+        ?string $translatedMessage = null,
+        ?int $id = null
+    ) {
         if (!array_key_exists($result, self::MESSAGES) && !$translatedMessage) {
             throw new Exception('Undefined error message');
         }
@@ -55,6 +61,7 @@ class TradeResult
         $this->result = $result;
         $this->translator = $translator;
         $this->translatedMessage = $translatedMessage;
+        $this->id = $id;
     }
 
     public function getMessage(): string
@@ -65,5 +72,10 @@ class TradeResult
     public function getResult(): int
     {
         return $this->result;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 }

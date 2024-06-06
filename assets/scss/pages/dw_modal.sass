@@ -1,0 +1,46 @@
+@import '../variables'
+@import '../mixins'
+
+.dw-modal
+  code a span
+    color: $code-color
+
+  .invalid-message
+    width: 100%
+    margin-top: 0.25rem
+    font-size: 80%
+    color: $red
+
+  .wallet-code
+    @include font-scale(sm)
+
+  .btn-network
+    border-radius: $btn-border-radius
+    border-color: $white !important
+    color: $white !important
+    font-weight: bold
+    background: $bg-primary-light !important
+
+    &:hover:not(:disabled), &.selected
+      border-color: $bg-primary-dark !important
+      color: $bg-primary-dark !important
+      background: $white !important
+
+  .withdraw-totals
+    font-weight: 600
+
+  .input-group
+    .btn
+      font-weight: 600
+
+  .selected-network-info
+    font-size: 0.78rem
+
+  input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+    border: 0
+
+  .two-fa-border
+    border: 1px solid $primary !important
+
+  .check-mark
+    font-size: $btn-font-size-extra

@@ -24,7 +24,10 @@ class UserControllerTest extends WebTestCase
             ]
         );
 
-        $this->assertContains('The password has been changed.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString(
+            'The password has been changed.',
+            (string)$this->client->getResponse()->getContent()
+        );
     }
 
     public function testEnable2fa(): void
@@ -50,8 +53,12 @@ class UserControllerTest extends WebTestCase
 
         $res = $this->client->getResponse()->getContent();
 
-        $this->assertContains('Congratulations! You have enabled two-factor authentication!', $res);
-        $this->assertContains('Downloading backups codes...', $res);
+        $this->assertStringContainsString(
+            'Congratulations! You have enabled two-factor authentication!',
+            (string)$res
+        );
+
+        $this->assertStringContainsString('Downloading backups codes...', (string)$res);
     }
 
     public function testDisable2fa(): void
@@ -79,9 +86,9 @@ class UserControllerTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'You have disabled two-factor authentication!',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 
@@ -94,9 +101,9 @@ class UserControllerTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Downloading backup codes...',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 
@@ -111,9 +118,9 @@ class UserControllerTest extends WebTestCase
 
         $this->client->request('GET', '/referral-program');
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             self::LOCALHOST . '/invite/' . $user->getReferralCode(),
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 

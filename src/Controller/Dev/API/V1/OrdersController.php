@@ -2,7 +2,9 @@
 
 namespace App\Controller\Dev\API\V1;
 
+use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
+use App\Exception\NotDeployedTokenException;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -22,17 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrdersController extends DevApiController
 {
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
+    private MarketHandlerInterface $marketHandler;
 
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
+    private RebrandingConverterInterface $rebrandingConverter;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    private TokenManagerInterface $tokenManager;
 
     public function __construct(
         MarketHandlerInterface $marketHandler,
@@ -108,6 +106,10 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
+        if ($quote instanceof Token && !$quote->isDeployed()) {
+            throw new NotDeployedTokenException();
+        }
+
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market not found');
         }
@@ -174,6 +176,10 @@ class OrdersController extends DevApiController
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        if ($quote instanceof Token && !$quote->isDeployed()) {
+            throw new NotDeployedTokenException();
+        }
 
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market not found');

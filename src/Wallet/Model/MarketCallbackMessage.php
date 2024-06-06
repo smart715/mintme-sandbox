@@ -2,25 +2,24 @@
 
 namespace App\Wallet\Model;
 
+/** @codeCoverageIgnore */
 class MarketCallbackMessage
 {
-    /** @var int */
-    private $retried;
-
-    /** @var string */
-    private $base;
-
-    /** @var string */
-    private $quote;
+    private int $retried;
+    private string $base;
+    private string $quote;
+    private ?int $userId;
 
     private function __construct(
         int $retried,
         string $base,
-        string $quote
+        string $quote,
+        ?int $userId
     ) {
         $this->retried = $retried;
         $this->base = $base;
         $this->quote = $quote;
+        $this->userId = $userId;
     }
 
     public function getRetried(): int
@@ -38,6 +37,11 @@ class MarketCallbackMessage
         return $this->quote;
     }
 
+    public function getUserId(): ?int
+    {
+        return $this->userId;
+    }
+
     public function incrementRetries(): int
     {
         return ++$this->retried;
@@ -49,6 +53,7 @@ class MarketCallbackMessage
             $data['retried'],
             $data['base'],
             $data['quote'],
+            $data['user_id'],
         );
     }
 
@@ -58,6 +63,7 @@ class MarketCallbackMessage
             'retried' => $this->getRetried(),
             'base' => $this->getBase(),
             'quote' => $this->getQuote(),
+            'user_id' => $this->getUserId(),
         ];
     }
 }

@@ -22,30 +22,20 @@ final class MoneyWrapper implements MoneyWrapperInterface
     public const MINTME_SUBUNIT = 18;
     public const MINTME_SHOW_SUBUNIT = 4;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
 
-    /** @var CurrencyList */
-    private $currencies;
+    private CurrencyList $currencies;
 
-    /** @var DecimalMoneyFormatter */
-    private $formatter;
+    private DecimalMoneyFormatter $formatter;
 
-    /** @var DecimalMoneyParser */
-    private $parser;
+    private DecimalMoneyParser $parser;
 
-    /** @var Converter */
-    private $converter;
+    private Converter $converter;
 
-    public function __construct(
-        CryptoManagerInterface $cryptoManager
-    ) {
-        $this->cryptoManager = $cryptoManager;
-    }
-
-    public function getRepository(): Currencies
+    public function __construct(CryptoManagerInterface $cryptoManager)
     {
-        return $this->currencies ?? $this->currencies = new CurrencyList(
+        $this->cryptoManager = $cryptoManager;
+        $this->currencies = new CurrencyList(
             array_merge(
                 $this->fetchCurrencies(),
                 [
@@ -54,11 +44,24 @@ final class MoneyWrapper implements MoneyWrapperInterface
                 ]
             )
         );
+        $this->formatter = new DecimalMoneyFormatter($this->getRepository());
+        $this->parser = new DecimalMoneyParser($this->getRepository());
     }
 
-    public function format(Money $money): string
+    public function getRepository(): Currencies
     {
-        return $this->getFormatter()->format($money);
+        return $this->currencies;
+    }
+
+    public function format(Money $money, bool $trailingZeros = true): string
+    {
+        $formatted = $this->getFormatter()->format($money);
+
+        if (!$trailingZeros) {
+            $formatted = rtrim(rtrim($formatted, '0'), '.');
+        }
+
+        return $formatted;
     }
 
     public function convertByRatio(Money $amount, string $toCurrency, string $ratio): Money
@@ -92,11 +95,15 @@ final class MoneyWrapper implements MoneyWrapperInterface
                 ->toScale($scale, RoundingMode::DOWN);
         }
 
+        $notation = str_replace(' ', '', $notation);
+
         return $notation;
     }
 
     public function parse(string $value, string $symbol): Money
     {
+        $value = ltrim($value, '0') ?: '0';
+
         return $this->getParser()->parse(
             $this->convertToDecimalIfNotation($value, $symbol),
             $symbol
@@ -107,8 +114,15 @@ final class MoneyWrapper implements MoneyWrapperInterface
     {
         $currencies = [];
 
-        foreach ($this->cryptoManager->findAll() as $crypto) {
-            $currencies[$crypto->getSymbol()] = $crypto->getSubunit();
+        foreach ($this->cryptoManager->findSymbolAndSubunitArr() as $result) {
+            $symbol = (string)$result['symbol'];
+            $subunit = (int)$result['subunit'];
+
+            $currencies[$symbol] = $subunit;
+
+            if (Symbols::WEB === $symbol) {
+                $currencies[Symbols::MINTME] = $subunit;
+            }
         }
 
         return $currencies;
@@ -127,11 +141,24 @@ final class MoneyWrapper implements MoneyWrapperInterface
 
     private function getFormatter(): DecimalMoneyFormatter
     {
-        return $this->formatter ?? $this->formatter = new DecimalMoneyFormatter($this->getRepository());
+        return $this->formatter;
     }
 
     private function getParser(): DecimalMoneyParser
     {
-        return $this->parser ?? $this->parser = new DecimalMoneyParser($this->getRepository());
+        return $this->parser;
+    }
+
+    public function convertAmountSubunits(Money $moneyToConvert, int $subunitChange): Money
+    {
+        $symbol = $moneyToConvert->getCurrency()->getCode();
+
+        return $this->convert(
+            $moneyToConvert,
+            new Currency($symbol),
+            new FixedExchange([
+                $symbol => [ $symbol => 10 ** $subunitChange ],
+            ])
+        );
     }
 }

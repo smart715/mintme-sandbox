@@ -1,8 +1,9 @@
 @import '~pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build'
 
 .bootstrap-datetimepicker-widget
+  color: $text-color-primary
   &, &:hover, &:focus, &:active
-    background-color: $secondary-dark
+    background-color: $bg-primary
 
   table
     thead tr:first-child th:hover,
@@ -11,7 +12,10 @@
     td.minute:hover,
     td.second:hover,
     td span:hover,
+    td.active,
+    td span.active,
+    td i.active,
     td i:hover,
     svg
-      color: $blue !important
+      color: $primary !important
 

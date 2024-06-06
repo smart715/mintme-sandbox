@@ -1,142 +1,188 @@
 <template>
-    <div  class="h-100">
-        <div class="card h-100">
-            <div class="card-header text-left">
-                {{ $t('trade.buy_order.header') }}
-                <span class="card-header-icon">
-                    <guide>
-                        <template slot="header">
-                            {{ $t('trade.buy_order.guide_header') }}
-                        </template>
-                        <template slot="body">
-                            <span v-html="this.$t('trade.buy_order.guide_body', translationsContext)"></span>
-                        </template>
-                    </guide>
-                </span>
+    <div class="card pt-2 h-100">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <div
+                class="font-size-3 font-weight-semibold header-highlighting"
+                v-html="$t('trade.buy_order.header')"
+            ></div>
+            <span class="card-header-icon font-size-3">
+                <guide :key="tooltipKey">
+                    <template slot="header">
+                        {{ $t('trade.buy_order.guide_header') }}
+                    </template>
+                    <template slot="body">
+                        <span v-html="this.$t('trade.buy_order.guide_body', translationsContext)"></span>
+                    </template>
+                </guide>
+            </span>
+        </div>
+        <div class="card-body px-2">
+            <div v-if="serviceUnavailable" class="p-5 text-center text-white">
+                {{ this.$t('toasted.error.service_unavailable_short') }}
             </div>
-            <div class="card-body">
-                <div v-if="balanceLoaded" class="row">
-                    <div v-if="loggedIn" class="col-12">
-                        <div class="form-group">
-                            <label
-                                for="buy-price-input"
-                                class="text-white">
-                                {{ $t('trade.buy_order.price_in.header', translationsContext) }}
-                            </label>
-                            <guide>
-                                <template slot="header">
-                                  {{ $t('trade.buy_order.price_in.guide_header', translationsContext) }}
-                                </template>
-                                <template slot="body">
-                                  {{ $t('trade.buy_order.price_in.guide_body', translationsContext) }}
-                                </template>
-                            </guide>
-                        </div>
-                        <div class="d-flex">
-                            <price-converter-input
-                                class="d-inline-block"
-                                :class="orderInputClass"
-                                v-model="buyPrice"
-                                input-id="buy-price-input"
-                                :disabled="useMarketPrice || !loggedIn"
-                                @keypress="checkPriceInput"
-                                @paste="checkPriceInput"
-                                tabindex="3"
-                                :from="market.base.symbol"
-                                :to="USD.symbol"
-                                :subunit="4"
-                                symbol="$"
-                                :show-converter="currencyMode === currencyModes.usd.value"
-                            />
-                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
-                                 {{ $t('trade.buy_order.your.header') }}
-                                 <span>
-                                    <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
-                                        <span class="text-white">
-                                            <span class="text-nowrap">
-                                                {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                            </span>
+            <div v-else-if="balanceLoaded">
+                <div v-if="loggedIn">
+                    <div v-if="immutableBalance" class="font-weight-semibold font-size-1">
+                        <div class="d-flex flex-lg-nowrap flex-wrap justify-content-between pt-2">
+                            <div class="w-75 pl-3">
+                                <div class="d-flex align-items-center">
+                                    {{ $t('trade.buy_order.your.header') }}
+                                    <span class="c-pointer d-flex align-items-center" @click="balanceClicked">
+                                        <coin-avatar
+                                            :symbol="market.base.symbol"
+                                            :is-crypto="true"
+                                            class="mr-1"
+                                        />
+                                        {{ market.base.symbol | rebranding }}:
+                                        <span class="ml-1 text-nowrap text-primary d-flex align-items-center">
+                                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                            <guide
+                                                class="font-size-2 mtn-3 ml-1"
+                                                :key="tooltipKey"
+                                            >
+                                                <template slot="header">
+                                                    {{ $t('trade.buy_order.your.guide_header') }}
+                                                    <coin-avatar
+                                                        :symbol="market.base.symbol"
+                                                        :is-crypto="true"
+                                                    />
+                                                    {{ market.base.symbol | rebranding }}:
+                                                </template>
+                                                <template slot="body">
+                                                    <span v-html="tradeBuyOrderYourGuideBody" />
+                                                </template>
+                                            </guide>
                                         </span>
                                     </span>
-                                    <guide>
-                                        <template slot="header">
-                                            {{ $t('trade.buy_order.your.guide_header', translationsContext) }}
-                                        </template>
-                                        <template slot="body">
-                                            {{ $t('trade.buy_order.your.guide_body', translationsContext) }}
-                                        </template>
-                                    </guide>
-                                </span>
-                                 <a
-                                     v-if="showDepositMoreLink"
-                                     :href="depositMoreLink"
-                                     class="d-block text-nowrap"
-                                     tabindex="1"
-                                 >{{ $t('trade.buy_order.deposit_more') }}</a>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div v-if="loggedIn" class="col-12 pt-2">
-                        <label
-                            for="buy-price-amount"
-                            class="d-flex flex-row flex-nowrap justify-content-start w-50"
-                        >
-                            <span class="d-inline-block text-nowrap">{{ $t('trade.buy_order.amount') }} </span>
-                            <span v-if="shouldTruncate"
-                                  v-b-tooltip="{title:market.quote.symbol, boundary: 'window', customClass: 'tooltip-custom'}"
-                                  class="d-inline-block ml-1">
-                                {{ market.quote | rebranding | truncate(17) }}
-                            </span>
-                            <span v-else class="d-inline-block ml-1">
-                                {{ market.quote | rebranding }}
-                            </span>
-                            <span class="d-inline-block">:</span>
-                        </label>
-                        <div class="d-flex">
-                            <input
-                                v-model="buyAmount"
-                                type="text"
-                                id="buy-price-amount"
-                                class="form-control"
-                                :class="orderInputClass"
-                                :disabled="!loggedIn"
-                                @keypress="checkAmountInput"
-                                @paste="checkAmountInput"
-                                tabindex="4"
-                            >
-                            <div v-if="loggedIn" class="w-50 m-auto pl-4">
-                                <div
-                                    v-if="!disabledMarketPrice"
-                                    class="form-group custom-control custom-checkbox pb-0">
-                                    <input
-                                        v-model="useMarketPrice"
-                                        step="0.00000001"
-                                        type="checkbox"
-                                        id="buy-price"
-                                        class="custom-control-input"
-                                        tabindex="2"
+                            <div class="pl-3 pr-md-3">
+                                <div v-if="showDepositMoreLink" class="pt-2 pt-md-0 text-nowrap">
+                                    <span
+                                        :class="getTradeDepositDisabledClasses(getCurrencySymbol)"
+                                        tabindex="1"
+                                        @click="openDepositModal(getCurrencySymbol)"
                                     >
-                                    <label
-                                        class="custom-control-label pb-0"
-                                        for="buy-price">
-                                        {{ $t('trade.buy_order.market_price.header') }}
-                                    </label>
-                                    <guide>
-                                        <template slot="header">
-                                            {{ $t('trade.buy_order.market_price.guide_header') }}
-                                        </template>
-                                        <template slot="body">
-                                            {{ $t('trade.buy_order.market_price.guide_body', translationsContext) }}
-                                        </template>
-                                    </guide>
+                                        {{ $t('trade.buy_order.add_more_funds') }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div v-if="loggedIn" class="col-12 pt-2">
-                      {{ $t('trade.buy_order.total_price.header') }}
-                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol | rebranding }}
-                        <guide>
+                    <div class="form-group ml-3 mt-3">
+                        <label
+                            for="buy-price-input"
+                            class="text-uppercase font-weight-bold"
+                        >
+                            {{ $t('trade.buy_order.price_in.header') }}
+                        </label>
+                        <guide
+                            :key="tooltipKey"
+                            class="font-size-1"
+                        >
+                            <template slot="header">
+                            {{ $t('trade.buy_order.price_in.guide_header', translationsContext) }}
+                            </template>
+                            <template slot="body">
+                                <span v-html="$t('trade.buy_order.price_in.guide_body', translationsContext)"></span>
+                            </template>
+                        </guide>
+                    </div>
+                    <div class="row align-items-center m-0">
+                        <div class="col-12">
+                            <div class="d-flex flex-1 pt-2">
+                                <div class="w-100 flex-nowrap">
+                                    <price-converter-input
+                                        v-model="buyPrice"
+                                        input-id="buy-price-input"
+                                        :disabled="disabledPriceConverterInput"
+                                        tabindex="2"
+                                        :from="market.base.symbol"
+                                        :to="USD.symbol"
+                                        :subunit="priceSubunits"
+                                        symbol="$"
+                                        :input-class="{'trade-order-input form-control white-input py-3 h-auto' : true}"
+                                        :overflow-class="{'trade-order-input--overflow' : true}"
+                                        @keyup.enter="keyupEnterInput"
+                                        @keypress="checkPriceInput"
+                                        @keyup="keyupPriceInput($event)"
+                                        @paste="checkPriceInput"
+                                    />
+                                </div>
+                                <div class="price-order d-flex justify-content-center align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <coin-avatar
+                                            :symbol="market.base.symbol"
+                                            :is-crypto="true"
+                                            class="mr-2"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="loggedIn" class="my-3">
+                    <label
+                        for="buy-price-amount"
+                        class="font-weight-semibold ml-3 mb-1 text-uppercase"
+                    >
+                        <span class="d-inline-block text-nowrap">
+                            {{ $t('trade.buy_order.amount') }}
+                        </span>
+                    </label>
+                    <div class="row m-0 align-items-center">
+                        <div class="col-12">
+                            <div class="d-flex flex-1 pt-2">
+                                <div class="w-100 flex-nowrap">
+                                    <input
+                                        id="buy-price-amount"
+                                        type="text"
+                                        v-model="buyAmount"
+                                        class="trade-order-input form-control white-input py-3 h-auto"
+                                        :disabled="!loggedIn || tradeDisabled"
+                                        tabindex="3"
+                                        :placeholder="0"
+                                        @keyup.enter="keyupEnterInput"
+                                        @keypress="checkAmountInput"
+                                        @keyup="keyupAmountInput($event)"
+                                        @paste="checkAmountInput"
+                                    >
+                                </div>
+                                <div class="price-order d-flex justify-content-center align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <coin-avatar
+                                            :image="getCoinAvatar(this.market.quote.symbol)"
+                                            :symbol="this.market.quote.symbol"
+                                            :is-crypto="!getCoinAvatar(this.market.quote.symbol)"
+                                            :is-user-token="!!getCoinAvatar(this.market.quote.symbol)"
+                                            class="mr-2"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-show="maxAmountWarning" class="col-12 pt-2 pl-3">
+                            <span class="max-amount-warning">
+                                {{ maxAmountWarning }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="loggedIn" class="col-12 container-slider">
+                    <m-slider
+                        :value="sliderAmount"
+                        :max-value="maxSliderAmount"
+                        :disabled="disabledSlider"
+                        :precision="market.base.subunit"
+                        tabindex="4"
+                        @change="sliderNewAmount"
+                    />
+                </div>
+                <div v-if="loggedIn" class="col-12 pt-3 mb-1">
+                    <div class="text-uppercase font-weight-semibold mb-1">
+                        {{ $t('trade.buy_order.total_price.header') }}
+                        <guide class="font-size-2 mtn-6 ml-1">
                             <template slot="header">
                                 {{ $t('trade.buy_order.total_price.guide_header') }}
                             </template>
@@ -145,32 +191,93 @@
                             </template>
                         </guide>
                     </div>
-                    <div class="col-12 pt-3 text-left">
-                        <button
-                            @click="placeOrder"
+                    <div class="col-12 p-0">
+                        <div class="d-flex flex-1 pt-2">
+                            <div class="w-100 flex-nowrap">
+                                <price-converter-input
+                                    v-model="totalPrice"
+                                    input-id="buy-total-price-input"
+                                    :disabled="disabledPriceConverterInput"
+                                    tabindex="5"
+                                    :from="market.base.symbol"
+                                    :to="USD.symbol"
+                                    :subunit="market.base.subunit"
+                                    symbol="$"
+                                    :input-class="{'trade-order-input white-input' : true}"
+                                    :overflow-class="{'trade-order-input--overflow' : true}"
+                                    @keyup="keyupTotalPriceInput($event)"
+                                    @keypress="checkPriceInput"
+                                    @paste="checkPriceInput"
+                                />
+                            </div>
+                            <div class="price-order d-flex justify-content-center align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <coin-avatar
+                                        :symbol="market.base.symbol"
+                                        :is-crypto="true"
+                                        class="mr-2"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-0 pt-4 text-left">
+                    <div class="col-12">
+                        <m-button
                             v-if="loggedIn"
-                            class="btn btn-primary"
+                            class="btn btn-primary py-3 w-100 text-uppercase"
                             :disabled="!buttonValid"
-                            tabindex="5"
+                            :loading="placingOrder"
+                            tabindex="6"
+                            @click="placeOrder"
                         >
                             <span :class="{'text-muted': tradeDisabled}">
                                 {{ $t('trade.buy_order.submit') }}
                             </span>
-                        </button>
+                        </m-button>
                         <template v-else>
-                            <a :href="loginUrl" class="btn btn-primary">{{ $t('log_in') }}</a>
+                            <button
+                                id="buy-login-url"
+                                class="btn btn-primary"
+                                @click.prevent="goToPage(loginUrl)"
+                            >
+                                {{ $t('log_in') }}
+                            </button>
                             <span class="px-2">{{ $t('or') }}</span>
-                            <a :href="signupUrl">{{ $t('sign_up') }}</a>
+                            <button
+                                id="buy-signup-url"
+                                class="btn btn-link seo-link"
+                                @click.prevent="goToPage(signupUrl)"
+                            >
+                                {{ $t('sign_up') }}
+                            </button>
                         </template>
                     </div>
                 </div>
-                <template v-else>
-                    <div class="p-5 text-center text-white">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                </template>
+            </div>
+            <div v-else class="p-5 text-center text-white">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
         </div>
+        <deposit-modal
+            :visible="showDepositModal"
+            :currency="getCurrencySymbol"
+            :is-token="isTokenModal"
+            :is-created-on-mintme-site="isCreatedOnMintmeSite"
+            :is-owner="isOwner"
+            :token-networks="currentTokenNetworks"
+            :crypto-networks="currentCryptoNetworks"
+            :subunit="currentSubunit"
+            :no-close="false"
+            :add-phone-alert-visible="addPhoneAlertVisible"
+            :deposit-add-phone-modal-visible="depositAddPhoneModalVisible"
+            @close-confirm-modal="closeConfirmModal"
+            @phone-alert-confirm="onPhoneAlertConfirm(getCurrencySymbol)"
+            @close-add-phone-modal="closeAddPhoneModal"
+            @deposit-phone-verified="onDepositPhoneVerified"
+            @close="closeDepositModal"
+        />
     </div>
 </template>
 
@@ -182,6 +289,12 @@ import Decimal from 'decimal.js';
 import {VBTooltip} from 'bootstrap-vue';
 import {mapMutations, mapGetters} from 'vuex';
 import Guide from '../Guide';
+import MSlider from '../UI/Slider';
+import {toMoney, generateCoinAvatarHtml} from '../../utils';
+import PriceConverterInput from '../PriceConverterInput';
+import DepositModal from '../modal/DepositModal';
+import {MButton} from '../UI';
+import CoinAvatar from '../CoinAvatar';
 import {
     WebSocketMixin,
     PlaceOrder,
@@ -189,14 +302,26 @@ import {
     PricePositionMixin,
     RebrandingFilterMixin,
     OrderMixin,
-    LoggerMixin,
     FiltersMixin,
+    OpenPageMixin,
+    FloatInputMixin,
+    DepositModalMixin,
+    TradeCheckInput,
 } from '../../mixins/';
-import {toMoney} from '../../utils';
-import {USD, currencyModes} from '../../utils/constants';
-import PriceConverterInput from '../PriceConverterInput';
+import {
+    USD,
+    webSymbol,
+    SLIDER_DEFAULT_MAX_AMOUNT,
+    TRADE_ORDER_INPUT_FLAGS,
+} from '../../utils/constants';
 
 library.add(faCircleNotch);
+
+const FLAGS_TRADE_BUY = {
+    price: TRADE_ORDER_INPUT_FLAGS.buyPrice,
+    amount: TRADE_ORDER_INPUT_FLAGS.buyAmount,
+    totalPrice: TRADE_ORDER_INPUT_FLAGS.buyTotalPrice,
+};
 
 export default {
     name: 'TradeBuyOrder',
@@ -204,6 +329,10 @@ export default {
         Guide,
         PriceConverterInput,
         FontAwesomeIcon,
+        DepositModal,
+        MButton,
+        MSlider,
+        CoinAvatar,
     },
     directives: {
         'b-tooltip': VBTooltip,
@@ -215,8 +344,11 @@ export default {
         PricePositionMixin,
         RebrandingFilterMixin,
         OrderMixin,
-        LoggerMixin,
         FiltersMixin,
+        OpenPageMixin,
+        FloatInputMixin,
+        DepositModalMixin,
+        TradeCheckInput,
     ],
     props: {
         loginUrl: String,
@@ -225,22 +357,41 @@ export default {
         market: Object,
         balance: [String, Boolean],
         balanceLoaded: [String, Boolean],
+        serviceUnavailable: Boolean,
         takerFee: Number,
         tradeDisabled: Boolean,
         currencyMode: String,
+        isOwner: Boolean,
+        isCreatedOnMintmeSite: Boolean,
+        changingMarket: Boolean,
     },
     data() {
         return {
             action: 'buy',
             placingOrder: false,
             USD,
-            currencyModes,
+            tooltipKey: 0,
+            setHighestPrice: true,
         };
     },
     methods: {
+        ...mapMutations('tradeBalance', [
+            'setBuyPriceInput',
+            'setBuyAmountInput',
+            'setBuyTotalPriceInput',
+            'setBaseBalance',
+            'setQuoteFullBalance',
+            'setUseBuyMarketPrice',
+            'setTakerFee',
+            'setBuyPriceManuallyEdited',
+        ]),
+        keyupEnterInput() {
+            if (this.buttonValid) {
+                this.placeOrder();
+            }
+        },
         checkPriceInput() {
-            this.$emit('check-input', this.market.base.subunit);
-            this.priceManuallyEdited = true;
+            this.$emit('check-input', this.priceSubunits);
         },
         checkAmountInput() {
             this.$emit(
@@ -250,7 +401,46 @@ export default {
                     : this.market.quote.decimals
             );
         },
+        keyupPriceInput(event) {
+            this.priceManuallyEdited = true;
+            const price = event.target.value;
+
+            this.syncInputPriceFlag(
+                price,
+                this.buyAmount,
+                FLAGS_TRADE_BUY
+            );
+
+            this.setInputValuesByFlags();
+        },
+        keyupAmountInput(event) {
+            const amount = event.target.value;
+
+            this.syncInputAmountFlag(
+                this.buyPrice,
+                amount,
+                FLAGS_TRADE_BUY
+            );
+
+            this.setInputValuesByFlags();
+        },
+        keyupTotalPriceInput(event) {
+            const totalPrice = event.target.value;
+
+            this.syncInputTotalPriceFlag(
+                this.buyPrice,
+                this.buyAmount,
+                totalPrice,
+                FLAGS_TRADE_BUY
+            );
+
+            this.setInputValuesByFlags();
+        },
         placeOrder: function() {
+            if (this.serviceUnavailable) {
+                this.notifyError(this.$t('toasted.error.service_unavailable'));
+                return;
+            }
             if (this.tradeDisabled) {
                 this.notifyError(this.$t('trade.orders.disabled'));
                 return;
@@ -266,9 +456,9 @@ export default {
                 }
 
                 this.placingOrder = true;
-                let data = {
+                const data = {
                     amountInput: toMoney(this.buyAmount, this.market.quote.subunit),
-                    priceInput: toMoney(this.buyPrice, this.market.base.subunit),
+                    priceInput: toMoney(this.buyPrice, this.priceSubunits),
                     marketPrice: this.useMarketPrice,
                     action: this.action,
                 };
@@ -279,33 +469,45 @@ export default {
                 }), data)
                     .then(({data}) => {
                         if (
+                            data.hasOwnProperty('message') &&
+                            data.hasOwnProperty('notified') &&
+                            'token.not_deployed_response' === data.message
+                        ) {
+                            this.showTokenNotDeployedNotification(this.market.quote.symbol, data.notified);
+
+                            return;
+                        }
+
+                        if (
                             data.hasOwnProperty('error') &&
                             data.hasOwnProperty('type')
                         ) {
                             this.$emit('making-order-prevented');
                             return;
                         }
-                        if (data.result === 1) {
+                        if (1 === data.result) {
                             this.resetOrder();
                         }
+                        this.setQuoteFullBalance(data.balance ?? 0);
                         this.showNotification(data);
                     })
                     .catch((error) => {
                         this.handleOrderError(error);
-                        this.sendLogs('error', 'Can not get place order', error);
+                        this.$logger.error('Can not get place order', error);
                     })
                     .then(() => this.placingOrder = false);
             }
         },
         resetOrder: function() {
             if (!this.useMarketPrice) {
-                this.buyPrice = 0;
+                this.buyPrice = '';
             }
-            this.buyAmount = 0;
+            this.buyAmount = '';
+            this.totalPrice = '';
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
-                this.buyPrice = this.price || 0;
+                this.buyPrice = this.price || '';
             }
 
             if (this.disabledMarketPrice) {
@@ -327,47 +529,239 @@ export default {
         },
         fillAmount() {
             this.buyAmount = toMoney(
-                new Decimal(this.immutableBalance).div(parseFloat(this.buyPrice)|| 1).toString(),
+                new Decimal(this.immutableBalance || 0).div(parseFloat(this.buyPrice)|| 1).toString(),
+                this.market.quote.subunit
+            );
+
+            if (this.isZero(this.buyPrice)) {
+                this.setDefaultBuyPrice();
+            }
+
+            this.syncInputAmountFlag(
+                this.buyPrice,
+                this.buyAmount,
+                FLAGS_TRADE_BUY
+            );
+
+            this.setInputValuesByFlags();
+        },
+        getCoinAvatar(symbol) {
+            return (this.market.quote.symbol === symbol && webSymbol !== symbol)
+                ? this.market.quote.image
+                : null;
+        },
+        setDefaultBuyPrice() {
+            this.setInputFlag(FLAGS_TRADE_BUY.price);
+
+            if (this.setHighestPrice && this.highestPrice) {
+                this.buyPrice = this.parseFloatInput(
+                    new Decimal(this.highestPrice).plus(this.minTotalPrice).toFixed()
+                );
+                this.setHighestPrice = false;
+
+                return;
+            }
+
+            this.buyPrice = this.marketPrice
+                ? this.parseFloatInput(this.marketPrice)
+                : '';
+            this.setHighestPrice = false;
+        },
+        sliderNewAmount(sliderAmount) {
+            this.sliderAmount = sliderAmount;
+        },
+        setInputValuesByFlags() {
+            if (
+                this.hasInputFlag(FLAGS_TRADE_BUY.amount) &&
+                this.hasInputFlag(FLAGS_TRADE_BUY.totalPrice)
+            ) {
+                this.buyPrice = this.getNewPrice(
+                    this.totalPrice,
+                    this.buyAmount,
+                    this.priceSubunits
+                );
+            }
+
+            if (
+                this.hasInputFlag(FLAGS_TRADE_BUY.price) &&
+                this.hasInputFlag(FLAGS_TRADE_BUY.totalPrice)
+            ) {
+                this.buyAmount = this.getNewAmount(
+                    this.totalPrice,
+                    this.buyPrice,
+                    this.market.quote.subunit
+                );
+            }
+
+            if (
+                this.hasInputFlag(FLAGS_TRADE_BUY.price) &&
+                this.hasInputFlag(FLAGS_TRADE_BUY.amount)
+            ) {
+                this.totalPrice = this.getTotalPrice(
+                    this.buyPrice,
+                    this.buyAmount,
+                    this.priceSubunits
+                );
+            }
+        },
+        checkBuyMaxAmount(price, amount, found) {
+            const maxAmount = new Decimal(found).div(price).toNumber();
+
+            return this.getMessageMaxAmount(
+                amount,
+                maxAmount,
                 this.market.quote.subunit
             );
         },
-        ...mapMutations('tradeBalance', [
-            'setBuyPriceInput',
-            'setBuyAmountInput',
-            'setBaseBalance',
-            'setUseBuyMarketPrice',
-            'setTakerFee',
-            'setBuyPriceManuallyEdited',
-        ]),
+        resetInputAmount() {
+            this.buyAmount = '';
+        },
+        getMessageMaxAmount(value, maxAmount) {
+            if (new Decimal(value).gt(maxAmount)) {
+                const translationsContext = {
+                    maxAmount: maxAmount,
+                    currency: this.rebrandingFunc(this.market.quote.symbol),
+                };
+
+                return this.$t('max.amount.warning', translationsContext);
+            }
+
+            return false;
+        },
+        resetInputValues() {
+            this.buyPrice = '';
+            this.buyAmount = '';
+            this.totalPrice = '';
+        },
     },
     computed: {
-        shouldTruncate: function() {
-            return this.market.quote.symbol.length > 17;
+        highestPrice() {
+            return this.buyOrders[0]
+                ? this.buyOrders[0].price
+                : 0;
         },
-        totalPrice: function() {
-            return new Decimal(this.buyPrice && !isNaN(this.buyPrice) ? this.buyPrice : 0)
-                .times(this.buyAmount && !isNaN(this.buyAmount) ? this.buyAmount : 0)
-                .toString();
+        priceSubunits() {
+            return this.isToken && this.market.quote.priceDecimals
+                ? this.market.quote.priceDecimals
+                : this.market.base.subunit;
+        },
+        isToken() {
+            return undefined === this.market.quote?.isToken;
+        },
+        disabledPriceConverterInput: function() {
+            return this.useMarketPrice || !this.loggedIn || this.tradeDisabled;
+        },
+        maxAmountWarning: function() {
+            const maxAmount = this.getNewValue(
+                this.founds,
+                this.buyPrice,
+                this.market.quote.subunit,
+            ).toString();
+
+            const message = this.getMessageMaxAmount(
+                this.buyAmount || 0,
+                maxAmount,
+            );
+
+            if (message && '0' !== maxAmount) {
+                this.resetInputAmount();
+            }
+
+            return message;
+        },
+        tooltipConfig: function() {
+            return {
+                title: this.rebrandingFunc(this.market.quote.symbol),
+                boundary: 'window',
+                customClass: 'tooltip-custom',
+            };
+        },
+        shouldTruncate: function() {
+            return 10 < this.market.quote.symbol.length;
+        },
+        founds: function() {
+            return new Decimal(this.immutableBalance).toNumber();
+        },
+        disabledSlider: function() {
+            return 0 === this.founds;
+        },
+        maxSliderAmount: function() {
+            return 0 < this.founds
+                ? this.founds
+                : SLIDER_DEFAULT_MAX_AMOUNT;
+        },
+        sliderAmount: {
+            get() {
+                const totalPrice = this.buyAmount * this.buyPrice || '0';
+                return totalPrice > this.maxSliderAmount
+                    ? this.maxSliderAmount
+                    : totalPrice;
+            },
+            set(value) {
+                if (this.isZero(this.buyPrice) && this.isZero(this.buyAmount)) {
+                    return;
+                }
+
+                this.buyAmount = toMoney(
+                    new Decimal(value || 0).div(parseFloat(this.buyPrice) || 1).toString(),
+                    this.market.quote.subunit
+                );
+
+                this.syncInputAmountFlag(
+                    this.buyPrice,
+                    this.buyAmount,
+                    FLAGS_TRADE_BUY
+                );
+
+                this.setInputValuesByFlags();
+            },
+        },
+        totalPrice: {
+            get() {
+                return 0 !== this.getBuyTotalPriceInput
+                    ? this.parseFloatInput(this.getBuyTotalPriceInput)
+                    : '';
+            },
+            set(value) {
+                this.setBuyTotalPriceInput(value || '');
+            },
         },
         price: function() {
-            return toMoney(this.marketPrice, this.market.base.subunit) || null;
+            return toMoney(this.marketPrice, this.priceSubunits) || null;
         },
         minTotalPrice: function() {
-            return toMoney('1e-' + this.market.base.subunit, this.market.base.subunit);
+            return toMoney('1e-' + this.priceSubunits, this.priceSubunits);
         },
         fieldsValid: function() {
-            return this.buyPrice > 0 && this.buyAmount > 0;
+            return 0 < this.buyPrice && 0 < this.buyAmount;
         },
         buttonValid: function() {
-            return this.fieldsValid && !this.placingOrder;
+            return this.fieldsValid && !this.placingOrder && !this.maxAmountWarning && !this.tradeDisabled;
         },
         disabledMarketPrice: function() {
-            return this.marketPrice <= 0 || !this.loggedIn;
+            return 0 >= this.marketPrice || !this.loggedIn;
+        },
+        tradeBuyOrderYourGuideBody: function() {
+            return this.$t('trade.buy_order.your.guide_body', this.translationsContext);
         },
         translationsContext: function() {
             return {
-                baseSymbol: this.rebrandingFunc(this.market.base.symbol),
-                quoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
+                baseSymbol: this.rebrandingFunc(this.market.base),
+                quoteSymbol: this.rebrandingFunc(this.market.quote),
+                quoteBlock: this.isToken
+                    ? generateCoinAvatarHtml({
+                        image: this.market.quote.image.url,
+                        isUserToken: true,
+                        symbol: this.rebrandingFunc(this.market.quote.symbol),
+                    })
+                    : generateCoinAvatarHtml({
+                        symbol: this.rebrandingFunc(this.market.quote.symbol),
+                        isCrypto: true,
+                    }),
+                baseBlock: generateCoinAvatarHtml({
+                    symbol: this.rebrandingFunc(this.market.base.symbol),
+                    isCrypto: true,
+                }),
                 rebrandedQuoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
                 minTotalPrice: this.minTotalPrice,
             };
@@ -375,27 +769,33 @@ export default {
         ...mapGetters('tradeBalance', [
             'getBuyPriceInput',
             'getBuyAmountInput',
+            'getBuyTotalPriceInput',
             'getBaseBalance',
             'getUseBuyMarketPrice',
             'getBuyPriceManuallyEdited',
         ]),
         ...mapGetters('orders', {
-             sellOrders: 'getSellOrders',
+            sellOrders: 'getSellOrders',
+            buyOrders: 'getBuyOrders',
         }),
         buyPrice: {
             get() {
-                return this.getBuyPriceInput;
+                return 0 !== this.getBuyPriceInput
+                    ? this.parseFloatInput(this.getBuyPriceInput)
+                    : '';
             },
-            set(val) {
-                this.setBuyPriceInput(val);
+            set(value) {
+                this.setBuyPriceInput(value || '');
             },
         },
         buyAmount: {
             get() {
-                return this.getBuyAmountInput;
+                return 0 !== this.getBuyAmountInput
+                    ? this.parseFloatInput(this.getBuyAmountInput)
+                    : '';
             },
-            set(val) {
-                this.setBuyAmountInput(val);
+            set(value) {
+                this.setBuyAmountInput(value || '');
             },
         },
         immutableBalance: {
@@ -408,10 +808,18 @@ export default {
         },
         useMarketPrice: {
             get() {
-                return this.getUseBuyMarketPrice && this.marketPrice > 0;
+                return this.getUseBuyMarketPrice && 0 < this.marketPrice;
             },
             set(val) {
                 this.setUseBuyMarketPrice(val);
+            },
+        },
+        amountManuallyEdited: {
+            get() {
+                return this.getBuyAmountManuallyEdited;
+            },
+            set(val) {
+                this.setBuyAmountManuallyEdited(val);
             },
         },
         priceManuallyEdited: {
@@ -424,11 +832,11 @@ export default {
         },
         marketPrice() {
             let tokenAmount = new Decimal(0);
-            let balance = new Decimal(this.immutableBalance || 0);
+            const balance = new Decimal(this.immutableBalance || 0);
 
             let result = this.sellOrders[0] ? this.sellOrders[this.sellOrders.length - 1].price : 0;
 
-            for (let order of this.sellOrders) {
+            for (const order of this.sellOrders) {
                 tokenAmount = tokenAmount.add(order.amount);
 
                 if (balance.div(order.price).lessThanOrEqualTo(tokenAmount)) {
@@ -442,21 +850,36 @@ export default {
         },
     },
     watch: {
-        useMarketPrice: function(newVal) {
-            this.updateMarketPrice();
-
-            if (!newVal) {
-                this.resetOrder();
+        sellOrders: function() {
+            if (this.sellOrders && 0 === this.sellOrders.length && this.buyOrders) {
+                this.setHighestPrice = true;
+                this.setDefaultBuyPrice();
             }
+        },
+        buyOrders: function() {
+            if (this.sellOrders && 0 === this.sellOrders.length && this.buyOrders) {
+                this.setHighestPrice = true;
+                this.setDefaultBuyPrice();
+            }
+        },
+        useMarketPrice: function() {
+            this.updateMarketPrice();
         },
         marketPrice: function() {
             this.updateMarketPrice();
+            this.setDefaultBuyPrice();
         },
         balance: function() {
             this.immutableBalance = this.balance;
             if (!this.balance) {
                 return;
             }
+        },
+        market: function() {
+            this.tooltipKey += 1;
+        },
+        changingMarket: function() {
+            this.resetInputValues();
         },
     },
     mounted: function() {

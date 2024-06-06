@@ -9,6 +9,7 @@ use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\LockFactory;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,26 +20,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /* Cron job added to DB. */
 class MarketsUpdateCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'app:markets:update';
+    private MarketStatusManagerInterface $marketStatusManager;
+    private MarketFactoryInterface $marketFactory;
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
+    private RebrandingConverterInterface $rebrandingConverter;
+    private LockFactory $lockFactory;
+    private EntityManagerInterface $entityManager;
 
-    /** @var MarketStatusManagerInterface */
-    private $marketStatusManager;
-
-    /** @var MarketFactoryInterface */
-    private $marketFactory;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
-
-    /** @var LockFactory */
-    private $lockFactory;
+    private const BATCH_SIZE = 20;
 
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
@@ -46,7 +36,8 @@ class MarketsUpdateCommand extends Command
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         RebrandingConverterInterface $rebrandingConverter,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        EntityManagerInterface $entityManager
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketFactory = $marketFactory;
@@ -54,12 +45,14 @@ class MarketsUpdateCommand extends Command
         $this->tokenManager = $tokenManager;
         $this->rebrandingConverter = $rebrandingConverter;
         $this->lockFactory = $lockFactory;
+        $this->entityManager = $entityManager;
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this
+            ->setName('app:markets:update')
             ->setDescription('Update markets with information from viabtc server')
             ->addArgument('market', InputArgument::OPTIONAL, 'The market to update (e.g. MINTME/BTC)')
             ->addOption('cron', null, InputOption::VALUE_NONE, 'Run in cron mode');
@@ -68,7 +61,9 @@ class MarketsUpdateCommand extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $lock = $this->lockFactory->createLock('markets-update');
+        // FileBasedLock because we clear EntityManager later,
+        // otherwise this process would lose this Lock
+        $lock = $this->lockFactory->createFileBasedLock('markets-update');
 
         if (!$lock->acquire()) {
             return 0;
@@ -96,19 +91,42 @@ class MarketsUpdateCommand extends Command
                 $this->marketStatusManager->getExpired()
             )
             : $this->marketFactory->createAll();
-        $io->progressStart(count($markets));
 
-        foreach ($markets as $market) {
+        $marketsCount = count($markets);
+        $io->progressStart($marketsCount);
+
+        $this->entityManager->beginTransaction();
+
+        foreach ($markets as $i => $market) {
             $tries = 10;
 
             while ($tries > 0) {
                 try {
-                    $this->marketStatusManager->updateMarketStatus($market);
+                    // We first fetch all the markets that we're updating,
+                    // then we clear the EntityManager, detaching all the entities from it,
+                    // after that we refetch them so we get an attached one again and update it.
+                    // Finally, each self::BATCH_SIZE update EntityManager is cleared again.
+                    //
+                    // Clearing EntityManager improves performance by 10x since it's a lot of markets/entities
+                    // being attached to it
+                    $attachedMarket = $this->marketFactory->createBySymbols(
+                        $market->getBase()->getSymbol(),
+                        $market->getQuote()->getSymbol()
+                    );
+
+                    $this->marketStatusManager->updateMarketStatus($attachedMarket);
 
                     break;
                 } catch (\Throwable $e) {
                     $tries--;
                 }
+            }
+
+            if (0 === (int)$i % self::BATCH_SIZE || (int)$i >= $marketsCount - 1) {
+                // It enters here in the first iteration because $i is 0
+                $this->entityManager->commit();
+                $this->entityManager->clear();
+                $this->entityManager->beginTransaction();
             }
 
             $io->progressAdvance();

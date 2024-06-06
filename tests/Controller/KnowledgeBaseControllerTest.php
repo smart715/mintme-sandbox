@@ -22,7 +22,7 @@ class KnowledgeBaseControllerTest extends WebTestCase
 
         $this->client->request('GET', self::LOCALHOST . '/kb');
 
-        $this->assertContains($fooUrl, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($fooUrl, (string)$this->client->getResponse()->getContent());
         $this->assertGreaterThan(
             0,
             $this->client->getCrawler()->filter('a[href="/kb/'. $fooUrl .'"]')->count()
@@ -35,9 +35,9 @@ class KnowledgeBaseControllerTest extends WebTestCase
 
         $this->client->request('GET', self::LOCALHOST . '/kb');
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'No articles found',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 
@@ -58,8 +58,8 @@ class KnowledgeBaseControllerTest extends WebTestCase
 
         $res = $this->client->getResponse()->getContent();
 
-        $this->assertContains($fooUrl, $res);
-        $this->assertContains('foo description', $res);
+        $this->assertStringContainsString($fooUrl, (string)$res);
+        $this->assertStringContainsString('foo description', (string)$res);
         $this->assertGreaterThan(
             0,
             $this->client->getCrawler()->filter('a[href="/kb"]')->count()

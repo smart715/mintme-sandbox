@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\ScheduledNotification;
+use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Mailer\MailerInterface;
@@ -11,8 +12,10 @@ use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\MarketingAirdropFeatureNotificationStrategy;
 use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\NotificationStrategyInterface;
 use App\Notifications\Strategy\OrderNotificationStrategy;
 use App\Notifications\Strategy\TokenMarketingTipsNotificationStrategy;
+use App\Notifications\Strategy\TokenPromotionNotificationStrategy;
 use App\Utils\NotificationTypes;
 use DateTimeImmutable;
 use Symfony\Component\Console\Command\Command;
@@ -27,6 +30,7 @@ class CheckScheduledNotificationsCommand extends Command
     public array $filled_intervals;
     public array $cancelled_intervals;
     public array $token_marketing_tips_intervals;
+    public array $token_promotion_intervals;
     public array $marketing_airdrop_feature_intervals;
     public array $kbLinks;
 
@@ -46,6 +50,7 @@ class CheckScheduledNotificationsCommand extends Command
         array $filled_intervals,
         array $cancelled_intervals,
         array $token_marketing_tips_intervals,
+        array $token_promotion_intervals,
         array $marketing_airdrop_feature_intervals
     ) {
         $this->scheduledNotificationManager = $scheduledNotificationManager;
@@ -57,6 +62,7 @@ class CheckScheduledNotificationsCommand extends Command
         $this->filled_intervals = $filled_intervals;
         $this->cancelled_intervals = $cancelled_intervals;
         $this->token_marketing_tips_intervals = $token_marketing_tips_intervals;
+        $this->token_promotion_intervals = $token_promotion_intervals;
         $this->marketing_airdrop_feature_intervals = $marketing_airdrop_feature_intervals;
 
         parent::__construct();
@@ -83,6 +89,12 @@ class CheckScheduledNotificationsCommand extends Command
 
             if (in_array($notificationType, NotificationTypes::MARKETING_TYPES)) {
                 $this->scheduleMarketingNotification($scheduledNotification);
+
+                continue;
+            }
+
+            if (NotificationTypes::TOKEN_PROMOTION === $notificationType) {
+                $this->schedulePromotionNotification($scheduledNotification);
             }
         }
 
@@ -113,9 +125,7 @@ class CheckScheduledNotificationsCommand extends Command
                 $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
             }
 
-            $actual_date = new DateTimeImmutable();
-
-            if ($actual_date < $dateToBeSend) {
+            if (new DateTimeImmutable() < $dateToBeSend) {
                 return;
             }
 
@@ -125,8 +135,8 @@ class CheckScheduledNotificationsCommand extends Command
                 $quoteToken,
                 $notificationType
             );
-            $notificationContext = new NotificationContext($strategy);
-            $notificationContext->sendNotification($user);
+            
+            $this->sendGeneralNotification($strategy, $user);
 
             $lastSent = end($arrayOfIntervals) === $timeInterval;
 
@@ -159,9 +169,7 @@ class CheckScheduledNotificationsCommand extends Command
             return;
         }
 
-        $actual_date = new DateTimeImmutable();
-
-        if ($actual_date < $dateToBeSend) {
+        if (new DateTimeImmutable() < $dateToBeSend) {
             return;
         }
 
@@ -179,7 +187,6 @@ class CheckScheduledNotificationsCommand extends Command
                 break;
             case NotificationTypes::MARKETING_AIRDROP_FEATURE:
                 $strategy = new MarketingAirdropFeatureNotificationStrategy(
-                    $this->userNotificationManager,
                     $this->mailer
                 );
 
@@ -190,8 +197,7 @@ class CheckScheduledNotificationsCommand extends Command
             return;
         }
 
-        $notificationContext = new NotificationContext($strategy);
-        $notificationContext->sendNotification($user);
+        $this->sendGeneralNotification($strategy, $user);
 
         $lastSent = end($arrayOfIntervals) === $timeInterval;
 
@@ -207,6 +213,41 @@ class CheckScheduledNotificationsCommand extends Command
             $arrayOfIntervals,
             $dateToBeSend
         );
+    }
+
+    private function schedulePromotionNotification(ScheduledNotification $scheduledNotification): void
+    {
+        $notificationType = $scheduledNotification->getType();
+        $timeInterval = $scheduledNotification->getTimeInterval();
+        $dateToBeSend = $scheduledNotification->getDateToBeSend();
+        $arrayOfIntervals = $this->{strtolower($notificationType) . '_intervals'};
+        $user = $scheduledNotification->getToken()->getOwner();
+
+        if (new DateTimeImmutable() < $dateToBeSend) {
+            return;
+        }
+
+        $strategy = new TokenPromotionNotificationStrategy(
+            $this->mailer,
+            $scheduledNotification->getToken(),
+        );
+
+        $this->sendGeneralNotification($strategy, $user);
+
+        $this->updateScheduledNotification(
+            $scheduledNotification,
+            $timeInterval,
+            $arrayOfIntervals,
+            $dateToBeSend
+        );
+    }
+
+    private function sendGeneralNotification(
+        NotificationStrategyInterface $strategy,
+        User $user
+    ): void {
+        $notificationContext = new NotificationContext($strategy);
+        $notificationContext->sendNotification($user);
     }
 
     private function updateScheduledNotification(

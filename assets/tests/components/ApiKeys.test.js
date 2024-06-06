@@ -1,21 +1,35 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import ApiKeys from '../../js/components/ApiKeys';
 import moxios from 'moxios';
-import axiosPlugin from '../../js/axios';
+import axios from 'axios';
 
 /**
  * @return {Wrapper<Vue>}
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axiosPlugin);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = {error: () => {}};
         },
     });
     return localVue;
+}
+
+/**
+ * @param {Object} propsData
+ * @param {Object} data
+ * @return {Wrapper<Vue>}
+ */
+function createWrapper(propsData = {}, data = {}) {
+    return shallowMount(ApiKeys, {
+        localVue: mockVue(),
+        propsData,
+        data: () => data,
+    });
 }
 
 describe('ApiKey', () => {
@@ -32,12 +46,7 @@ describe('ApiKey', () => {
             publicKey: 'foo',
             plainPrivateKey: 'bar',
         };
-        const wrapper = shallowMount(ApiKeys, {
-            localVue: mockVue(),
-            propsData: {
-                apiKeys,
-            },
-        });
+        const wrapper = createWrapper({apiKeys}, {});
 
         expect(wrapper.vm.keys.publicKey).toBe(apiKeys.publicKey);
         expect(wrapper.vm.keys.plainPrivateKey).toBe(apiKeys.plainPrivateKey);
@@ -66,12 +75,8 @@ describe('ApiKey', () => {
             publicKey: 'foo',
             plainPrivateKey: 'bar',
         };
-        const wrapper = shallowMount(ApiKeys, {
-            localVue: mockVue(),
-            propsData: {
-                apiKeys,
-            },
-        });
+
+        const wrapper = createWrapper({apiKeys}, {});
 
         moxios.stubRequest('delete_keys', {
             status: 203,

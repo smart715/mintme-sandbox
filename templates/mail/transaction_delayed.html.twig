@@ -1,0 +1,97 @@
+{% extends 'mail/layout.html.twig' %}
+{% block content %}
+    {{ parent() }}
+    <div class="box-table">
+        <table
+            role="presentation"
+            width="100%"
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            class="table-border"
+            bgcolor="#ffffff"
+        >
+            <tr>
+                <td
+                    align="center"
+                    width="600"
+                    class="td-body"
+                    bgcolor="#ffffff"
+                >
+                    <img
+                        alt="Withdraw"
+                        src="{{ absolute_url(asset('build/images/Withdraw.png')) }}"
+                        width="120"
+                        class="img-build-v0"
+                    />
+                    <p class="p-hello">{% trans %} hello {% endtrans %} {{ nickname }}</p>
+                    <p class="p-second-line">
+                        {% trans %} mail.transaction.delayed.msg {% endtrans %}
+                    </p>
+                    <br>
+                    <p class="p-mail-info">
+                        {% trans %} mail.transaction.delayed.msg_extra {% endtrans %}
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <table
+            role="presentation"
+            width="100%"
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            class="border-blank-space"
+            bgcolor="#f3f3f3"
+        >
+            <tr>
+                <td align="center" class="prev-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+        <table
+            role="presentation"
+            width="100%"
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            class="table-border-v3"
+            bgcolor="#2199e8"
+        >
+            <tr>
+                <td align="center" width="600" class="td-code-v2" bgcolor="#2199e8">
+                    <p class="p-fiveteenth-line">
+                        <a href="{{ urlWallet }}" class="a-link-text" style="mso-padding-alt:0;">
+                            {% trans %} mail.deposit_complete.text_link {% endtrans %}
+                        </a>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <table
+            role="presentation" 
+            width="100%" 
+            border="0" 
+            cellpadding="0" 
+            cellspacing="0" 
+            class="border-blank-space"
+            bgcolor="#f3f3f3"
+        >
+            <tr>
+                <td align="center" class="prev-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+        <table
+            role="presentation"
+            width="100%"
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            class="border-blank-space"
+            bgcolor="#f3f3f3"
+        >
+            <tr>
+                <td align="center" class="post-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

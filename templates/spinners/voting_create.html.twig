@@ -1,20 +1,30 @@
-<div class="row" v-if="false">
-    <div class="card h-100 col-sm-12 col-lg-7">
+<div class="row">
+    <div class="card h-100 mb-3 col-12 p-0 {% if isTokenPage is not defined %}col-lg-7{% endif %}">
         <div class="card-header">
-            {% trans %}voting.create{% endtrans %}
+            <h3 class="text-white">
+                {% trans %}voting.create{% endtrans %}
+                <span class="text-primary">{% trans %}voting.voting{% endtrans %}</span>
+            </h3>
         </div>
         <div class="card-body">
-            {{ include('spinners/spinner.html.twig') }}
+            <div class="p-5 text-center">
+                <div class="icon-loading"></div>
+            </div>
         </div>
     </div>
-    <div class="card h-100 col-sm-12 col-lg-5">
+    <div class="card h-100 col-12 p-0 {% if isTokenPage is not defined %}col-lg-5{% endif %}">
         <div class="card-header">
             <div class="d-flex justify-content-between">
-                {% trans %}voting.options{% endtrans %}
+                <h3 class="text-white">
+                    {% trans %}voting.options.set{% endtrans %}
+                    <span class="text-primary">{% trans %}voting.options{% endtrans %}</span>
+                </h3>
             </div>
         </div>
         <div class="card-body">
-            {{ include('spinners/spinner.html.twig') }}
+            <div class="p-5 text-center">
+                <div class="icon-loading"></div>
+            </div>
         </div>
     </div>
 </div>

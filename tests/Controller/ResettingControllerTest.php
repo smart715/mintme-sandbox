@@ -32,18 +32,18 @@ class ResettingControllerTest extends WebTestCase
 
         $this->assertNotNull($user->getConfirmationToken());
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Email Sent!',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 
     public function testResetActionNotFound(): void
     {
         $this->client->request('GET', self::LOCALHOST . '/resetting/reset/' . $this->generateString());
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Page not found',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 
@@ -76,9 +76,9 @@ class ResettingControllerTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'The password has been reset successfully.',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 }

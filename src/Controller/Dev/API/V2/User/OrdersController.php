@@ -4,9 +4,6 @@ namespace App\Controller\Dev\API\V2\User;
 
 use App\Controller\Dev\API\V1\DevApiController;
 use App\Exchange\ExchangerInterface;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
-use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -19,20 +16,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrdersController extends DevApiController
 {
-    private CryptoManagerInterface $cryptoManager;
-    private TokenManagerInterface $tokenManager;
-    private RebrandingConverterInterface $rebrandingConverter;
-
-    public function __construct(
-        CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager,
-        RebrandingConverterInterface $rebrandingConverter
-    ) {
-        $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
-        $this->rebrandingConverter = $rebrandingConverter;
-    }
-
     /**
      * List users active orders
      *
@@ -133,7 +116,7 @@ class OrdersController extends DevApiController
      * Place an order on a specific market
      *
      * @Rest\View()
-     * @Rest\Post()
+     * @Rest\Post(defaults={"_private_key_required"=true})
      * @Rest\RequestParam(name="base", allowBlank=false)
      * @Rest\RequestParam(name="quote", allowBlank=false)
      * @Rest\RequestParam(
@@ -156,8 +139,8 @@ class OrdersController extends DevApiController
      *      format="application/json",
      *      @SWG\Schema(
      *          type="object",
-     *          @SWG\Property(property="base", type="string", example="MINTME", description="Base name"),
-     *          @SWG\Property(property="quote", type="string", example="MY_TOKEN", description="Quote name"),
+     *          @SWG\Property(property="base", type="string", example="MY_TOKEN", description="Base name"),
+     *          @SWG\Property(property="quote", type="string", example="MINTME", description="Quote name"),
      *          @SWG\Property(property="priceInput", type="string", example="5", description="Price to place"),
      *          @SWG\Property(property="amountInput", type="string", example="12.33", description="Amount to order"),
      *          @SWG\Property(property="marketPrice", type="boolean", example=false, description="Use market price"),
@@ -168,6 +151,7 @@ class OrdersController extends DevApiController
      * ),
      * @SWG\Response(response="201",description="Returns success message",)
      * @SWG\Response(response="404",description="Market not found")
+     * @SWG\Response(response="403", description="Access denied or Please wait at least some seconds before placing a new order")
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="User Orders")
      */
@@ -198,9 +182,14 @@ class OrdersController extends DevApiController
      * Remove order of specific market
      *
      * @Rest\View()
-     * @Rest\Delete("/{id}", requirements={"id"="\d+"})
+     * @Rest\Delete(
+     *     "/{id}",
+     *     requirements={"id"="\d+"},
+     *     defaults={"_private_key_required"=true}
+     * )
      * @SWG\Response(response="202", description="Order successfully removed")
      * @SWG\Response(response="400", description="Invalid request")
+     * @SWG\Response(response="403", description="Access denied or Please wait at least some seconds before canceling an order")
      * @SWG\Response(response="404", description="Market not found")
      * @Rest\QueryParam(name="base", allowBlank=false, strict=true)
      * @Rest\QueryParam(name="quote", allowBlank=false, strict=true)

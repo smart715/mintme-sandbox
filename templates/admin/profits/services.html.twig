@@ -1,0 +1,145 @@
+{% extends 'admin/custom_layout.html.twig' %}
+
+{% set label = 'page.profits.services.title' | trans %}
+
+{% block sonata_head_title %}
+    {% spaceless %}
+        {{ label }} | mintMe
+    {% endspaceless %}
+{% endblock %}
+
+{% block logo %}
+    {% spaceless %}
+        <a class="logo" href="{{ path('sonata_admin_dashboard') }}">
+            <img src="{{ asset('build/images/logo.png') }}" alt="imp-logo">
+        </a>
+    {% endspaceless %}
+{% endblock %}
+
+{% block content %}
+    <form class="form-inline" action="{{ path('services_profits') }}" method="GET">
+        <div class="form-group">
+            <label for="start_date">{% trans %} mintme.api.finance.start_date {% endtrans %}:</label>
+            <input type="text" id="start_date" name="start_date" value="{{ startDate }}" required>
+        </div>
+        <div class="form-group">
+            <label for="end_date">{% trans %} mintme.api.finance.end_date {% endtrans %}:</label>
+            <input type="text" id="end_date" name="end_date" value="{{ endDate }}" required>
+        </div>
+        <button type="submit" class="btn btn-default">{% trans %} mintme.api.finance.filter {% endtrans %}</button>
+    </form>
+    <br>
+    <h2> {% trans %} mintme.api.profit.deployment_table {% endtrans %} </h2>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+            <tr class="sonata-ba-list-field-header">
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.symbol {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.count {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.profit {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.profit_usd {% endtrans %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for deploymentProfit in deploymentProfits %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ deploymentProfit.symbol }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ deploymentProfit.count }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ deploymentProfit.profit |  toMoney(8, false, true) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ deploymentProfit.profitInUsd | toMoney(2, false, true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <h2> {% trans %} mintme.api.profit.additional_markets_table {% endtrans %} </h2>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+            <tr class="sonata-ba-list-field-header">
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.symbol {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.count {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.profit {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}  mintme.api.profit.profit_usd {% endtrans %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for additionalMarketsProfit in additionalMarketsProfits %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ additionalMarketsProfit.symbol }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ additionalMarketsProfit.count }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ additionalMarketsProfit.profit |  toMoney(8, false, true) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ additionalMarketsProfit.profitInUsd | toMoney(2, false, true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h2> {% trans %} mintme.api.profit.comment_tips_fees_table {% endtrans %} </h2>
+    <table class="table table-bordered table-striped sonata-ba-list">
+        <thead>
+            <tr class="sonata-ba-list-field-header">
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.symbol {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.count {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %} mintme.api.profit.profit {% endtrans %}
+                </th>
+                <th class="sonata-ba-list-field-header-text">
+                    {% trans %}  mintme.api.profit.profit_usd {% endtrans %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commentTipFeeProfit in commentTipFeesProfit %}
+            <tr>
+                <td class="sonata-ba-list-field sonata-ba-list-field-choice">
+                    {{ commentTipFeeProfit.symbol }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ commentTipFeeProfit.count }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ commentTipFeeProfit.profit | toMoney(8, false, true) }}
+                </td>
+                <td class="sonata-ba-list-field sonata-ba-list-field-boolean">
+                    {{ commentTipFeeProfit.profitInUsd | toMoney(2, false, true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

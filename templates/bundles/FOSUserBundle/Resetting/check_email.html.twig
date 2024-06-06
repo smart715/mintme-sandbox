@@ -1,24 +1,37 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% block bgclass %}d-flex align-items-center{% endblock %}
 
 {% trans_default_domain 'FOSUserBundle' %}
+
+{% block pagestyles %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('security_pages') }}
+{% endblock %}
 
 {% block fos_user_content %}
     <div class="container">
         <div class="row pt-4 justify-content-center notification">
             <div class="col-12">
-                <div class="card card-fixed-small mx-auto">
-                    <div class="card-header">
-                        <div class="row">
-                            {% trans %}email.sent{% endtrans %}
-                        </div>
+                <div class="card py-3 py-md-5 card-fixed-lg mx-auto">
+                    <div class="d-flex justify-content-center">
+                        <img src="{{ asset('build/images/paper-plane.svg') }}" class="my-4 paper-plane-img" />
                     </div>
-                    <div class="card-body py-2 text-center">
-                        <p>
-                            {% trans with {'%hours%': tokenLifetime} %}email.sent.body{% endtrans %}
-                        </p>
-                        <p class="pb-0 mb-0">
-                            {% trans %}email.sent.help{% endtrans %}
-                        </p>
+                    <div class="h1 font-weight-semibold text-center">
+                        {% trans %} email.sent {% endtrans %}
+                    </div>
+                    <div class="card-body card-body-limited py-2 text-center w-100 m-auto">
+                        <div class="font-size-1 line-height-md">
+                            {% trans %} email.sent.body {% endtrans %}
+                        </div>
+                        <div class="font-size-1 line-height-md">
+                            {% trans %} email.sent.help {% endtrans %}
+                        </div>
+                        <div class="font-size-1 mt-2 subtitle-text-color line-height-md text-subtitle">
+                            {% trans with {'%hours%': tokenLifetime} %} email.sent.note {% endtrans %}
+                        </div>
+                        <a href="{{ path('homepage') }}" class="btn btn-primary py-3 mt-5 col-12 col-sm-6">
+                            {% trans from 'messages' %} back.to_main {% endtrans %}
+                        </a>
                     </div>
                 </div>
             </div>

@@ -4,64 +4,69 @@
             v-if="editing"
             class="form-group col-12"
         >
-            <label for="website-err">{{ $t('token.website.label') }}</label>
-            <input
-                id="website-err"
+            <m-input
                 v-model="newWebsite"
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': showWebsiteError }"
-                @keyup.enter="checkWebsiteUrl"
+                :invalid="showWebsiteError"
+                :label="$t('token.website.label')"
             >
-            <div
-                v-if="showWebsiteError"
-                class="invalid-feedback"
-            >
-                {{ $t('token.website.invalid_url') }}
-            </div>
-            <div class="col-12 text-left mt-3 px-0">
-                <button
-                    class="btn btn-primary"
+                <template v-slot:assistive-postfix>
+                    <div :class="{'text-danger' : showWebsiteLengthError}">
+                       {{ newWebsite.length }} / {{ websiteMaxLength }}
+                    </div>
+                </template>
+                <template v-slot:errors>
+                    <div v-if="showWebsiteLengthError">
+                        {{ $t('token.website.max_length_url', translationContext) }}
+                    </div>
+                    <div v-if="showWebsiteError">
+                        {{ $t('token.website.invalid_url') }}
+                    </div>
+                </template>
+            </m-input>
+            <div class="col-12 text-left px-0 d-flex align-items-center">
+                <m-button
+                    :disabled="disableConfirmButton"
+                    type="primary"
+                    :loading="submitting"
                     @click="editWebsite"
                 >
-                    {{ $t('token.website.save') }}
-                </button>
-                <span
-                    class="btn-cancel pl-3 c-pointer"
+                    {{ $t('token.website.submit') }}
+                </m-button>
+                <m-button
+                    type="link"
+                    class="ml-2"
                     @click="editing = false"
                 >
                     {{ $t('token.website.cancel') }}
-                </span>
+                </m-button>
             </div>
         </div>
         <div
             v-else
             class="col text-truncate"
+            @click.prevent="toggleEdit"
         >
             <span
-                id="website-link"
-                class="c-pointer text-white hover-icon"
-                @click.prevent="toggleEdit"
+                class="token-introduction-profile-icon text-center text-white d-inline-block c-pointer mr-1"
             >
-                <span class="token-introduction-profile-icon text-center d-inline-block">
-                    <font-awesome-icon
-                        icon="globe"
-                        size="lg"
-                    />
-                </span>
-                <a href="#" class="text-reset">
-                    {{ computedWebsiteUrl }}
-                </a>
+                <font-awesome-icon
+                    icon="globe"
+                    size="lg"
+                    class="text-white ml-n1"
+                    fixed-width
+                />
             </span>
-            <b-tooltip
-                v-if="currentWebsite"
-                target="website-link"
-                :title="computedWebsiteUrl"
-            />
+            <span
+                id="website-link"
+            >
+                <p class="ttext-reset text-nowrap d-inline link highlight" tabindex="0">
+                    {{ computedWebsiteUrl | truncate(addWebsiteTruncateLength) }}
+                </p>
+            </span>
         </div>
-        <div class="col-auto">
+        <div class="col-auto" v-if="!editing">
             <a
-                v-if="currentWebsite"
+                v-if="currentWebsite && !submitting"
                 @click.prevent="deleteWebsite"
             >
                 <font-awesome-icon
@@ -69,6 +74,7 @@
                     class="text-danger c-pointer ml-2"
                 />
             </a>
+            <div v-if="submitting" class="spinner-border spinner-border-sm" role="status"></div>
         </div>
         <modal
             @close="closeFileErrorModal"
@@ -84,6 +90,7 @@
                             href="https://www.restapitutorial.com/httpstatuscodes.html"
                             target="_blank"
                             rel="nofollow"
+                            class="link highlight"
                         >
                             {{ $t('token.website.more_info') }}
                         </a>
@@ -117,20 +124,49 @@
                                 <a
                                     :href="confirmWebsiteFileUrl"
                                     target="_blank"
+                                    class="highlight link"
                                 >
                                     {{ $t('token.website.download_2') }}
                                 </a>
                             </li>
-                            <li>{{ $t('token.website.upload', translationsContext) }}</li>
+                            <li>
+                                {{ $t('token.website.upload') }}
+                                <span
+                                    id="website-upload"
+                                    class="word-break-all"
+                                >
+                                    {{ parsedWebsite | truncate(websiteTruncateLength) }}
+                                </span>
+                                <b-tooltip
+                                    placement="top"
+                                    fallback-placement="clockwise"
+                                    boundary="document"
+                                    target="website-upload"
+                                    custom-class="tooltip-website"
+                                    :title="parsedWebsite"
+                                    :disabled="disabledTooltip"
+                                />
+                            </li>
                             <li>
                                 {{ $t('token.website.check') }}
                                 <a
+                                    id="website-check"
                                     :href="siteRequestUrl"
                                     target="_blank"
                                     rel="nofollow"
+                                    class="highlight link text-break"
                                 >
-                                    {{ siteRequestUrl }}
+                                    {{ siteRequestUrl | truncate(websiteTruncateLength) }}
                                 </a>
+                                <b-tooltip
+                                    placement="top"
+                                    fallback-placement="clockwise"
+                                    boundary="document"
+                                    target="website-check"
+                                    custom-class="tooltip-website"
+                                    :title="siteRequestUrl"
+                                    :disabled="disabledTooltip"
+                                />
                             </li>
                             <li>{{ $t('token.website.click') }}</li>
                         </ol>
@@ -167,11 +203,16 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {faGlobe, faTimes, faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {BTooltip} from 'bootstrap-vue';
-import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins/';
+import {FiltersMixin, NotificationMixin} from '../../../mixins/';
 import {isValidUrl} from '../../../utils';
 import Modal from '../../modal/Modal';
+import {MInput, MButton} from '../../UI';
 
 library.add(faGlobe, faTimes, faCircleNotch);
+
+const WEBSITE_MAX_LENGTH = 2048;
+const WEBSITE_TRUNCATE_LENGTH = 85;
+const ADD_WEBSITE_TRUNCATE_LENGTH = 60;
 
 export default {
     name: 'TokenWebsiteAddress',
@@ -184,8 +225,10 @@ export default {
         BTooltip,
         FontAwesomeIcon,
         Modal,
+        MInput,
+        MButton,
     },
-    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
+    mixins: [FiltersMixin, NotificationMixin],
     data() {
         return {
             confirmWebsiteFileUrl: this.$routing.generate('token_website_confirmation', {
@@ -201,6 +244,9 @@ export default {
             showConfirmWebsiteModal: false,
             showWebsiteError: false,
             submitting: false,
+            websiteTruncateLength: WEBSITE_TRUNCATE_LENGTH,
+            addWebsiteTruncateLength: ADD_WEBSITE_TRUNCATE_LENGTH,
+            websiteMaxLength: WEBSITE_MAX_LENGTH,
         };
     },
     watch: {
@@ -210,6 +256,7 @@ export default {
         },
         newWebsite: function() {
             this.fileError = {};
+            this.validateWebsiteUrl();
         },
     },
     computed: {
@@ -225,10 +272,19 @@ export default {
         siteRequestUrl: function() {
             return this.parsedWebsite + '/mintme.html';
         },
-        translationsContext: function() {
+        disabledTooltip: function() {
+            return this.parsedWebsite.length < this.websiteTruncateLength;
+        },
+        translationContext() {
             return {
-                parsedWebsite: this.parsedWebsite,
+                maxWebsiteLength: this.websiteMaxLength,
             };
+        },
+        showWebsiteLengthError: function() {
+            return this.newWebsite.length > this.websiteMaxLength;
+        },
+        disableConfirmButton: function() {
+            return this.showWebsiteLengthError || this.showWebsiteError;
         },
     },
     methods: {
@@ -245,10 +301,18 @@ export default {
                 return;
             }
         },
-        checkWebsiteUrl: function() {
+        validateWebsiteUrl: function() {
             this.showWebsiteError = false;
+
             if (!isValidUrl(this.newWebsite)) {
                 this.showWebsiteError = true;
+                return;
+            }
+        },
+        checkWebsiteUrl: function() {
+            this.validateWebsiteUrl();
+
+            if (this.showWebsiteError || this.showWebsiteLengthError) {
                 return;
             }
 
@@ -256,7 +320,7 @@ export default {
             this.showConfirmWebsiteModal = true;
         },
         deleteWebsite: function() {
-            this.newWebsite = null;
+            this.newWebsite = '';
             this.saveWebsite();
         },
         saveWebsite: function() {
@@ -281,7 +345,7 @@ export default {
                     } else if (response.data.errors.length) {
                         response.data.errors.forEach((error) => {
                             this.notifyError(error);
-                            this.sendLogs('error', 'Save website response data error', error);
+                            this.$logger.error('Save website response data error', error);
                         });
                         this.clearFileError();
                     } else {
@@ -290,8 +354,12 @@ export default {
                     }
                 })
                 .catch(({response}) => {
-                    this.notifyError(!response ? this.$t('toasted.error.network') : response.statusText);
-                    this.sendLogs('error', 'Save website network error', response);
+                    this.notifyError(
+                        response
+                            ? (response.data.message ? response.data.message : response.statusText)
+                            : this.$t('toasted.error.network')
+                    );
+                    this.$logger.error('Save website network error', response);
                 })
                 .then(() => this.submitting = false);
         },

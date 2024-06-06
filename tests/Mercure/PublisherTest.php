@@ -2,11 +2,12 @@
 
 namespace App\Tests\Mercure;
 
-use _HumbugBox196d2b78600b\Nette\Neon\Exception;
+use App\Entity\TradableInterface;
+use App\Entity\User;
 use App\Mercure\Publisher;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mercure\PublisherInterface;
+use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -20,9 +21,9 @@ class PublisherTest extends TestCase
             ->with('bar', null, ['groups' => ['API']])
             ->willReturn('bar');
 
-        $bp = $this->createMock(PublisherInterface::class);
+        $bp = $this->createMock(HubInterface::class);
         $bp->expects($this->once())
-            ->method('__invoke')
+            ->method('publish')
             ->with(
                 $this->callback(
                     fn (Update $u) => in_array('foo', $u->getTopics()) && '"bar"' === $u->getData()
@@ -41,7 +42,7 @@ class PublisherTest extends TestCase
         $l = $this->createMock(LoggerInterface::class);
         $l->expects($this->once())->method('error');
 
-        $p = new Publisher($this->createMock(PublisherInterface::class), $n, $l);
+        $p = new Publisher($this->createMock(HubInterface::class), $n, $l);
         $p->publish('foo', 'bar');
     }
 
@@ -53,7 +54,7 @@ class PublisherTest extends TestCase
         $l = $this->createMock(LoggerInterface::class);
         $l->expects($this->once())->method('error');
 
-        $p = new Publisher($this->createMock(PublisherInterface::class), $n, $l);
+        $p = new Publisher($this->createMock(HubInterface::class), $n, $l);
         $p->publish('foo', 'bar');
     }
 
@@ -62,13 +63,49 @@ class PublisherTest extends TestCase
         $n = $this->createMock(NormalizerInterface::class);
         $n->method('normalize')->willReturn('bar');
 
-        $bp = $this->createMock(PublisherInterface::class);
-        $bp->method('__invoke')->willThrowException(new \Exception());
+        $bp = $this->createMock(HubInterface::class);
+        $bp->method('publish')->willThrowException(new \Exception());
 
         $l = $this->createMock(LoggerInterface::class);
         $l->expects($this->once())->method('error');
 
         $p = new Publisher($bp, $n, $l);
         $p->publish('foo', 'bar');
+    }
+
+    public function testPublishWithdrawEvent(): void
+    {
+        $normalizerMock = $this->createMock(NormalizerInterface::class);
+        $normalizerMock
+            ->method('normalize')
+            ->willReturnCallback(fn ($x) => $x);
+
+        $hubMock = $this->createMock(HubInterface::class);
+        $hubMock
+            ->expects($this->once())
+            ->method('publish')
+            ->with(
+                $this->callback(
+                    function (Update $update) {
+                        $this->assertEquals(['withdraw/1'], $update->getTopics());
+                        $this->assertEquals('{"tradable":"WEB"}', $update->getData());
+                        $this->assertTrue($update->isPrivate());
+
+                        return true;
+                    }
+                )
+            );
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+
+        $publisher = new Publisher($hubMock, $normalizerMock, $loggerMock);
+
+        $userMock = $this->createMock(User::class);
+        $userMock->method('getId')->willReturn(1);
+
+        $tradable = $this->createMock(TradableInterface::class);
+        $tradable->method('getSymbol')->willReturn('WEB');
+
+        $publisher->publishWithdrawEvent($userMock, $tradable);
     }
 }

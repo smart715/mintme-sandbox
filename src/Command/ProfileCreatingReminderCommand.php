@@ -2,9 +2,8 @@
 
 namespace App\Command;
 
-use App\Entity\User;
 use App\Mailer\MailerInterface;
-use App\Manager\ProfileManager;
+use App\Manager\ProfileManagerInterface;
 use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -14,30 +13,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ProfileCreatingReminderCommand extends Command
 {
-    /** @var string  */
-    protected static $defaultName = 'app:profile-creating-reminder';
-
-    /** @var User */
-    protected $user;
-
-    /** @var EntityManagerInterface */
-    protected $em;
-
-    /** @var MailerInterface  */
-    protected $mailer;
-
-    /** @var ProfileManager */
-    protected $profileManager;
-
-    /** @var LockFactory */
-    private $lockFactory;
+    private EntityManagerInterface $em;
+    private MailerInterface $mailer;
+    private ProfileManagerInterface $profileManager;
+    private LockFactory $lockFactory;
 
     public const REMINDER_INTERVAL = [1, 2, 3, 6, 6, 6, 12, 12, 12, 12, 12, 12, 12, 12];
 
     public function __construct(
         EntityManagerInterface $em,
         MailerInterface $mailer,
-        ProfileManager $profileManager,
+        ProfileManagerInterface $profileManager,
         LockFactory $lockFactory
     ) {
         $this->profileManager = $profileManager;
@@ -50,6 +36,7 @@ class ProfileCreatingReminderCommand extends Command
     protected function configure(): void
     {
         $this
+            ->setName('app:profile-creating-reminder')
             ->setDescription('Send notification email to user which has not created profile yet')
         ;
     }

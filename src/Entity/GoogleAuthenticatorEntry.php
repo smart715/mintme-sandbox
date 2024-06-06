@@ -2,16 +2,26 @@
 
 namespace App\Entity;
 
+use App\Entity\ValidationCode\SmsValidationCodeTrait;
+use App\Entity\ValidationCode\ValidationCodeOwner;
+use App\Entity\ValidationCode\ValidationCodeOwnerInterface;
+use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\GoogleAuthenticatorEntryRepository")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class GoogleAuthenticatorEntry
+class GoogleAuthenticatorEntry extends ValidationCodeOwner implements ValidationCodeOwnerInterface
 {
-   /**
+
+    use SmsValidationCodeTrait;
+
+    /**
      * @ORM\Id()
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -32,11 +42,31 @@ class GoogleAuthenticatorEntry
     protected $secret;
 
     /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\ValidationCode\BackupValidationCode",
+     *     mappedBy="googleAuthenticatorEntry",
+     *     indexBy="google_auth_entry_id",
+     *     cascade={"persist", "remove"}
+     * )
+     * @var ArrayCollection|PersistentCollection
+     */
+    protected Collection $validationCode;
+
+    /**
      * @ORM\Column(type="json_array", nullable=true)
      * @var string[]|null
      */
     protected $backupCodes;
 
+    /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private int $backupCodesDownloads = 0; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
+    private ?DateTimeImmutable $lastdownloadBackupDate;
 
     public function getId(): int
     {
@@ -82,5 +112,39 @@ class GoogleAuthenticatorEntry
                 unset($this->backupCodes[$key]);
             }
         }
+    }
+
+    public function getLastdownloadBackupDate(): ?DateTimeImmutable
+    {
+        return $this->lastdownloadBackupDate;
+    }
+
+    public function setLastdownloadBackupDate(?DateTimeImmutable $lastdownloadBackupDate): self
+    {
+        $this->lastdownloadBackupDate = $lastdownloadBackupDate;
+
+        return $this;
+    }
+
+    public function getBackupCodesDownloads(): int
+    {
+        return $this->backupCodesDownloads;
+    }
+
+    public function setBackupCodesDownloads(int $backupCodesDownloads): self
+    {
+        $this->backupCodesDownloads = $backupCodesDownloads;
+
+        return $this;
+    }
+
+    public function incrementBackupCodesDownloadCount(): void
+    {
+        $this->backupCodesDownloads++;
+    }
+
+    public function resetBackupCodesDownloadCount(): void
+    {
+        $this->setBackupCodesDownloads(0);
     }
 }

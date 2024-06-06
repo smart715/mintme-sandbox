@@ -3,7 +3,7 @@
 namespace App\Utils\Converter;
 
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Exchange\Market;
 use App\Utils\Symbols;
 
@@ -19,18 +19,16 @@ class MarketNameConverter implements MarketNameConverterInterface
 
     public function convert(Market $market, bool $baseFirst = false): string
     {
+        $base = $this->convertTradable($market->getBase());
         $quote = $this->convertTradable($market->getQuote());
-        $base = $market->getQuote() instanceof Token
-            ? Symbols::WEB
-            : $this->convertTradable($market->getBase());
 
         return strtoupper($baseFirst ? $base . $quote : $quote . $base);
     }
 
-    private function convertTradable(TradebleInterface $tradeble): string
+    private function convertTradable(TradableInterface $tradable): string
     {
-        return $tradeble instanceof Token ?
-            $this->tokenConverter->convert($tradeble) :
-            $tradeble->getSymbol();
+        return $tradable instanceof Token ?
+            $this->tokenConverter->convert($tradable) :
+            $tradable->getSymbol();
     }
 }

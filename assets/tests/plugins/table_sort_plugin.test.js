@@ -13,8 +13,8 @@ describe('table_sort_plugin', () => {
     it('sorts two different dates correctly', () => {
         const localVue = createLocalVue();
         localVue.use(tableSortPlugin);
-        const a = '24.02.2020 15:48:51';
-        const b = '03.03.2020 15:33:51';
+        const a = '15:48:51 24.02.2020';
+        const b = '15:33:51 03.03.2020';
         expect(localVue.prototype.$dateCompare(a, b)).toBe(-1);
         expect(localVue.prototype.$dateCompare(b, a)).toBe(1);
         expect(localVue.prototype.$dateCompare(a, a)).toBe(0);

@@ -2,69 +2,113 @@
 
 namespace App\Wallet\Withdraw\Fetcher\Mapper;
 
+use App\Config\LimitHistoryConfig;
 use App\Entity\Crypto;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\WrappedCryptoTokenManagerInterface;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\Fetcher\Storage\StorageAdapterInterface;
+use Money\Currency;
 use Money\Money;
 
 class WithdrawMapper implements MapperInterface
 {
-    /** @var StorageAdapterInterface */
-    private $storage;
+    private StorageAdapterInterface $storage;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
+
+    private LimitHistoryConfig $limitHistoryConfig;
+
+    private WrappedCryptoTokenManagerInterface $wrappedCryptoTokenManager;
 
     public function __construct(
         StorageAdapterInterface $storage,
         CryptoManagerInterface $cryptoManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        LimitHistoryConfig $limitHistoryConfig,
+        WrappedCryptoTokenManagerInterface $wrappedCryptoTokenManager
     ) {
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->limitHistoryConfig = $limitHistoryConfig;
+        $this->wrappedCryptoTokenManager = $wrappedCryptoTokenManager;
     }
 
     /** {@inheritdoc} */
     public function getHistory(User $user, int $offset = 0, int $limit = 50): array
     {
         return array_map(function (array $transaction) {
+            // new gateway support
+            $timestamp = $transaction['createdDate'] ?? $transaction['timestamp'];
+
+            $hash = $transaction['transactionHash'] ?? $transaction['hash'];
+            $from = $transaction['from'] ?? null;
+            $to = $transaction['walletAddress'] ?? $transaction['to'];
+
+            $amount = (string)$transaction['amount'];
+            $fee = (string)$transaction['fee'];
+
+            /** @var Crypto $crypto */
+            $crypto = $this->cryptoManager->findBySymbol(strtoupper($transaction['crypto']));
+
+            $nativeBlockchainCrypto = $this->wrappedCryptoTokenManager->findNativeBlockchainCrypto($crypto);
+
+            $nativeCrypto = $nativeBlockchainCrypto
+                ? $nativeBlockchainCrypto->getCrypto()
+                : $crypto;
+            $nativeCryptoSymbol = $nativeCrypto->getSymbol();
+
+            $amount = $this->moneyWrapper->parse($amount, $nativeCryptoSymbol);
+            $fee = $this->moneyWrapper->parse($fee, $nativeCryptoSymbol);
+
             return new Transaction(
-                (new \DateTime())->setTimestamp($transaction['createdDate']),
-                $transaction['transactionHash'],
-                null,
-                $transaction['walletAddress'],
-                $this->moneyWrapper->parse((string)$transaction['amount'], $transaction['crypto']),
-                $this->moneyWrapper->parse((string)$transaction['fee'], $transaction['crypto']),
-                $this->cryptoManager->findBySymbol(
-                    strtoupper($transaction['crypto'])
-                ),
-                Status::fromString(
-                    $transaction['status']
-                ),
-                Type::fromString(Type::WITHDRAW)
+                (new \DateTime())->setTimestamp($timestamp),
+                $hash,
+                $from,
+                $to,
+                $amount,
+                $fee,
+                $nativeCrypto,
+                Status::fromString($transaction['status']),
+                Type::fromString(Type::WITHDRAW),
+                false,
+                $nativeCrypto
             );
-        }, $this->storage->requestHistory($user->getId(), $offset, $limit));
+        }, $this->storage->requestHistory(
+            $user->getId(),
+            $offset,
+            $limit,
+            $this->limitHistoryConfig->getFromDate()->getTimestamp()
+        ));
     }
 
-    public function getBalance(Crypto $crypto): Money
+    public function getBalance(TradableInterface $tradable, Crypto $cryptoNetwok): Money
     {
-        return $this->moneyWrapper->parse(
-            $this->storage->requestBalance($crypto->getSymbol()),
-            $crypto->getSymbol()
-        );
+        $balance = $this->storage->requestBalance($tradable->getSymbol(), $cryptoNetwok->getSymbol());
+
+        return $this->moneyWrapper->parse($balance, $tradable->getMoneySymbol());
     }
 
     public function isContractAddress(string $address, string $crypto): bool
     {
-        return $this->storage->requestAddressCode($address, $crypto);
+        return '0x' !== $this->storage->requestAddressCode($address, $crypto);
+    }
+
+    public function getUserId(string $address, string $cryptoNetwork): ?int
+    {
+        return $this->storage->requestUserId($address, $cryptoNetwork);
+    }
+
+    public function getCryptoIncome(string $crypto, \DateTimeImmutable $from, \DateTimeImmutable $to): array
+    {
+        return $this->storage->requestCryptoIncome($crypto, $from, $to);
     }
 }

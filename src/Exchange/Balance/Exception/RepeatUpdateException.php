@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Balance\Exception;
 
+/** @codeCoverageIgnore */
 class RepeatUpdateException extends \Exception
 {
 

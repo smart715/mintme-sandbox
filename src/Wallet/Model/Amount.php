@@ -4,6 +4,7 @@ namespace App\Wallet\Model;
 
 use Money\Money;
 
+/** @codeCoverageIgnore */
 class Amount
 {
     /** @var Money */

@@ -8,6 +8,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ * @ORM\Table(
+ *     name="message_metadata",
+ *     indexes={
+ *         @ORM\Index(name="IDX_IS_READ", columns={"is_read"}),
+ *     }
+ * )
  * @codeCoverageIgnore
  */
 class MessageMetadata
@@ -16,29 +22,30 @@ class MessageMetadata
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Message\Message", inversedBy="metadata")
      * @ORM\JoinColumn(nullable=false)
-     * @var Message
      */
-    private $message;
+    private Message $message;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(nullable=false)
-     * @var User
      */
-    private $participant;
+    private User $participant;
 
     /**
      * @ORM\Column(type="boolean", options={"default": 0})
-     * @var bool
      */
-    private $isRead = false;
+    private bool $isRead = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     */
+    private bool $isDeleted = false; // phpcs:ignore
 
     public function getId(): int
     {
@@ -82,5 +89,17 @@ class MessageMetadata
     public function isRead(): bool
     {
         return $this->isRead;
+    }
+
+    public function setDeleted(): self
+    {
+        $this->isDeleted = true;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
     }
 }

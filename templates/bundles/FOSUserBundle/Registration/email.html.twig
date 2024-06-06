@@ -2,15 +2,14 @@
 
 {% block subject %}
     {%- autoescape false -%}
-      {{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
+      {{ 'registration.email.subject'|trans({'%username%': user.nickName, '%confirmationUrl%': confirmationUrl}) }}
     {%- endautoescape -%}
 {% endblock %}
 
 {% block body_text %}
  {% embed('mail/layout.txt.twig') %}
   {% block content %}
-    {% trans from 'messages' %}hello{% endtrans %}
-    {{user.userName}}
+    {% trans from 'messages' %}hello{% endtrans %}  {{user.nickName}}
     {% trans from 'messages' %}welcome{% endtrans %}
     {% trans from 'FOSUserBundle' %}email.register.complete{% endtrans %}
     {{confirmationUrl}}
@@ -21,35 +20,36 @@
 {% block body_html %}
   {% embed 'mail/layout.html.twig' %}
     {% block content %}
-    <div style="width:100%;max-width:600px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;display:inline-block;vertical-align:middle;">
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
-      <tr>
-        <td align="center" width="600" style="width:100%;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
-            <img alt="mintme" src="{{ absolute_url(asset('build/images/Token.png')) }}" width="120" style="width:120px;height:auto;border:none;outline:0;text-align:center;text-decoration:none;color:#ffffff;-ms-interpolation-mode:bicubic;" />
-            <p style="Margin:0 0 12px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans from 'messages' %} hello {% endtrans %}
-            </p>
-            <p style="Margin:0 0 18px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;line-height:30px;color:#2199e8;">{{ user.userName }}
-            </p>
-            <p style="Margin:0 0 12px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans from 'messages' %} welcome {% endtrans %}<span style="color:#0a0a0a;font-weight:600;font-style:oblique;"> mintMe.com</span>
-            </p>
-            <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans from 'FOSUserBundle' %}email.register.complete{% endtrans %}
-            </p>
-        </td>
-      </tr>
-    </table>
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
-      <tr>
-        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:18px;height:18px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
-      </tr>
-    </table>
-    {% set vars = {'href': confirmationUrl, 'text': confirmationUrl } %}
-    {% include 'mail/mail_block_button.html.twig' with vars %}
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
-      <tr>
-        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:10px;height:10px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
-      </tr>
-    </table>
-    </div>
+      {{ parent() }}
+      <div class="box-table">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border" bgcolor="#ffffff">
+          <tr>
+            <td align="center" width="600" class="td-body" bgcolor="#ffffff">
+                <img alt="mintme" src="{{ absolute_url(asset('build/images/mail-token.png')) }}" width="120" class="img-build-v3" />
+                <p class="p-hello">{% trans from 'messages' %} hello {% endtrans %} {{ user.nickName }}</p>
+                <p class="p-second-line p-20px">{% trans from 'messages' %} welcome {% endtrans %}<span class="link-mintme"> mintMe.com</span></p>
+                <p class="p-second-line">{% trans from 'FOSUserBundle' %}email.register.complete{% endtrans %}</p>
+            </td>
+          </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+          <tr>
+            <td align="center" class="prev-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+          </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border-v3" bgcolor="#2199e8" style="table-layout:fixed">
+            <tr>
+                <td align="center" width="600" class="td-code-v2" bgcolor="#2199e8">
+                    <p class="p-fiveteenth-line"><a href="{{ confirmationUrl }}" class="a-link-text" style="mso-padding-alt:0;">{{ confirmationUrl }}</a></p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+          <tr>
+            <td align="center" class="post-blank-space" bgcolor="#f3f3f3">&nbsp;</td>
+          </tr>
+        </table>
+      </div>
     {% endblock %}
   {% endembed %}
 {% endblock %}

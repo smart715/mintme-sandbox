@@ -5,16 +5,19 @@ ifneq ($(THREADS_COUNT),0)
 endif
 
 phpunit:
-	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" -and -not -path "*Controller/*" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
+	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" -and -not -path "*Controller/*" -and -not -path "*/Integration/*" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
 
 phpfunctional:
 	./vendor/bin/simple-phpunit --testsuite nothing && find tests/Controller/ -name "*Test.php" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
+
+phpintegration:
+	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" -and -path "*/Integration/*" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
 
 phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
 
 jest:
-	npm run unit
+	node --expose-gc --no-compilation-cache node_modules/.bin/jest --maxWorkers=3 --logHeapUsage
 
 syntax_check:
 	php bin/console cache:warmup
@@ -35,6 +38,7 @@ syntax_correction_assets:
 
 validate:
 	make phpunit
+	make phpintegration
 	make syntax_check
 	make syntax_check_assets
 	make jest
@@ -49,3 +53,6 @@ all:
 
 generate_translations:
 	php bin/console app:load-translations-ui
+
+submodules_init:
+	git submodule update --init --remote --recursive

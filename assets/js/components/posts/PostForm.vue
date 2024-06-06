@@ -1,7 +1,9 @@
 <template>
     <div class="card h-100">
         <div class="card-header">
-            <slot name="title">Create post</slot>
+            <slot name="title">
+                {{ $t('post.create') }}
+            </slot>
         </div>
         <div class="card-body">
             <div class="form-group">
@@ -13,16 +15,29 @@
                         {{ $t('post_form.body') }}
                     </template>
                 </guide>
-                <input id="post-form-amount-input"
-                    class="form-control form-control-lg w-100"
-                    :class="{ 'is-invalid' : invalidAmount }"
-                    name="amount"
-                    type="text"
-                    v-model="amount"
-                    @keypress="checkInput(subunit, 6)"
-                    @paste="checkInput(subunit, 6)"
+                <div class="input-group">
+                    <div class="w-100">
+                        <input id="post-form-amount-input"
+                            autocomplete="off"
+                            class="form-control form-control-lg w-100"
+                            :class="{ 'is-input-invalid' : invalidAmount }"
+                            name="amount"
+                            type="text"
+                            v-model="amount"
+                            placeholder="0"
+                            @keypress="checkInput(subunit)"
+                            @paste="checkInput(subunit)"
+                        >
+                    </div>
+                    <input-delete
+                        :hasInputError="invalidAmount"
+                        @clear-input="clearInput('amount', '')"
+                    >
+                    </input-delete>
+                </div>
+                <div class="invalid-feedback"
+                     :class="{ 'd-block' : invalidAmount }"
                 >
-                <div class="invalid-feedback">
                     {{ invalidAmountMessage }}
                 </div>
             </div>
@@ -32,19 +47,32 @@
                 </label>
                 <guide>
                     <template slot="body">
-                        {{ $t('post_form.share_reward_guide') }}
+                        {{ $t('post_form.share_reward_guide', { rewardDays }) }}
                     </template>
                 </guide>
-                <input id="post-form-share_reward-input"
-                    class="form-control form-control-lg w-100"
-                    :class="{ 'is-invalid' : invalidShareReward }"
-                    name="share_reward"
-                    type="text"
-                    v-model="shareReward"
-                    @keypress="checkInput(4, 3)"
-                    @paste="checkInput(4, 3)"
+                <div class="input-group">
+                    <div class="w-100">
+                        <input id="post-form-share_reward-input"
+                            autocomplete="off"
+                            class="form-control form-control-lg w-100"
+                            :class="{ 'is-input-invalid' : invalidShareReward }"
+                            name="share_reward"
+                            type="text"
+                            v-model="shareReward"
+                            placeholder="0"
+                            @keypress="checkInput(4)"
+                            @paste="checkInput(4)"
+                        >
+                    </div>
+                    <input-delete
+                        :hasInputError="invalidShareReward"
+                        @clear-input="clearInput('shareReward', '')"
+                    >
+                </input-delete>
+                </div>
+                <div class="invalid-feedback"
+                    :class="{ 'd-block' : invalidShareReward }"
                 >
-                <div class="invalid-feedback">
                     {{ invalidShareRewardMessage }}
                 </div>
             </div>
@@ -52,26 +80,46 @@
                 <label for="title">
                     {{ $t('post_form.title') }}
                 </label>
-                <input class="form-control form-control-lg w-100"
-                       :class="{ 'is-invalid' : invalidTitle }"
-                       id="title"
-                       name="title"
-                       type="text"
-                       v-model="title"
+                <div class="input-group">
+                    <div class="w-100">
+                        <input class="form-control form-control-lg w-100"
+                            :class="{ 'is-input-invalid' : invalidTitle }"
+                            id="title"
+                            name="title"
+                            type="text"
+                            v-model="title"
+                        >
+                    </div>
+                    <input-delete
+                        :hasInputError="invalidTitle"
+                        @clear-input="clearInput('title', '')"
+                    >
+                    </input-delete>
+                </div>
+                <div class="invalid-feedback"
+                    :class="{ 'd-block' : invalidTitle }"
                 >
-                <div class="invalid-feedback">
                     {{ invalidTitleMessage }}
                 </div>
             </div>
             <div class="form-group">
-                <bbcode-help class="float-right mt-2" placement="right" />
-                <bbcode-editor class="form-control w-100"
-                    :class="{ 'is-invalid' : invalidContent }"
-                    :value="content"
-                    @change="onContentChange"
-                    @input="onContentChange"
-                    ref="input"
-                />
+                <div class="input-group d-block" >
+                    <input-delete
+                        :hasInputError="invalidContent"
+                        class="float-right mt-5"
+                        @clear-input="clearInput('content', '')"
+                    >
+                    </input-delete>
+                    <counted-textarea
+                        class="form-control w-100"
+                        :class="{ 'is-input-invalid' : invalidContent }"
+                        :value="content"
+                        name="content"
+                        @change="onContentChange"
+                        @input="onContentChange"
+                        ref="input"
+                    />
+                </div>
                 <div class="invalid-feedback"
                     :class="{ 'd-block' : invalidContent }"
                 >
@@ -94,24 +142,32 @@
 </template>
 
 <script>
-import BbcodeEditor from '../bbcode/BbcodeEditor';
-import BbcodeHelp from '../bbcode/BbcodeHelp';
+import {CountedTextarea} from '../UI';
 import Guide from '../Guide';
-import {toMoney} from '../../utils';
 import {HTTP_OK, requiredBBCText} from '../../utils/constants';
-import {CheckInputMixin, NotificationMixin} from '../../mixins';
+import {toMoney} from '../../utils';
+import {
+    CheckInputMixin,
+    NotificationMixin,
+    ClearInputMixin,
+    FloatInputMixin,
+} from '../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
+import InputDelete from '../InputDelete';
+import {mapGetters} from 'vuex';
 
 export default {
     name: 'PostForm',
     mixins: [
         CheckInputMixin,
         NotificationMixin,
+        ClearInputMixin,
+        FloatInputMixin,
     ],
     components: {
-        BbcodeEditor,
-        BbcodeHelp,
+        CountedTextarea,
         Guide,
+        InputDelete,
     },
     props: {
         tokenName: String,
@@ -120,9 +176,9 @@ export default {
             type: Object,
             default: () => ({
                 content: '',
-                amount: '0',
+                amount: '',
                 title: '',
-                shareReward: '0',
+                shareReward: '',
             }),
         },
         resetAfterAction: {
@@ -137,9 +193,9 @@ export default {
     data() {
         return {
             content: this.post.content,
-            amount: toMoney(this.post.amount),
+            amount: this.post.amount ? toMoney(this.post.amount, this.subunit) : this.post.amount,
             title: this.post.title,
-            shareReward: toMoney(this.post.shareReward),
+            shareReward: this.post.shareReward ? toMoney(this.post.shareReward, this.subunit) : this.post.shareReward,
             minContentLength: 2,
             maxContentLength: 1000,
             maxDecimals: 4,
@@ -158,8 +214,11 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('posts', {
+            rewardDays: 'getPostRewardsCollectableDays',
+        }),
         invalidContent() {
-            return this.contentError || (this.$v.content.$invalid && this.content.length > 0);
+            return this.contentError || (this.$v.content.$invalid && 0 < this.content.length);
         },
         invalidContentMessage() {
             if (this.contentError) {
@@ -169,7 +228,7 @@ export default {
                 return this.$t('post_form.msg.empty');
             }
             if (!this.$v.content.minLength) {
-              return this.$t('post_form.msg.min_length', {minContentLength: this.minContentLength});
+                return this.$t('post_form.msg.min_length', {minContentLength: this.minContentLength});
             }
             if (!this.$v.content.maxLength) {
                 return this.$t('post_form.msg.max_length', {maxContentLength: this.maxContentLength});
@@ -178,14 +237,11 @@ export default {
             return '';
         },
         invalidAmount() {
-            return this.amountError || this.$v.amount.$invalid;
+            return this.amountError || (this.$v.amount.$invalid && 0 < this.amount.length);
         },
         invalidAmountMessage() {
             if (this.amountError) {
                 return this.amountErrorMessage;
-            }
-            if (!this.$v.amount.required) {
-                return this.$t('post_form.msg.amount.required');
             }
             if (!this.$v.amount.decimal) {
                 return this.$t('post_form.msg.amount.numeric');
@@ -200,7 +256,7 @@ export default {
             return '';
         },
         invalidTitle() {
-            return this.titleError || (this.$v.title.$invalid && this.title.length > 0);
+            return this.titleError || (this.$v.title.$invalid && 0 < this.title.length);
         },
         invalidTitleMessage() {
             if (this.titleError) {
@@ -218,14 +274,11 @@ export default {
             return '';
         },
         invalidShareReward() {
-            return this.shareRewardError || this.$v.shareReward.$invalid;
+            return this.shareRewardError || (this.$v.shareReward.$invalid && 0 < this.shareReward.length);
         },
         invalidShareRewardMessage() {
             if (this.shareRewardError) {
                 return this.shareRewardErrorMessage;
-            }
-            if (!this.$v.shareReward.required) {
-                return this.$t('post_form.msg.share_reward.required');
             }
             if (!this.$v.shareReward.decimal) {
                 return this.$t('post_form.msg.share_reward.numeric');
@@ -248,22 +301,18 @@ export default {
             this.submitting = true;
             this.$v.$touch();
 
-            if (this.$v.$invalid) {
-                return;
-            }
-
             const url = this.post.id
                 ? this.$routing.generate('edit_post', {tokenName: this.tokenName, id: this.post.id})
                 : this.$routing.generate('create_post', {tokenName: this.tokenName});
 
             this.$axios.single.post(url, {
                 content: this.content,
-                amount: this.amount,
+                amount: this.amount ? this.amount : '0',
                 title: this.title,
-                shareReward: this.shareReward,
+                shareReward: this.shareReward ? this.shareReward : '0',
             })
-            .then(this.savePostSuccessHandler.bind(this), this.savePostErrorHandler.bind(this))
-            .finally(() => this.submitting = false);
+                .then(this.savePostSuccessHandler.bind(this), this.savePostErrorHandler.bind(this))
+                .finally(() => this.submitting = false);
         },
         savePostSuccessHandler(res) {
             if (HTTP_OK !== res.status) {
@@ -279,7 +328,8 @@ export default {
         },
         // handles server side validation errors, although it shouldn't happen (because of frontend validation)
         savePostErrorHandler(data) {
-            let errors = data.response.data.errors;
+            data.response?.data?.message && this.notifyError(data.response.data.message);
+            const errors = data.response.data.errors;
             if (errors) {
                 if (errors.children.amount.errors) {
                     this.amountError = true;
@@ -305,8 +355,8 @@ export default {
         reset() {
             this.title = '';
             this.content = '';
-            this.amount = '0';
-            this.shareReward = '0';
+            this.amount = '';
+            this.shareReward = '';
 
             this.$nextTick(() => {
                 this.$refs.input.$el.dispatchEvent(new Event('input'));
@@ -327,6 +377,7 @@ export default {
         amount() {
             this.amountError = false;
             this.amountErrorMessage = '';
+            this.amount = this.parseFloatInput(this.amount);
         },
         title() {
             this.titleError = false;
@@ -335,6 +386,7 @@ export default {
         shareReward() {
             this.shareRewardError = false;
             this.shareRewardErrorMessage = '';
+            this.shareReward = this.parseFloatInput(this.shareReward);
         },
     },
     validations() {
@@ -345,7 +397,6 @@ export default {
                 maxLength: maxLength(this.maxContentLength),
             },
             amount: {
-                required,
                 decimal,
                 maxDecimals: (val) => {
                     return (val.split('.')[1] || '').length <= this.maxDecimals;
@@ -357,7 +408,6 @@ export default {
                 maxLength: maxLength(this.maxTitleLength),
             },
             shareReward: {
-                required,
                 decimal,
                 maxDecimals: (val) => {
                     return (val.split('.')[1] || '').length <= this.maxDecimals;

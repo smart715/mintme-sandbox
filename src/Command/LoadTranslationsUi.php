@@ -12,7 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class LoadTranslationsUi extends Command
 {
-    private string $translationsPath;
+    private array $translationsPaths;
     private string $jsPath;
     private string $twigPath;
     private string $filepath;
@@ -26,7 +26,7 @@ class LoadTranslationsUi extends Command
         $this->filepath = $params->get('ui_trans_keys_filepath');
         $this->extraFilepath = $params->get('ui_extra_keys_filepath');
 
-        $this->translationsPath = 'translations/messages.en.yml';
+        $this->translationsPaths = ['translations/messages.en.yml', 'translations/crypto/messages.en.yml'];
         $this->jsPath = 'assets/js';
         $this->twigPath = 'templates';
         $this->twigEngine = $twigEngine;
@@ -55,7 +55,7 @@ class LoadTranslationsUi extends Command
                 if (!in_array($word, $words)) {
                     try {
                         if (!in_array($word, $translations)) {
-                            throw new \Exception($word. ' does not exist in '.$this->translationsPath);
+                            throw new \Exception($word. ' does not exist in translations files');
                         } else {
                             $words[] = $word;
                         }
@@ -63,6 +63,12 @@ class LoadTranslationsUi extends Command
                         $output->writeln($e->getMessage());
                     }
                 }
+            }
+        }
+
+        foreach ($translations as $translationKey) {
+            if (str_starts_with($translationKey, "dynamic.") && !in_array($translationKey, $words)) {
+                $words[] = $translationKey;
             }
         }
 
@@ -110,6 +116,14 @@ class LoadTranslationsUi extends Command
 
     public function getTranslations(): array
     {
-        return array_keys(Yaml::parseFile($this->translationsPath));
+        $keys = [];
+
+        foreach ($this->translationsPaths as $translationsPath) {
+            if (file_exists($translationsPath)) {
+                $keys = array_merge($keys, array_keys(Yaml::parseFile($translationsPath)));
+            }
+        }
+
+        return $keys;
     }
 }

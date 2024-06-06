@@ -2,32 +2,50 @@
 
 namespace App\Manager;
 
+use App\Communications\Exception\FetchException;
 use App\Entity\MarketStatus;
 use App\Entity\User;
 use App\Exchange\Market;
+use App\Exchange\Market\Model\HighestPriceModel;
+use App\Utils\Symbols;
 
 interface MarketStatusManagerInterface
 {
-    public function getMarketsCount(int $deployed = 0): int;
+    /** @return array<string> */
+    public function getFilterForTokens(): array;
 
-    public function getUserRelatedMarketsCount(int $userId): int;
+    public function getMarketsCount(string $filter = '', ?string $crypto = ''): int;
+
+    /**
+     * @return array<MarketStatus|null>
+     */
+    public function getPredefinedMarketStatuses(): array;
+
+    /**
+     * @return array<MarketStatus|null>
+     */
+    public function getFilteredPromotedMarketStatuses(): array;
 
     /**
      * @param int $offset
      * @param int $limit
      * @param string $sort
      * @param string $order
-     * @param int $filter
+     * @param array<string> $filters
      * @param int|null $userId
-     * @return array<MarketStatus>
+     * @param string|null $crypto
+     * @param string|null $searchPhrase
+     * @return array<MarketStatus|null>
      */
-    public function getMarketsInfo(
+    public function getFilteredMarketStatuses(
         int $offset,
         int $limit,
         string $sort = "monthVolume",
         string $order = "DESC",
-        int $filter = 0,
-        ?int $userId = null
+        array $filters = [],
+        ?int $userId = null,
+        ?string $crypto = Symbols::WEB,
+        ?string $searchPhrase = null
     ): array;
 
     /**
@@ -36,13 +54,18 @@ interface MarketStatusManagerInterface
     public function getCryptoAndDeployedMarketsInfo(?int $offset = null, ?int $limit = null): array;
 
     /**
-     * @param array $market
+     * @param array $markets
+     * @return array<MarketStatus>
      */
-    public function createMarketStatus(array $market): void;
+    public function createMarketStatus(array $markets): array;
 
     public function updateMarketStatus(Market $market): void;
 
+    public function updateMarketStatusNetworks(Market $market): void;
+
     public function getMarketStatus(Market $market): ?MarketStatus;
+
+    public function getOrCreateMarketStatus(Market $market): MarketStatus;
 
     /**
      * @param User $user
@@ -59,4 +82,11 @@ interface MarketStatusManagerInterface
      * @return array
      */
     public function getExpired(): array;
+
+    /**
+     * @throws FetchException
+     */
+    public function getTokenHighestPrice(array $markets): HighestPriceModel;
+
+    public function findByBaseQuoteNames(string $symbol, string $quote): ?MarketStatus;
 }

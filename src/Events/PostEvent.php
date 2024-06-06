@@ -3,25 +3,25 @@
 namespace App\Events;
 
 use App\Entity\Post;
-use App\Entity\Token\Token;
-use Symfony\Contracts\EventDispatcher\Event;
+use App\Entity\User;
+use App\Events\Activity\UserTokenEventActivity;
 
-class PostEvent extends Event implements PostEventInterface, TokenEventInterface
+/** @codeCoverageIgnore */
+class PostEvent extends UserTokenEventActivity implements PostEventInterface
 {
     protected Post $post;
+    protected int $type;
+    protected ?User $user;
 
-    public function __construct(Post $post)
+    public function __construct(Post $post, int $type, ?User $user = null)
     {
         $this->post = $post;
+
+        parent::__construct($user ?? $post->getAuthor()->getUser(), $post->getToken(), $type);
     }
 
     public function getPost(): Post
     {
         return $this->post;
-    }
-
-    public function getToken(): Token
-    {
-        return $this->post->getToken();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Communications\Exception;
 
 use Exception;
 
+/** @codeCoverageIgnore */
 class FetchException extends Exception
 {
 }

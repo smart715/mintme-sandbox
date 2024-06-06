@@ -13,9 +13,11 @@ class DepositWithdrawalVoter extends Voter
     private ContainerInterface $container;
     private const MAKE_DEPOSIT = 'make-deposit';
     private const MAKE_WITHDRAWAL = 'make-withdrawal';
+    private const CONFIRM_WITHDRAWAL = 'confirm-withdrawal';
     private const ACTIONS = [
         self::MAKE_DEPOSIT,
         self::MAKE_WITHDRAWAL,
+        self::CONFIRM_WITHDRAWAL,
     ];
     private AccessDecisionManagerInterface $decisionManager;
 
@@ -44,16 +46,30 @@ class DepositWithdrawalVoter extends Voter
             return false;
         }
 
-        if (self::MAKE_DEPOSIT === $attribute || self::MAKE_WITHDRAWAL === $attribute) {
-            return $this->canMakeDepositOrWithdrawal($token);
+        if (self::MAKE_DEPOSIT === $attribute) {
+            return $this->canMakeDepositOrWithdrawal(
+                $this->container->getParameter('auth_make_disable_deposit'),
+                $token
+            );
+        }
+
+        if (self::MAKE_WITHDRAWAL === $attribute) {
+            return $this->canMakeDepositOrWithdrawal(
+                $this->container->getParameter('auth_make_disable_withdrawals'),
+                $token
+            );
+        }
+
+        if (self::CONFIRM_WITHDRAWAL === $attribute) {
+            return !$user->isBlocked();
         }
 
         return false;
     }
-
-    private function canMakeDepositOrWithdrawal(TokenInterface $token): bool
+    
+    private function canMakeDepositOrWithdrawal(bool $authMakeDisable, TokenInterface $token): bool
     {
-        if ($this->container->getParameter('auth_make_disable_withdrawals_and_deposit')) {
+        if ($authMakeDisable) {
             return $this->decisionManager->decide($token, [User::ROLE_AUTHENTICATED]);
         }
 

@@ -1,35 +1,69 @@
 <template>
-    <div class="form-group">
-        <textarea
-            class="form-control mb-3"
-            :class="{ 'is-invalid' : contentInvalid }"
+    <div
+        @click="goToLogInIfGuest"
+    >
+        <m-textarea
+            :label="$t('comment.input.label')"
+            :invalid="contentInvalid"
+            :disabled="!isEnoughUserBalance"
             v-model="content"
-            @focus="goToLogIn"
-        ></textarea>
-        <div class="invalid-feedback">
-            {{ contentError }}
+            :rows="3"
+            editable
+        >
+            <template v-slot:errors>
+                <div v-if="contentInvalid">
+                    {{ contentError }}
+                </div>
+            </template>
+        </m-textarea>
+        <div>
+            <m-button
+                ref="commentButton"
+                type="primary"
+                class="mr-1"
+                :disabled="submitDisabled"
+                :loading="isSubmitting"
+                @click="submit"
+            >
+                {{ isEdit ? $t('save') : $t('comment.add_comment') }}
+            </m-button>
+            <m-button
+                v-if="isEdit"
+                type="secondary"
+                :disabled="isSubmitting"
+                @click="cancel"
+            >
+                {{ $t('cancel') }}
+            </m-button>
         </div>
-        <button
-            class="btn btn-primary"
-            @click="submit"
-            :disabled="$v.content.$invalid"
-        >
-          {{ $t('save') }}
-        </button>
-        <button
-            class="btn btn-cancel"
-            @click="cancel"
-        >
-          {{ $t('cancel') }}
-        </button>
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            :message="addPhoneModalMessage"
+            @close="addPhoneModalVisible = false"
+            @phone-verified="onPhoneVerified"
+        />
     </div>
 </template>
 
 <script>
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {NotificationMixin, AddPhoneAlertMixin} from '../../mixins';
+import {MTextarea, MButton} from '../UI';
+import Decimal from 'decimal.js';
+import {mapGetters} from 'vuex';
+import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
 
 export default {
     name: 'CommentForm',
+    mixins: [
+        NotificationMixin,
+        AddPhoneAlertMixin,
+    ],
+    components: {
+        MTextarea,
+        MButton,
+        AddPhoneAlertModal,
+    },
     props: {
         loggedIn: Boolean,
         propContent: {
@@ -41,18 +75,29 @@ export default {
             type: Boolean,
             default: false,
         },
+        isEdit: Boolean,
+        post: Object,
+        commentMinAmount: Number,
+        isOwner: Boolean,
     },
     data() {
         return {
             content: this.propContent,
             loginUrl: this.$routing.generate('login', {}, true),
-            minContentLength: 1,
+            minContentLength: 2,
             maxContentLength: 500,
+            isSubmitting: false,
         };
     },
     computed: {
+        ...mapGetters('tradeBalance', {
+            quoteBalance: 'getQuoteBalance',
+        }),
+        ...mapGetters('user', {
+            hasPhoneVerified: 'getHasPhoneVerified',
+        }),
         contentInvalid() {
-            return this.$v.content.$invalid && this.content.length > 0;
+            return this.$v.content.$invalid && 0 < this.content.length;
         },
         contentError() {
             if (!this.$v.content.required) {
@@ -66,6 +111,12 @@ export default {
             }
             return '';
         },
+        isEnoughUserBalance() {
+            return this.quoteBalance >= this.commentMinAmount;
+        },
+        submitDisabled() {
+            return this.$v.content.$invalid || !this.isEnoughUserBalance;
+        },
     },
     methods: {
         submit() {
@@ -74,21 +125,32 @@ export default {
                 return;
             }
 
-            if (this.$v.content.$invalid) {
+            if (this.$v.content.$invalid || this.isSubmitting) {
                 return;
             }
 
-            this.$axios.single.post(this.apiUrl, {content: this.content})
-            .then((res) => {
-                this.$emit('submitted', res.data.comment);
+            if (!this.hasPhoneVerified) {
+                this.addPhoneModalVisible = true;
+                return;
+            }
 
-                if (this.resetAfterSubmit) {
-                    this.content = '';
-                }
-            })
-            .catch(() => {
-                this.$emit('error');
-            });
+            this.isSubmitting = true;
+            this.$axios.single.post(this.apiUrl, {content: this.content})
+                .then((res) => {
+                    this.$emit('submitted', res.data.comment);
+
+                    if (this.resetAfterSubmit) {
+                        this.content = '';
+                    }
+                })
+                .catch((error) => {
+                    error.response?.data?.message
+                        ? this.notifyError(error.response?.data.message)
+                        : this.$emit('error');
+                })
+                .finally(() => {
+                    this.isSubmitting = false;
+                });
         },
         cancel() {
             if (!this.loggedIn) {
@@ -99,11 +161,25 @@ export default {
             this.content = this.propContent;
             this.$emit('cancel');
         },
-        goToLogIn(e) {
+        goToLogInIfGuest(e) {
             if (!this.loggedIn) {
                 e.target.blur();
                 location.href = this.loginUrl;
             }
+
+            if (!this.isOwner && new Decimal(this.commentMinAmount).gt(this.quoteBalance)) {
+                this.notifyInfo(
+                    this.$t('comment.add_comment.min_amount', {
+                        amount: this.commentMinAmount,
+                        currency: this.post.token.name,
+                    })
+                );
+                return;
+            }
+        },
+        onPhoneVerified() {
+            this.addPhoneModalVisible = false;
+            this.submit();
         },
     },
     watch: {

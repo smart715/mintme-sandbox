@@ -1,9 +1,14 @@
 <template>
     <div class="card">
         <div class="card-header">
-            {{ $t('voting.votes') }} ({{ votesCount }})
+            <h4 class="text-white">
+                {{ $t('voting.votes') }}
+                <span class="text-primary">
+                    {{ votesCount }}
+                </span>
+            </h4>
         </div>
-        <div class="card-body p-0">
+        <div class="card-body">
             <div class="table-responsive">
                 <b-table
                     :items="votes"
@@ -14,7 +19,24 @@
                         <elastic-text :value="row.item.option"/>
                     </template>
                     <template v-slot:cell(trader)="row">
-                        <elastic-text :value="row.item.trader" :url="getProfileUrl(row.item.trader)"/>
+                        <div class="d-flex">
+                            <avatar
+                                :image="row.item.trader.profileAvatarUrl"
+                                class="mr-1"
+                                img-class="icon contract-avatar"
+                            />
+                            <elastic-text :value="row.item.trader.name" :url="getProfileUrl(row.item.trader.name)"/>
+                        </div>
+                    </template>
+                    <template v-slot:cell(amount)="row">
+                        {{ row.item.amount }}
+                        <coin-avatar
+                            :symbol="tokenName"
+                            :is-crypto="!isToken"
+                            :is-user-token="isToken"
+                            :image="tokenAvatar"
+                        />
+                        {{ tokenName | rebranding }}
                     </template>
                 </b-table>
             </div>
@@ -28,6 +50,8 @@ import {mapGetters} from 'vuex';
 import {RebrandingFilterMixin} from '../../mixins';
 import ElasticText from '../ElasticText';
 import {toMoney} from '../../utils';
+import CoinAvatar from '../CoinAvatar';
+import Avatar from '../Avatar.vue';
 
 export default {
     name: 'VotingVotes',
@@ -37,6 +61,15 @@ export default {
     components: {
         BTable,
         ElasticText,
+        CoinAvatar,
+        Avatar,
+    },
+    props: {
+        isToken: {
+            type: Boolean,
+            default: false,
+        },
+        tokenAvatar: String,
     },
     data() {
         return {
@@ -64,9 +97,12 @@ export default {
         votes() {
             return this.voting.userVotings.map((uv) => {
                 return {
-                    trader: uv.user.profile.nickname,
+                    trader: {
+                        name: uv.user.profile.nickname,
+                        profileAvatarUrl: uv.user.profile.image.avatar_small,
+                    },
                     option: uv.option.title,
-                    amount: `${toMoney(uv.amountMoney, 2)} ${this.rebrandingFunc(this.tokenName)}`,
+                    amount: toMoney(uv.amountMoney, 2),
                 };
             });
         },

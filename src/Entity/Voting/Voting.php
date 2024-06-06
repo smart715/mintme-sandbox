@@ -5,8 +5,8 @@ namespace App\Entity\Voting;
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Validator\Constraints\DateTimeMin;
-use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -14,6 +14,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @codeCoverageIgnore
  * @ORM\Entity(repositoryClass="App\Repository\VotingRepository")
+ * @ORM\Table(
+ *      indexes={
+ *          @ORM\Index(name="FK_END_DATE", columns={"end_date"}),
+ *      }
+ *  )
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"voting"="Voting", "tokenVoting"="TokenVoting", "cryptoVoting"="CryptoVoting"})
@@ -34,14 +39,13 @@ abstract class Voting
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\Length(min="5", max="100")
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     private string $title = ''; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string", length=1000)
      * @Assert\NotNull
-     * @NotEmptyWithoutBbcodes
      * @Assert\Length(min="100", max="1000")
      */
     private string $description = ''; // phpcs:ignore
@@ -72,8 +76,7 @@ abstract class Voting
     /**
      * @ORM\ManyToOne(
      *     targetEntity="App\Entity\User",
-     *     inversedBy="votings",
-     *     cascade={"persist", "remove"}
+     *     cascade={"persist"}
      * )
      * @ORM\JoinColumn(name="creator_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
@@ -85,9 +88,8 @@ abstract class Voting
      *     mappedBy="voting",
      *     cascade={"persist", "remove"}
      * )
-     * @var ArrayCollection|null
      */
-    private $userVotings;
+    private ?Collection $userVotings;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -97,10 +99,11 @@ abstract class Voting
     public function __construct()
     {
         $this->options = new ArrayCollection();
+        $this->userVotings = new ArrayCollection();
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getId(): int
     {
@@ -108,7 +111,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getTitle(): string
     {
@@ -123,7 +126,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getDescription(): string
     {
@@ -138,7 +141,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getEndDate(): ?\DateTimeImmutable
     {
@@ -157,7 +160,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getSlug(): ?string
     {
@@ -172,7 +175,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getOptions(): array
     {
@@ -212,7 +215,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getCreatedAt(): \DateTimeImmutable
     {
@@ -237,7 +240,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getCreatorProfile(): Profile
     {
@@ -245,14 +248,21 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
+     */
+    public function getCreatorId(): int
+    {
+        return $this->creator->getId();
+    }
+
+    /**
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function getUserVotings(): array
     {
         return $this->userVotings
             ? $this->userVotings->toArray()
-            : []
-            ;
+            : [];
     }
 
     public function addUserVoting(UserVoting $userVoting): self
@@ -272,7 +282,7 @@ abstract class Voting
     }
 
     /**
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "API_BASIC"})
      */
     public function isClosed(): bool
     {

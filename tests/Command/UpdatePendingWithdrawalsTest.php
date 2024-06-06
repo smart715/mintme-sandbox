@@ -11,14 +11,12 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
-use App\Repository\CryptoRepository;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapperInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,7 +27,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Lock\LockInterface;
 
 class UpdatePendingWithdrawalsTest extends KernelTestCase
@@ -39,26 +36,27 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $kernel      = self::bootKernel();
         $application = new Application($kernel);
         $emCount     = 10;
-        $lockCount   = $emCount * 2;
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
-        $handler->expects($this->exactly($lockCount))
+        $handler->expects($this->exactly($emCount * 4))
             ->method('deposit');
 
-        $cm = $this->createMock(CryptoManagerInterface::class);
+        $repoC = $this->createMock(CryptoManagerInterface::class);
+        $repoC->expects($this->exactly(1))
+            ->method('findBySymbol')
+            ->willReturn($this->mockCrypto());
 
         $upw = new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
             $this->mockEm($emCount),
             $this->mockDate(new DateTimeImmutable()),
             $handler,
-            $cm,
-            $this->mockLockFactory(),
-            $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(TokenConfig::class)
+            $repoC,
+            $this->mockLockFactory()
         );
 
         $upw->withdrawExpirationTime = 1;
+        $upw->viabtcResponseTimeout = 1;
 
         $application->add($upw);
 
@@ -74,30 +72,30 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $kernel      = self::bootKernel();
         $application = new Application($kernel);
         $emCount     = 10;
-        $lockCount   = $emCount;
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
-        $handler->expects($this->exactly($lockCount))
+        $handler->expects($this->exactly($emCount * 4))
             ->method('deposit')
             ->willThrowException(new Exception());
 
-        $cm = $this->createMock(CryptoManagerInterface::class);
+        $repoC = $this->createMock(CryptoManagerInterface::class);
+        $repoC->expects($this->exactly(1))
+            ->method('findBySymbol')
+            ->willReturn($this->mockCrypto());
 
         $em = $this->mockEm($emCount);
-        $em->expects($this->exactly($lockCount * 2))->method('rollback');
 
         $upw = new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
             $em,
             $this->mockDate(new DateTimeImmutable()),
             $handler,
-            $cm,
-            $this->mockLockFactory(),
-            $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(TokenConfig::class)
+            $repoC,
+            $this->mockLockFactory()
         );
 
         $upw->withdrawExpirationTime = 1;
+        $upw->viabtcResponseTimeout = 1;
 
         $application->add($upw);
 
@@ -135,12 +133,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
                 return $this->mockPendingToken();
             }, range(1, $lockCount)));
 
-        $repoC = $this->createMock(CryptoRepository::class);
-        $repoC->expects($this->exactly(1))
-            ->method('findBySymbol')
-            ->willReturn(array_map(function () {
-                return $this->mockCrypto();
-            }, range(1, $lockCount)));
+        $repoC = $this->createMock(CryptoManagerInterface::class);
 
         $em->method('getRepository')->willReturn($repo, $repoT, $repoC);
 
@@ -185,6 +178,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $crypto->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
 
         $token->method('getCrypto')->willReturn($crypto);
+        $token->method('isMintmeToken')->willReturn(true);
 
         $lock->method('getToken')->willReturn($token);
 
@@ -197,6 +191,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
 
         $lock->method('getSymbol')->willReturn(Symbols::WEB);
         $lock->method('getName')->willReturn(Symbols::WEB);
+        $lock->method('getFee')->willReturn(new Money('100', new Currency(Symbols::WEB)));
 
         return $lock;
     }

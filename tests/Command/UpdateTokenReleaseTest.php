@@ -15,60 +15,97 @@ use Symfony\Component\Lock\LockInterface;
 
 class UpdateTokenReleaseTest extends KernelTestCase
 {
-    public function testExecute(): void
+    /** @dataProvider executeDataProvider */
+    public function testExecute(bool $isLockAcquired, string $expected): void
     {
         $kernel = self::bootKernel();
         $application = new Application($kernel);
-        $lockCount = 10;
 
         $application->add(new UpdateTokenRelease(
-            $this->createMock(LoggerInterface::class),
-            $this->mockEm($lockCount),
-            $this->mockLockFactory()
+            $this->mockLogger(),
+            $this->mockEntityManager(10, $isLockAcquired),
+            $this->mockLockFactory($isLockAcquired),
         ));
 
         $command = $application->find('app:update-token-release');
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        $output = $commandTester->getDisplay();
-
-        $this->assertContains("${lockCount} tokens were updated. Saving to DB..", $output);
+        $this->assertStringContainsString($expected, $commandTester->getDisplay());
+        $this->assertEquals(0, $commandTester->getStatusCode());
     }
 
-    private function mockEm(int $lockCount): EntityManagerInterface
+    public function executeDataProvider(): array
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        return  [
+            "if isLockAcquired equal true, return an expected message" => [
+                "isLockAcquired" => true,
+                "expected" => "10 tokens were updated. Saving to DB..",
+            ],
+            "if isLockAcquired equal false, return an empty message" => [
+                "isLockAcquired" => false,
+                "expected" => "",
+            ],
+        ];
+    }
 
-        $repo = $this->createMock(LockInRepository::class);
-        $repo->expects($this->once())
+    private function mockEntityManager(int $lockCount, bool $isLockAcquired): EntityManagerInterface
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $entityManager
+            ->method('getRepository')
+            ->willReturn($this->mockLockInRepository($lockCount, $isLockAcquired));
+
+        return $entityManager;
+    }
+
+    private function mockLockInRepository(int $lockCount, bool $isLockAcquired): LockInRepository
+    {
+        $lockInRepository = $this->createMock(LockInRepository::class);
+        $lockInRepository
+            ->expects($isLockAcquired ? $this->once() : $this->never())
             ->method('findAllUnreleased')
-            ->willReturn(array_map(function () {
-                return $this->mockLockIn();
+            ->willReturn(array_map(function () use ($isLockAcquired) {
+                return $this->mockLockIn($isLockAcquired);
             }, range(1, $lockCount)));
 
-        $em->method('getRepository')->willReturn($repo);
-
-        return $em;
+        return $lockInRepository;
     }
 
-    private function mockLockIn(): LockIn
+    private function mockLockIn(bool $isLockAcquired): LockIn
     {
         $lock = $this->createMock(LockIn::class);
 
-        $lock->expects($this->once())->method('updateFrozenAmount');
+        $lock
+            ->expects($isLockAcquired ? $this->once() : $this->never())
+            ->method('updateFrozenAmount');
 
         return $lock;
     }
 
-    private function mockLockFactory(): LockFactory
+    private function mockLock(bool $isLockAcquired): LockInterface
     {
         $lock = $this->createMock(LockInterface::class);
-        $lock->method('acquire')->wilLReturn(true);
+        $lock
+            ->method('acquire')
+            ->wilLReturn($isLockAcquired);
 
-        $lf = $this->createMock(LockFactory::class);
-        $lf->method('createLock')->willReturn($lock);
+        return $lock;
+    }
 
-        return $lf;
+    private function mockLockFactory(bool $isLockAcquired): LockFactory
+    {
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory
+            ->method('createLock')
+            ->willReturn($this->mockLock($isLockAcquired));
+
+        return $lockFactory;
+    }
+
+    private function mockLogger(): LoggerInterface
+    {
+        return $this->createMock(LoggerInterface::class);
     }
 }

@@ -1,0 +1,171 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/token_settings') }}
+{% endblock %}
+
+{% block title %}{% trans %}navbar.token_settings{% endtrans %} | mintMe{% endblock %}
+
+{% set currentLocale = app.session.get('_locale') %}
+{% set showRewardSummaryModal = showRewardSummaryModal is defined and showRewardSummaryModal ? 'true' : 'false' %}
+{% set isCreatedOnMintmeSite = token.isCreatedOnMintmeSite ? 'true' : 'false' %}
+
+{% block content %}
+    <div
+        id="token-settings"
+        class="p-2"
+        data-active-tab="{{ activeTab }}"
+        data-active-sub-tab="{{ activeSubTab }}"
+        data-markets-feature-enabled="{{ new_markets_enabled ? 'true' : 'false' }}"
+        data-rewards-feature-enabled="{{ rewards_enabled ? 'true' : 'false' }}"
+    >
+        <token-settings-init
+            active-tab="{{ activeTab }}"
+            token-name="{{ token.name }}"
+            token-avatar="{{ token.image.url }}"
+            :deploys="{{ deploys | json_encode }}"
+            :social-urls="{{ socialUrls | json_encode }}"
+            :token-delete-sold-limit="{{ tokenDeleteSoldLimit }}"
+            :has-release-period="{{ token.getLockIn ? 'true' : 'false' }}"
+            :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+            is-owner
+            ref="token-settings-init"
+        ></token-settings-init>
+        <market-init
+            market-index="{{ currentMarket.base.symbol }}"
+            :markets="{{ markets | json_encode }}"
+        ></market-init>
+        <balance-init
+            is-token
+            websocket-url="{{ global_websocket_url }}"
+            hash="{{ hash }}"
+            logged-in
+            is-owner
+            :precision="{{ precision }}"
+        ></balance-init>
+        <token-settings-header
+            :tokens="{{ tokens | json_encode }}"
+            :tokens-count="{{ tokensCount }}"
+            token-name="{{ token.name }}"
+            token-avatar="{{ token.image.url }}"
+            @open-sidenav="onOpenSidenav"
+        ></token-settings-header>
+        <crypto-init :cryptos="{{ enabledCryptos | json_encode }}"></crypto-init>
+        {# While loading page show spinner #}
+        <div v-if="false" class="d-flex justify-content-center">
+            <div class="spinner-border" role="status"></div>
+        </div>
+        <div v-cloak class="row mx-1">
+            <div class="col-12 col-md-3 pl-0 settings-nav-wrp" :class="{'opened': sideNavOpened}">
+                <div class="card py-2">
+                    <token-settings-nav
+                        :tabs="tabs"
+                        @change="onNavTabChange"
+                    />
+                </div>
+            </div>
+            <div class="col-12 col-md-9 card">
+                <template v-if="SETTINGS_TABS.general === activeTab">
+                    <token-settings-general
+                        current-description="{{ tokenDescription }}"
+                        :twofa-enabled="{{ app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false' }}"
+                        :token-deploys="{{ deploys | json_encode }}"
+                        cover-image="{{ token.coverImage ? token.coverImage.url : '' }}"
+                        :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+                        :token-proposal-min-amount="{{ tokenProposalMinAmount }}"
+                        :dm-min-amount="{{ dmMinAmount }}"
+                        :comment-min-amount="{{ commentMinAmount }}"
+                    ></token-settings-general>
+                </template>
+                <template v-if="SETTINGS_TABS.promotion === activeTab">
+                    <token-settings-promotion
+                        :airdrop-params="{{ airdrop_params | json_encode }}"
+                        :signup-bonus-params="{{ token_signup_bonus_params | json_encode }}"
+                        youtube-client-id="{{ global_youtube_client_id }}"
+                        current-locale="{{ currentLocale }}"
+                        discord-auth-url="{{ discordAuthUrl }}"
+                        :show-summary="{{ showRewardSummaryModal }}"
+                        :rewards="{{ rewards | json_encode }}"
+                        :bounties="{{ bounties | json_encode }}"
+                        disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                        {% if reward is defined %}
+                            :reward="{{ reward | json_encode }}"
+                        {% endif %}
+                        :rewards-enabled="{{ rewards_enabled ? 'true' : 'false' }}"
+                        :active-sub-tab="activeSubTab"
+                        :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+                        :token-promotion-tariffs="{{ token_promotion_tariffs | json_encode }}"
+                    ></token-settings-promotion>
+                </template>
+                <template v-if="SETTINGS_TABS.advanced === activeTab">
+                    <token-settings-advanced
+                        facebook-app-id="{{ global_facebook_app_id }}"
+                        youtube-client-id="{{ global_youtube_client_id }}"
+                        release-address="{{ token.mintDestination }}"
+                        :twofa-enabled="{{ app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false' }}"
+                        :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+                        websocket-url="{{ global_websocket_url }}"
+                        disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                        current-locale="{{ currentLocale }}"
+                        :explorer-urls="{{ global_explorer_urls | json_encode }}"
+                        :initial-sell-order-config="{{ initial_sell_order_config | json_encode }}"
+                        :is-user-blocked="{{ app.user.isBlocked|default(false) ? 'true' : 'false'}}"
+                        :disabled-cryptos="{{ disabledBlockchain|json_encode }}"
+                        :token-connect-enabled="{{ token_connect_enabled ? 'true' : 'false' }}"
+                        @token-deploy-pending="handleTokenDeployEvent"
+                    ></token-settings-advanced>
+                </template>
+                <template v-if="SETTINGS_TABS.deploy === activeTab">
+                    <token-settings-deploy
+                        :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+                        websocket-url="{{ global_websocket_url }}"
+                        disabled-services-config="{{ disabledServicesConfig|json_encode }}"
+                        current-locale="{{ currentLocale }}"
+                        :explorer-urls="{{ global_explorer_urls|json_encode }}"
+                        :disabled-cryptos="{{ disabledBlockchain|json_encode }}"
+                        :token-connect-enabled="{{ token_connect_enabled ? 'true' : 'false' }}"
+                        @token-deploy-pending="handleTokenDeployEvent"
+                    ></token-settings-deploy>
+                </template>
+                {% if new_markets_enabled %}
+                    <template v-if="SETTINGS_TABS.markets === activeTab">
+                        <token-settings-markets
+                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                            :is-created-on-mintme-site="{{ isCreatedOnMintmeSite }}"
+                        ></token-settings-markets>
+                    </template>
+                {% endif %}
+            </div>
+        </div>
+        <div class="menu-backdrop d-none" :class="{'d-block': sideNavOpened}" @click="closeSidenav"></div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script>
+        window.firebaseConfig = {
+            apiKey: '{{ firebase_twitter_api_key }}',
+            authDomain: '{{ firebase_twitter_auth_domain }}',
+            projectId: '{{ firebase_twitter_project_id }}',
+            storageBucket: '{{ firebase_twitter_storage_bucket }}',
+            messagingSenderId: '{{ firebase_twitter_messaging_sender_id }}',
+            appId: '{{ firebase_twitter_app_id }}',
+            measurementId: '{{ firebase_twitter_measurement_id }}',
+        };
+    </script>
+    <script defer src="https://apis.google.com/js/platform.js"></script>
+    <script defer src="https://apis.google.com/js/api.js"></script>
+    {{ encore_entry_script_tags('pages/token_settings') }}
+    <script>
+        window.fbAsyncInit = () => {
+            FB.init({
+                appId: '{{ global_facebook_app_id }}',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v3.1',
+            });
+        };
+    </script>
+    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+{% endblock %}

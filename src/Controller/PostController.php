@@ -2,9 +2,19 @@
 
 namespace App\Controller;
 
+use App\Config\PostsConfig;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exception\NotFoundPostException;
+use App\Exception\UnauthorizedPostException;
+use App\Exchange\Factory\MarketFactoryInterface;
+use App\Manager\ActivityManagerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\PostManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Utils\BaseQuote;
+use App\Utils\Symbols;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -14,8 +24,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class PostController extends Controller
 {
-    /** @var PostManagerInterface */
-    private $postManager;
+    private PostManagerInterface $postManager;
 
     public function __construct(
         NormalizerInterface $normalizer,
@@ -30,11 +39,7 @@ class PostController extends Controller
      */
     public function show(int $id): Response
     {
-       	if(!empty($id)){
-		 $post = $this->postManager->getById($id);
-	} else {
-	$post = 0;
-	}
+        $post = $this->postManager->getById($id);
 
         if (!$post) {
             throw new NotFoundPostException();
@@ -43,7 +48,7 @@ class PostController extends Controller
         $slug = $post->getSlug();
 
         if ($slug) {
-            return $this->redirectToRoute('new_show_post', [
+            return $this->redirectToRoute('token_show_post', [
                 'name' => $post->getToken()->getName(),
                 'slug' => $slug,
             ]);
@@ -53,6 +58,7 @@ class PostController extends Controller
             'post' => $this->normalize($post),
             'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
             'comments' => $this->normalize($post->getComments()),
+            'commentMinAmount' => (float)$post->getToken()->getCommentMinAmount(),
         ]);
     }
 
@@ -67,7 +73,9 @@ class PostController extends Controller
             throw new NotFoundPostException();
         }
 
-        $this->denyAccessUnlessGranted('edit', $post);
+        if (!$this->isGranted('edit', $post)) {
+            throw new UnauthorizedPostException();
+        }
 
         /** @var array $serializedPost */
         $serializedPost = $this->normalize($post);
@@ -87,10 +95,10 @@ class PostController extends Controller
     }
 
     /**
-     * @Route("/home", name="show_user_home")
+     * @Route("/feed", name="show_user_feed", options={"expose"=true})
      */
     public function home(): Response
     {
-        return $this->render('pages/show_user_home.html.twig');
+        return $this->redirectToRoute('homepage');
     }
 }

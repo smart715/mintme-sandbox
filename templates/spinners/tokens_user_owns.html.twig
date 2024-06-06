@@ -1,0 +1,67 @@
+<div class="user-token-table" v-if="false">
+    <div class="card card-fixed-medium token-list-fixed">
+        <div class="card-header text-uppercase pl-3 h3 font-weight-semibold">
+            {% if canEdit %}
+                <div>
+                    {{ 'page.profile.tokens.i_own.header'|trans|raw }}
+                </div>
+            {% else %}
+                <div>
+                    {{ 'page.profile.tokens.user_owns.header'|trans({'%nickname%': profile.nickname})|raw }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            {% if tokensUserOwnsCount != 0 %}
+                <div class="table-responsive table-restricted">
+                    <table class="table b-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    {{ 'tokens.user.owns_name'|trans }}
+                                </th>
+                                <th>
+                                    {{ 'tokens.user.owns_amount'|trans }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, token in tokensUserOwns|slice(0, 10) %}
+                                <tr class="c-pointer">
+                                    <td>
+                                        <img src="{{ token.avatar.avatar_small }}">
+                                        <a
+                                            href="{{ path('token_show', {'name' : token.name}) }}"
+                                        >
+                                            {{ token.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if token.rank %}
+                                            <img
+                                                src="{{ asset('build/images/medal-' ~ token.rank ~ '.png') }}"
+                                                class="medal mr-1"
+                                                alt="medal"
+                                            />
+                                        {% endif %}
+                                        {{ token.available ? token.available | toMoney(token_precision) : '-' }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if 10 < tokensUserOwnsCount %}
+                        <div class="text-center">
+                            <button
+                                id="see-more-btn"
+                                class="see-more-btn px-5 py-3"
+                            >
+                                {{ 'see_more'|trans }}
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

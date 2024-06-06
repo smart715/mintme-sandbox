@@ -1,210 +1,93 @@
 <template>
-    <div class="overflow-hidden token-name">
-        <template v-if="editable">
-            <token-edit-modal
-                v-if="editable"
-                :current-name="currentName"
-                :has-release-period-prop="hasReleasePeriodProp"
-                :is-owner="editable"
-                :is-token-created="isTokenCreated"
-                :is-mintme-token="isMintmeToken"
-                :is-controlled-token="isControlledToken"
-                :is-token-exchanged="isTokenExchanged"
-                :no-close="true"
-                :precision="precision"
-                :status-prop="statusProp"
-                :twofa="twofa"
-                :visible="showTokenEditModal"
-                :websocket-url="websocketUrl"
-                :release-address="releaseAddress"
-                :discord-url="discordUrl"
-                :editable="editable"
-                :facebook-url="facebookUrl"
-                :facebook-app-id="facebookAppId"
-                :telegram-url="telegramUrl"
-                :website-url="websiteUrl"
-                :youtube-client-id="youtubeClientId"
-                :youtube-channel-id="youtubeChannelId"
-                :airdrop-params="airdropParams"
-                :disabled-services-config="disabledServicesConfig"
-                @close="closeTokenEditModal"
-                @token-deploy-pending="$emit('token-deploy-pending')"
-                @updated-website="$emit('updated-website', $event)"
-                @updated-facebook="$emit('updated-facebook', $event)"
-                @updated-youtube="$emit('updated-youtube', $event)"
-                @updated-discord="$emit('updated-discord', $event)"
-                @updated-telegram="$emit('updated-telegram', $event)"
-                :current-locale="currentLocale"
-                :token-deployed-date="tokenDeployedDate"
-                :token-tx-hash-address="tokenTxHashAddress"
-                :mintme-explorer-url="mintmeExplorerUrl"
-                :eth-explorer-url="ethExplorerUrl"
-                :bnb-explorer-url="bnbExplorerUrl"
-                :token-crypto="tokenCrypto"
-                :discord-auth-url="discordAuthUrl"
-            />
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle token-edit-icon"
-                icon="edit"
-                transform="shrink-4 up-1.5"
-                @click="editToken"
-            />
-        </template>
-        <h1 v-if="shouldTruncate"
-              class="h2 current-token-name"
-              v-b-tooltip="{title: currentName, boundary:'viewport'}">
-            {{ currentName | truncate(maxLengthToTruncate) }}
-        </h1>
-        <h1 v-else class="h2 current-token-name">
-            {{ currentName }}
+    <div class="text-truncate">
+        <h1
+            class="h2 text-white text-truncate"
+            v-b-tooltip="tooltipTokenName(tokenName)"
+        >
+            {{ tokenName | truncate(maxLengthToTruncate) }}
         </h1>
     </div>
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {mixin as clickaway} from 'vue-clickaway';
 import {VBTooltip} from 'bootstrap-vue';
-import {WebSocketMixin, FiltersMixin, LoggerMixin} from '../../mixins/';
-import {AIRDROP_CREATED, AIRDROP_DELETED, TOKEN_NAME_CHANGED} from '../../utils/constants';
-
-library.add(faEdit);
+import {
+    TokenPageTabSelector,
+    FiltersMixin,
+} from '../../mixins/';
+import {TOKEN_NAME_TRUNCATE_LENGTH} from '../../utils/constants';
 
 export default {
     name: 'TokenName',
-    components: {
-        FontAwesomeIcon,
-        TokenEditModal: () => import('../modal/TokenEditModal').then((data) => data.default),
-    },
     directives: {
         'b-tooltip': VBTooltip,
     },
     mixins: [
-        WebSocketMixin,
+        TokenPageTabSelector,
         FiltersMixin,
-        clickaway,
-        LoggerMixin,
     ],
     props: {
-        editable: Boolean,
-        hasReleasePeriodProp: Boolean,
-        isTokenCreated: Boolean,
-        isMintmeToken: Boolean,
-        isControlledToken: Boolean,
-        identifier: String,
+        tabIndex: Number,
         name: String,
-        precision: Number,
-        statusProp: String,
-        twofa: Boolean,
-        websocketUrl: String,
-        releaseAddress: String,
-        airdropParams: Object,
-        discordUrl: String,
-        facebookUrl: String,
-        facebookAppId: String,
-        telegramUrl: String,
-        websiteUrl: String,
-        youtubeClientId: String,
-        youtubeChannelId: String,
-        showTokenEditModalProp: Boolean,
-        disabledServicesConfig: String,
-        currentLocale: String,
-        tokenDeployedDate: {
-            type: Object,
-            default: null,
-        },
-        tokenTxHashAddress: {
-            type: String,
-            default: null,
-        },
-        mintmeExplorerUrl: String,
-        ethExplorerUrl: String,
-        bnbExplorerUrl: String,
-        tokenCrypto: Object,
-        discordAuthUrl: String,
     },
     data() {
         return {
             currentName: this.name,
-            isTokenExchanged: true,
-            isTokenNotDeployed: false,
-            maxLengthToTruncate: 30,
-            showTokenEditModal: this.showTokenEditModalProp,
+            maxLengthToTruncate: TOKEN_NAME_TRUNCATE_LENGTH,
         };
     },
     computed: {
-        shouldTruncate: function() {
-            return this.currentName.length > this.maxLengthToTruncate;
+        tokenName: function() {
+            return this.checkTabName();
         },
     },
-    mounted: function() {
-        if (!this.editable) {
-            return;
-        }
-
-        window.addEventListener('storage', (event) => {
-            // Reload token page in case if token name was changed in another tab
-            if (TOKEN_NAME_CHANGED === event.key && this.currentName === event.oldValue
-                && this.currentName !== event.newValue
-            ) {
-                this.currentName = event.newValue;
-                window.localStorage.removeItem(event.key);
-                location.href = this.$routing.generate('token_show', {
-                    name: this.currentName,
-                });
-            }
-
-            // Reload token page in case if new token created/deleted in another tab
-            if ((AIRDROP_CREATED === event.key || AIRDROP_DELETED === event.key)
-                && this.currentName === event.newValue
-            ) {
-                window.localStorage.removeItem(event.key);
-                location.reload();
-            }
-        });
-
-        this.checkIfTokenExchanged();
-
-        this.addMessageHandler((response) => {
-            if (
-                ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier))
-                || 'order.update' === response.method
-            ) {
-                this.checkIfTokenExchanged();
-            }
-        }, 'token-name-asset-update', 'TokenName');
-
-        if (this.showTokenEditModalProp) {
-            window.history.replaceState(
-                {}, '', this.$routing.generate('token_show', {
-                    name: this.name,
-                })
-            );
-        }
+    watch: {
+        tabIndex(val, oldVal) {
+            this.setPageTitle();
+        },
     },
     methods: {
-        closeTokenEditModal: function() {
-            this.showTokenEditModal = false;
+        tooltipTokenName: function(tokenName) {
+            return this.checkLengthName(tokenName)
+                ? {title: this.currentName, boundary: 'viewport'}
+                : '';
         },
-        checkIfTokenExchanged: function() {
-            this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
-                name: this.currentName,
-            }))
-            .then((res) => this.isTokenExchanged = res.data)
-            .catch((err) => {
-                this.sendLogs('error', 'Can not fetch token data now', err);
-            });
+        checkLengthName: function(tokenName) {
+            return tokenName.length > this.maxLengthToTruncate;
         },
-        editToken: function() {
-            if (!this.editable) {
-                return;
+        checkTabName: function() {
+            const translationContext = {name: this.currentName};
+
+            if (this.isTradeTab) {
+                return this.$t('token.trade.token_name', translationContext);
             }
 
-            this.showTokenEditModal = true;
+            if (this.isVotingTab) {
+                return this.$t('token.voting.token_name', translationContext);
+            }
+
+            if (this.isPostTab) {
+                return this.$t('token.posts.token_name', translationContext);
+            }
+
+            return this.currentName;
+        },
+        setPageTitle() {
+            const translationContext = {name: this.name};
+            let title = '';
+
+            if (this.isIntroTab) {
+                title = this.$t('page.pair.title_info', translationContext);
+            } else if (this.isVotingTab) {
+                title = this.$t('page.pair.title_voting', translationContext);
+            } else if (this.isPostTab) {
+                title = this.$t('page.pair.title_posts', translationContext);
+            } else if (this.isTradeTab) {
+                title = this.$t('page.pair.title_market_tab', translationContext);
+            }
+
+            return document.title = title;
         },
     },
 };
 </script>
-

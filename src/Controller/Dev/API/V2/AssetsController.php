@@ -3,6 +3,8 @@
 namespace App\Controller\Dev\API\V2;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
+use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
@@ -19,15 +21,18 @@ class AssetsController extends AbstractFOSRestController
     private CryptoManagerInterface $cryptoManager;
     private TokenManagerInterface $tokenManager;
     private RebrandingConverterInterface $rebrandingConverter;
+    private LimitOrderConfig $limitOrderConfig;
 
     public function __construct(
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        RebrandingConverterInterface $rebrandingConverter
+        RebrandingConverterInterface $rebrandingConverter,
+        LimitOrderConfig $limitOrderConfig
     ) {
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->rebrandingConverter = $rebrandingConverter;
+        $this->limitOrderConfig = $limitOrderConfig;
     }
 
     /**
@@ -49,9 +54,15 @@ class AssetsController extends AbstractFOSRestController
         $cryptos = $this->cryptoManager->findAllIndexed('symbol', true);
         $tokens = $this->tokenManager->getDeployedTokens();
         $tokenMinWithdraw = number_format((float)('1e-' . Token::TOKEN_SUBUNIT), Token::TOKEN_SUBUNIT);
-        $makerFee = $this->getParameter('maker_fee_rate');
-        $takerFee = $this->getParameter('taker_fee_rate');
+        /** @var User|null $user */
+        $user = $this->getUser();
+        $userFee = null !== $user
+            ? $user->getTradingFee()
+            : null;
 
+        $cryptoFee = $userFee ?? $this->limitOrderConfig->getFeeCryptoRate();
+        $tokenFee = $userFee ?? $this->limitOrderConfig->getFeeTokenRate();
+        
         foreach ($cryptos as $crypto) {
             $subUnit = $crypto['showSubunit'];
             $minWithdraw = '1e-' . $subUnit;
@@ -61,8 +72,8 @@ class AssetsController extends AbstractFOSRestController
                 'can_withdraw' => true,
                 'can_deposit' => true,
                 'min_withdraw' => number_format((float)$minWithdraw, $subUnit),
-                'maker_fee' => $makerFee,
-                'taker_fee' => $takerFee,
+                'maker_fee' => $cryptoFee,
+                'taker_fee' => $cryptoFee,
             ];
         }
 
@@ -78,9 +89,9 @@ class AssetsController extends AbstractFOSRestController
                 'can_deposit' => true,
                 'min_withdraw' => $tokenMinWithdraw,
                 'max_withdraw' => $this->getParameter('token_quantity'),
-                'maker_fee' => $makerFee,
-                'taker_fee' => $takerFee,
-                'token_address' => $token->getAddress(),
+                'maker_fee' => $tokenFee,
+                'taker_fee' => $tokenFee,
+                'token_address' => $token->getMainDeploy()->getAddress(),
             ];
         }
 

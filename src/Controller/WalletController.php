@@ -2,20 +2,26 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\ViewOnlyTrait;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
-use App\Logger\UserActionLogger;
+use App\Logger\WithdrawLogger;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\UserTokenManagerInterface;
+use App\Manager\WithdrawalLocksManager;
 use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
 use App\Security\Config\DisabledServicesConfig;
+use App\Security\DisabledServicesVoter;
+use App\Services\TranslatorService\TranslatorInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
-use App\Utils\LockFactory;
 use App\Wallet\WalletInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -26,28 +32,38 @@ use Throwable;
  */
 class WalletController extends Controller
 {
-    private UserActionLogger $userActionLogger;
     private RebrandingConverterInterface $rebrandingConverter;
-    private LockFactory $lockFactory;
+    private TranslatorInterface $translator;
+    protected SessionInterface $session;
+    private WithdrawalLocksManager $withdrawalLocksManager;
+    private WithdrawLogger $withdrawLogger;
+
+    use ViewOnlyTrait;
 
     public function __construct(
-        UserActionLogger $userActionLogger,
         NormalizerInterface $normalizer,
         RebrandingConverterInterface $rebrandingConverter,
-        LockFactory $lockFactory
+        TranslatorInterface $translator,
+        SessionInterface $session,
+        WithdrawalLocksManager $withdrawalLocksManager,
+        WithdrawLogger $withdrawLogger
     ) {
-        $this->userActionLogger = $userActionLogger;
         $this->rebrandingConverter = $rebrandingConverter;
-        $this->lockFactory = $lockFactory;
+        $this->translator = $translator;
+        $this->session = $session;
+        $this->withdrawalLocksManager = $withdrawalLocksManager;
+        $this->withdrawLogger = $withdrawLogger;
 
         parent::__construct($normalizer);
     }
 
     /**
-     * @Route("/{tab}",
+     * @Route(
+     *     path="/{tab}",
      *     name="wallet",
+     *     methods={"GET"},
      *     defaults={"tab"="wallet"},
-     *     requirements={"tab"="dw-history|trade-history|active-orders"},
+     *     requirements={"tab"="dw-history|trade-history|active-orders|activity-history"},
      *     options={"expose"=true}
      * )
      * @param Request $request
@@ -60,12 +76,18 @@ class WalletController extends Controller
         Request $request,
         DisabledBlockchainConfig $disabledBlockchainConfig,
         DisabledServicesConfig $disabledServicesConfig,
+        CryptoManagerInterface $cryptoManager,
+        UserTokenManagerInterface $userTokensManager,
         ?string $tab
     ): Response {
         $depositMore = $request->get('depositMore') ?? '';
 
-        /** @var  User $user*/
+        /** @var User|null $user*/
         $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('login');
+        }
 
         return $this->render('pages/wallet.html.twig', [
             'hash' => $user->getHash(),
@@ -73,7 +95,8 @@ class WalletController extends Controller
             'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
             'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
             'tab' => $tab,
-            'error' => !$this->isGranted('make-deposit') || !$this->isGranted('make-withdrawal'),
+            'enabledCryptos' => $this->normalize($cryptoManager->findAll()),
+            'ownTokensCount' => $userTokensManager->getUserOwnsCount($user->getId()),
         ]);
     }
 
@@ -89,17 +112,8 @@ class WalletController extends Controller
         /** @var User|null $user */
         $user = $this->getUser();
 
-        if (!$user) {
+        if (!$user || $this->isViewOnly()) {
             throw new AccessDeniedException();
-        }
-
-        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
-
-        if (!$lock->acquire() || !$this->isGranted('withdraw')) {
-            return $this->createWalletRedirection(
-                'danger',
-                'Withdrawing is not possible. Please try again later'
-            );
         }
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -116,14 +130,18 @@ class WalletController extends Controller
         if (!$pendingWithdraw) {
             return $this->createWalletRedirection(
                 'danger',
-                'There are no transactions attached to this hashcode'
+                $this->translator->trans('wallet.no_transaction_attached')
             );
         }
 
-        if ($pendingWithdraw instanceof PendingTokenWithdraw && !$this->isGranted('token-withdraw')) {
+        if (($pendingWithdraw instanceof PendingTokenWithdraw &&
+            !$this->isGranted(DisabledServicesVoter::TOKEN_WITHDRAW, $pendingWithdraw->getToken())) ||
+            ($pendingWithdraw instanceof PendingWithdraw &&
+            !$this->isGranted(DisabledServicesVoter::COIN_WITHDRAW))
+        ) {
             return $this->createWalletRedirection(
                 'danger',
-                'Withdrawing is not possible. Please try again later'
+                $this->translator->trans('wallet.withdrawing_no_possible')
             );
         }
 
@@ -137,8 +155,17 @@ class WalletController extends Controller
         if ($isBlocked) {
             return $this->createWalletRedirection(
                 'danger',
-                'Account or token was blocked. Withdrawing is not possible'
+                $this->translator->trans('wallet.account_token_blocked')
             );
+        }
+
+        if ($pendingWithdraw instanceof PendingWithdraw) {
+            if (!$this->isGranted(DisabledServicesVoter::COIN_WITHDRAW, $pendingWithdraw->getCrypto())) {
+                return $this->createWalletRedirection(
+                    'danger',
+                    $this->translator->trans('wallet.withdraw_disabled')
+                );
+            }
         }
 
         if ($pendingWithdraw instanceof PendingWithdraw &&
@@ -146,31 +173,48 @@ class WalletController extends Controller
         ) {
             return $this->createWalletRedirection(
                 'danger',
-                'Withdraw for this crypto was disabled. Please try again later'
+                $this->translator->trans('wallet.withdraw_disabled')
             );
         }
 
         $this->denyAccessUnlessGranted('edit', $pendingWithdraw);
+
+        $lockWithdrawalDelayError = $this->withdrawalLocksManager->prepareDelayLocks($user->getId());
+
+        if ($lockWithdrawalDelayError) {
+            return $this->createWalletRedirection(
+                'danger',
+                $lockWithdrawalDelayError
+            );
+        }
+
+        if (!$this->withdrawalLocksManager->acquireLockBalance($user->getId())) {
+            return $this->createWalletRedirection(
+                'danger',
+                $this->translator->trans('wallet.withdrawing_no_possible')
+            );
+        }
 
         try {
             $wallet->withdrawCommit($pendingWithdraw);
         } catch (Throwable $exception) {
             return $this->createWalletRedirection(
                 'danger',
-                'Something went wrong during withdrawal. Contact us or try again later!'
+                $this->translator->trans('wallet.withdraw_something_wrong')
             );
         }
 
-        $this->userActionLogger->info("Confirm withdrawal for {$pendingWithdraw->getSymbol()}.", [
+        $this->withdrawLogger->info("Confirm withdrawal for {$pendingWithdraw->getSymbol()}.", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+            'email' => $user->getEmail(),
         ]);
 
-        $lock->release();
+        $this->withdrawalLocksManager->releaseLockBalance();
 
         return $this->createWalletRedirection(
             'success',
-            'Your transaction has been successfully confirmed and queued to be sent.'
+            $this->translator->trans('wallet.transaction_confirmed')
         );
     }
 

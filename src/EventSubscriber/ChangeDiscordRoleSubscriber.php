@@ -8,6 +8,8 @@ use App\Entity\User;
 use App\Events\DepositCompletedEvent;
 use App\Events\OrderEvent;
 use App\Events\OrderEventInterface;
+use App\Events\PostEvent;
+use App\Events\RewardEvent;
 use App\Events\TokenEvents;
 use App\Events\TokenUserEventInterface;
 use App\Events\TransactionCompletedEvent;
@@ -36,6 +38,9 @@ class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
         return [
             TokenEvents::AIRDROP_CLAIMED => 'handleTokenUserEvent',
             TokenEvents::DONATION => 'handleTokenUserEvent',
+            TokenEvents::POST_SHARED => 'handlePostSharedEvent',
+            RewardEvent::PARTICIPANT_ADDED => 'handleRewardEvent',
+            RewardEvent::VOLUNTEER_COMPLETED => 'handleRewardEvent',
             DepositCompletedEvent::NAME => 'handleTransactionEvent',
             WithdrawCompletedEvent::NAME => 'handleTransactionEvent',
             OrderEvent::COMPLETED => 'handleOrderEvent',
@@ -104,6 +109,34 @@ class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
 
         // When a lot of orders were cancelled all at once the role was being changed everytime
         // So this is to wait until after the request was finished to finally change the role
+        $this->addUserAndTokenToHandleOnTerminate($user, $token);
+    }
+
+    public function handlePostSharedEvent(PostEvent $event): void
+    {
+        $reward = $event->getPost()->getShareReward();
+
+        if ($reward->isZero()) {
+            return;
+        }
+
+        $user = $event->getUser();
+        $token = $event->getToken();
+
+        $this->addUserAndTokenToHandleOnTerminate($user, $token);
+    }
+
+    public function handleRewardEvent(RewardEvent $event): void
+    {
+        $member = $event->getRewardMember();
+
+        if (!$member) {
+            return;
+        }
+
+        $user = $member->getUser();
+        $token = $event->getReward()->getToken();
+
         $this->addUserAndTokenToHandleOnTerminate($user, $token);
     }
 

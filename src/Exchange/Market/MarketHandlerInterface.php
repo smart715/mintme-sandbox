@@ -34,6 +34,12 @@ interface MarketHandlerInterface
      * @param Market $market
      * @return Order[]
      */
+    public function getAllPendingBuyOrders(Market $market): array;
+
+    /**
+     * @param Market $market
+     * @return Order[]
+     */
     public function getAllPendingSellOrders(Market $market): array;
 
     /**
@@ -78,7 +84,8 @@ interface MarketHandlerInterface
         int $offset = 0,
         int $limit = 50,
         bool $reverseBaseQuote = false,
-        int $donationsOffset = 0
+        int $donationsOffset = 0,
+        int $fullDonationsOffset = 0
     ): array;
 
     /**
@@ -97,7 +104,15 @@ interface MarketHandlerInterface
         bool $reverseBaseQuote = false
     ): array;
 
-    public function getExpectedSellResult(Market $market, string $amount, string $fee): CheckTradeResult;
+    public function getExpectedSellResult(Market $market, string $amount, string $feeRate): CheckTradeResult;
+
+    public function getExpectedSellReversedResult(Market $market, string $amountToReceive, string $feeRate): CheckTradeResult;
+
+    public function getExpectedBuyResult(Market $market, string $amount, string $feeRate): CheckTradeResult;
+
+    public function getExpectedBuyReversedResult(Market $market, string $amountToReceive, string $feeRate): CheckTradeResult;
+
+    public function getExpectedDonationReversedResult(Market $market, string $amountToReceive, string $feeRate): CheckTradeResult;
 
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo;
 
@@ -115,17 +130,25 @@ interface MarketHandlerInterface
      */
     public function getKLineStatDaily(Market $market): array;
 
-    public function getExecutedOrder(Market $market, int $id, int $limit = 100): Order;
+    /**
+     * @param Market $market
+     * @return Market\Model\LineStat[]
+     */
+    public function getKLineStatByPeriod(Market $market, string $period): array;
 
-    public function getPendingOrder(Market $market, int $id): Order;
+    public function getExecutedOrder(Market $market, int $id, int $limit = 100): ?Order;
+
+    public function getPendingOrder(Market $market, int $id): ?Order;
 
     public function getBuyDepth(Market $market): string;
 
-    public function getSellOrdersSummary(Market $market): SellOrdersSummaryResult;
+    public function getSellOrdersSummary(Market $market, ?User $user = null): SellOrdersSummaryResult;
 
     public function getBuyOrdersSummary(Market $market): BuyOrdersSummaryResult;
 
     public function getSellOrdersSummaryByUser(User $user, Market $market): array;
+
+    public function getTokenSellOrdersSummary(Token $token, User $user): string;
 
     /**
      * @param Market $market
@@ -135,4 +158,29 @@ interface MarketHandlerInterface
     public function getMarketStatus(Market $market, int $period = 86400): array;
 
     public function soldOnMarket(Token $token): Money;
+
+    /**
+     * @param array $result
+     * @param array $markets
+     * @param bool $reverseBaseQuote
+     * @return Deal[]
+     */
+    public function parseDeals(
+        array $result,
+        array $markets,
+        bool $reverseBaseQuote = false,
+        bool $limitedResult = true
+    ): array;
+
+    /**
+     * @param array $result
+     * @param Market $market
+     * @param bool $limitedResult
+     * @return Deal[]
+     */
+    public function parseDealsSingleMarket(
+        array $result,
+        Market $market,
+        bool $limitedResult = true
+    ): array;
 }

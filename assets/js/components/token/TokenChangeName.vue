@@ -1,124 +1,88 @@
 <template>
     <div>
-        <div v-if="isTokenExchanged || !isTokenNotDeployed" id="error-message"
-             class="bg-danger text-white text-center py-2 mb-3">
-            {{ errorMessage }}
-        </div>
-        <div class="col-12 pb-3 px-0">
-            <div class="clearfix">
-                <label for="tokenName" class="float-left">
-                    {{ $t('token.change_name.edit_token') }}
-                </label>
-                <div class="float-right">
-                    <div
-                        v-if="tokenNameExists"
-                        class="alert alert-danger alert-float"
-                    >
-                        <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+        <div class="col-12 px-0">
+            <m-input
+                v-model="newName"
+                :label="$t('token.change_name.edit_token')"
+                :loading="tokenNameProcessing"
+                :disabled="!!errorMessage"
+                :hint="errorMessage"
+                input-tab-index="1"
+            >
+                <template v-slot:errors>
+                    <div v-if="!$v.newName.validChars">
+                        {{ $t('page.token_creation.error.contain') }}
+                    </div>
+                    <div v-if="isInvalidSpaceError">
+                        {{ $t('page.token_creation.error.space') }}
+                    </div>
+                    <div v-if="!$v.newName.minLength">
+                        {{ $t('page.token_creation.error.min') }}
+                    </div>
+                    <div v-if="!$v.newName.maxLength">
+                        {{ $t('page.token_creation.error.max') }}
+                    </div>
+                    <div v-if="!$v.newName.hasNotBlockedWords">
+                        {{ $t('page.token_creation.error.blocked') }}
+                    </div>
+                    <div v-if="tokenNameExists">
                         {{ $t('page.token_creation.error.taken') }}
                     </div>
-                </div>
-                <div class="float-right">
-                    <div
-                        v-if="tokenNameInBlacklist"
-                        class="alert alert-danger alert-float"
-                    >
-                        <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                    <div v-if="tokenNameInBlacklist">
                         {{ $t('page.token_creation.error.forbidden') }}
                     </div>
-                </div>
-            </div>
-            <input
-                id="tokenName"
-                type="text"
-                v-model="newName"
-                ref="tokenNameInput"
-                class="token-name-input form-control w-100 px-2"
-                :class="{ 'is-invalid': this.$v.$invalid }"
-            >
-            <div class="col-12 pt-2 px-0 clearfix">
-                <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
-                    {{ $t('page.token_creation.error.contain') }}
-                </div>
-                <div
-                    v-if="this.newName.length > 0
-                    &&(!this.$v.newName.validFirstChars
-                    || !this.$v.newName.validLastChars
-                    || !this.$v.newName.noSpaceBetweenDashes)"
-                    class="text-danger text-center small">
-                    {{ $t('page.token_creation.error.space') }}
-                </div>
-                <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
-                    {{ $t('page.token_creation.error.min') }}
-                </div>
-                <div v-if="!this.$v.newName.maxLength" class="text-danger text-center small">
-                    {{ $t('page.token_creation.error.max') }}
-                </div>
-                <div v-if="!this.$v.newName.hasNotBlockedWords" class="text-danger text-center small">
-                    {{ $t('page.token_creation.error.blocked') }}
-                </div>
-            </div>
+                    <div v-if="!$v.newName.noBadWords" v-text="newNameBadWordMessage"></div>
+                </template>
+            </m-input>
         </div>
-        <div class="col-12 pt-2 px-0 clearfix">
-            <button
-                class="btn btn-primary float-left"
-                :disabled="btnDisabled"
-                @click="editName"
-            >
-                {{ $t('save') }}
-            </button>
-        </div>
-        <two-factor-modal
-            :visible="showTwoFactorModal"
-            :twofa="twofa"
-            @verify="doEditName"
-            @close="closeTwoFactorModal"
-        />
     </div>
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
-import TwoFactorModal from '../modal/TwoFactorModal';
-import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {maxLength, minLength, required} from 'vuelidate/lib/validators';
 import {
-    tokenNameValidChars,
-    tokenValidFirstChars,
-    tokenValidLastChars,
-    tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
     HTTP_OK,
+    tokenNameValidChars,
+    tokenNoSpaceBetweenDashes,
+    tokenValidFirstChars,
+    tokenValidLastChars,
 } from '../../utils/constants';
-import {LoggerMixin, NotificationMixin} from '../../mixins';
-
-library.add(faExclamationCircle);
+import {MInput} from '../UI';
+import {
+    ClearInputMixin,
+    NoBadWordsMixin,
+    NotificationMixin,
+} from '../../mixins';
 
 export default {
     name: 'TokenChangeName',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [
+        NotificationMixin,
+        ClearInputMixin,
+        NoBadWordsMixin,
+    ],
     components: {
-        TwoFactorModal,
-        FontAwesomeIcon,
+        MInput,
     },
     props: {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
         currentName: String,
-        twofa: Boolean,
     },
     data() {
         return {
             minLength: 4,
             maxLength: 60,
             newName: this.currentName,
-            showTwoFactorModal: false,
             submitting: false,
             tokenNameExists: false,
             tokenNameProcessing: false,
             tokenNameTimeout: null,
             tokenNameInBlacklist: false,
+            isRequestingNameCheck: false,
+            loading: false,
+            newNameBadWordMessage: '',
         };
     },
     computed: {
@@ -128,7 +92,7 @@ export default {
                 || this.currentName === this.newName || this.tokenNameInBlacklist;
         },
         errorMessage: function() {
-            let message = '';
+            let message = null;
 
             if (!this.isTokenNotDeployed) {
                 message = this.$t('token.change_name.cant_be_changed');
@@ -138,16 +102,26 @@ export default {
 
             return message;
         },
+        isInvalidSpaceError: function() {
+            if (0 === this.newName.length) {
+                return false;
+            }
+
+            return !this.$v.newName.validFirstChars
+                || !this.$v.newName.validLastChars
+                || !this.$v.newName.noSpaceBetweenDashes;
+        },
     },
     watch: {
         newName: function() {
             clearTimeout(this.tokenNameTimeout);
-            if (this.newName.replace(/\s/g, '').length === 0) {
+            if (0 === this.newName.replace(/\s/g, '').length) {
                 this.newName = '';
             }
             this.tokenNameExists = false;
             this.tokenNameInBlacklist = false;
-            if (!this.$v.$invalid && this.newName) {
+            this.$emit('validation', true);
+            if (this.$v.$invalid && this.newName) {
                 this.tokenNameProcessing = true;
                 this.tokenNameTimeout = setTimeout(this.checkTokenExistence, 500);
             }
@@ -156,19 +130,22 @@ export default {
     methods: {
         checkTokenExistence: function() {
             new Promise((resolve, reject) => {
-                this.$axios.single.get(
-                    this.$routing.generate('token_name_blacklist_check',
-                        {name: this.newName}))
+                this.$axios.single.get(this.$routing.generate('token_name_blacklist_check', {name: this.newName}))
                     .then((response) => {
                         if (HTTP_OK === response.status) {
                             this.tokenNameInBlacklist = response.data.blacklisted;
                             if (!this.tokenNameInBlacklist) {
                                 this.$axios.single.get(
-                                    this.$routing.generate('check_token_name_exists',
+                                    this.$routing.generate('is_unique_token_name',
                                         {name: this.newName}))
                                     .then((response) => {
                                         if (HTTP_OK === response.status) {
                                             this.tokenNameExists = response.data.exists;
+
+                                            if (!this.tokenNameExists) {
+                                                this.$emit('name-change', this.newName);
+                                            }
+                                            this.$emit('validation', this.tokenNameExists);
                                         }
                                     }, () => {
                                         this.notifyError(this.$t('toasted.error.try_later'));
@@ -182,72 +159,6 @@ export default {
                         this.notifyError(this.$t('toasted.error.try_later'));
                     });
             });
-        },
-        closeTwoFactorModal: function() {
-            this.showTwoFactorModal = false;
-        },
-        closeModal: function() {
-            this.cancelEditingMode();
-        },
-        cancelEditingMode: function() {
-            if (!this.showTwoFactorModal) {
-                this.$v.$reset();
-                this.newName = this.currentName;
-            }
-        },
-        editName: function() {
-            this.$v.$touch();
-            if (this.currentName === this.newName ||
-                this.isTokenExchanged || !this.isTokenNotDeployed || !this.newName ||
-                !this.$v.newName.validFirstChars || !this.$v.newName.validLastChars ||
-                !this.$v.newName.noSpaceBetweenDashes || !this.$v.newName.validChars ||
-                !this.$v.newName.minLength || !this.$v.newName.maxLength) {
-                return;
-            }
-            if (this.twofa) {
-                this.showTwoFactorModal = true;
-            } else {
-                this.doEditName();
-            }
-        },
-        doEditName: function(code = '') {
-            if (this.submitting) {
-                return;
-            }
-
-            this.submitting = true;
-            this.$axios.single.patch(this.$routing.generate('token_update_name', {
-                name: this.currentName,
-            }), {
-                name: this.newName,
-                code: code,
-            })
-                .then((response) => {
-                    if (response.status === HTTP_OK) {
-                        this.notifySuccess(this.$t('token.change_name.changed_successfully'));
-
-                        this.showTwoFactorModal = false;
-                        this.closeModal();
-
-                        location.href = this.$routing.generate('token_show', {
-                            name: response.data['tokenName'],
-                        });
-                    }
-                }, (error) => {
-                    if (!error.response) {
-                        this.notifyError(this.$t('toasted.error.network'));
-                        this.sendLogs('error', 'Edit name network error', error);
-                    } else if (error.response.data.message) {
-                        this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not edit name', error);
-                    } else {
-                        this.notifyError(this.$t('toasted.error.try_later'));
-                        this.sendLogs('error', 'An error has occurred, please try again later', error);
-                    }
-                })
-                .then(() => {
-                    this.submitting = false;
-                });
         },
     },
     validations() {
@@ -264,8 +175,12 @@ export default {
                 validChars: tokenNameValidChars,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),
+                noBadWords: () => this.noBadWordsValidator('newName', 'newNameBadWordMessage'),
             },
         };
+    },
+    beforeMount() {
+        this.newName = this.currentName;
     },
 };
 </script>

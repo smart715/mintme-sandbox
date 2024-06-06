@@ -11,32 +11,29 @@ use Symfony\Component\Process\Process;
 
 class ServiceInfoBuilder implements ServiceInfoBuilderInterface
 {
-    private const SERVER_COMMAND = 'sudo^ssh^-t^-p^2279^mintme@10.81.143.1^'
-        .'lxc exec branch-%branch% -- bash -c \'git -C %path% rev-parse --abbrev-ref HEAD\'';
+    private const SERVER_COMMAND = 'sudo^ssh^-t^-p^2279^mintme@%url%^'
+        .'lxc exec branch-%branch% -- sh -c "su mintme-gateway -c \'git -C %path% branch --show-current\'"';
     private TokenManagerInterface $tokenManager;
     private ServiceInfo $serviceInfo;
     private RabbitMQCommunicatorInterface $rabbitCommunicator;
     private ContractHandlerInterface $contractHandler;
-    private string $depositWorkDir;
-    private string $withdrawWorkDir;
-    private string $contractWorkDir;
+    private string $serviceContainerIp;
+    private string $gatewayWorkDir;
     private bool $isTestingServer;
     private ?string $panelBranch;
     private LoggerInterface $logger;
 
     public function __construct(
-        string $depositWorkDir,
-        string $withdrawWorkDir,
-        string $contractWorkDir,
+        string $serviceContainerIp,
+        string $gatewayWorkDir,
         bool $isTestingServer,
         TokenManagerInterface $tokenManager,
         RabbitMQCommunicatorInterface $rabbitCommunicator,
         ContractHandlerInterface $contractHandler,
         LoggerInterface $logger
     ) {
-        $this->depositWorkDir = $depositWorkDir;
-        $this->withdrawWorkDir = $withdrawWorkDir;
-        $this->contractWorkDir = $contractWorkDir;
+        $this->serviceContainerIp = $serviceContainerIp;
+        $this->gatewayWorkDir = $gatewayWorkDir;
         $this->tokenManager = $tokenManager;
         $this->rabbitCommunicator = $rabbitCommunicator;
         $this->contractHandler = $contractHandler;
@@ -64,18 +61,8 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
 
         $this->serviceInfo
             ->setPanelBranch($this->panelBranch)
-            ->setDepositBranch($this->getGitBranch(
-                $this->depositWorkDir,
-                self::SERVER_COMMAND,
-                $this->isTestingServer
-            ))
-            ->setWithdrawBranch($this->getGitBranch(
-                $this->withdrawWorkDir,
-                null,
-                true
-            ))
-            ->setContractBranch($this->getGitBranch(
-                $this->contractWorkDir,
+            ->setGatewayBranch($this->getGitBranch(
+                $this->gatewayWorkDir,
                 self::SERVER_COMMAND,
                 $this->isTestingServer
             ));
@@ -97,7 +84,10 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
         bool $externalContainer = false
     ): ?string {
         if ($externalCommand && $externalContainer) {
-            $externalCommand = str_replace('%path%', $path, $externalCommand);
+            $search = ['%path%', '%url%'];
+            $replace = [$path, $this->serviceContainerIp];
+            $externalCommand = str_replace($search, $replace, $externalCommand);
+
             $externalCommand = $this->panelBranch
                 ? str_replace('%branch%', $this->panelBranch, $externalCommand)
                 : $externalCommand;
@@ -106,11 +96,11 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
             $process = new Process($command);
         } elseif ($externalContainer) {
             $process = new Process(
-                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                ['git', 'branch', '--show-current'],
                 str_replace('%branch%', $this->panelBranch, $path)
             );
         } else {
-            $process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], $path);
+            $process = new Process(['git', 'branch', '--show-current'], $path);
         }
 
         try {
@@ -127,6 +117,12 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
 
     public function addServicesStatus(): void
     {
-        $this->serviceInfo->setIsTokenContractActive($this->contractHandler->ping());
+        try {
+            $this->serviceInfo->setIsGatewayActive($this->contractHandler->ping());
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to ping for gateway status. Reason: '.$exception->getMessage());
+            
+            $this->serviceInfo->setIsGatewayActive(false);
+        }
     }
 }

@@ -13,7 +13,15 @@ set('repository', 'ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurren
 //prevent to clone submodules
 set('git_recursive', false);
 
-set('branch', 'master');
+set('branch', function() {
+    $branch = 'master';
+
+    if (input()->hasOption('branch') && !empty(input()->getOption('branch'))) {
+        $branch = input()->getOption('branch');
+    }
+
+    return $branch;
+});
 
 // [Optional] Allocate tty for git clone. Default value is false.
 //set('git_tty', true);
@@ -98,7 +106,7 @@ task('php-fpm-reload', function() {
 });
 
 task('db-backup', function() {
-     run('cd {{deploy_path}}/shared && /usr/bin/mysqldump -h `cat .env |grep DATABASE_URL|cut -d ":" -f 3 |cut -d "@" -f 2` -u`cat .env |grep DATABASE_URL|cut -d ":" -f 2|tr -d "/"` -p`cat .env |grep DATABASE_URL|cut -d ":" -f 3 |cut -d "@" -f 1` mintme_frontend > /home/mintme/backup/mintme-panel-database-`date +"%m_%d_%Y-%H_%M_%S"`.sql');
+     run('cd {{deploy_path}}/shared && /usr/bin/mysqldump -h `cat .env |grep DATABASE_URL|cut -d ":" -f 3 |cut -d "@" -f 2` -u`cat .env |grep DATABASE_URL|cut -d ":" -f 2|tr -d "/"` -p`cat .env |grep DATABASE_URL|cut -d ":" -f 3 |cut -d "@" -f 1` mintme_frontend --routines > /home/mintme/backup/mintme-panel-database-`date +"%m_%d_%Y-%H_%M_%S"`.sql');
 });
 
 task('change-version', function() {
@@ -114,7 +122,9 @@ task('restart-consumers', function() {
         sudo /bin/systemctl restart mintme-market-gateway-consumer;
         sudo /bin/systemctl restart mintme-token-contract-gateway-consumer;
         sudo /bin/systemctl restart mintme-token-contract-update-consumer;
-        sudo /bin/systemctl restart mintme-withdraw-gateway-consumer;');
+        sudo /bin/systemctl restart mintme-withdraw-gateway-consumer;
+        sudo /bin/systemctl restart mintme-email-consumer;'
+     );
 });
 
 task('check-mintme-user', function() {
@@ -129,7 +139,9 @@ task('maintenance-off', function() {
      run('rm -f {{deploy_path}}/current/maintenance_on && rm -f {{release_path}}/maintenance_on');
 });
 
-
+task('downgrade-db', function() {
+    run('./deployer_scripts/deployer-downgrade-db.sh {{branch}} {{deploy_path}}/current');
+});
 
 task('deploy', [
     'check-mintme-user',
@@ -137,6 +149,7 @@ task('deploy', [
     'deploy:lock',
     'deploy:release',
     'db-backup',
+    'downgrade-db',
     'deploy:update_code',
     'deploy:shared',
     'opcache-reset',

@@ -20,8 +20,8 @@ describe('ElasticText', () => {
             },
         });
 
-        expect(wrapper.find('a[href="bar"]').exists()).toBe(true);
-        expect(wrapper.find('a').text()).toBe('foo');
+        expect(wrapper.findComponent('a[href="bar"]').exists()).toBe(true);
+        expect(wrapper.findComponent('a').text()).toBe('foo');
     });
 
     it('updateTooltip works correctly', () => {
@@ -73,7 +73,7 @@ describe('ElasticText', () => {
                 },
             });
 
-            expect(wrapper.find('img').exists()).toBe(true);
+            expect(wrapper.findComponent('img').exists()).toBe(true);
         });
 
         it('shouldn\'t render it in case not exists', () => {
@@ -85,7 +85,7 @@ describe('ElasticText', () => {
                 },
             });
 
-            expect(wrapper.find('img').exists()).toBe(false);
+            expect(wrapper.findComponent('img').exists()).toBe(false);
         });
     });
 });

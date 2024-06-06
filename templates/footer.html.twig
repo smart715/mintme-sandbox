@@ -1,80 +1,203 @@
-<footer id="footer" class="container-fluid align-items-end">
-    <div class="row h-100 justify-content-center align-items-center text-white pt-3 pb-0 px-5">
-        <div class="col-md-12 text-center drops-switcher">
-            {% if global_translation_flags|length > 1 %}
-                <locale-switcher
-                    current-locale="{{ app.session.get('_locale') ?: app.request.attributes.get('_locale') }}"
-                    flags="{{ global_translation_flags | json_encode(constant('JSON_UNESCAPED_UNICODE')) }}"
-                ></locale-switcher>
-            {% endif %}
-            <currency-mode-switcher></currency-mode-switcher>
-        </div>
-        <div class="col-md-12 text-center">
-            <a href="{{ path('terms_of_service') }}">{% trans %}terms_of_service{% endtrans %}</a> | <a href="{{ path('privacy_policy') }}">{% trans %}privacy_policy{% endtrans %}</a> | <a href="{{ path('app.swagger_ui', {'area': 'v2'}) }}">API</a> | <a {% if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %} target="_blank" {% endif %} href="{{ path('press_kit') }}">Press Kit</a> | <a href="https://www.mintme.com/coin/">MintMe Coin</a> | <a href="https://www.mintme.com/web-wallet/">Web Wallet</a> | <a href="https://www.mintme.com/explorer" target="_blank">{% trans %}footer.explorer{% endtrans %}</a> | <a href="https://www.mintme.com/pool" target="_blank">{% trans %}footer.pool{% endtrans %}</a> <br/>
-            {{ version }} | {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
-            <span class="justify-content-center d-inline cookies-term"> <span class="separator">-</span> <font-awesome-icon icon="cookie-bite"></font-awesome-icon>{% trans %}footer.cookies{% endtrans %}</span>
-        </div>
-        <div class="col-md-12 mt-3 text-center social-media-icons">
-            <a
-                href="{{ twitter_footer_link }}"
-                rel="noopener"
-                aria-label="twitter"
-                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
-                target="_blank"
-            >
-                <img src="{{ asset('build/images/icon-twitter-45.png') }}" class="align-self-center text-center mb-3"
-                     alt="twitter logo"/>
-            </a>
-            <a
-                href="{{ reddit_footer_link }}"
-                rel="noopener"
-                aria-label="reddit"
-                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
-                target="_blank"
-            >
-                <img src="{{ asset('build/images/icon-reddit-45.png') }}" class="align-self-center text-center mb-3"
-                     alt="reddit logo"/>
-            </a>
-            <a
-                href="{{ discord_footer_link }}"
-                rel="noopener"
-                aria-label="discord"
-                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
-                target="_blank"
-            >
-                <img src="{{ asset('build/images/icon-discord-45.png') }}" class="align-self-center text-center mb-3"
-                     alt="discord icon"/>
-            </a>
-            <a
-                href="{{ telegram_chat_footer_link }}"
-                rel="noopener"
-                aria-label="telegram_group"
-                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
-                target="_blank"
-            >
-                <img src="{{ asset('build/images/icon-telegram-group-45.png') }}" class="align-self-center text-center mb-3"
-                     alt="telegram group"/>
-            </a>
-            <a
-                href="{{ telegram_public_footer_link }}"
-                rel="noopener"
-                aria-label="telegram_channel"
-                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
-                target="_blank"
-            >
-                <img src="{{ asset('build/images/icon-telegram-announcement-45.png') }}" class="align-self-center text-center mb-3"
-                     alt="telegram chat"/>
-            </a>
-            <a
-                href="{{ facebook_footer_link }}"
-                rel="noopener"
-                aria-label="facebook"
-                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
-                target="_blank"
-            >
-                <img src="{{ asset('build/images/icon-facebook-45.png') }}" class="align-self-center text-center mb-3"
-                     alt="facebook logo"/>
-            </a>
+{% set hideElements = false %}
+
+{% if app.request.attributes.get('_route') in [
+    'login',
+    'register',
+    'fos_user_resetting_send_email',
+    'fos_user_resetting_check_email',
+    'fos_user_resetting_reset',
+    'fos_user_registration_check_email',
+    '2fa_login'
+] %}
+    {% set hideElements = true %}
+{% endif %}
+<footer id="footer" class="container-fluid align-items-center">
+    <div class="row d-flex justify-content-center">
+        {% if not hideElements %}
+            <div class="row col-12">
+                <div class="col-12 logo-mintme text-center">
+                    <img src="{{ asset('build/images/logo.svg') }}" alt="mintme logo" />
+                </div>
+                <div class="col-6 col-seventh col-sm-4">
+                    <span class="font-weight-semibold">
+                        {% trans %}footer.company{% endtrans %}
+                    </span>
+                    <ul class="list-unstyled mt-2">
+                        <li class="mb-1">
+                            <a class="c-pointer" @click.prevent="goToPage({{ path('terms_of_service') | json_encode }}, '_blank')">
+                                {% trans from 'tos' %}terms_of_service{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="c-pointer" @click.prevent="goToPage({{ path('privacy_policy') | json_encode }}, '_blank')">
+                                {% trans from 'pp' %}privacy_policy{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-6 col-seventh col-sm-4">
+                    <span class="font-weight-semibold">
+                        {% trans %}footer.blockchain{% endtrans %}
+                    </span>
+                    <ul class="list-unstyled mt-2">
+                        <li class="mb-1">
+                            <a
+                                href="{{ global_explorer_urls.WEB }}"
+                                target="_blank"
+                            >
+                                {% trans %}footer.explorer{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="{{ mintme_pool_url }}"
+                                target="_blank"
+                            >
+                                {% trans %}footer.pool{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-6 col-seventh col-sm-4">
+                    <span class="font-weight-semibold">
+                        {% trans %}footer.resources{% endtrans %}
+                    </span>
+                    <ul class="list-unstyled mt-2">
+                        <li class="mb-1">
+                            <a href="{{ path('nelmio_api_doc.swagger_ui') }}">
+                                {% trans %}footer.api{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                {% if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %} target="_blank" {% endif %}
+                                href="{{ path('press_kit') }}"
+                            >
+                                {% trans %}footer.press_kit{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-6 col-seventh col-sm-4">
+                    <span class="font-weight-semibold">
+                        {% trans %}footer.our_product{% endtrans %}
+                    </span>
+                    <ul class="list-unstyled mt-2">
+                        <li class="mb-1">
+                            <a href="{{ url('homepage') }}coin">
+                                {% trans %}footer.mintme_coin{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ mintme_wallet_url }}">
+                                {% trans %}footer.web_wallet{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {{ render(path('footer_get_links')) }}
+                <div class="col-12 mt-4 text-center">
+                    <span class="font-weight-semibold">
+                        {% trans %} footer.follow_us {% endtrans %}
+                    </span>
+                    <div class="row align-items-center">
+                        <div class="col-12 ml-3">
+                            <ul class="d-flex justify-content-center list-unstyled row icon-socialmedia mt-2">
+                                <li class="mr-4">
+                                    <a
+                                        href="{{ twitter_footer_link }}"
+                                        class="p-0"
+                                        target="_blank"
+                                        rel="noopener"
+                                        aria-label="twitter"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'x-twitter']"></font-awesome-icon>
+                                    </a>
+                                </li>
+                                <li class="mr-4">
+                                    <a
+                                        href="{{ reddit_footer_link }}"
+                                        class="p-0"
+                                        target="_blank"
+                                        rel="noopener"
+                                        aria-label="reddit"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'reddit-alien']"></font-awesome-icon>
+                                    </a>
+                                </li>
+                                <li class="mr-4">
+                                    <a
+                                        href="{{ discord_footer_link }}"
+                                        class="p-0"
+                                        target="_blank"
+                                        rel="noopener"
+                                        aria-label="discord"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'discord']"></font-awesome-icon>
+                                    </a>
+                                </li>
+                                <li class="mr-4">
+                                    <a
+                                        href="{{ telegram_chat_footer_link }}"
+                                        class="p-0"
+                                        target="_blank"
+                                        rel="noopener"
+                                        aria-label="telegram_group"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'telegram-plane']"></font-awesome-icon>
+                                    </a>
+                                </li>
+                                <li class="mr-4">
+                                    <a
+                                        href="{{ telegram_public_footer_link }}"
+                                        class="p-0"
+                                        target="_blank"
+                                        rel="noopener"
+                                        aria-label="telegram_channel"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'telegram-plane']"></font-awesome-icon>
+                                    </a>
+                                </li>
+                                <li class="mr-4">
+                                    <a
+                                        href="{{ facebook_footer_link }}"
+                                        class="p-0"
+                                        target="_blank"
+                                        rel="noopener"
+                                        aria-label="facebook"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'facebook-f']"></font-awesome-icon>
+                                    </a>
+                                </li>
+                                <li class="mr-4">
+                                    <a
+                                        href="{{ instagram_footer_link }}"
+                                        class="p-0"
+                                        target="_blank"
+                                        rel="noopener"
+                                        aria-label="instagram"
+                                    >
+                                        <font-awesome-icon :icon="['fab', 'instagram']"></font-awesome-icon>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="border border-secondary mt-2 w-100">
+        {% endif %}
+        <div class="col-12 row">
+            <div class="col-12 text-center {{ hideElements ? '' : 'text-lg-left col-lg-10' }}">
+                <p class="copyright mb-0">
+                    <span>
+                        {{ version }} | {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
+                    </span>
+                    <span class="justify-content-center d-inline cookies-term">
+                        <span class="separator">-</span> {% trans %}footer.cookies{% endtrans %}
+                    </span>
+                </p>
+            </div>
         </div>
     </div>
 </footer>

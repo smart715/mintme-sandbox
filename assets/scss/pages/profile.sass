@@ -1,36 +1,230 @@
 @import "../variables"
 @import '../mixins'
-@import '../markitup.sass'
+
+body
+  background-image: url('../../img/profile-bg.webp')
+  background-position: center
 
 .profile-view
   .description
     @include media-breakpoint-up(md)
       border-left: .125rem solid $primary
 
-.edit-icon
-  position: absolute
-  top: 20px
-  right: 20px
-  z-index: 999
+.avatar-field
+  width: 152px
+  height: 152px
+  position: relative
+  top: -35px
+
+  img
+    background: $bg-avatar-primary
+
+.form-control-select
+  select
+    width: 100%
+
+  select:focus-visible
+    outline: none !important
+
+.edit-profile
+  color: $white
+  font-weight: 400
+  height: 5px
+  top: -35px
+  position: relative
+
+  .icon-reserve
+    width: 19px
+    display: inline-block
+    font-size: 17px
+
+  span
+    border-bottom: $white 1px solid
+
+  &:hover
+    a
+      color: $primary
+      transition: color 0.15s
+      &::selection
+        color: $primary
+        background-color: $bg-secondary
+
+    span
+      border-bottom: $primary 1px solid
+      transition: border-bottom .15s
+
+.bbcode-content
+  margin-top: 3.5rem
+
+.phone-verified-margin
+  margin-left: -1.5rem
+  margin-right: -1.5rem
 
 .phone-number
-  .input-phone-number
-    background-color: $input-focus !important
+  max-height: 42px
 
-  .country-selector .input-country-selector
-    background-color: $input-bg !important
+  .vue-tel-input
+    border: none !important
 
-  .country-selector__list
-    background-color: $input-bg !important
-    border-top: thin solid #ced4da
+    &:focus-within
+      box-shadow: none
 
-  .country-selector__input, .input-tel__input
+  .vti__input
+    background-color: transparent
+    color: $text-color-primary
+    width: 410px !important
+    border: none !important
+    border-left: 1px solid $bg-primary-light !important
+
+  .vti__dropdown
+    background-color: transparent !important
+    border: none !important
+
+  .vti__dropdown-item
+    white-space: nowrap !important
+    overflow: hidden !important
+    text-overflow: ellipsis
+
+    strong
+      font-weight: normal !important
+
+  .vti__selection
+    span
+      &:nth-child(3)
+        padding-left: 20px
+
+  .vti__country-code
+    color: $white !important
+
+  .vti__dropdown.open
+    background-color: $bg-primary !important
+
+  .vti__dropdown-list
+    background-color: $bg-primary !important
     border: none
+    border-radius: $border-radius
 
-  .country-selector__list__item
-    font-size: 16px !important
+    .vti__search_box
+      margin-top: 0.5rem
+      border-color: $primary
+      border-radius: $border-radius
 
-    .country-selector__list__item__calling-code
-      color: rgba(255, 255, 255, 0.54) !important
-      width: 49px !important
-      text-align: left !important
+  .vti__dropdown-item.highlighted
+    background-color: lighten($bg-primary, 5) !important
+    text-align: left !important
+
+.text-action
+  font-size: 14px
+  color: $text-color-primary !important
+  a:hover
+    color: $primary !important
+
+#profile
+  min-height: 300px
+  max-width: 570px
+  border-radius: $btn-border-radius
+  background: $bg-primary-dark
+
+  .profile-header
+    background: $primary
+    border-top-left-radius: $btn-border-radius
+    border-top-right-radius: $btn-border-radius
+    min-height: 50px
+
+    a
+      color: $black
+      padding-bottom: 1px
+
+      &:hover
+        border-bottom: $black 1px solid
+        padding-bottom: 0
+
+      .go-back-arrow
+        font-size: 1.3rem
+
+      span
+        font-size: 1rem
+        font-weight: 600
+
+  .profile-body
+    .user-data
+      @include font-scale(sl)
+
+      div
+        margin-bottom: 2px
+
+        label
+          color: $white
+          margin: 0
+          font-weight: 600
+
+        span
+          color: $primary
+          word-break: break-all
+          &::selection
+            color: $primary
+            background-color: $bg-secondary
+
+        .token-name
+          border-bottom: 1px solid $text-color-primary
+
+          &:hover
+            border-bottom: 1px solid $primary !important
+
+    .money-msg
+      background: $black
+      color: $white
+      font-size: $font-size-sm
+      line-height: 2rem
+
+    .user-token-table
+      padding: 0
+
+      .card
+        .card-header
+          @include font-scale(sl)
+          line-height: 2rem
+          font-weight: 600
+          color: $white
+          &::selection
+            background-color: $primary
+
+          span
+            color: $primary
+            &::selection
+              color: $primary
+              background-color: $bg-secondary
+
+        .card-body
+          tr
+            height: 36px
+
+          .reserve-space
+            width: 100%
+            height: 80px
+.text-red
+  color: $red
+
+.see-more-btn
+  border-radius: $btn-border-radius-extra
+  background-color: $bg-primary-dark
+  border: 1px solid $bg-primary-light
+  color: $text-color-primary
+
+.image-uploader
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  z-index: 100
+  width: 100%
+  height: 100%
+  opacity: 0
+  background-color: rgba(0,0,0,0.5)
+
+  &:hover
+    transition: opacity 1s ease
+    opacity: 1
+
+.avatar .image-uploader
+  border-radius: 100%

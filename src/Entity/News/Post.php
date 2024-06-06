@@ -5,6 +5,7 @@ namespace App\Entity\News;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Sonata\NewsBundle\Entity\BasePost;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\News\PostRepository")
@@ -15,6 +16,9 @@ use Sonata\NewsBundle\Entity\BasePost;
  */
 class Post extends BasePost
 {
+    public const RECOMMENDED_CACHE_KEY = 'post_news_recommended';
+    public const FOOTER_CACHE_KEY = 'footer_posts_and_tokens';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -25,6 +29,7 @@ class Post extends BasePost
      * @Serializer\SerializedName("id")
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
+     * @Groups({"API"})
      * @var int
      */
     protected $id;
@@ -67,76 +72,99 @@ class Post extends BasePost
     /**
      * @ORM\Column(type="string", nullable=true)
      */
+    protected ?string $deTitle;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
     protected ?string $esAbstract;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $arAbstract;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $frAbstract;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $plAbstract;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $ptAbstract;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $ruAbstract;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $uaAbstract;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $deAbstract;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $esContent;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $arContent;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $frContent;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $plContent;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $ptContent;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $ruContent;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected ?string $uaContent;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $deContent;
 
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @Groups({"API"})
+     */
+    public function getEnTitle(): string
+    {
+        return $this->title;
     }
 
     public function getArTitle(): string
@@ -219,6 +247,18 @@ class Post extends BasePost
     public function setUaTitle(?string $uaTitle): self
     {
         $this->uaTitle = $uaTitle;
+
+        return $this;
+    }
+
+    public function getDeTitle(): string
+    {
+        return $this->deTitle ?? '';
+    }
+
+    public function setDeTitle(?string $deTitle): self
+    {
+        $this->deTitle = $deTitle;
 
         return $this;
     }
@@ -307,6 +347,18 @@ class Post extends BasePost
         return $this;
     }
 
+    public function getDeAbstract(): string
+    {
+        return $this->deAbstract ?? '';
+    }
+
+    public function setDeAbstract(?string $deAbstract): self
+    {
+        $this->deAbstract = $deAbstract;
+
+        return $this;
+    }
+
     public function getArContent(): string
     {
         return $this->arContent ?? '';
@@ -387,6 +439,18 @@ class Post extends BasePost
     public function setUaContent(?string $uaContent): self
     {
         $this->uaContent = $uaContent;
+
+        return $this;
+    }
+
+    public function getDeContent(): string
+    {
+        return $this->deContent ?? '';
+    }
+
+    public function setDeContent(?string $deContent): self
+    {
+        $this->deContent = $deContent;
 
         return $this;
     }

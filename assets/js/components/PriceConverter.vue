@@ -1,36 +1,35 @@
 <template>
-    <div>
-        ({{ symbol }}{{ convertedAmount }})
+    <div v-if="requestingRates || rateLoaded">
+        <div v-if="requestingRates || !rateLoaded" class="spinner-border spinner-border-sm">
+            <span class="sr-only"> {{ $t('loading') }} </span>
+        </div>
+        <span v-else>
+            {{ convertedAmountWithSymbol }}
+        </span>
     </div>
 </template>
 <script>
 import {mapMutations, mapGetters} from 'vuex';
 import Decimal from 'decimal.js';
 import {toMoney} from '../utils';
-import debounce from 'lodash/debounce';
-import {LoggerMixin} from '../mixins';
+import {NotificationMixin} from '../mixins';
 
 export default {
     name: 'PriceConverter',
-    mixins: [
-        LoggerMixin,
-    ],
+    mixins: [NotificationMixin],
     props: {
         amount: [Number, String],
         from: String,
         to: String,
         subunit: Number,
         symbol: String,
-        delay: {
-            required: false,
-            type: Number,
-            default: 0,
-        },
-        convertedAmountProp: String,
+        isToken: Boolean,
+        hasParentheses: Boolean,
     },
     data() {
         return {
-            convertedAmount: this.convertedAmountProp,
+            markets: {},
+            tokenMaxPrice: '0',
         };
     },
     methods: {
@@ -38,12 +37,54 @@ export default {
             'setRates',
             'setRequesting',
         ]),
-        convert() {
-            let amount = !!parseFloat(this.amount) && this.rateLoaded
-                ? Decimal.mul(this.amount, this.rate)
-                : '0';
-            this.convertedAmount = toMoney(amount, this.subunit);
-            this.$emit('update:convertedAmountProp', this.convertedAmount);
+        getExchangeRates: async function() {
+            if (this.rateLoaded || this.requestingRates) {
+                return;
+            }
+
+            this.requestingRates = true;
+
+            try {
+                const response = await this.$axios.retry.get(this.$routing.generate('exchange_rates'));
+                this.setRates(response.data);
+                this.getMarketsStatus();
+            } catch (error) {
+                this.$logger.error('Can\'t load conversion rates', error);
+                this.notifyError(this.$t('toasted.error.external'));
+            } finally {
+                this.requestingRates = false;
+            }
+        },
+        getMarketsStatus: async function() {
+            if (!this.isToken) {
+                return;
+            }
+
+            try {
+                const response = await this.$axios.retry.get(this.$routing.generate(
+                    'markets_status',
+                    {quote: this.from}
+                ));
+                this.markets = response.data;
+                this.getTokenMaxPriceInUSD();
+            } catch (error) {
+                this.notifyError(this.$t('toasted.error.try_reload'));
+                this.$logger.error('Can not load market status', error);
+            }
+        },
+        getTokenMaxPriceInUSD: function() {
+            const tokenMaxPrice = Object.keys(this.markets).reduce(
+                (tokenMaxPrice, market) =>
+                    Decimal.max(
+                        tokenMaxPrice,
+                        Decimal.mul(
+                            this.markets[market].last,
+                            this.getRates[market].USD
+                        )
+                    ),
+                new Decimal(0)
+            );
+            this.tokenMaxPrice = tokenMaxPrice.toString();
         },
     },
     computed: {
@@ -51,8 +92,35 @@ export default {
             'getRequesting',
             'getRates',
         ]),
+        ...mapGetters('minOrder', {
+            minOrder: 'getMinOrder',
+        }),
+        ...mapGetters('market', {
+            market: 'getCurrentMarket',
+        }),
+        convertedAmount() {
+            let amount = '0';
+
+            if (!!parseFloat(this.amount) && this.rateLoaded) {
+                amount = this.convertAmountWithRate;
+            }
+
+            return toMoney(amount, this.subunit);
+        },
+        minOrderInCrypto() {
+            return Decimal
+                .div(this.minOrder, this.rate)
+                .toDP(this.baseSubunit, Decimal.ROUND_HALF_UP)
+                .toString();
+        },
+        convertAmountWithRate() {
+            return Decimal.mul(this.amount ?? '0', this.rate);
+        },
+        baseSubunit() {
+            return this.market.base.subunit;
+        },
         rate() {
-            return (this.getRates[this.from] || [])[this.to];
+            return !this.isToken ? this.getRates[this.from]?.[this.to] : this.tokenMaxPrice;
         },
         rateLoaded() {
             return this.rate !== undefined;
@@ -65,32 +133,14 @@ export default {
                 this.setRequesting(val);
             },
         },
-    },
-    created() {
-        this.convertAmount = !!this.delay ? debounce(this.convert, this.delay) : this.convert;
+        convertedAmountWithSymbol() {
+            return this.hasParentheses
+                ? `(${this.symbol}${this.convertedAmount})`
+                : `${this.symbol}${this.convertedAmount}`;
+        },
     },
     mounted() {
-        if (!this.rateLoaded && !this.requestingRates) {
-            this.requestingRates = true;
-            this.$axios.retry.get(this.$routing.generate('exchange_rates'))
-            .then((res) => {
-                this.setRates(res.data);
-            })
-            .catch((err) => {
-                this.sendLogs('error', 'Can\'t load conversion rates', err);
-            })
-            .finally(() => {
-                this.requestingRates = false;
-            });
-        }
-    },
-    watch: {
-        amount() {
-            this.convertAmount();
-        },
-        rate() {
-            this.convertAmount();
-        },
+        this.getExchangeRates();
     },
 };
 </script>

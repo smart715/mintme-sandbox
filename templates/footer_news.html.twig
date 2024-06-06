@@ -1,0 +1,28 @@
+<div class="col-6 check-tokens-column col-sm-4">
+    <span class="font-weight-semibold">
+        {% trans %}footer.check_tokens{% endtrans %}
+    </span>
+    <ul class="list-unstyled mt-2">
+        {% for token in tokens %}
+            <li class="mb-1 text-truncate">
+                <a href="{{ path('token_show_intro', { 'name': token.name }) }}">
+                    {{token.name}}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="col-6 news-column col-sm-4">
+    <span class="font-weight-semibold">
+        {% trans %}footer.read_about{% endtrans %}
+    </span>
+    <ul class="list-unstyled mt-2">
+        {% for post in postNews %}
+            <li class="mb-1 line-clamp-2">
+                <a href="{{ path('sonata_news_view', {'permalink': sonata_news_permalink(post) }) }}">
+                    {{ post|translateArticle('title') }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

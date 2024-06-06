@@ -39,7 +39,7 @@ class SlashCommandsHandler implements SlashCommandsHandlerInterface, ServiceSubs
         return [
             'type' => InteractionResponseType::CHANNEL_MESSAGE_WITH_SOURCE,
             'data' => [
-                'content' => 'unkown command',
+                'content' => 'unknown command',
             ],
         ];
     }

@@ -6,7 +6,7 @@ export default {
             let delayOrdersUpdating = false;
 
             if (orders.length < newOrders.length) {
-                let newOrder = newOrders.filter((order) => {
+                const newOrder = newOrders.filter((order) => {
                     return !orders.some((order2) => order.price === order2.price);
                 });
 
@@ -22,8 +22,8 @@ export default {
 
                 if (newOrder.length) {
                     newOrder = newOrder[0];
-                    let oldOrder = orders.find((order) => order.id === newOrder.id);
-                    let newAmount = new Decimal(newOrder.amount);
+                    const oldOrder = orders.find((order) => order.id === newOrder.id);
+                    const newAmount = new Decimal(newOrder.amount);
 
                     if (newAmount.greaterThanOrEqualTo(oldOrder.amount)) {
                         newOrder.highlightClass = 'success-highlight';
@@ -34,8 +34,8 @@ export default {
                 }
             }
 
-            if (orders.length > 0 && orders.length > newOrders.length) {
-                let removedOrder = orders.filter((order) => {
+            if (0 < orders.length && orders.length > newOrders.length) {
+                const removedOrder = orders.filter((order) => {
                     return !newOrders.some((order2) => order.price === order2.price);
                 });
 

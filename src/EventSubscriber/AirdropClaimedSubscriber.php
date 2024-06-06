@@ -9,27 +9,22 @@ use App\Mailer\MailerInterface;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\AirdropReferralCodeManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 class AirdropClaimedSubscriber implements EventSubscriberInterface
 {
-
     private MailerInterface $mailer;
     private AirdropReferralCodeManager $arcManager;
-    private SessionInterface $session;
     private AirdropCampaignManagerInterface $airdropCampaignManager;
 
     public function __construct(
         MailerInterface $mailer,
         AirdropReferralCodeManager $arcManager,
-        SessionInterface $session,
         AirdropCampaignManagerInterface $airdropCampaignManager
     ) {
         $this->mailer = $mailer;
         $this->arcManager = $arcManager;
-        $this->session = $session;
         $this->airdropCampaignManager = $airdropCampaignManager;
     }
 

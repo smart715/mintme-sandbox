@@ -38,6 +38,9 @@ function mockDiscordRoleEdit(props = {}, data = {}) {
         },
         propsData: {
             role: testRole,
+            roles: [testRole],
+            minRequiredBalance: 1,
+            maxRequiredBalance: 1000000,
             ...props,
         },
         data() {
@@ -50,36 +53,36 @@ function mockDiscordRoleEdit(props = {}, data = {}) {
 
 describe('Discord Role', () => {
     describe('test validations', () => {
-        it('requiredBalance is required', () => {
+        it('requiredBalance is required', async () => {
             const wrapper = mockDiscordRoleEdit();
 
-            wrapper.setProps({role: {...testRole, requiredBalance: '            '}});
+            await wrapper.setProps({role: {...testRole, requiredBalance: '            '}});
 
             expect(wrapper.vm.$v.$invalid).toBe(true);
 
             expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.requiredBalance.not_empty');
         });
 
-        it('requiredBalance should be decimal', () => {
+        it('requiredBalance should be decimal', async () => {
             const wrapper = mockDiscordRoleEdit();
 
-            wrapper.setProps({role: {...testRole, requiredBalance: 'foo'}});
+            await wrapper.setProps({role: {...testRole, requiredBalance: 'foo'}});
 
             expect(wrapper.vm.$v.$invalid).toBe(true);
 
-            expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.requiredBalance.decimal');
+            expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.requiredBalance.numeric');
         });
 
-        it('between validation', () => {
+        it('between validation', async () => {
             const wrapper = mockDiscordRoleEdit();
 
-            wrapper.setProps({role: {...testRole, requiredBalance: '0'}});
+            await wrapper.setProps({role: {...testRole, requiredBalance: '0'}});
 
             expect(wrapper.vm.$v.$invalid).toBe(true);
 
             expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.requiredBalance.between');
 
-            wrapper.setProps({requiredBalance: '1000001'});
+            await wrapper.setProps({requiredBalance: '1000000001'});
 
             expect(wrapper.vm.$v.$invalid).toBe(true);
 
@@ -101,12 +104,12 @@ describe('Discord Role', () => {
         expect(wrapper.emitted().update[1]).toEqual([testRole, 'name', 'foo']);
     });
 
-    it('updates valid when role prop changes', () => {
+    it('updates valid when role prop changes', async () => {
         const wrapper = mockDiscordRoleEdit();
 
-        let role = {...testRole, valid: false};
+        const role = {...testRole, valid: false};
 
-        wrapper.setProps({role});
+        await wrapper.setProps({role});
 
         expect(wrapper.emitted().update[1]).toEqual([role, 'valid', true]);
     });

@@ -1,185 +1,273 @@
 <template>
-    <div :id="post.id" class="post">
-        <button v-if="showEdit"
-                class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-                :disabled="deleteDisabled"
-                @click="showModal"
+    <div
+        v-if="post.token"
+        :id="post.id"
+        class="post mb-3 p-3"
+        :class="cardClass"
+        ref="post"
+    >
+        <div
+            class="d-flex c-pointer"
+            :class="[isSinglePost ? 'align-items-center' : 'align-items-start']"
+            ref="post-link"
+            @click.prevent="goToPost(post)"
         >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="trash"
-                transform="shrink-4 up-1.5"
-            />
-        </button>
-        <a v-if="showEdit"
-           class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
-           :href="$routing.generate('edit_post_page', {id: post.id})"
-        >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="edit"
-                transform="shrink-4 up-1.5"
-            />
-        </a>
-        <template v-if="post.title">
-            <h1 v-if="singlePage" class="post-title">
-                {{ post.title }}
-            </h1>
-            <h2 v-else-if="recentPost">
-                <a :href="singlePageUrl"
-                   class="text-decoration-none text-white"
-                   >{{ post.title }}
-                </a>
-                <b> {{ $t('by') }}</b>
-                <a :href="$routing.generate('token_show', {name: post.token.name})" class="text-white">
-                    <img :src="tokenAvatar"  class="rounded-circle d-inline-block" alt="avatar">
-                </a>
-                <small>{{ post.token.name }}</small>
-            </h2>
-            <a v-else :href="singlePageUrl"
-               class="text-decoration-none"
-               @click.prevent="$emit('go-to-post', post)"
+            <div
+                :class="avatarClass"
+                @click.stop.prevent="goToIntro(post)"
             >
-                <h2 class="post-title">
-                    {{ post.title }}
-                </h2>
-            </a>
-        </template>
-        <div>
-            <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
-                <img
-                    :src="post.author.image.avatar_small"
-                    class="rounded-circle d-inline-block"
-                    alt="avatar"
+                <img :src="tokenAvatar" class="avatar-img rounded-circle">
+            </div>
+            <div class="flex-fill">
+                <div class="font-weight-semibold font-size-2 d-flex justify-content-between align-items-center">
+                    <a class="link">{{ post.title }}</a>
+                    <div class="post-icons">
+                        <a
+                            v-if="showEdit"
+                            class="delete-icon mr-3"
+                            @click.stop="$emit('delete-post', post)"
+                        >
+                            <font-awesome-icon
+                                class="icon-default c-pointer align-middle"
+                                icon="trash"
+                            />
+                        </a>
+                        <a
+                            v-if="showEdit"
+                            class="post-edit-icon"
+                            @click.stop="$emit('edit-post', post)"
+                        >
+                            <font-awesome-icon
+                                class="icon-default c-pointer align-middle"
+                                icon="edit"
+                            />
+                        </a>
+                    </div>
+                </div>
+                <div
+                    class="font-italic text-subtitle c-pointer"
+                    ref="post-link"
+                    :class="{'font-size-12 mt-n1': isHomePage}"
+                    @click.prevent="goToPost(post)"
                 >
-                {{ post.author.nickname }}
-            </a>
-            <a :href="singlePageUrl" class="text-decoration-none post-date">
-                {{ date }}
-            </a>
-            <copy-link :content-to-copy="link" class="c-pointer ml-1">
-              <font-awesome-icon :icon="['far', 'copy']"/>
-            </copy-link>
+                    {{ date }}
+                </div>
+                <div v-if="!isSinglePost">
+                    <p v-if="post.content" class="post-content-short">
+                        <plain-text-view :text="postContent" />
+                    </p>
+                    <p v-else>
+                        {{ $t('post.logged_in.1') }}
+                        <span
+                            v-b-tooltip="modalTooltip"
+                            class="link c-pointer d-inline-block"
+                            @click.stop="goToTrade"
+                        >
+                            <span
+                                class="link highlight d-inline-block"
+                            >
+                                {{ post.amount | toMoney | formatMoney }}
+                            </span>
+                            <coin-avatar
+                                :image="tokenAvatar"
+                                :is-user-token="true"
+                            />
+                            <span
+                                class="link highlight d-inline-block"
+                            >
+                                {{ post.token.name | truncate(tokenTruncateLength) }}
+                            </span>
+                        </span>
+                        {{ $t('post.logged_in.2') }}
+                        <span
+                            class="link highlight c-pointer d-inline-block"
+                            @click.stop="goToTrade"
+                        >
+                            {{ $t('post.logged_in.trade') }}
+                        </span>
+                        {{ $t('post.logged_in.3') }}
+                    </p>
+                </div>
+            </div>
         </div>
-        <template>
-            <p v-if="post.content" class="post-content my-2">
-                <bbcode-view :value="post.content"/>
-            </p>
+        <div
+            v-if="!isSinglePost"
+            class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-3 ml-2"
+        >
+            <div class="d-flex align-items-center">
+                <div
+                    class="d-flex align-items-center mr-3 font-size-2 c-pointer"
+                    ref="post-link"
+                    @click.prevent="goToPost(post)"
+                >
+                    <font-awesome-icon
+                        :icon="['far', 'comment']"
+                        class="mr-2"
+                        transform="up-1.5"
+                    />
+                    {{ post.commentsCount }}
+                </div>
+                <post-likes
+                    :is-liked="isUserAlreadyLiked"
+                    :likes="postLikes"
+                    :is-logged-in="loggedIn"
+                    @like="toggleLike"
+                />
+            </div>
+            <div v-if="showSeeMoreButton" class="d-flex justify-content-center mx-auto">
+                <a
+                    class="btn btn-secondary-rounded"
+                    :href="singlePageUrl"
+                >
+                    {{ $t('see_more') }}
+                </a>
+            </div>
+            <div class="d-flex justify-content-end">
+                <a class="link" @click.stop="sharePost">
+                    <span v-if="isReward">
+                        {{ $t('post.share.reward', translationContext) }}
+                        <coin-avatar
+                            :is-user-token="true"
+                            :image="tokenAvatar"
+                        />
+                        {{ post.token.name | truncate(tokenTruncateLength) }}
+                    </span>
+                    <span v-else>
+                        {{ $t('post.share') }}
+                    </span>
+                </a>
+            </div>
+        </div>
+        <div v-if="isSinglePost" class="mt-4 text-subtitle">
+            <plain-text-view v-if="post.content" :text="postContent" />
             <p v-else>
-              {{ $t('post.logged_in.1') }} <a href="#" @click.prevent="$emit('go-to-trade', post.amount)">{{post.amount | toMoney | formatMoney}} {{post.token.name}}</a> {{ $t('post.logged_in.2') }}
+                {{ $t('post.logged_in.1') }}
+                <span
+                    v-b-tooltip="modalTooltip"
+                    class="link c-pointer d-inline-block"
+                    @click.stop="goToTrade"
+                >
+                    <span
+                        class="link highlight d-inline-block"
+                    >
+                        {{ post.amount | toMoney | formatMoney }}
+                    </span>
+                    <coin-avatar
+                        :image="tokenAvatar"
+                        :is-user-token="true"
+                    />
+                    <span
+                        class="link highlight d-inline-block"
+                    >
+                        {{ post.token.name | truncate(tokenTruncateLength) }}
+                    </span>
+                </span>
+                {{ $t('post.logged_in.2') }}
+                <span
+                    class="link highlight c-pointer d-inline-block"
+                    @click.stop="goToTrade"
+                >
+                    {{ $t('post.logged_in.trade') }}
+                </span>
+                {{ $t('post.logged_in.3') }}
             </p>
-        </template>
-        <a :href="singlePageUrl" class="hover-icon text-decoration-none text-white">
-            <font-awesome-icon
-                class="c-pointer align-middle"
-                icon="comment"
-                transform="grow-1.5"
-            />
-          <span class="social-link ml-1">{{ post.commentsCount }} {{ $t('post.comments') }}</span>
-        </a>
-        <a href="#" @click="sharePost">
-            {{ shareText }}
-        </a>
-        <p v-if="!post.content && singlePage" class="text-center">
-            {{ commentsRestriction }}
-        </p>
-        <confirm-modal
-            :visible="isModalVisible"
-            @confirm="deletePost"
-            @close="closeModal"
-        >
-            <p class="text-white modal-title pt-2">
-                {{ $t('post.delete') }}
-            </p>
-        </confirm-modal>
-        <confirm-modal
-            :visible="showLoginModal"
-            :show-image="false"
-            @confirm="goToLogin"
-            @cancel="goToSignup"
-            @close="showLoginModal = false"
-        >
-            <p class="text-white modal-title pt-2">
-                {{ $t('post.reward.not_logged_in', translationContext) }}
-            </p>
-            <template v-slot:confirm>{{ $t('log_in') }}</template>
-            <template v-slot:cancel>{{ $t('sign_up') }}</template>
-        </confirm-modal>
-        <confirm-modal
-            :visible="showTwitterSignInModal"
-            :show-image="false"
-            @confirm="sharePostNotSignedIn"
-            @cancel="showTwitterSignInModal = false"
-            @close="showTwitterSignInModal = false"
-        >
-            {{ $t('post.share.sign_in_twitter') }}
-            <template v-slot:confirm>{{ $t('twitter.sign_in') }}</template>
-        </confirm-modal>
-        <confirm-modal
-            :visible="showConfirmShareModal"
-            :show-image="false"
-            @confirm="doSharePost"
-            @cancel="showConfirmShareModal = false"
-            @close="showConfirmShareModal = false"
-        >
-            <p>
-                {{ $t('post.share.confirm_modal', translationContext) }}
-            </p>
-            <p>
-                "{{ shareMessage }}"
-            </p>
-            <template v-slot:confirm>{{ $t('post.share.accept') }}</template>
-        </confirm-modal>
-        <modal
-            :visible="showErrorModal"
-            @close="showErrorModal = false"
-        >
-            <template v-slot:body>
-                <p>{{ $t('post.share.not_enough_funds') }}</p>
-                <p v-if="discordOrTelegram">
-                    {{ $t('post.share.try_here') }}
-                    <a :href="discordOrTelegram">
-                        {{ discordOrTelegram }}
-                    </a>
-                </p>
-            </template>
-        </modal>
+        </div>
+        <div v-if="isSinglePost" class="d-flex justify-content-between align-items-center">
+            <single-post-status :is-logged-in="loggedIn" :is-single-post="isSinglePost" />
+            <a
+                v-if="!viewOnly"
+                href="#"
+                v-b-tooltip="modalTooltip"
+                @click.stop="sharePost"
+            >
+                <span v-if="isReward">
+                    {{ $t('post.share.reward', translationContext) }}
+                    <coin-avatar
+                        :is-user-token="true"
+                        :image="tokenAvatar"
+                    />
+                    {{ post.token.name | truncate(tokenTruncateLength) }}
+                </span>
+                <span v-else>
+                    {{ $t('post.share') }}
+                </span>
+                <guide v-if="hasReward && !isOwner" class="tooltip-center">
+                    <template slot="header">
+                        {{ $t('post.tooltip.share_post') }}
+                    </template>
+                </guide>
+            </a>
+        </div>
+        <post-actions
+            :subunit="post.token.subunit"
+            :token-name="post.token.name"
+            :logged-in="loggedIn"
+            :is-owner="isOwner"
+            :is-home-page="isHomePage"
+            ref="postActions"
+            @post-created="onCreatePostSuccess($event)"
+            @post-edited="onEditPostSuccess($event)"
+            @post-deleted="onDeletePostSuccess($event)"
+        />
     </div>
 </template>
 
 <script>
-import BbcodeView from '../bbcode/BbcodeView';
+
+import {VBTooltip} from 'bootstrap-vue';
 import moment from 'moment';
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit, faTrash, faComment} from '@fortawesome/free-solid-svg-icons';
-import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {MoneyFilterMixin, NotificationMixin, TwitterMixin, FiltersMixin} from '../../mixins';
-import ConfirmModal from '../modal/ConfirmModal';
-import Modal from '../modal/Modal';
-import CopyLink from '../CopyLink';
-import {formatMoney, openPopup, toMoney} from '../../utils';
+import {
+    MoneyFilterMixin,
+    NotificationMixin,
+    FiltersMixin,
+    StringMixin,
+} from '../../mixins';
+import {toMoney} from '../../utils';
 import {mapGetters} from 'vuex';
+import {
+    GENERAL,
+    TOKEN_NAME_TRUNCATE_LENGTH,
+    CONTENT_TRUNCATE_LENGTH,
+} from '../../utils/constants';
+import Guide from '../Guide';
+import PostLikes from './PostLikes';
+import PostActions from './PostActions';
+import SinglePostStatus from './SinglePostStatus';
+import PlainTextView from '../UI/PlainTextView';
+import CoinAvatar from '../CoinAvatar';
 
-library.add(faEdit, faTrash, faComment, faCopy);
+library.add(faEdit, faTrash);
+
+const maxAllowedHeight = 575;
 
 export default {
     name: 'Post',
     mixins: [
         MoneyFilterMixin,
         NotificationMixin,
-        TwitterMixin,
         FiltersMixin,
+        StringMixin,
     ],
     components: {
-        BbcodeView,
-        ConfirmModal,
+        Guide,
         FontAwesomeIcon,
-        CopyLink,
-        Modal,
+        PostLikes,
+        SinglePostStatus,
+        PlainTextView,
+        PostActions,
+        CoinAvatar,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
-        post: Object,
+        post: {
+            type: Object,
+            default: () => ({}),
+        },
         index: {
             type: Number,
             default: null,
@@ -189,154 +277,174 @@ export default {
             default: false,
         },
         loggedIn: Boolean,
-        singlePage: Boolean,
         recentPost: Boolean,
+        isSinglePost: Boolean,
+        isOwner: {
+            type: Boolean,
+            default: false,
+        },
+        viewOnly: Boolean,
+        redirect: Boolean,
+        isHomePage: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
-            deleteDisabled: false,
-            isModalVisible: false,
-            showLoginModal: false,
-            showTwitterSignInModal: false,
-            showConfirmShareModal: false,
-            showErrorModal: false,
+            postActionsRef: null,
+            showSeeMoreButton: false,
+            requesting: false,
+            tokenTruncateLength: TOKEN_NAME_TRUNCATE_LENGTH,
         };
     },
     computed: {
-        ...mapGetters('user', {loggedInUserId: 'getId'}),
+        ...mapGetters('user', {
+            loggedInUserId: 'getId',
+            userNickname: 'getNickname',
+        }),
+        ...mapGetters('posts', {
+            postRewardsCollectableDays: 'getPostRewardsCollectableDays',
+            isAuthorizedForReward: 'getIsAuthorizedForReward',
+        }),
         date() {
-            return moment(this.post.createdAt).format('H:mm, MMM D, YYYY');
-        },
-        link() {
-            return this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'}, true) + '#' + this.post.id;
+            return moment(this.post.createdAt).format(GENERAL.dateTimeFormat);
         },
         singlePageUrl() {
             return this.post.slug
-                ? this.$routing.generate('new_show_post', {name: this.post.token.name, slug: this.post.slug}, true)
+                ? this.$routing.generate(
+                    'token_show_post',
+                    {
+                        name: this.dashedString(this.post.token.name),
+                        slug: this.post.slug,
+                    },
+                    true)
                 : this.$routing.generate('show_post', {id: this.post.id}, true);
-        },
-        twitterMessageLink() {
-            return 'https://twitter.com/intent/tweet?text=' + decodeURI(this.shareMessage);
-        },
-        shareMessage() {
-            return this.$t('post.share.message', this.translationContext);
-        },
-        loginUrl() {
-            return this.$routing.generate('login', {}, true);
-        },
-        signupUrl() {
-            return this.$routing.generate('register', {}, true);
-        },
-        discordOrTelegram() {
-          return this.post.token.discordUrl || this.post.token.telegramUrl;
         },
         hasReward() {
             return 0 !== parseFloat(this.post.shareReward);
         },
+        isPostRewardOutdated() {
+            return -moment(this.post.createdAt).diff(moment(), 'days') >= this.postRewardsCollectableDays;
+        },
         reward() {
             return toMoney(this.post.shareReward);
         },
-        commentsRestriction() {
-          return this.$t('comment.min_amount', {token: this.post.token.name, amount: formatMoney(toMoney(this.post.amount))});
-        },
-        shareText() {
-            return this.hasReward && !this.post.isUserAlreadyRewarded
-                ? this.$t('post.share.reward', this.translationContext)
-                : this.$t('post.share');
+        isReward() {
+            return this.hasReward
+                && !this.post.isUserAlreadyRewarded
+                && !this.isPostRewardOutdated
+                && !this.isOwner;
         },
         translationContext() {
             return {
                 amount: this.reward,
-                tokenName: this.post.token.name,
+                tokenName: this.truncateFunc(this.post.token.name, TOKEN_NAME_TRUNCATE_LENGTH),
                 title: this.post.title,
                 url: this.singlePageUrl,
             };
         },
-        isOwner() {
-            return this.loggedInUserId === this.post.token.ownerId;
+        postContent() {
+            return this.isHomePage && this.post.content.length > CONTENT_TRUNCATE_LENGTH
+                ? this.truncateFunc(this.post.content, CONTENT_TRUNCATE_LENGTH)
+                : this.post.content;
         },
         tokenAvatar() {
-            return this.post.token.image
-                ? this.post.token.image.avatar_small
-                : require('../../../img/' + this.post.token.cryptoSymbol + '_avatar.png');
+            if (this.post.token.image) {
+                return this.isHomePage
+                    ? this.post.token.image.avatar_small
+                    : this.post.token.image.avatar_large;
+            }
+
+            return require('../../../img/' + this.post.token.cryptoSymbol + '_avatar.png');
         },
-        tokenLink() {
-            return this.$routing.generate('token_show', {name: this.post.token.name});
+        avatarClass() {
+            return this.isSinglePost ? 'mr-4 ml-2' : 'mr-4 ml-2 mt-2';
+        },
+        postLikes() {
+            return this.post.likes;
+        },
+        isUserAlreadyLiked() {
+            return this.post.isUserAlreadyLiked;
+        },
+        tokenTradeTabLink() {
+            return this.$routing.generate('token_show_trade', {name: this.post.token.name}, true);
+        },
+        shouldTruncateTokenName: function() {
+            return this.post.token.name.length > this.tokenTruncateLength;
+        },
+        modalTooltip: function() {
+            return this.shouldTruncateTokenName
+                ? {
+                    title: this.post.token.name,
+                    boundary: 'viewport',
+                    placement: 'bottom',
+                }
+                : null;
+        },
+        cardClass() {
+            return this.isHomePage ? 'feed' : 'card';
         },
     },
     methods: {
-        deletePost() {
-            this.deleteDisabled = true;
-            this.$axios.single.post(this.$routing.generate('delete_post', {id: this.post.id}))
-            .then((res) => {
-               this.$emit('delete-post', this.index, this.post.id);
-               this.notifySuccess(this.$t('post.deleted'));
-            })
-            .catch(() => {
-                this.notifyError(this.$t('post.error.deleted'));
-            })
-            .finally(() => {
-                this.deleteDisabled = false;
-            });
-        },
-        showModal() {
-            this.isModalVisible = true;
-        },
-        closeModal() {
-            this.isModalVisible = false;
-        },
         sharePost() {
-            if (!this.hasReward || this.post.isUserAlreadyRewarded || this.isOwner) {
-                openPopup(this.twitterMessageLink);
-                return;
-            }
-
+            this.postActionsRef.sharePost(this.post);
+            return false;
+        },
+        goToIntro(post) {
+            location.href = this.$routing.generate('token_show_intro', {name: post.token.name});
+        },
+        goToPost(post) {
+            this.$emit('go-to-post', post);
+        },
+        isMaxAllowedHeight() {
+            return maxAllowedHeight <= this.$refs.post.clientHeight;
+        },
+        setSeeMoreButton() {
+            setTimeout(() => {
+                this.showSeeMoreButton = this.isMaxAllowedHeight();
+            }, 0);
+        },
+        async toggleLike() {
             if (!this.loggedIn) {
-                this.showLoginModal = true;
+                location.href = this.$routing.generate('login', {}, true);
                 return;
             }
 
-            if (!this.isSignedInWithTwitter) {
-                this.showTwitterSignInModal = true;
+            if (this.requesting) {
                 return;
             }
 
-            this.showConfirmShareModal = true;
+            this.requesting = true;
+            try {
+                this.saveLike();
+                await this.$axios.single.post(this.$routing.generate('like_post', {id: this.post.id}));
+            } catch (err) {
+                this.saveLike();
+                this.notifyError(err.response?.data?.message || this.$t('post.like.toggle'));
+                this.$logger.error('error', 'Error during toggle like.', err);
+            } finally {
+                this.requesting = false;
+            }
         },
-        doSharePost() {
-            this.$axios.single.post(this.$routing.generate('share_post', {id: this.post.id}))
-                .then(
-                    () => {
-                        this.$emit('update-post', {
-                            ...this.post,
-                            isUserAlreadyRewarded: true,
-                        });
-                        this.notifySuccess(this.$t('post.share.success', this.translationContext));
-                    },
-                    ({response}) => {
-                        if ('invalid twitter token' === response.data.message) {
-                            this.isSignedInWithTwitter = false;
-                            this.showTwitterSignInModal = true;
-                            return;
-                        }
-
-                        if ('not enough funds' === response.data.message) {
-                            this.showErrorModal = true;
-                            return;
-                        }
-
-                        this.notifyError(this.$t('toasted.error.try_later'));
-                    }
-                );
+        saveLike() {
+            this.$emit('save-like', this.index);
         },
-        sharePostNotSignedIn() {
-            this.signInWithTwitter().then(this.sharePost, (err) => this.notifyError(err.message));
+        goToTrade() {
+            if (this.redirect) {
+                window.location.href = this.tokenTradeTabLink;
+            } else {
+                this.$emit('go-to-trade', this.post.amount);
+            }
         },
-        goToLogin() {
-            location.href = this.loginUrl;
-        },
-        goToSignup() {
-            location.href = this.signupUrl;
+    },
+    mounted() {
+        this.postActionsRef = this.$refs['postActions'];
+        this.setSeeMoreButton();
+    },
+    watch: {
+        post: function() {
+            this.setSeeMoreButton();
         },
     },
 };

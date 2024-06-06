@@ -7,7 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @codeCoverageIgnore
- * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
+ * @ORM\Entity()
+ * @ORM\Table(
+ *     name="airdrop_referral_code",
+ *     indexes={
+ *         @ORM\Index(name="FK_AirdropReferralCode_User", columns={"user_id"}),
+ *         @ORM\Index(name="FK_AirdropReferralCode_Airdrops", columns={"airdrop_id"})
+ *    },
+ * )
  */
 class AirdropReferralCode
 {
@@ -20,11 +27,13 @@ class AirdropReferralCode
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", cascade={"remove"})
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected User $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\AirdropCampaign\Airdrop", cascade={"remove"})
+     * @ORM\JoinColumn(name="airdrop_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected Airdrop $airdrop;
 

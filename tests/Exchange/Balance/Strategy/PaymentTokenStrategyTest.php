@@ -12,7 +12,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -34,7 +34,7 @@ class PaymentTokenStrategyTest extends TestCase
         );
     }
 
-    private function mockBalanceHandler(Invocation $invocation): BalanceHandlerInterface
+    private function mockBalanceHandler(InvokedCount $invocation): BalanceHandlerInterface
     {
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->expects($invocation)->method('deposit');

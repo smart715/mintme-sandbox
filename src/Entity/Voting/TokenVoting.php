@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @codeCoverageIgnore
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\TokenVotingRepository")
  */
 class TokenVoting extends Voting
 {
@@ -15,7 +15,7 @@ class TokenVoting extends Voting
      * @ORM\ManyToOne(
      *     targetEntity="App\Entity\Token\Token",
      *     inversedBy="votings",
-     *     cascade={"persist", "remove"}
+     *     cascade={"persist"}
      * )
      * @ORM\JoinColumn(name="token_id", referencedColumnName="id", onDelete="CASCADE")
      */

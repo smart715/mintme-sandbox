@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\DiscordRole;
-use App\Form\DataTransformer\ColorTransformer;
 use App\Form\DataTransformer\MoneyTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
@@ -11,18 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class DiscordRoleType extends AbstractType
 {
     private MoneyTransformer $moneyTransformer;
-    private ColorTransformer $colorTransformer;
 
-    public function __construct(
-        MoneyTransformer $moneyTransformer,
-        ColorTransformer $colorTransformer
-    ) {
+    public function __construct(MoneyTransformer $moneyTransformer)
+    {
         $this->moneyTransformer = $moneyTransformer;
-        $this->colorTransformer = $colorTransformer;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

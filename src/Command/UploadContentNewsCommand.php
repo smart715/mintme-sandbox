@@ -133,6 +133,7 @@ class UploadContentNewsCommand extends Command
 
     private function updatePost(array $newsCoin, array $jsonNewsMediaСontents, array $jsonMediaСontents): bool
     {
+        /** @var ?Post $post */
         $post = $this->getPostRepository()->findOneBy(['slug' =>$newsCoin['slug']]);
 
         if (!$post) {

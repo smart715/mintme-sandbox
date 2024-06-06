@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 
-
 {% block title %}{% trans %}page.index.title{% endtrans %}{% endblock %}
 
 {% block stylesheets %}
@@ -10,248 +9,542 @@
 
 {% block bgclass %}index-bg{% endblock %}
 
+{% set currentLocale = app.session.get('_locale') %}
+{% set loggedIn = app.user ? 'true' : 'false' %}
+{% set hash = app.user ? app.user.getHash() : '' %}
+
 {% block content %}
     <div id="home">
-        <section id="top-showcase">
-            <div class="container px-lg-5">
-                <div class="row">
-                    <div class="col-12 col-md-6 p-lg-0">
-                        <div class="text-center">
-                            {% spaceless %}
-                            <h1 class="title mt-5">
-                                {# <span><br class="d-sm-none">{% trans %}page.index.promo.main_2{% endtrans %} <br class="d-none d-sm-inline">{% trans %}page.index.promo.main_3{% endtrans %}</span> #}
-                                <span>{% trans %}page.index.promo.main_1{% endtrans %} <br class="d-sm-none">{% trans %}page.index.promo.main_2{% endtrans %} <br class="d-none d-sm-inline">{% trans %}page.index.promo.main_3{% endtrans %}</span>
-                                <span>
-                                    <span id="typed-strings">
-                                        <span><br class="d-sm-none">&nbsp;<wbr>{% trans %}page.index.promo.main.word_1{% endtrans %}</span>
-                                        <span class="d-none"><br class="d-sm-none">&nbsp;<wbr>{% trans %}page.index.promo.main.word_2{% endtrans %}</span>
-                                        <span class="d-none"><br class="d-sm-none">&nbsp;<wbr>{% trans %}page.index.promo.main.word_3{% endtrans %}</span>
-                                        <span class="d-none">{% trans %}page.index.promo.main.word_4{% endtrans %}</span>
-                                    </span>
-                                    <span id="typed"></span>
-                                </span>
-                            </h1>
-                            {% endspaceless %}
-                            <h2 class="subtitle mt-4 mt-sm-5">
-                                {% trans %}page.index.promo.description{% endtrans %}
-                            </h2>
-                        </div>
+        <balance-init
+            :is-token="false"
+            :is-owner="true"
+            :logged-in="{{ loggedIn }}"
+            :view-only="{{ viewOnly ? 'true' : 'false' }}"
+            websocket-url="{{ global_websocket_url }}"
+            hash="{{ hash }}"
+            :precision="{{ precision }}"
+            :market-prop="{{ market | json_encode }}"
+        ></balance-init>
+        <posts-init
+            :comment-tip-cost="{{ commentTipCost }}"
+            :comment-tip-min-amount="{{ commentTipMinAmount }}"
+            :comment-tip-max-amount="{{ commentTipMaxAmount }}"
+        ></posts-init>
+        <crypto-init :cryptos="{{ enabledCryptos|json_encode }}"></crypto-init>
+        <div class="mainpage-feed row justify-content-center">
+            <div class="row justify-content-center px-4">
+                <div class="col-12 col-md-3 xl-feed-column">
+                    <div v-cloak v-if="isXLScreen" class="row mt-3 justify-content-center mr-0 mt-2">
+                        <m-button type="primary-rounded" class="w-100 mt-2" @click="createToken">
+                            {% trans %} user_feed.create_token.button {% endtrans %}
+                        </m-button>
                     </div>
-                    <div class="col-12 col-md-6 col-lg-5 offset-lg-1 p-lg-0">
-                        <div class="d-none d-md-block">
-                            <img class="w-100" src="{{ asset('build/images/hero-image.webp') }}" alt="hero-image">
+                    <div class="row mt-3 justify-content-center mr-0 mt-2">
+                        <div class="card h-100 posts-container col-12">
+                            <div class="card-header d-flex justify-content-between text-white mt-3 px-0">
+                                <h2 class="header-highlighting">
+                                    {% trans %} user_feed.latest_activity {% endtrans %}
+                                </h2>
+                            </div>
+                            <div class="card-body p-0 trending-tags pb-4">
+                                <feed
+                                    v-if="isXLScreen"
+                                    class="px-3"
+                                    :items-prop="{{ activities | json_encode }}"
+                                    mercure-hub-url="{{ mercure_hub_url }}"
+                                    :min="9"
+                                    :max="20"
+                                ></feed>
+                                <div v-if="false" class="d-flex p-3 align-items-center justify-content-center">
+                                    <span class="spinner-border spinner-border-md">
+                                        <span class="sr-only"> {% trans %} loading {% endtrans %} </span>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="text-center">
-                            {% if not app.user %}
-                                <a class="homepage-action-button btn btn-ghost ghost-alt btn-lg text-uppercase text-bold mt-5" href="{{ path('fos_user_registration_register') }}">
-                                    {% trans %}page.index.promo.btn.register{% endtrans %}
-                                </a>
-                            {% else %}
-                                <a class="homepage-action-button btn btn-ghost ghost-alt btn-lg text-uppercase text-bold mt-5" href="{{ path('trading') }}">
-                                    {% trans %}page.index.promo.btn.trade{% endtrans %}
-                                </a>
-                            {% endif %}
+                <div class="col-12 col-md-8 col-xl-6 mr-0 px-0">
+                    <div class="mt-3 justify-content-center">
+                        <div v-cloak v-if="!hashtag && isSmallScreen" class="user-feed-tabs">
+                            <div
+                                class="tab"
+                                :class="{'active': 'all' === activeTab}"
+                                @click="changeTab('all')"
+                            >
+                                {% trans %} page.pair.recent_feed {% endtrans %}
+                            </div>
+                            <div
+                                v-if="isSmallScreen"
+                                class="tab"
+                                :class="{'active': 'tags' === activeTab}"
+                                @click="changeTab('tags')"
+                            >
+                                {% trans %} popular_tags.title {% endtrans %}
+                            </div>
+                            <div
+                                v-if="isSmallScreen"
+                                class="tab"
+                                :class="{'active': 'activity' === activeTab}"
+                                @click="changeTab('activity')"
+                            >
+                                {% trans %} user_feed.latest_activity {% endtrans %}
+                            </div>
+                            <div
+                                v-if="isSmallScreen"
+                                class="tab"
+                                :class="{'active': 'top-tokens' === activeTab}"
+                                @click="changeTab('top-tokens')"
+                            >
+                                <div class="row d-inline">
+                                    {% trans %} user_feed.top_tokens.title {% endtrans %}
+                                    <guide class="mb-2 ml-1">
+                                        <template slot="body">
+                                            {% trans %} user_feed.top_tokens.guide {% endtrans %}
+                                        </template>
+                                    </guide>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card posts-container pt-3 p-sm-3 pl-2">
+                            <div v-cloak v-if="hashtag" class="card-header d-flex justify-content-between text-white px-0">
+                                <h2 class="header-highlighting text-truncate">
+                                    <font-awesome-icon
+                                        icon="long-arrow-alt-left"
+                                        class="c-pointer"
+                                        @click="clearHashtag"
+                                    ></font-awesome-icon>
+                                    {% trans %} navbar.feed {% endtrans %} <span v-text="'#' + hashtag"></span>
+                                </h2>
+                            </div>
+                            <div
+                                v-cloak
+                                v-if="!isSmallScreen && 'all' === activeTab && !hashtag"
+                                class="card-header d-flex justify-content-between text-white px-0"
+                            >
+                                <h2 class="header-highlighting text-truncate">
+                                    {% trans %} page.pair.recent_feed {% endtrans %}
+                                </h2>
+                            </div>
+                            <div v-if="false" class="d-flex justify-content-center">
+                                <span class="spinner-border spinner-border-md">
+                                    <span class="sr-only"> {% trans %} loading {% endtrans %} </span>
+                                </span>
+                            </div>
+                            <div class="card-body posts position-relative p-0">
+                                <user-feed
+                                    v-if="'all' === activeTab"
+                                    :logged-in="{{ loggedIn }}"
+                                    :post-rewards-collectable-days="{{ postRewardsCollectableDays }}"
+                                    :is-authorized-for-reward="{{ isAuthorizedForReward ? 'true' : 'false' }}"
+                                    :view-only="{{ viewOnly ? 'true' : 'false' }}"
+                                    :comment-tip-cost="{{ commentTipCost }}"
+                                    :comment-tip-min-amount="{{ commentTipMinAmount }}"
+                                    :comment-tip-max-amount="{{ commentTipMaxAmount }}"
+                                    :hashtag="hashtag"
+                                    :is-all-tab="true"
+                                    :lazy-loading-disabled="true"
+                                    :first-page-posts-amount="3"
+                                    @update-post="updatePost($event)"
+                                ></user-feed>
+
+                                <feed-trending-tags
+                                    v-if="'tags' === activeTab"
+                                    :active-tag="hashtag"
+                                    @hashtag-change="onHashtagChange"
+                                    @hashtags-loaded="onHashtagsLoaded"
+                                ></feed-trending-tags>
+
+                                <top-tokens-list
+                                    v-if="'top-tokens' === activeTab"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    mercure-hub-url="{{ mercure_hub_url }}"
+                                    :amount-to-show="5"
+                                    :top-tokens="{{ topTokens | json_encode }}"
+                                ></top-tokens-list>
+
+                                <feed
+                                    v-if="'activity' === activeTab"
+                                    class="px-3"
+                                    :items-prop="{{ activities | json_encode }}"
+                                    mercure-hub-url="{{ mercure_hub_url }}"
+                                    :min="9"
+                                    :max="20"
+                                    is-feed-page
+                                ></feed>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-12 mt-5 p-lg-0 d-flex justify-content-center">
-                        {{ include("spinners/feed.html.twig") }}
-                        <feed
-                            :items-prop="{{ activities | json_encode }}"
-                            mercure-hub-url="{{ mercure_hub_url }}"
-                            :min="6"
-                            :max="30"
-                        ></feed>
+                </div>
+                <div v-if="!isSmallScreen" class="col-12 col-md-4 col-xl-3 pl-1 d-none d-md-block">
+                    <div v-cloak v-if="!isXLScreen" class="row mt-3 justify-content-center ml-0 ml-md-2">
+                        <m-button type="primary-rounded" class="w-100 mt-2" @click="createToken">
+                            {% trans %} user_feed.create_token.button {% endtrans %}
+                        </m-button>
+                    </div>
+                    <div class="row mt-3 justify-content-center ml-0 ml-md-2 lg-feed-column">
+                        <div class="card h-100 posts-container col-12 overflow-hidden">
+                            <div class="card-header d-flex justify-content-between text-white mt-3 px-0">
+                                <h2 class="header-highlighting">
+                                    {% trans %} user_feed.latest_activity {% endtrans %}
+                                </h2>
+                            </div>
+                            <div class="card-body p-0 trending-tags pb-4">
+                                <feed
+                                    v-if="!isXLScreen"
+                                    class="px-3"
+                                    :items-prop="{{ activities | json_encode }}"
+                                    mercure-hub-url="{{ mercure_hub_url }}"
+                                    :min="9"
+                                    :max="20"
+                                    is-feed-page
+                                ></feed>
+                                <div v-if="false" class="d-flex p-3 align-items-center justify-content-center">
+                                    <span class="spinner-border spinner-border-md">
+                                        <span class="sr-only"> {% trans %} loading {% endtrans %} </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center ml-0 ml-md-2 mb-3">
+                        <div class="card h-100 posts-container col-12 overflow-hidden mt-3">
+                            <div class="card-header d-flex justify-content-start align-items-center text-white mt-3 px-0">
+                                <h2 class="header-highlighting">
+                                    {% trans %} user_feed.top_tokens.title {% endtrans %}
+                                </h2>
+                                <guide class="mb-2 ml-1" placement="bottom-end">
+                                    <template slot="body">
+                                        {% trans %} user_feed.top_tokens.guide {% endtrans %}
+                                    </template>
+                                </guide>
+                            </div>
+                            <div class="card-body p-0 trending-tags pb-4">
+                                <top-tokens-list
+                                    websocket-url="{{ global_websocket_url }}"
+                                    mercure-hub-url="{{ mercure_hub_url }}"
+                                    :amount-to-show="5"
+                                    :top-tokens="{{ topTokens | json_encode }}"
+                                ></top-tokens-list>
+                                <div v-if="false" class="d-flex p-3 align-items-center justify-content-center">
+                                    <span class="spinner-border spinner-border-md">
+                                        <span class="sr-only"> {% trans %} loading {% endtrans %} </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        v-cloak
+                        v-if="showPopularHashtags && isXLScreen"
+                        class="row mt-3 mb-2 justify-content-center ml-0 ml-md-2"
+                    >
+                        <div class="card h-100 posts-container col-12 overflow-hidden">
+                            <div class="card-header d-flex justify-content-between text-white mt-3 px-0">
+                                <h2 class="header-highlighting">
+                                    {% trans %} popular_tags.title {% endtrans %}
+                                </h2>
+                            </div>
+                            <div class="card-body p-0 trending-tags pb-4">
+                                <feed-trending-tags
+                                    :active-tag="hashtag"
+                                    :amount-to-show="3"
+                                    :disable-show-more="true"
+                                    @hashtag-change="onHashtagChange"
+                                    @hashtags-loaded="onHashtagsLoaded"
+                                ></feed-trending-tags>
+                                <div v-if="false" class="d-flex p-3 align-items-center justify-content-center">
+                                    <span class="spinner-border spinner-border-md">
+                                        <span class="sr-only"> {% trans %} loading {% endtrans %} </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="header">
+            <div class="header-background background-img d-flex justify-content-center align-items-center">
+                <div class="row container-fluid">
+                    <div class="col-12 col-md-6 col-lg-6 d-flex align-items-center">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% spaceless %}
+                                <div class='title-header font-weight-bold'>
+                                    <h1 class="text-primary d-inline title-header font-weight-bold">
+                                        {% trans %} page.index.promo.main_1 {% endtrans %}
+                                    </h1>
+                                    <span class="text-title-secondary">
+                                        <br class="d-sm-none">
+                                        {% trans %} page.index.promo.main_2 {% endtrans %}
+                                        <br class="d-none d-sm-inline">
+                                        {% trans %} page.index.promo.main_3 {% endtrans %}{# -#}
+                                    </span>
+                                    <span class="text-title-secondary">
+                                        <br class="d-sm-none">&nbsp;<wbr>
+                                        <span id="typed-strings">
+                                            <span>
+                                                {% trans %} page.index.promo.main.word_1 {% endtrans %}
+                                            </span>
+                                            <span class="d-none">
+                                                {% trans %} page.index.promo.main.word_2 {% endtrans %}
+                                            </span>
+                                        </span>
+                                        <span id="typed"></span>
+                                    </span>
+                                </div>
+                                {% endspaceless %}
+                                <h2 class="subtitle-text-color text-paragraph pt-2 text-paragraph-header font-weight-normal">
+                                    {% trans %} page.index.promo.description {% endtrans %}
+                                </h2>
+                            </div>
+                            <div class="mt-3 col-md-12 button-align">
+                                <a
+                                    href="{{ app.user
+                                        ? path('token_create')
+                                        : path('fos_user_registration_register')
+                                    }}"
+                                    class="btn button-primary rounded-pill btn-lg font-weight-bold mr-md-3 button-margin"
+                                >
+                                    {% trans %} page.index.promo.btn.buy.token {% endtrans %}
+                                </a>
+                                <a
+                                    href="/coin/MINTME/BTC"
+                                    class="btn button-secondary rounded-pill btn-lg font-weight-normal button-margin"
+                                >
+                                    {% trans %} page.index.promo.btn.buy.mintme.coin {% endtrans %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 d-none d-md-block position-relative main-coin-md">
+                        <div>
+                            <img
+                                class="main-dots-img"
+                                src="{{ asset('build/images/main_dots.webp') }}"
+                                alt="main_dots"
+                                loading="lazy"
+                            />
+                        </div>
+                        <div class="top-0 start-0 d-flex align-items-center justify-content-center position-absolute">
+                            <img
+                                class="main-coin-img"
+                                src="{{ asset('build/images/main_coin.svg') }}"
+                                alt="main_coin"
+                                loading="lazy"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
         <section id="description">
-            <div class="container px-5">
-                <div class="row justify-content-center pt-md-3 pb-3">
-                    <div class="col">
-                        <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_1.header{% endtrans %}</h3>
+            <div class="description-background">
+                <div class="row pt-5 pb-5">
+                    <div class="col-md-12 col-12 col-lg-6 d-flex justify-content-center align-items-center">
+                        <img
+                            class="img-coin-description"
+                            src="{{ asset('build/images/me_coin_scheme_home-min.png') }}"
+                            alt="main-coin-processor"
+                        />
                     </div>
-                </div>
-
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <p class="text-white text-center pb-4">
-                            {% trans %}page.index.block_1.body{% endtrans %}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="feature-boxes container px-5">
-                <div class="row justify-content-center text-white text-center">
-                    <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
-                        <img class="img-fluid mb-3" src="{{ asset('build/images/home-creator-icon.svg') }}" alt="{% trans %}img.creator{% endtrans %}">
-                        <h4 class="mb-4">{% trans %}page.index.block_2.section_1.header{% endtrans %}</h4>
-                        <p>{% trans %}page.index.block_2.section_1.body{% endtrans %}</p>
-                    </div>
-                    <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
-                        <img class="img-fluid mb-3" src="{{ asset('build/images/home-trader-icon.svg') }}" alt="{% trans %}img.tok_trading{% endtrans %}">
-                        <h4 class="mb-4">{% trans %}page.index.block_2.section_2.header{% endtrans %}</h4>
-                        <p>{% trans %}page.index.block_2.section_2.body{% endtrans %}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container pb-3">
-                <div class="row justify-content-center pt-md-3">
-                    <div class="col">
-                        <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_3.header{% endtrans %}</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="feature-boxes container px-5">
-                <div class="row justify-content-center text-white">
-                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_01.svg') }}" alt="{% trans %}img.tok_easy_icon_1{% endtrans %}">
-                        <p>
-                            {% trans %}page.index.block_3.section_1{% endtrans %}
-                        </p>
-                    </div>
-                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_02.svg') }}" alt="{% trans %}img.tok_easy_icon_2{% endtrans %}">
-                        <p>
-                            {% trans %}page.index.block_3.section_2{% endtrans %}
-                        </p>
-                    </div>
-                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_03.svg') }}" alt="{% trans %}img.tok_easy_icon_3{% endtrans %}">
-                        <p>
-                            {% trans %}page.index.block_3.section_3{% endtrans %}
-                        </p>
-                    </div>
-                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_04.svg') }}" alt="{% trans %}img.tok_easy_icon_4{% endtrans %}">
-                        <p>
-                            {% trans %}page.index.block_3.section_4{% endtrans %}
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="container my-5">
-                <div class="text-center">
-                {% if not app.user %}
-                    <a href="{{ path('fos_user_registration_register') }}" class="btn btn-ghost btn-lg btn-big text-uppercase">
-                        {% trans %}page.index.block_4.btn.register{% endtrans %}
-                    </a>
-                {% else %}
-                    <a class="btn btn-ghost btn-lg btn-big text-uppercase" href="{{ path('trading') }}">
-                        {% trans %}page.index.block_4.btn.trade{% endtrans %}
-                    </a>
-                {% endif %}
-                </div>
-            </div>
-            <div class="container mb-3">
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <h3 class="text-uppercase text-white text-center mb-0 mt-4">{% trans %}page.index.block_5.header{% endtrans %}</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container px-5 text-white mb-4">
-                <div class="border container bg-secondary">
-                    <div class="row">
-                        <div class="col-lg-5 py-4 d-flex centered">
-                            <img src="{{ asset('build/images/mintme-coin-graphic.svg') }}" class="align-self-center mx-auto img-fluid img-reduced" alt="{% trans %}img.webchain_graph{% endtrans %}">
+                    <div class="col-md-12 col-12 col-lg-6 pb-4 text-description">
+                        <div class="row justify-content-center align-items-center h-100">
+                            <div class="col-auto text-paragraph-description">
+                                <h3 class="font-weight-bold color-section-title text-title">
+                                    {% trans %} page.index.block_1.header {% endtrans %}
+                                </h3>
+                                <p class="color-section-paragraph text-paragraph link-color">
+                                    {% trans %} page.index.block_1.body {% endtrans %}
+                                </p>
+                                {% if youtube_video_id %}
+                                    <main-page-video-btn video-id="{{ youtube_video_id }}"></main-page-video-btn>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="col-lg-7 pb-3 pt-lg-5 pb-lg-5 px-0 text-center">
-                            <a href="https://mintme.com/coin" target="_blank">
-                                <img src="{{ asset('build/images/mintme-coin-logo.svg') }}" class="img-fluid img-reduced px-xl-3 mb-4" alt="{% trans %}img.webchain{% endtrans %}">
-                            </a>
-                            <p class="px-4 px-lg-5">
-                                {% trans %}page.index.block_5.body{% endtrans %}
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-center mt-4 mb-4">
+                <div class="col-12 col-md-6 pr-0">
+                    <div class="article-padding-1 article-xs">
+                        <h4 class="mb-4 font-weight-bold text-title-article">
+                            {% trans %} page.index.article_1_1 {% endtrans %}
+                            <span class="text-primary">
+                                {% trans %} page.index.article_1_2 {% endtrans %}
+                            </span>
+                        </h4>
+                        <p class="text-paragraph-article subtitle-text-color">
+                            {% trans %} page.index.article_paragraph_1 {% endtrans %}
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="position-relative">
+                        <img
+                            class="w-100 h-auto"
+                            src="{{ asset('build/images/home_dots.webp') }}"
+                            alt="{% trans %} img.creator {% endtrans %}"
+                            loading="lazy"
+                        />
+                        <img
+                            class="img-laptop img-top w-100"
+                            src="{{ asset('build/images/main_content_creator_illustration.svg') }}"
+                            alt="{% trans %} img.creator {% endtrans %}"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-center mt-4 mb-4">
+                <div class="col-12 col-md-6 order-2 order-md-1">
+                    <img
+                        class="w-100 h-auto"
+                        src="{{ asset('build/images/main-statistics_composition.webp') }}"
+                        alt="{% trans %} img.tok_trading {% endtrans %}"
+                        loading="lazy"
+                    />
+                </div>
+                <div class="col-12 col-md-6 order-1 order-md-2">
+                    <div class="article-xs article-padding-2">
+                        <h4 class="mb-4 font-weight-bold text-title-article">
+                            {% trans %} page.index.article_2_1 {% endtrans %}
+                            <span class="text-primary">
+                                {% trans %} page.index.article_2_2 {% endtrans %}
+                            </span>
+                        </h4>
+                        <p class="text-paragraph-article subtitle-text-color">
+                            {% trans %} page.index.article_paragraph_2 {% endtrans %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5 align-items-center">
+                <div class="col-12 col-md-12 col-lg-7 container-box-items card-deck-width">
+                    <div class="mb-4 mt-5 article-xs justify-text card-deck-width">
+                        <h3 class="mb-0 ml-xl-0 ml-sm-0 text-bold text-title">
+                            {% trans %} page.index.block_3.header_1 {% endtrans %}
+                            <p class="text-primary">
+                                {% trans %} page.index.block_3.header_2 {% endtrans %}
+                            </p>
+                        </h3>
+                    </div>
+                    <div class="card-deck card-deck-width">
+                        <div class="card card-flex-text mb-4">
+                            <div class="d-flex justify-content-center mt-3">
+                                <img
+                                    class="card-img-top img-fluid card-icon-section"
+                                    src="{{ asset('build/images/home-page-icon_mint.svg') }}"
+                                    alt="{% trans %} img.tok_easy_icon_1 {% endtrans %}"
+                                    loading="lazy"
+                                />
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-center">
+                                    {% trans %} page.index.card.mint {% endtrans %}
+                                </h5>
+                                <p class="card-text text-center">
+                                    {% trans %} page.index.block_3.section_1 {% endtrans %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card card-flex-text mb-4">
+                            <div class="d-flex justify-content-center mt-3">
+                                <img
+                                    class="card-img-top img-fluid card-icon-section"
+                                    src="{{ asset('build/images/home-page-icon_earn.svg') }}"
+                                    alt="{% trans %} img.tok_easy_icon_2 {% endtrans %}"
+                                    loading="lazy"
+                                />
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-center">
+                                    {% trans %} page.index.card.earn {% endtrans %}
+                                </h5>
+                                <p class="card-text text-center">
+                                    {% trans %} page.index.block_3.section_2 {% endtrans %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="w-100 d-block"></div>
+                        <div class="card card-flex-text mb-4">
+                            <div class="d-flex justify-content-center mt-3">
+                                <img
+                                    class="card-img-top img-fluid card-icon-section"
+                                    src="{{ asset('build/images/home-page-icon_socialize.svg') }}"
+                                    alt="{% trans %} img.tok_easy_icon_3 {% endtrans %}"
+                                />
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-center">
+                                    {% trans %} page.index.card.socialize {% endtrans %}
+                                </h5>
+                                <p class="card-text text-center">
+                                    {% trans %} page.index.block_3.section_3 {% endtrans %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card card-flex-text mb-4">
+                            <div class="d-flex justify-content-center mt-3">
+                                <img
+                                    class="card-img-top img-fluid card-icon-section"
+                                    src="{{ asset('build/images/home-page-icon_referral.svg') }}"
+                                    alt="{% trans %} img.tok_easy_icon_4 {% endtrans %}"
+                                />
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-center">
+                                    {% trans %} page.index.card.referral {% endtrans %}
+                                </h5>
+                                <p class="card-text text-center">
+                                    {% trans %} page.index.block_3.section_4 {% endtrans %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-5 d-none d-sm-block d-md-none d-lg-block mt-4">
+                    <img
+                        class="w-70 float-right"
+                        src="{{ asset('build/images/main_waiting_illustration.webp') }}"
+                        alt="{% trans %} img.tok_trading {% endtrans %}"
+                        loading="lazy"
+                    />
+                </div>
+            </div>
+            <div class="mt-5 description-background">
+                <div class="row d-flex align-items-center justify-content-center m-0">
+                    <div class="col-12 col-md-6 pr-0 position-relative
+                        d-flex align-items-center justify-content-center description-height"
+                    >
+                        <img
+                            class="w-100 img-map"
+                            src="{{ asset('build/images/dots-map.webp') }}"
+                            alt="{% trans %} img.trading.map {% endtrans %}"
+                            loading="lazy"
+                        />
+                        <img
+                            class="w-75 img-top"
+                            src="{{ asset('build/images/mintMe_logo_dark.svg') }}"
+                            alt="{% trans %} img.trading.mintme_logo {% endtrans %}"
+                            loading="lazy"
+                        />
+                    </div>
+                    <div class="col-12 col-md-6 pl-0">
+                        <div class="paragraph-description-text description-height">
+                            <h2 class="color-title-description font-weight-semibold text-title">
+                                {% trans %} page.index.card.mintme_coin {% endtrans %}
+                            </h2>
+                            <p class="text-paragraph text-paragraph-color">
+                                {% trans %} page.index.block_5.body {% endtrans %}
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="container mb-3">
-                <div class="row justify-content-center pt-md-3">
-                    <div class="col">
-                        <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.faq.header{% endtrans %}</h3>
-                    </div>
-                </div>
-            </div>
-<style>
-    .homepage #description .faq .card .card-header {
-    background: #152d47;
-}
-</style>
-            <div class="container faq  px-5 text-white mb-5 pb-5">
-                <div class="border">
-                    <div class="row faq-block mx-0">
-                        <faq-item>
-                        <span slot="title">
-                            {% trans %}page.index.faq.q1.header{% endtrans %}
-                        </span>
-                        <span slot="body">
-                        {% trans %}page.index.faq.q1.body{% endtrans %}
-                        </span>
-                        </faq-item>
-                    </div>
-                    <div class="row faq-block mx-0">
-                        <faq-item>
-                        <span slot="title">
-                            {% trans %}page.index.faq.q2.header{% endtrans %}
-                        </span>
-                        <span slot="body">
-                        {% trans %}page.index.faq.q2.body{% endtrans %}
-                        </span>
-                        </faq-item>
-                    </div>
-                    <div class="row faq-block mx-0">
-                        <faq-item>
-                        <span slot="title">
-                            {% trans %}page.index.faq.q3.header{% endtrans %}
-                        </span>
-                            <span slot="body">
-                            {% trans %}page.index.faq.q3.body{% endtrans %}
-                        </span>
-                        </faq-item>
-                    </div>
-                    <div class="row faq-block mx-0">
-                        <faq-item>
-                        <span slot="title">
-                            {% trans %}page.index.faq.q4.header{% endtrans %}
-                        </span>
-                            <span slot="body">
-                            {% trans %}page.index.faq.q4.body{% endtrans %}
-                        </span>
-                        </faq-item>
-                    </div>
-                    <div class="row faq-block mx-0">
-                        <faq-item>
-                        <span slot="title">
-                            {% trans %}page.index.faq.q5.header{% endtrans %}
-                        </span>
-                            <span slot="body">
-                            {% trans %}page.index.faq.q5.body{% endtrans %}
-                        </span>
-                        </faq-item>
-                    </div>
-                    <div class="row faq-block mx-0">
-                        <faq-item>
-                        <span slot="title">
-                            {% trans %}page.index.faq.q6.header{% endtrans %}
-                        </span>
-                            <span slot="body">
-                            {% trans %}page.index.faq.q6.body{% endtrans %}
-                        </span>
-                        </faq-item>
-                    </div>
-                </div>
-            </div>
         </section>
+        <input id="hashtag_param" type="hidden" value="{{ hashtag }}" />
+        <input id="active_tab" type="hidden" value="{{ activeTab }}" />
     </div>
 {% endblock %}
 

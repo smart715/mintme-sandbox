@@ -4,6 +4,8 @@ namespace App\EventSubscriber;
 
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
+use App\Mercure\Authorization as MercureAuthorization;
+use RuntimeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,37 +18,49 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class KernelSubscriber implements EventSubscriberInterface
 {
-    /** @var ProfileManagerInterface */
-    private $profileManager;
-
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var CsrfTokenManagerInterface */
-    private $csrfTokenManager;
-
-    /** @var bool */
-    private $isAuth;
+    private ProfileManagerInterface $profileManager;
+    private TokenStorageInterface $tokenStorage;
+    private CsrfTokenManagerInterface $csrfTokenManager;
+    private bool $isAuth;
+    private MercureAuthorization $mercureAuthorization;
 
     public function __construct(
         bool $isAuth,
         ProfileManagerInterface $profileManager,
         TokenStorageInterface $tokenStorage,
-        CsrfTokenManagerInterface $csrfTokenManager
+        CsrfTokenManagerInterface $csrfTokenManager,
+        MercureAuthorization $mercureAuthorization
     ) {
         $this->isAuth = $isAuth;
         $this->profileManager = $profileManager;
         $this->tokenStorage = $tokenStorage;
         $this->csrfTokenManager = $csrfTokenManager;
+        $this->mercureAuthorization = $mercureAuthorization;
     }
 
     /** @codeCoverageIgnore */
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => 'onRequest',
-            KernelEvents::RESPONSE => 'onResponse',
+            KernelEvents::REQUEST => [
+                ['onRequest', 0],
+                ['handleRegisterFormContentOnlyRedirection', 100],
+            ],
+            KernelEvents::RESPONSE => [
+                ['onResponse', -1],
+                ['setMercureAuthorizationCookie', 1],
+            ],
         ];
+    }
+
+    public function handleRegisterFormContentOnlyRedirection(RequestEvent $event): void
+    {
+        $request = $event->getRequest();
+
+        if ($request->getSession()->get('registered_form_content_only')) {
+            $request->getSession()->remove('registered_form_content_only');
+            $event->setResponse(new Response('', Response::HTTP_NO_CONTENT));
+        }
     }
 
     /** @codeCoverageIgnore */
@@ -54,18 +68,45 @@ class KernelSubscriber implements EventSubscriberInterface
     {
         //todo: handle this protection through config/packages/nelmio_security.yaml
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
+
+        // todo: remove this part completely as soon as admin will support CSP
+        // https://redmine.abchosting.org/issues/8618
+        if (str_starts_with($event->getRequest()->getPathInfo(), '/admin-r8bn')
+            && $event->getResponse()->headers->has('Content-Security-Policy')
+        ) {
+            $csp = $event->getResponse()->headers->get('Content-Security-Policy');
+            $csp = preg_replace("/script-src [^;]*;/", "script-src 'self' 'unsafe-inline';", $csp);
+
+            $event->getResponse()->headers->set('Content-Security-Policy', $csp);
+        }
     }
 
-    public function onRequest(RequestEvent $request): void
+    public function setMercureAuthorizationCookie(ResponseEvent $event): void
     {
-        $csrf = $request->getRequest()->headers->get('X-CSRF-TOKEN', '');
+        $request = $event->getRequest();
+
+        if ($this->isMercureAuthorizationCookiePresent($request)) {
+            return;
+        }
+
+        try {
+            $this->mercureAuthorization->setCookie($request, 'public');
+        } catch (RuntimeException $e) {
+        } // in case cookie was already set in another event
+    }
+
+    public function onRequest(RequestEvent $event): void
+    {
+        $request = $event->getRequest();
+
+        $csrf = $request->headers->get('X-CSRF-TOKEN', '');
 
         if (!is_string($csrf) ||
-            ($request->getRequest()->isXmlHttpRequest() &&
-            $this->isApiRequest($request->getRequest()) &&
+            ($request->isXmlHttpRequest() &&
+            $this->isApiRequest($request) &&
             !$this->isCsrfTokenValid($csrf))
         ) {
-            $request->setResponse(new Response('Invalid token given.', Response::HTTP_UNAUTHORIZED));
+            $event->setResponse(new Response('Invalid token given.', Response::HTTP_UNAUTHORIZED));
 
             return;
         }
@@ -73,8 +114,8 @@ class KernelSubscriber implements EventSubscriberInterface
         /** @psalm-suppress UndefinedDocblockClass */
         if (is_object($this->tokenStorage->getToken()) &&
             is_object($this->tokenStorage->getToken()->getUser()) &&
-            !$request->getRequest()->isXmlHttpRequest() &&
-            !$this->isImgFilterRequest($request->getRequest())
+            !$request->isXmlHttpRequest() &&
+            !$this->isImgFilterRequest($request)
         ) {
             /**
              * @var User $user
@@ -103,5 +144,10 @@ class KernelSubscriber implements EventSubscriberInterface
     private function isImgFilterRequest(Request $request): bool
     {
         return 'liip_imagine_filter' === $request->attributes->get('_route');
+    }
+
+    private function isMercureAuthorizationCookiePresent(Request $request): bool
+    {
+        return null !== $request->cookies->get('mercureAuthorization');
     }
 }

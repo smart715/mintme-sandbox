@@ -1,0 +1,33 @@
+@import "../variables"
+@import '../mixins'
+
+.v-sidebar-menu
+  background-color: $bg-primary-dark !important
+  color: $text-color-secondary !important
+  z-index: $z-index-hacker-menu !important
+
+.collapse-btn
+  position: absolute
+  color: $text-color-secondary !important
+  background-color: $primary !important
+  bottom: 3.5% !important
+  @include media-breakpoint-down(xs)
+    bottom: 8% !important
+
+  &:after
+    font-family: $poppins-font !important
+    font-size: 10px !important
+    line-height: 4px !important
+    content: "Hack menu >>" !important
+
+.vsm-collapsed
+  width: 10px !important
+  background: none !important
+  & > *:not(button)
+    display: none !important
+
+  .collapse-btn
+    width: 43px !important
+
+.vsm-arrow:after
+  content: "↓" !important

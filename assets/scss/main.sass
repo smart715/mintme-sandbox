@@ -1,7 +1,7 @@
 @import 'variables'
 @import 'mixins'
 @import '~bootstrap/scss/bootstrap'
-@import url('https://fonts.googleapis.com/css?family=Lato')
+@import 'form-control'
 @import 'topnav'
 @import 'avatar'
 @import 'icons'
@@ -12,23 +12,19 @@
 
 html
   @include font-scale(sm)
-  min-height: 100vh
   box-sizing: border-box
-  overflow-y: scroll
   font-display: swap
-  overflow-x: hidden
 
 body
   @include font-scale(sm)
-  color: $dark-white
-  font-family: $lato-font
-  background: $black url("../img/sky_image.webp") no-repeat fixed
-  background-size: 100% 100%
+  color: $text-color-primary
+  font-family: $poppins-font
+  background: $bg-primary
   min-height: 100vh
   overflow-x: hidden
-
-  &.modal-open
-    padding-right: 0 !important
+  background-image: url('../img/bg-pattern.webp')
+  background-position: top right
+  background-repeat: no-repeat
 
   @include media-breakpoint-up(xs)
     content: "xs"
@@ -59,17 +55,66 @@ body
     &:after
       display: none
 
+// https://github.com/bootstrap-vue/bootstrap-vue/issues/6326
+.sr-only
+  left: 0
+
+th
+  .sorting-arrows
+    width: 0.65em
+    height: 1em
+    display: inline-block
+    background-position: center
+    background-repeat: no-repeat
+    background-size: 0.65em 1em
+    transform: translate(-3px, 1px)
+
+  &[aria-sort=none] .sorting-arrows
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' preserveAspectRatio='none'%3E%3Cpath fill='%23fff' opacity='.3' d='m51 1 25 23 24 22H1l25-22zm0 100 25-23 24-22H1l25 22z'/%3E%3C/svg%3E")
+  &[aria-sort=descending] .sorting-arrows
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' preserveAspectRatio='none'%3E%3Cpath fill='%23fff' opacity='.3' d='m51 1 25 23 24 22H1l25-22z'/%3E%3Cpath fill='%23fff' d='m51 101 25-23 24-22H1l25 22z'/%3E%3C/svg%3E")
+  &[aria-sort=ascending] .sorting-arrows
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' preserveAspectRatio='none'%3E%3Cpath fill='%23fff' d='m51 1 25 23 24 22H1l25-22z'/%3E%3Cpath fill='%23fff' opacity='.3' d='m51 101 25-23 24-22H1l25 22z'/%3E%3C/svg%3E")
+
+.sorting-arrows-th
+  background-image: none !important
+  box-sizing: content-box !important
+
 .show-hide-text
-  p
-    @include truncate(20, 20px, #fff)
+  div
+    @include truncate(10, 24px, #fff)
+
+.counter
+  width: 0
+  display: inline-block
+  svg
+    display: none
 
 .content-wrapper
   min-height: 100vh
-  background: $index-description-bg
-  width: 100% !important
+  margin: 0 auto
 
-.form-control
-  height: auto
+.main
+  width: 100%
+  max-width: $page-content-width
+  margin: 0 auto
+
+.text-primary
+  color: $primary
+  span::selection
+    color: $primary
+    background-color: $bg-secondary
+  div::selection
+    color: $primary
+    background-color: $bg-secondary
+
+.page-title
+  font-weight: 500
+  span
+    color: $primary
+    &::selection
+      color: $primary
+      background-color: $bg-secondary
 
 .tooltip-custom
   max-width: 200px
@@ -78,10 +123,13 @@ body
 .tooltip-inner
   white-space: pre-wrap !important
   width: auto
-  max-width: 100%
+  max-width: calc(min(500px, 100vw))
 
 .text-white:not(input):not(.bg-danger)
   color: $dark-white !important
+
+.text-subtitle
+  color: $subtitle-text-color
 
 .min-width-0
   min-width: 0
@@ -89,44 +137,66 @@ body
 .text-bold
   font-weight: 800
 
-.img-reduced
-  max-width: 70%
-  @include media-breakpoint-up(md)
-    max-width: 60%
-  @include media-breakpoint-up(lg)
-    max-width: 80%
+.link
+  cursor: pointer
+  &.highlight
+    color: $link-color-highlight !important
+    text-decoration: underline !important
 
-.index-bg
-  min-height: 100vh
-  margin-top: -4.5%
-  padding-top: 4.5%
-  background: url("../img/hero_image.png") no-repeat, linear-gradient(#102238 50%, transparent)
-  background-size: 100% auto
-  @include media-breakpoint-down(sm)
-    background: linear-gradient($secondary-dark 50%, transparent)
+    &::selection
+      color: $link-color-highlight
+      background-color: $bg-secondary
+    &:hover
+      color: $primary-highlight !important
 
-a
-  color: $color-link
+a, a:not([href]):not([tabindex]).link
+  color: $link-color
+
+  &.highlight
+    color: $link-color-highlight !important
+    text-decoration: none !important
+
+    &:hover
+      color: $text-color-secondary-dark !important
+
+    &::selection
+      background-color: $bg-secondary
+
+  &.active
+    color: $link-color-active
+
+    &::selection
+      color: $link-color-active
+      background-color: $bg-secondary
+
+  &.disabled
+    pointer-events: none
 
   &.link-light
     color: $dark-white
 
   &:hover
-    color: $color-link-hover
+    color: $link-color-hover
+    &::selection
+      color: $link-color-hover
+      background-color: $bg-secondary
 
   @media (hover: none)
     &:hover
-      color: $color-link
+      color: $link-color
       text-decoration: none
 
     &:focus
-      color: $color-link
+      color: $link-color
       text-decoration: none
 
-    &:active
-      color: $color-link-hover
+    &:active, &.active
+      color: $link-color-hover
       transition: color 0s
       text-decoration: underline
+      &::selection
+        color: $link-color-hover
+        background-color: $bg-secondary
 
 .btn-cancel
   display: inline-block
@@ -137,12 +207,14 @@ a
   border-width: 1px
   border-style: solid
   border-color: transparent
-  color: $color-link
+  color: $link-color
+
+  &:focus
+    @include focus-light-outline
 
   &:hover
-    color: $color-link-hover
+    color: $text-color-primary-dark
     text-decoration: underline
-
 
 .btn-disabled
   &, &:hover
@@ -163,47 +235,98 @@ a
   &.alert-primary, &.alert-info
     border-color: $toast-info-bg
     background-color: $toast-info-bg
-    color: $toast-info-text
+    color: $text-color-secondary-dark
 
   &.alert-warning
     border-color: $toast-warning-bg
     background-color: $toast-warning-bg
     color: $toast-warning-text
 
-  font-size: 20px
-  padding: 6px 15px
-  border-radius: 2px
+    font-size: 20px
+    padding: 6px 15px
+    border-radius: 2px
 
 .alert, .toast
   i
     margin-right: 15px
 
-.faq-block
-  &.light-border
-    border-top: none !important
-    border-bottom: 1px solid $secondary !important
+.token-created-modal-dialog
+  max-width: 850px !important
 
-    &:last-child
-      border: none !important
+  &a
+    color: $primary
 
-  &.no-decoration a
-      text-decoration: none
-      white-space: normal
+    &:hover
+      color: $primary-highlight
 
-  a:hover
-    color: white
+  .navigation-btn
+    &:hover
+      color: $primary !important
 
-  a:focus
-    color: white
-    border-style: dotted
-    border-width: 1px
-    border-color: $color-link
+    @media (max-width: map-get($container-max-widths, "sm"))
+      font-size: 14px
+
+.facebook-icon
+  margin-left: 2px !important
+
+.token-facebook-address, .token-youtube-address
+  padding-left: 35px
+
+.plain-text-content
+  a
+    color: $primary !important
+
+    &::-moz-selection
+      background: $bg-secondary
+
+    &::selection
+      background: $bg-secondary
+
+    &:hover, &:focus
+      color: $primary-highlight !important
+
+  img
+    max-width: 100%
+
+.pagination
+  .page-item
+    .page-link
+      padding: .75rem 1rem
+      color: $link-color
+      line-height: 13px
+      background-color: $bg-primary-dark
+
+      &:focus
+        box-shadow: 0 0 0 0.15rem transparentize($bg-secondary, 0.8)
+      &:hover
+        background-color: $bg-secondary-dark
+
+    &.active
+      a
+        cursor: default !important
+        pointer-events: none !important
+      .page-link
+        background-color: $primary
+        font-weight: 600
 
 .visible-hidden
   visibility: hidden
 
 .c-pointer
   cursor: pointer
+
+.c-default
+  cursor: default
+
+.c-text
+  cursor: text
+
+.tooltip-center
+  svg
+    margin-top: -2px
+.tooltip-title-center
+  svg
+    margin-top: -4px
 
 .tippy-tooltip
   padding: .3px
@@ -216,12 +339,14 @@ a
   p
     margin: 0
 
-.blue-question
-  background: $color-tooltip
+.guide-icon
+  background: $primary
   padding: .125rem
   font-size: .875em
   text-align: center
   vertical-align: middle
+  path
+    color: $text-color-secondary
 
   &.square
     width: 1em
@@ -239,39 +364,80 @@ a
     from
       background-color: $toast-error-bg
 
+.header-highlighting
+  color: $text-color-primary
+  & > span
+    color: $primary
+    &::selection
+      color: $primary
+      background-color: $bg-secondary
+
+.form-control
+  background-color: transparent
+
+.form-control-btn.is-invalid
+  background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
+
+.verify-code-wrp
+  input
+    height: 48px !important
+    width: 48px
+    font-size: 1.5rem
+    font-weight: 600
+    border-radius: 4px
+    @include media-breakpoint-down(xs)
+      height: 40px
+      width: 40px
+      font-size: 1rem
+    &:focus, &.filled
+      border: 1px solid $input-focus-border-color !important
+
+.input-password .form-control-field
+  input
+    padding-right: 2rem !important
+
+.input-password-settings .form-control-field
+  input
+    padding-right: 2.6rem !important
+
 .card, .modal, .box
   label
     margin: 0
     padding-bottom: .3em
 
+    .agree-label
+      color: $text-color-primary
+
   .form-group
     margin-bottom: .5rem
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
-    background-color: $card-input-color !important
-    color: $white !important
-    border-radius: 0
+    background-color: transparent
+    border: 1px solid $primary
     height: calc(2.0rem + 2px)
+    color: $text-color-primary
     transition: all .3s ease
 
   input:not([type=button]):not([type=submit]):not([type=reset])
     &:focus, &:valid
-      background-color: $input-focus !important
       box-shadow: none !important
 
   input:not([type=button]):not([type=submit]):not([type=reset]):-webkit-autofill
-    -webkit-box-shadow: 0 0 0 30px $card-input-color inset !important
+    -webkit-box-shadow: 0 0 0 30px $bg-primary-light inset !important
     -webkit-text-fill-color: $white !important
 
     &:hover, &:focus, &:active, &:valid
-      -webkit-box-shadow: 0 0 0 30px $input-focus inset !important
+      -webkit-box-shadow: 0 0 0 30px $bg-primary-light inset !important
       -webkit-text-fill-color: $white !important
+
+  .agree-check-input
+    height: 16px !important
 
   textarea
     height: auto
-    border: none
     cursor: url('../img/input-cursor.png'), auto
     -webkit-text-fill-color: white
+    max-height: $textarea-max-height
 
   .custom-select, .form-control
     border: none
@@ -279,24 +445,107 @@ a
   .custom-select:focus
     color: $white
 
+.page-header
+  font-size: $page-header-font-size
+  font-weight: bold
+
+  span
+    color: $primary
+    &::selection
+      color: $primary
+      background-color: $bg-secondary
+
+.table-header
+  font-size: $table-header-font-size
+
+  span
+    color: $primary
+    &::selection
+      color: $primary
+      background-color: $bg-secondary
+
+.card-title
+  text-transform: uppercase
+  span
+    color: $primary
+    &::selection
+      background-color: $bg-secondary
+
+.text-primary-darker
+  color: $text-color-primary-darker
+
+  &::selection, span::selection
+    color: $text-color-primary
+
 .card
-  background: none
   position: relative
-  color: $card-text-color
-  border: none
-  border-radius: 0
+
+  &.card-yellow
+    background: $primary-dark !important
+    border: 1px solid $primary
+
+  &.youtube-channel
+    border: 1px solid $primary
+    max-width: 375px
+
+    .channel-link
+      color: $subtitle-text-color !important
+
+      p
+        font-size: $small-font-size
+        margin-bottom: 0
+
+      &:hover
+        color: $primary-highlight
+
+    .channel-thumbnail
+      width: 70px
+      height: 70px
+
+  &:not(.card-yellow)
+    .card-body p
+      a
+        color: $link-color-highlight
+        &:hover
+          color: $link-color-highlight-hover
+        &::selection
+          background-color: $bg-secondary
+
+  .card-title
+    text-transform: uppercase
+    span
+      color: $primary
+      &::selection
+        background-color: $bg-secondary
 
   .card-header
-    border: none
-    background: $card-header-bg
-    color: $dark-white
     padding: .2rem 1.25rem
+    &::selection
+      color: $bg-secondary
+      background-color: $primary
+    & > span
+      color: $primary
+      &::selection
+        color: $primary
+        background-color: $bg-secondary
+    &.card-big-header
+      font-size: $font-size-ml
+      font-weight: 600
+    &.card-highlight-header
+      color: $text-color-primary
+
+      span
+        color: $primary
 
     &[role=tab]
-      background: $secondary-dark
-
+      background: $bg-primary
 
     @include font-scale(md)
+
+    div
+      .m-0::selection
+        color: $primary
+        background-color: $bg-secondary
 
     .card-header-description
       font-size: .7em
@@ -305,9 +554,6 @@ a
       float: right
       color: $dark-white
 
-  .card-body
-    background: $card-body-bg
-
   &.transparent
     background-color: transparent
 
@@ -315,37 +561,161 @@ a
       background-color: $dark-white
       color: inherit
 
+  .card-text
+    color: $subtitle-text-color
+
+    &::selection
+      color: $text-color-dark-primary
+
+.card-icon-section
+  width: $card-icon-less-lg
+  height: $card-icon-less-lg
+  @include media-breakpoint-up(lg)
+    width: $card-icon-lg
+    height: $card-icon-lg
+
+.card-deck-width
+  width: auto
+  @include media-breakpoint-up(lg)
+    width: max-content
+
+.card-flex-text
+  flex: 1 0 0 !important
+  @include media-breakpoint-up(lg)
+    flex: 0 0 280px !important
+
+.modal-content
+  background: $bg-primary-dark
+
+  .modal-header
+    background-color: $primary
+    color: $text-color-secondary
+    padding: 0
+    min-height: 33px
+    align-items: center
+    font-size: 1.85rem
+    font-weight: bold
+
+    .highlight
+      span
+        color: $text-color-primary
+
+    & > div
+      width: 100%
+
+    .modal-close
+      padding-bottom: 1px
+      @include font-scale(lg)
+      color: $text-color-secondary
+      text-decoration: none
+
+  .modal-title
+    padding-top: 0 !important
+    @include font-scale(md)
+
+.custom-control-label:before
+  background-color: transparent
+  border: 1px solid $checkbox-border-color
+
+.custom-checkbox .custom-control-label
+  &:before, &:after
+    top: 50% !important
+    transform: translateY(-70%) !important
+    transition: none !important
+    border-radius: 3px !important
+    height: 1.15rem
+    width: 1.15rem
+
+  &:focus
+    outline: none !important
+
+.custom-control-input:focus~.custom-control-label:before
+  box-shadow: none !important
+  border-color: $primary
+
+.input-focusable:focus~.custom-control-label:before
+  box-shadow: none !important
+  border-color: $primary !important
+
+.custom-control-input:focus:not(:checked)~.custom-control-label:before
+  border-color: $checkbox-border-color
+
+.custom-control-input:not(:disabled):active~.custom-control-label:before
+  background-color: transparent
+  border-color: $white
+
+.custom-checkbox .custom-control-input:checked~.custom-control-label:after
+  background-size: 80%
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='iso-8859-1'%3F%3E%3Csvg version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 17.837 17.837' style='enable-background:new 0 0 17.837 17.837;' xml:space='preserve'%3E%3Cg%3E%3Cpath style='fill:%23fff;' d='M16.145,2.571c-0.272-0.273-0.718-0.273-0.99,0L6.92,10.804l-4.241-4.27 c-0.272-0.274-0.715-0.274-0.989,0L0.204,8.019c-0.272,0.271-0.272,0.717,0,0.99l6.217,6.258c0.272,0.271,0.715,0.271,0.99,0 L17.63,5.047c0.276-0.273,0.276-0.72,0-0.994L16.145,2.571z'/%3E%3C/g%3E%3C/svg%3E%0A")
+
+.trade-chart-no-trades-label
+  position: absolute
+  height: 100%
+  width: 100%
+  font-size: $font-size-ml
+  text-align: center
+  font-weight: 500
+
+  @include media-breakpoint-down(sm)
+    font-size: $font-size-md
+
+.trade-chart-blurred
+  filter: blur(4px)
+
 .row
   &.trade-orders
     .card
       .card-body
         line-height: 1 !important
 
-      .d-flex
-        .w-50
-          .custom-checkbox
-            min-height: 1rem !important
+.btn
+  border: none
+  color: $btn-default-color
+  background-color: $btn-default-bg
+  padding: .4rem 1.25rem
+  font-weight: bold
+  border-radius: $btn-border-radius
+  font-size: $btn-font-size
 
-            > .custom-control-label
-              &:before, &:after
-                top: 0 !important
+  &.btn-secondary-rounded
+    border-radius: $btn-border-radius-extra
+    background-color: $bg-primary-dark
+    border: 1px solid $bg-primary-light
+    color: $text-color-primary
+    padding: 0.7rem 2rem
 
-              .blue-question
-                vertical-align: bottom
+  &.btn-wide
+    min-width: 100px
 
-  &.currency-container
-    min-height: 95px
+  &:active
+    box-shadow: none !important
 
-  .col-donation-balance
-    @include media-breakpoint-up(lg)
-      min-width: 197px
+  &:focus
+    @include focus-light-outline
+
+  &:hover:not(.disabled)
+    color: $text-color-primary-dark
+    background-color: $btn-default-bg-hover
+
+.btn-link
+  border: none
+  color: $btn-link-color
+  background-color: $btn-link-bg
+
+  &:hover
+    color: $btn-link-color-hover
+    background-color: $btn-link-bg-hover
 
 .btn-primary
-  color: $dark-white !important
-  background-color: transparent !important
-  border-color: $dark-white
+  color: $bg-primary-dark !important
+  background-color: $primary !important
+  font-weight: bold
+
+  &:focus
+    @include focus-light-outline
+
   @media (hover: hover)
-    &:hover:not(:disabled)
+    &:hover:not(:disabled):not(.disabled)
       color: $secondary !important
       background-color: $dark-white !important
       border-color: $dark-white !important
@@ -353,93 +723,62 @@ a
     background-color: $primary
     border-color: $dark-white !important
 
-  &:disabled
+  &:disabled, &.disabled
+    pointer-events: none
+    cursor: default
+    color: $btn-primary-disabled-color !important
+    background-color: $bg-primary-light !important
     &:hover
       color: inherit
       background-color: $primary
       border-color: $primary
 
   &.dropdown-toggle
-    background-color: transparent !important
-    border-color: $dark-white !important
-
     &:hover
       color: $secondary !important
       background-color: $dark-white !important
+      &::selection
+        color: $primary
+        background-color: $secondary
+    &:focus
+      outline: none !important
+      box-shadow: none !important
 
-.btn-big
-  @include media-breakpoint-up(lg)
-    font-size: 1.4rem
-  @include media-breakpoint-up(xxl)
-    font-size: 2rem
+.btn-primary-rounded
+  border-radius: $btn-border-radius-extra
+  color: $bg-primary-dark !important
+  background-color: $primary !important
+  padding: 0.7rem 2rem
+
+  @media (hover: hover)
+    &:hover:not(:disabled):not(.disabled)
+      color: $secondary !important
+      background-color: $dark-white !important
+      border-color: $dark-white !important
+  @media (hover: none)
+    background-color: $primary
+    border-color: $dark-white !important
 
 .btn-transparent
   border-color: transparent
   background: transparent
 
-.btn-ghost
-  border-color: $dark-white
-  background: transparent
-  color: $dark-white !important
-  transition: all .3s ease
-  @media (hover: hover)
-    &:hover
-      background: $dark-white
-      color: $secondary
-  @media (hover: none)
-    background-color: $secondary-dark !important
-    border-color: $dark-white !important
-
-  &.ghost-alt
-    &:hover
-      color: $primary-light
-
-.bright-on-hover
-  transition: all .3s ease
-
-  &:hover
-    filter: brightness(1.2)
-
 .dropdown-menu
-  color: $dark-white
-  background-color: $secondary
-  border: 1px solid $dark-white
-
   .dropdown-item
-    color: $dark-white
+    cursor: pointer
+    color: $dropdown-link-color
 
-    &:hover
-      color: $gold
-      background-color: transparent
+    &:hover, &:focus
+      background-color: $dropdown-link-bg-hover
+      color: $dropdown-link-color-hover
 
-.circle-progress
-  div.circle
-    background: none
-    height: auto
-    width: auto
-
-    canvas
-      @include media-breakpoint-down(md)
-        width: 33px
-      @include media-breakpoint-down(sm)
-        width: 23px
-      @include media-breakpoint-down(xs)
-        width: 23px
-
-.percent-text
-  font-size: 15px !important
-  margin-bottom: 5px
-
-  @include media-breakpoint-down(md)
-    font-size: 13px !important
-  @include media-breakpoint-down(sm)
-    font-size: 10px !important
-  @include media-breakpoint-down(xs)
-    font-size: 9px !important
-
-.nav-item-circle-progress
-  @include media-breakpoint-up(md)
-    margin-left: 30px
+    &.active
+      background-color: $dropdown-link-active-bg
+      color: $dropdown-link-active-color
+      font-weight: 500
+      &:hover, &:focus
+        background-color: $dropdown-link-active-bg
+        color: $dropdown-link-active-color
 
 .circle
   background: #51677F
@@ -454,22 +793,25 @@ a
     width: 120px
 
 .custom-scrollbar
-  scrollbar-color: auto
   cursor: default
 
   &::-webkit-scrollbar
     width: 10px
     height: 10px
+    border-radius: $border-radius
 
   &::-webkit-scrollbar-track-piece
-    background-color: $dark-white
+    background-color: $bg-primary-light
+    border-radius: $border-radius
 
   &::-webkit-scrollbar-thumb:horizontal
-    background-color: $primary-light
+    background-color: $primary
+    border-radius: $border-radius
 
   &::-webkit-scrollbar-thumb:vertical
     height: 30px
-    background-color: $primary-light
+    background-color: $primary
+    border-radius: $border-radius
 
 .fixed-head-table
   thead
@@ -483,7 +825,6 @@ a
         width: 100px
 
   tbody
-    max-height: 17.7rem
     display: block
     width: 100%
     position: relative
@@ -493,35 +834,36 @@ a
       table-layout: fixed
       display: table
 
+.aligned-table
+  thead
+    tr
+      display: table-row !important
+
+  tbody
+    display: table-row-group !important
+
+    tr
+      display: table-row !important
+
 .table, .table-responsive
   color: inherit
+  font-size: 0.9rem
   margin-bottom: 0.7rem
 
   thead
     tr th
       border: none
-      font-weight: normal
       padding-top: 0.2rem
+      font-size: 1rem
+      padding-bottom: 0.7rem
 
       &:first-child
         padding-left: 1.5rem
 
-  tbody
-    tr
-      &:hover
-        color: inherit
-
-      &:nth-child(odd)
-        background-color: $odd-item-color
-        border: none
-
-  &, tbody
-    @extend .custom-scrollbar
-
   td
     border: none
-    padding-top: 0.35rem
-    padding-bottom: 0.35rem
+    padding-top: $td-padding
+    padding-bottom: $td-padding
     vertical-align: middle
 
     &:first-child
@@ -541,42 +883,55 @@ a
 
     img
       height: 22px
+      width: auto
 
   .trading-body
     td
       padding-left: calc(0.75rem + 0.65em) !important
 
-  .table-orders
-    td
-      &:first-child
-        padding-left: 1.5rem
+  tbody tr
+    &:hover
+      color: inherit
 
-      &:last-child
-        padding-right: 1.5rem
-        padding-left: 0.75rem
+      th,td
+        background-color: $block-background-hover !important
+        color: $bg-secondary
 
-    white-space: nowrap
+    &:nth-child(odd)
+      border: none
 
-  .table-orders:hover
-    tr
-      cursor: pointer
+  &, tbody
+    @extend .custom-scrollbar
+
+  &.table-rewards-summary tbody
+    tr.b-table-has-details td
+      .action-status
+        white-space: nowrap
+
+    tr.hide-note td
+      padding: 0 !important
+    tr:nth-child(4n+3), tr:nth-child(4n+4)
+      background-color: $odd-item-color
+
+  &:not(.table-rewards-summary) tbody
+    tr:nth-child(odd)
+      background-color: $odd-item-color
+
+.table-sticky-head
+  thead
+    background-color: $bg-primary-dark
+    position: sticky
+    top: 0
+    z-index: $z-index-sticky-header
+
+.table-rewards-summary thead
+  white-space: nowrap
 
 .fix-layout
   table-layout: fixed
 
-
-.pagination
-  .page-item
-    .page-link
-      background: none
-      color: $blue
-      line-height: 13px
-
-  .active
-    .page-link
-      color: $dark-white
-      cursor: default !important
-      pointer-events: none !important
+.table-min-width
+  min-width: 300px
 
 .tabs
   @media (max-width: 768px)
@@ -596,27 +951,27 @@ a
             display: none
 
   .nav-tabs
-    background-color: $color-tabs
+    background-color: $bg-primary-dark
     display: flex
     text-align: center
-    padding: 3px !important
     align-items: stretch
     border: none
 
     .nav-item
-      flex: 1 1 auto
       padding: 1px
       color: $dark-white
-      margin-right: 2px
 
       .nav-link
         border: none
-        background-color: $color-tabs
-        color: $dark-white
-        padding: .2rem 1.25rem
+        background-color: $bg-primary-light
+        color: $text-color-primary
+        font-weight: bold
+        padding: .45rem 1.25rem
+        border-radius: $border-radius
 
         &:hover
-          color: $gold
+          color: $text-color-secondary
+          background: $bg-secondary
 
         @include font-scale(md)
 
@@ -624,12 +979,11 @@ a
           cursor: default
 
       .active
-        color: $gold
-
+        background: $bg-secondary
+        color: $text-color-secondary
 
   .tab-content
     flex: 1 1 auto
-    background: $secondary
 
   &.no-padding
     .tab-content
@@ -637,10 +991,10 @@ a
 
   &.transparent
     .nav-tabs
-      background: $secondary
+      background: $bg-primary-dark
       text-align: left
       overflow: hidden
-      border: 2px solid $secondary
+      border: 2px solid $bg-primary-dark
       white-space: nowrap
 
     .nav-item-token
@@ -655,7 +1009,7 @@ a
         @include font-scale(md)
 
         &.active
-          color: $color-link
+          color: $link-color
 
         &.active::after
           content: ' '
@@ -676,12 +1030,12 @@ a
       .nav-link
         color: inherit
         position: relative
-        background: $secondary
+        background: $bg-primary-dark
 
         @include font-scale(md)
 
         &.active
-          color: $gold
+          color: $primary
 
         &.active::after
           content: ' '
@@ -695,6 +1049,9 @@ a
     /* stylelint-enable no-descending-specificity */
 
     @media (max-width: 480px)
+      .trading-market
+        text-align: center
+        width: 100%
       .swagger-ui .model
         font-size: 4px
 
@@ -710,7 +1067,10 @@ a
           @include font-scale(md)
 
           &.active
-            color: $gold
+            color: $primary
+            &::selection
+              color: $primary
+              background-color: $bg-secondary
 
           &.active::after
             content: ' '
@@ -732,35 +1092,12 @@ a
       padding: 1rem 0
       background: none
 
-.modal-content
-  background: $secondary
-
-  .modal-header
-    background-color: $primary
-    padding: 0
-    height: 33px
-    align-items: center
-
-    div
-      width: 100%
-
-    .modal-close
-      padding-bottom: 1px
-      @include font-scale(lg)
-
-      color: $dark-white
-      font-weight: lighter
-
-  .modal-title
-    padding-top: 11px
-    @include font-scale(md)
-
 @-moz-document url-prefix()
   .modal-title
     padding-top: 11px !important
 
   .modal-close
-      padding-bottom: 3px !important
+    padding-bottom: 3px !important
 
 nav.top-navbar
   @include media-breakpoint-down(md)
@@ -780,9 +1117,17 @@ nav.top-navbar
   position: relative
   align-self: stretch
   white-space: nowrap
-  padding-top: 3px
-  padding-bottom: 3px
   margin-left: 2px
+  padding: 0
+  border-bottom: 1px solid $primary
+  border-radius: 0
+  color: $primary
+  background: none
+  font-size: 0.78rem
+  height: auto
+  &::selection
+    color: $primary
+    background-color: $bg-secondary
 
 .modal.show
   display: block
@@ -790,6 +1135,12 @@ nav.top-navbar
 
 .modal-dialog
   @extend .modal-dialog-centered
+  max-width: $modal-max-width
+
+  &.small-modal
+    max-width: 400px
+  &.create-post-modal
+    max-width: 700px
 
 .empty-table
   .b-table-has-details
@@ -801,7 +1152,9 @@ nav.top-navbar
     font-weight: 800
 
   .link
-    color: $blue
+    color: $primary
+    &::selection
+      background-color: $bg-secondary
 
 .v-cloak--block, .v-cloak--inline, .v-cloak--inline-block, .v-cloak--flex
   display: none
@@ -841,6 +1194,10 @@ nav.top-navbar
   display: block
   background-size: auto 100%
   background-repeat: no-repeat
+
+  &.contract-avatar
+    width: 20px
+    height: 20px
 
 .icon-with-badge
   margin-top: -4px
@@ -884,12 +1241,19 @@ nav.top-navbar
       background: $toast-warning-bg
       color: $toast-warning-text
 
-  justify-content: center !important
-  font-size: 20px !important
-  padding: 6px 15px !important
+      justify-content: center !important
+      font-size: 20px !important
+      padding: 6px 15px !important
+      min-height: 46px !important
 
 .toast-text
   text-align: center
+
+  @media(max-width: 768px)
+    word-break: break-word
+
+  @media(min-width: 992px)
+    word-break: break-all
 
 .toasted-container
   align-items: center
@@ -902,18 +1266,17 @@ nav.top-navbar
 
 .toasted
   pointer-events: auto
+  flex-basis: 0
 
 meter
   width: 100%
-  height: .5em
-  vertical-align: top
   /* Applicable only to Firefox
   background: none
-  background-color: $grey-light
+  background-color: transparent
 
   &::-webkit-meter-bar
     background: none
-    background-color: $grey-light
+    background-color: transparent
 
 @for $i from 1 to length($meterbg-list)+1
   meter[value="#{$i}"]::-webkit-meter-optimum-value
@@ -946,9 +1309,6 @@ meter
 .pointer-events-none
   pointer-events: none !important
 
-.bg-module
-  background: $module-background
-
 .is-invalid
   border: 1px solid $red !important
 
@@ -959,9 +1319,6 @@ meter
     outline-style: none !important
     box-shadow: 0 0 0 0 rgba(0, 123, 255, 0) !important
 
-input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
-  cursor: url('../img/input-cursor.png'), auto
-
 input[type=search]::-webkit-search-cancel-button
   -webkit-appearance: none
 
@@ -969,23 +1326,41 @@ input[type=search]::-webkit-search-cancel-button
   background-image: none !important
 
 .show-password
-  float: right
-  position: relative
-  top: 32px
-  right: 10px
+  position: absolute
+  right: 0
+  padding: 12px 15px
+  z-index: 2
+  color: $text-color-secondary-light
 
 .show-password:hover
-  cursor: pointer
-  color: $color-toggle-password-active
+  @media (hover: hover)
+    cursor: pointer
+    color: $primary
 
 .show-password-active
   @extend .show-password
-  color: $color-toggle-password-hover
+  color: $primary
 
 .truncate-name
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
+  width: 5rem
+
+.trader-name-width
+  width: auto !important
+  max-width: 10rem !important
+
+.truncate-name-width
+  width: 25px
+
+.truncate-block
+  @extend .truncate-name
+  display: block
+  width: 95%
+
+  @media (max-width: 600px)
+    width: 90%
 
 .truncate-token
   width: 100%
@@ -993,64 +1368,86 @@ input[type=search]::-webkit-search-cancel-button
   text-overflow: ellipsis
   margin-block: -5px
 
-.truncate-address
-  .token-address-buttons
-    display: flex
-    padding-left: 6px
-
-  span
-    white-space: nowrap
-    overflow: hidden
-    text-overflow: ellipsis
-
 .pair-cell
   max-width: 200px
 
 .card-fixed-small
   width: 100%
-  max-width: 450px
+  max-width: 500px
+
+.card-fixed-medium
+  width: 100%
+  max-width: 735px
+
+.card-fixed-lg
+  width: 100%
+  max-width: 900px
 
 .card-fixed-large
   width: 100%
-  max-width: 981px
+  max-width: $page-content-width
 
-.form-control-btn.is-invalid
-  background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
+.counter-wrapper
+  position: relative
+  display: flex
+  align-items: center
+  justify-content: center
+  & > svg
+    font-size: 1.5rem
+  .counter
+    font-size: 0.9rem
+    left: 40%
+    top: -30%
+    background-color: $red
+    color: $text-color-primary
+    display: block
+    position: absolute
+    width: auto
+    text-align: center
+    line-height: 1
+    padding: 3px 4px 1px 4px
+    border-radius: $border-radius
+    font-weight: 500
+
+    &.block
+      position: relative
+
+  .counter-icon
+    line-height: 0.45
+
+  .custom-icon
+    margin-left: 1.3rem
+
+.alert-block
+  background-color: $bg-primary
+  color: $text-color-primary
+  border-left: 4px solid $primary
+
+  svg
+    font-size: 2rem
+
+.card-fixed-extra-large
+  width: 100%
+  max-width: 1200px
+
+.phone-number
+  .error-spacer
+    min-height: 1.5rem
 
 .form-control:focus, .phone-number .input-tel__input:focus
   border-style: solid !important
   border-width: thin !important
-  border-color: $pale-gray !important
+  border-color: $bg-primary-light !important
   -webkit-box-shadow: none !important
   box-shadow: none !important
 
-.hover-icon:hover svg, svg.hover-icon:hover, .icon-default:hover
-  color: $gold
+.hover-icon:hover, .hover-icon:hover svg, svg.hover-icon:hover, .icon-default:hover
+  color: $primary !important
   transition: color .15s
 
 a.hover-icon:hover, div.hover-icon:hover
   span.social-link, span.wallet-action-txt
     text-decoration: underline !important
-
-@include media-breakpoint-up(lg)
-  .card-two-divs-fixed-large
-    width: 100%
-    max-width: calc(981px / 2)
-  .airdrop-container
-    text-align: left !important
-
-@include media-breakpoint-down(md)
-  .airdrop-container
-    text-align: center !important
-    font-size: 17px
-
-    button
-      margin-top: .5rem !important
-
-@include media-breakpoint-only(xs)
-  .airdrop-container
-    span.message
-      display: block !important
 
 @media (max-width: 420px)
   .width-100
@@ -1100,9 +1497,6 @@ a.hover-icon:hover, div.hover-icon:hover
 #register-form-captcha-container
   min-height: 75.5px
 
-#register-form-password-container
-  min-height: 88px
-
 ul.spinner-tabs
   height: 36px
 
@@ -1110,8 +1504,8 @@ li.trade-tab
   a.nav-link
     margin-right: 64px
 
-.bell-notification:hover svg, .default-user-avatar-topnav:hover, .default-user-avatar-navbar:hover
-  filter: invert(26%) sepia(52%) saturate(255%) hue-rotate(4deg) brightness(87%) contrast(64%)
+.bell-notification:hover svg
+  filter: invert(54%) sepia(100%) saturate(652%) hue-rotate(16deg) brightness(101%) contrast(101%)
 
 .overflow-y-hidden
   overflow-y: hidden
@@ -1126,11 +1520,8 @@ li.trade-tab
   max-width: 380px
   max-height: 230px
 
-.text-gold
-  color: $gold
-
 .bg-secondary-dark
-  background-color: $secondary-dark !important
+  background-color: $bg-primary-light !important
 
 .top-0
   top: 0
@@ -1141,13 +1532,50 @@ li.trade-tab
 .h-fit-content
   height: fit-content
 
+.white-input
+  border-color: $bg-secondary !important
+  background-color: $bg-secondary !important
+  color: $text-color-secondary !important
+  &::placeholder
+    color: $white-input-placeholder-color
+  &:focus
+    background-color: $bg-secondary !important
+
+#amount-to-donate
+  -webkit-text-fill-color: $text-color-secondary !important
+  -webkit-box-shadow: inset 0 0 0 30px $bg-secondary !important
+
+.qt-dropdown.form-control-container
+  min-width: 131px
+  .form-control-field
+    margin-top: 0
+    .outline .left-outline
+      border-top-left-radius: 0
+      border-bottom-left-radius: 0
+  .dropdown .dropdown-toggle
+    display: flex
+    align-items: center
+    padding: 0.75rem 1rem 0.75rem 0 !important
+    & > div
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
+      justify-content: flex-end
+    &:after
+      position: relative
+      right: 0
+      top: 0
+
 .price-converter-input__input
+  padding: 1rem
   &.is-invalid
     background-position-x: 100%
 
 .price-converter-input__input--overflow
-  padding-bottom: 24px
   height: 48px !important
+  position: relative
+  bottom: 9px
+  padding: 0 .2rem .5rem 0.5rem !important
 
 .price-converter-input__converter--overflow
   top: initial
@@ -1155,31 +1583,24 @@ li.trade-tab
   bottom: 0
   left: 0
   height: 20px !important
-  padding-left: 15px
+  padding-left: 0.3rem
   align-items: start !important
   overflow: hidden
-  width: 100%
+  width: 91%
   white-space: nowrap
   line-height: 16px
 
-.icon-blue
-  color: #005ca1
+.recent-activities-date
+  margin-left: 29px
 
 .font-size-12
   font-size: 12px
 
+.font-size-14
+  font-size: 14px
+
 .input-disabled
   color: #6c757d !important
-
-.nav-envelope-badge
-  border-radius: 50%
-  min-width: 12px
-  height: 12px
-  bottom: 4px
-  left: 12px
-  padding: 1px
-  background-color: red
-  font-size: 8px
 
 .account-settings
   form
@@ -1188,10 +1609,11 @@ li.trade-tab
 
 .custom-switch
   .custom-control-input:checked + label.custom-control-label::before
-    background-color: $blue !important
+    background-color: $primary !important
 
   .custom-control-label::before
     border-color: $white !important
+    background-color: $odd-item-color !important
 
   .custom-control-label::after
     background-color: $white !important
@@ -1210,6 +1632,12 @@ li.trade-tab
   border: none
   padding: 0.5rem 0.2rem
 
+.elastic-text-wrapper
+  .wreath
+    position: absolute
+    left: -2px
+    top: 1px
+
 .elastic-text
   width: calc(100% - 2em)
   min-width: 70px
@@ -1217,38 +1645,301 @@ li.trade-tab
 .clearfix
   clear: both
 
-.w-max-50
-    max-width: 50%
+  &:hover
+    transition: opacity 1s ease
+    opacity: 1
 
 .alert-float
   font-size: 14px !important
   padding: 0 10px !important
   margin-bottom: 5px
 
-.ml-mx-4
-  @include media-breakpoint-up(lg)
-    margin-left: 110px !important
+.token-list-fixed
+  @media (max-width: 767px)
+    margin-left: auto
 
-  @include media-breakpoint-up(xl)
-    margin-left: 115px !important
+.user-token-table
+  @media (max-width: 767px)
+    top: 10px
 
-  @media screen and (min-width: 1400px)
-    margin-left: 175px !important
+.coin-avatar
+  display: inline-block
+  text-align: center
 
-.ml-mx-5
-  @media screen and (max-width: 1145px) and (min-width: 992px)
-    margin-left: 0 !important
+  &.qt-coin-avatar
+    $iconWidth: 30px
+    width: $iconWidth
+    height: $iconWidth
 
-  @media screen and (max-width: 1200px) and (min-width: 1145px)
-    margin-left: 45px !important
+    img
+      max-width: $iconWidth
+      max-height: $iconWidth
 
-  @media screen and (max-width: 1310px) and (min-width: 1200px)
-    margin-left: 0 !important
+.deployed-avatar
+  @extend .coin-avatar
+  width: 26px
+  height: 26px
 
-  @media screen and (max-width: 1400px) and (min-width: 1310px)
-    margin-left: 45px !important
+.progress .progress-bar
+  line-height: 1
+  padding-top: 3px
 
-  @media screen and (min-width: 1400px)
-    margin-left: 60px !important
+.vue-slider .vue-slider-process
+  background-color: $primary !important
 
+::selection
+  background-color: $primary
 
+.text-primary::selection
+  color: $primary
+  background-color: $bg-secondary
+
+.opacity-0
+  opacity: 0
+
+.left-50
+  left: 50%
+
+.translate-middle
+  transform: translate(-50%,-50%)
+
+.copy-container
+  border-radius: $border-radius
+  background-color: $bg-primary
+
+.underline
+  text-decoration: underline
+
+.font-size-1
+  font-size: 1.1rem
+
+.font-size-2
+  font-size: 1.25rem
+.font-size-3
+  font-size: 1.6rem
+.font-size-4
+  font-size: 3rem
+
+.font-size-tooltip
+  font-size: 1.5rem
+
+.text-underline
+  text-decoration: underline
+
+.font-weight-semibold
+  font-weight: 600
+
+.line-height-1
+  line-height: 1
+
+.line-height-md
+  line-height: 1.5
+
+.price-change
+  border-radius: $border-radius
+  &.negative
+    background-color: $danger
+  &.positive
+    background-color: $green
+
+.mtn-2
+  margin-top: -2px
+.mtn-3
+  margin-top: -3px
+.mtn-6
+  margin-top: -6px
+
+.input-container
+  border: 1px solid $primary
+  border-radius: $btn-border-radius
+
+  .legend
+    background: $bg-primary-dark
+    position: absolute
+    top: -10px
+    left: 12px
+    font-size: 0.78rem
+    color: $primary
+    &::selection
+      background-color: $bg-secondary
+
+.text-nowrap, .whitespace-nowrap
+  white-space: nowrap
+
+  &.highlight
+    color: $link-color-highlight !important
+    text-decoration: underline !important
+
+    &::selection
+      color: $link-color-highlight
+      background-color: $bg-secondary
+
+    &:hover
+      color: $primary-highlight !important
+
+.pe-all
+  pointer-events: all
+
+// custom scrollbar
+/* width */
+::-webkit-scrollbar
+  width: $scroll-width
+
+/* Track */
+::-webkit-scrollbar-track
+  background: $bg-primary
+
+/* Handle */
+::-webkit-scrollbar-thumb
+  background: $scroll-handle-bg
+  border-radius: $border-radius
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover
+  background: $scroll-handle-bg-hover
+
+.is-input-invalid
+  border: 1px solid $red !important
+
+.seo-link
+  color: $link-color
+  padding: 0
+  vertical-align: baseline
+
+.seo-link:hover
+  color: $link-color-hover
+
+.tippy-popper
+  @media (max-width: 575px)
+    max-width: 280px!important
+
+.token-intro-description-plan
+  @media (max-width: 575px)
+    font-size: 0.68rem
+    color: $primary
+
+.color-text-danger
+  color: $toast-warning-text
+
+.input-height
+  min-height: 42px
+
+.confirm-modal-image
+  width: 150px
+  max-width: 100%
+
+.bg-primary-dark
+  background-color: $bg-primary-dark !important
+.btn-enabled-focus-dark:focus
+  @include focus-dark-outline
+
+.btn-enabled-focus-light:focus
+  @include focus-light-outline
+
+.dark-border-on-focus:focus
+  border: 1px solid $secondary !important
+
+.dropdown-menu.show
+  z-index: 1021
+
+.custom-control-input-dark:focus:not(:checked)~.custom-control-label:before
+  outline: none !important
+  border: 1px solid $primary !important
+
+.custom-control-input-dark:focus:checked~.custom-control-label:before
+  outline: none !important
+  border: 1px solid $text-color-primary !important
+
+.text-hint
+  color: $subtitle-text-color
+  margin-bottom: .75rem
+
+  &::selection
+    color: $text-color-primary
+
+.text-content-primary
+  a
+    @include link-content-primary
+
+.link-primary
+  color: $primary !important
+  cursor: pointer
+
+  &::selection
+    background-color: $bg-secondary
+
+  &:hover
+    color: $primary-highlight !important
+
+.wallet-code
+  @include font-scale(sm)
+
+  &:hover
+    color: $primary
+
+.b-tooltip-white
+  .arrow::before
+    border-top-color: $bg-secondary
+  .tooltip-inner
+    background-color: $bg-secondary
+    color: $text-color-secondary
+
+.medal
+  width: 15px
+
+.min-height-40
+  min-height: 40px
+
+.min-height-50
+  min-height: 50px
+
+.min-height-600
+  min-height: 600px
+
+.expand-post-options
+
+  &.not-collapsed a
+    color: $primary !important
+
+  a
+    font-size: 1.3rem
+    color: $text-color-primary !important
+    margin-right: 0.5rem
+
+.top-tokens-list .top-token-item
+  &:hover
+    background-color: $bg-primary-darker
+    color: $text-color-primary
+
+  .avatar img
+    height: 22px
+    min-width: 22px
+    width: 22px
+
+  .has-airdrop
+    position: absolute
+    border-radius: 100%
+    width: 22px
+    height: 22px
+    background-color: $bg-secondary
+    right: -2px
+    bottom: -2px
+    border: 2px solid $bg-primary-dark
+    display: flex
+    align-items: center
+    justify-content: center
+
+    img
+      margin-left: -1px
+      margin-bottom: -1px
+
+.notify-button
+  @extend .text-dark
+  text-decoration: underline !important
+  font-size: 15px !important
+  padding: 0 !important
+  margin: 0 !important
+  text-transform: none !important
+  letter-spacing: 0 !important
+  font-weight: 300 !important
+  margin-left: 4px !important

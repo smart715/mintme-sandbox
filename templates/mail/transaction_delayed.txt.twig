@@ -1,0 +1,10 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ nickname }}!
+
+{% trans %} mail.transaction.delayed.msg {% endtrans %}.
+{% trans %} mail.transaction.delayed.msg_extra {% endtrans %}.
+
+{% endblock %}
+

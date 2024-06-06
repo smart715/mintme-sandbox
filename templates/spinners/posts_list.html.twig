@@ -1,0 +1,73 @@
+{% import "default/pagination_macro.html.twig" as pagination %}
+<div {% if hideWithVue is not defined or hideWithVue %} v-if="false" {% endif %}>
+    <div class="posts-container p-0">
+        {% if posts is not empty %}
+            <div class="posts overflow-hidden position-relative">
+                <div
+                    id="posts-container"
+                    ref="postsContainer"
+                    class="w-100"
+                >
+                    {% for post in posts %}
+                        <div class="card post mb-3 p-3">
+                            <div class="d-flex align-items-start">
+                                <div class="mr-4 ml-2 mt-2">
+                                    <img
+                                        src="{{ post.author.image.avatar_large }}"
+                                        class="avatar-img rounded-circle img-fluid"
+                                    />
+                                </div>
+                                <div class="flex-fill overflow-hidden">
+                                    <div
+                                        class="font-weight-semibold font-size-2 d-flex
+                                            justify-content-between align-items-center"
+                                    >
+                                        <a href="{{ path('token_show_post', {name: token.name, slug: post.slug }) }}">{{ post.title }}</a>
+                                    </div>
+                                    <div class="font-italic">
+                                        {{ post.createdAt | date('H:m:s d M, Y') }}
+                                    </div>
+                                    <div>
+                                        <p class="plain-text-content post-content-short post-content-spinner">
+                                            {{ post.content | raw }}
+                                        </p>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <a href="#">
+                                            {{ 'post.share' | trans }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if pagination is defined and pagination %}
+                    <div class="mt-4">
+                        {{ pagination.pagination(
+                            (posts_amount / 10) | round(0, 'ceil'),
+                            0 == page ? 1 : page,
+                            path('token_show', {name: token.name, tab: 'posts'}) ~ '/'
+                        ) }}
+                    </div>
+                {% endif %}
+                {% if showMore is defined and showMore and posts_amount > 3 %}
+                    <div class="d-flex justify-content-center my-4">
+                        <a
+                            href="{{ path('token_show_post', {name: token.name}) }}"
+                            class="btn btn-secondary-rounded"
+                        >
+                            {{ 'see_more' | trans }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="card h-100 d-flex align-items-center justify-content-center">
+                <span class="text-center py-4 ">
+                    {{ 'post.not_any_post' | trans }}
+                </span>
+            </div>
+        {% endif %}
+    </div>
+</div>

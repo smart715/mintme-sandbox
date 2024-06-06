@@ -1,4 +1,5 @@
-import {webSymbol, btcSymbol, ethSymbol, usdcSymbol, bnbSymbol, WSAPI} from '../utils/constants';
+import {mapGetters} from 'vuex';
+import {WSAPI, tokenDeploymentStatus} from '../utils/constants';
 
 export default {
     props: {
@@ -11,18 +12,15 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('tokenInfo', [
+            'getDeploymentStatus',
+        ]),
+        ...mapGetters('crypto', {
+            enabledCryptosMap: 'getCryptosMap',
+        }),
         showDepositMoreLink: function() {
-            return this.loggedIn && this.isCryptoMarket;
-        },
-        orderInputClass: function() {
-            return this.loggedIn ? 'w-50' : 'w-100';
-        },
-        depositMoreLink: function() {
-            if (this.isCryptoMarket) {
-                return this.$routing.generate('wallet', {
-                    depositMore: this.rebrandingFunc(this.marketIdentifier),
-                });
-            }
+            return this.loggedIn
+                && (this.isCryptoMarket || this.getDeploymentStatus === tokenDeploymentStatus.deployed);
         },
         marketIdentifier: function() {
             if ('buy' === this.action) {
@@ -36,7 +34,15 @@ export default {
             return '';
         },
         isCryptoMarket: function() {
-            return [webSymbol, btcSymbol, ethSymbol, usdcSymbol, bnbSymbol].includes(this.marketIdentifier);
+            return Object.keys(this.enabledCryptosMap || {}).includes(this.marketIdentifier);
+        },
+        getCurrencySymbol: function() {
+            const symbols = {
+                'buy': this.market.base,
+                'sell': this.market.quote,
+            };
+
+            return symbols[this.action]?.symbol ?? '';
         },
     },
     methods: {

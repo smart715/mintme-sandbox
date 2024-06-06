@@ -1,0 +1,40 @@
+{% extends 'mail/layout.html.twig' %}
+{% block content %}
+    {{ parent() }}
+    <div class="box-table">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border" bgcolor="#ffffff">
+            <tr>
+                <td align="center" width="600" class="td-body" bgcolor="#ffffff">
+                    <img alt="Blockchain" src="{{ absolute_url(asset('build/images/mail-token.png')) }}" width="120" class="img-build-v3" />
+                    <p class="p-hello">{% trans from 'messages' %} hello {% endtrans %} {{ nickname }}</p>
+                    <p class="p-second-line">
+                        {% trans with {
+                            '%profileNickname%': profileNickname,
+                            '%profileUrl%': absolute_url(path('profile-view', {'nickname': profileNickname}))
+                        } %}
+                            mail.new_buy_order.msg
+                        {% endtrans %}
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" class="td-presentation-layout-v4" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+        {% set url = absolute_url(path('token_show', {'name': tokenName, 'crypto': cryptoSymbol | rebranding, 'tab': 'trade' })) %}
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border-v3" bgcolor="#2199e8">
+            <tr>
+                <td align="center" width="600" class="td-code-v2" bgcolor="#2199e8">
+                    <p class="p-fiveteenth-line"><a href="{{ url }}" class="a-link-text" style="mso-padding-alt:0;">{% trans %} mail.new_buy_order.add_sell {% endtrans %}</a></p>
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" class="border-blank-space" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" class="td-presentation-layout-v5" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

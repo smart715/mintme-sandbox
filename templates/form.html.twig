@@ -1,11 +1,11 @@
 <div class="container">
     <div class="row pt-4 justify-content-center">
         <div class="col-12">
-            <div class="card card-fixed-small mx-auto">
-                <div class="card-header">
+            <div class="card card-fixed-small mx-auto p-4">
+                <div class="card-header card-big-header card-highlight-header text-center font-size-3 pt-0 pb-3">
                     {{ formHeader }}
                 </div>
-                <div class="card-body py-3">
+                <div class="card-body pt-2 pb-3">
                     {% block formBody %}
                         {{ form(form) }}
                     {% endblock %}

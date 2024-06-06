@@ -1,7 +1,7 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
 
-{% trans %} hello {% endtrans %}, {{ email }}
+{% trans %} hello {% endtrans %} {{ user.nickName }}
 
 {% trans %} mail.verification_code {% endtrans %}
 

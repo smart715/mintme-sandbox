@@ -1,0 +1,7 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %} {{ nickname }}!
+{% trans with {'%rewardTitle%': rewardTitle} %} mail.reward.participant.rejected.msg {% endtrans %}
+{% endblock %}
+

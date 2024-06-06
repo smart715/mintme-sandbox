@@ -2,21 +2,30 @@
 
 namespace App\Tests\Wallet;
 
+use App\Config\HideFeaturesConfig;
 use App\Entity\Crypto;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
-use App\Exception\NotFoundTokenException;
+use App\Entity\WrappedCryptoToken;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Factory\UpdateBalanceView;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\TokenConfig;
-use App\Manager\CryptoManagerInterface;
+use App\Logger\WithdrawLogger;
+use App\Manager\CryptoManager;
+use App\Manager\InternalTransactionManagerInterface;
 use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\WrappedCryptoTokenManagerInterface;
+use App\Repository\UserRepository;
 use App\SmartContract\ContractHandlerInterface;
+use App\Tests\Mocks\MockMoneyWrapper;
+use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Symbols;
+use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
@@ -24,159 +33,191 @@ use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
-use App\Wallet\Money\MoneyWrapper;
-use App\Wallet\Money\MoneyWrapperInterface;
+use App\Wallet\Model\WithdrawInfo;
 use App\Wallet\Wallet;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WalletTest extends TestCase
 {
+
+    use MockMoneyWrapper;
+
     public function testGetWithdrawDepositHistory(): void
     {
         $depositTransactions = [
-            $this->mockTransaction(9876541, 'WEB', 'deposit'),
-            $this->mockTransaction(9876545, 'BTC', 'deposit'),
+            $this->mockTransaction(1, 'WEB', 'deposit'),
+            $this->mockTransaction(4, 'BTC', 'deposit'),
         ];
         $withdrawTransactions = [
-            $this->mockTransaction(9876543, 'ETH', 'withdraw'),
-            $this->mockTransaction(9876547, 'XMR', 'withdraw'),
+            $this->mockTransaction(3, 'ETH', 'withdraw'),
+            $this->mockTransaction(6, 'XMR', 'withdraw'),
+        ];
+        $withdrawTokenPendingTransaction = [
+            $this->mockTransaction(7, 'goo', 'withdraw'),
+        ];
+        $withdrawCryptoPendingTransaction = [
+            $this->mockTransaction(8, 'doo', 'withdraw'),
+        ];
+        $tokenTransactions = [
+            $this->mockTransaction(5, 'foo', 'withdraw'),
+            $this->mockTransaction(2, 'bar', 'deposit'),
+        ];
+        $internalTransactions = [
+            $this->mockTransaction(9, 'moo', 'withdraw'),
+            $this->mockTransaction(10, 'loo', 'deposit'),
         ];
 
-        $tokenTransactions = [
-            $this->mockTransaction(9876546, 'foo', 'withdraw'),
-            $this->mockTransaction(9876542, 'bar', 'deposit'),
+        $expectedHistory = [
+            $internalTransactions[1],
+            $internalTransactions[0],
+            $withdrawCryptoPendingTransaction[0],
+            $withdrawTokenPendingTransaction[0],
+            $withdrawTransactions[1],
+            $tokenTransactions[0],
+            $depositTransactions[1],
+            $withdrawTransactions[0],
+            $tokenTransactions[1],
+            $depositTransactions[0],
         ];
+
+        $pendingManager = $this->createMock(PendingManagerInterface::class);
+        $pendingManager
+            ->method('getPendingTokenWithdraw')
+            ->willReturn($withdrawTokenPendingTransaction);
+
+        $pendingManager
+            ->method('getPendingCryptoWithdraw')
+            ->willReturn($withdrawCryptoPendingTransaction);
 
         $wallet = new Wallet(
             $this->mockWithdrawGatewayInterface($withdrawTransactions),
             $this->mockBalanceHandler(),
             $this->mockDepositCommunicator($depositTransactions),
-            $this->mockPendingManager($this->never()),
+            $pendingManager,
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager(),
             $this->mockContractHandler($tokenTransactions),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->mockInternalTransactionManager($internalTransactions),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
+
+        $expectedHistory = array_map(static fn(Transaction $transaction) => [
+            $transaction->getDate()->getTimestamp(),
+            $transaction->getTradable()->getSymbol(),
+            $transaction->getType()->getTypeCode(),
+        ], $expectedHistory);
 
         $history = $wallet->getWithdrawDepositHistory($this->mockUser(), 0, 10);
+        $history = array_map(static fn(Transaction $transaction) => [
+            $transaction->getDate()->getTimestamp(),
+            $transaction->getTradable()->getSymbol(),
+            $transaction->getType()->getTypeCode(),
+        ], $history);
 
-        $this->assertEquals(
-            [
-                [
-                    9876547,
-                    'XMR',
-                    'withdraw',
-                ],
-                [
-                    9876546,
-                    'foo',
-                    'withdraw',
-                ],
-                [
-                    9876545,
-                    'BTC',
-                    'deposit',
-                ],
-                [
-                    9876543,
-                    'ETH',
-                    'withdraw',
-                ],
-                [
-                    9876542,
-                    'bar',
-                    'deposit',
-                ],
-                [
-                    9876541,
-                    'WEB',
-                    'deposit',
-                ],
-            ],
-            [
-                [
-                    $history[0]->getDate()->getTimestamp(),
-                    $history[0]->getTradable()->getSymbol(),
-                    $history[0]->getType()->getTypeCode(),
-                ],
-                [
-                    $history[1]->getDate()->getTimestamp(),
-                    $history[1]->getTradable()->getSymbol(),
-                    $history[1]->getType()->getTypeCode(),
-                ],
-                [
-                    $history[2]->getDate()->getTimestamp(),
-                    $history[2]->getTradable()->getSymbol(),
-                    $history[2]->getType()->getTypeCode(),
-                ],
-                [
-                    $history[3]->getDate()->getTimestamp(),
-                    $history[3]->getTradable()->getSymbol(),
-                    $history[3]->getType()->getTypeCode(),
-                ],
-                [
-                    $history[4]->getDate()->getTimestamp(),
-                    $history[4]->getTradable()->getSymbol(),
-                    $history[4]->getType()->getTypeCode(),
-                ],
-                [
-                    $history[5]->getDate()->getTimestamp(),
-                    $history[5]->getTradable()->getSymbol(),
-                    $history[5]->getType()->getTypeCode(),
-                ],
-            ]
-        );
+        $this->assertEquals($expectedHistory, $history);
     }
 
     public function testWithdrawInitCrypto(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([], '3000000000000000000'),
-            $this->mockBalanceHandler($this->once(), '3000000000000000000'),
+            $this->mockWithdrawGatewayInterface([], '3000000000000000000', Symbols::WEB),
+            $this->mockBalanceHandler($this->once(), '3000000000000000000', '0', "WEB"),
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager($this->once()),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000000000', new Currency(Symbols::WEB))),
+            $this->mockCrypto(Symbols::WEB),
             $this->mockCrypto(Symbols::WEB)
+        );
+    }
+
+    public function testWithdrawInitCryptoWrapped(): void
+    {
+        $wallet = new Wallet(
+            $this->mockWithdrawGatewayInterface([], '3000000000000000000', Symbols::WEB),
+            $this->mockBalanceHandler($this->once(), '3000000000000000000', '0', "WEB"),
+            $this->mockDepositCommunicator([]),
+            $this->mockPendingManager($this->once()),
+            $this->createMock(EntityManagerInterface::class),
+            $this->mockContractHandler([], Symbols::ETH),
+            $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
+            $this->mockMoneyWrapper(),
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
+        );
+
+        $wallet->withdrawInit(
+            $this->mockUser(),
+            $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
+            $this->mockAmount(new Money('1000000000000000000', new Currency(Symbols::WEB))),
+            $this->mockCrypto(Symbols::WEB, Symbols::ETH),
+            $this->mockCrypto(Symbols::ETH)
         );
     }
 
     public function testWithdrawInitCryptoWithLowBalance(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([], '1000000000000000000'),
+            $this->mockWithdrawGatewayInterface([], '1000000000000000000', Symbols::WEB),
             $this->mockBalanceHandler($this->never(), '1000000000000000000'),
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager($this->never()),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -185,6 +226,7 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000000000', new Currency(Symbols::WEB))),
+            $this->mockCrypto(Symbols::WEB),
             $this->mockCrypto(Symbols::WEB)
         );
     }
@@ -192,65 +234,79 @@ class WalletTest extends TestCase
     public function testWithdrawInitToken(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([]),
+            $this->mockWithdrawGatewayInterface([], '3000000000000', Symbols::TOK),
             $this->mockBalanceHandler(
-                $this->exactly(2),
+                $this->exactly(2), // token balance, crypto fee balance
                 '3000000000000000000',
                 '3000000000000'
             ),
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager($this->once()),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(),
+            $this->mockCrypto(Symbols::WEB)
         );
     }
 
-    public function testWithdrawInitTokenWithNullCrypto(): void
+    public function testWithdrawInitTokenWithOwnFee(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([]),
+            $this->mockWithdrawGatewayInterface([], '3000000000000', Symbols::TOK),
             $this->mockBalanceHandler(
-                $this->never(),
+                $this->exactly(1),
                 '3000000000000000000',
                 '3000000000000'
             ),
             $this->mockDepositCommunicator([]),
-            $this->mockPendingManager($this->never()),
+            $this->mockPendingManager($this->once()),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager($this->once(), true),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
-
-        $this->expectException(NotFoundTokenException::class);
 
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(Symbols::TOK),
+            $this->mockCrypto(Symbols::WEB)
         );
     }
 
     public function testWithdrawInitTokenWithLowBalance(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([]),
+            $this->mockWithdrawGatewayInterface([], '100000000000', Symbols::TOK),
             $this->mockBalanceHandler(
                 $this->never(),
                 '3000000000000000000',
@@ -259,12 +315,19 @@ class WalletTest extends TestCase
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager($this->never()),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -273,14 +336,15 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(),
+            $this->mockCrypto(Symbols::WEB)
         );
     }
 
     public function testWithdrawInitTokenWithNoEnoughFee(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([]),
+            $this->mockWithdrawGatewayInterface([], '3000000000000', Symbols::TOK),
             $this->mockBalanceHandler(
                 null,
                 '1000000000000000',
@@ -289,12 +353,19 @@ class WalletTest extends TestCase
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager($this->never()),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(NotEnoughAmountException::class);
@@ -303,24 +374,32 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(),
+            $this->mockCrypto(Symbols::WEB)
         );
     }
 
     public function testWithdrawCommitCrypto(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([], '3000000000000000000', $this->once()),
+            $this->mockWithdrawGatewayInterface([], '3000000000000000000', Symbols::WEB, $this->once()),
             $this->mockBalanceHandler(),
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager(),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000'));
@@ -329,20 +408,25 @@ class WalletTest extends TestCase
     public function testWithdrawCommitCryptoWithLowBalance(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([], '10000000000000000', $this->never()),
+            $this->mockWithdrawGatewayInterface([], '10000000000000000', Symbols::WEB, $this->once()),
             $this->mockBalanceHandler(),
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager(),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
-
-        $this->expectException(NotEnoughAmountException::class);
 
         $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000'));
     }
@@ -350,17 +434,24 @@ class WalletTest extends TestCase
     public function testWithdrawCommitToken(): void
     {
         $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface([]),
+            $this->mockWithdrawGatewayInterface([], '1000000000000', Symbols::TOK),
             $this->mockBalanceHandler(),
             $this->mockDepositCommunicator([]),
             $this->mockPendingManager(),
             $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager(),
-            $this->mockContractHandler([], $this->once()),
-            $this->createMock(LoggerInterface::class),
+            $this->mockContractHandler([], Symbols::WEB, $this->once()),
             $this->mockTokenManager(),
+            $this->mockTokenConfig(),
+            $this->createMock(RebrandingConverterInterface::class),
+            $this->createMock(ValidatorFactoryInterface::class),
+            $this->createMock(UserRepository::class),
             $this->mockMoneyWrapper(),
-            $this->mockTokenConfig()
+            $this->createMock(CryptoManager::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InternalTransactionManagerInterface::class),
+            $this->mockHideFeaturesConfig(),
+            $this->createMock(WithdrawLogger::class),
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $wallet->withdrawCommit($this->mockPendingTokenWithdraw('1000000000000'));
@@ -375,7 +466,9 @@ class WalletTest extends TestCase
 
         $pending = $this->createMock(PendingWithdraw::class);
         $pending->method('getCrypto')->willReturn($this->mockCrypto(Symbols::WEB));
+        $pending->method('getCryptoNetwork')->willReturn($this->mockCrypto(Symbols::WEB));
         $pending->method('getAmount')->willReturn($amountMock);
+        $pending->method('getFee')->willReturn(new Money('0', new Currency(Symbols::WEB)));
 
         return $pending;
     }
@@ -390,11 +483,12 @@ class WalletTest extends TestCase
         $pending = $this->createMock(PendingTokenWithdraw::class);
         $pending->method('getToken')->willReturn($this->mockToken());
         $pending->method('getAmount')->willReturn($amountMock);
+        $pending->method('getFee')->willReturn(new Money('0', new Currency(Symbols::WEB)));
 
         return $pending;
     }
 
-    private function mockPendingManager(?Invocation $inv = null): PendingManagerInterface
+    private function mockPendingManager(?InvokedCount $inv = null): PendingManagerInterface
     {
         $manager = $this->createMock(PendingManagerInterface::class);
         $manager->expects($inv ?? $this->never())->method('create');
@@ -415,39 +509,61 @@ class WalletTest extends TestCase
         $depositCommunicatorMock = $this->createMock(DepositGatewayCommunicator::class);
         $depositCommunicatorMock
             ->method('getTransactions')
-            ->willReturn($transactions)
-        ;
+            ->willReturn($transactions);
 
         return $depositCommunicatorMock;
     }
 
-    private function mockContractHandler(array $transactions, ?Invocation $withdrawInv = null): ContractHandlerInterface
-    {
+    private function mockContractHandler(
+        array $transactions,
+        string $symbol = 'WEB',
+        ?InvokedCount $withdrawInv = null
+    ): ContractHandlerInterface {
         $contractHandler = $this->createMock(ContractHandlerInterface::class);
         $contractHandler->expects($withdrawInv ?? $this->never())->method('withdraw');
         $contractHandler
             ->method('getTransactions')
             ->willReturn($transactions);
 
+        $contractHandler
+            ->method('getWithdrawInfo')
+            ->willReturn($this->mockWithdrawInfo('0', $symbol, false));
+
         return $contractHandler;
+    }
+
+    private function mockWithdrawInfo(
+        string $minFee,
+        string $symbol,
+        bool $isPaused
+    ): WithdrawInfo {
+        $withdrawInfo = $this->createMock(WithdrawInfo::class);
+        $withdrawInfo
+            ->method('getMinFee')
+            ->willReturn(new Money($minFee, new Currency($symbol)));
+        $withdrawInfo
+            ->method('isPaused')
+            ->willReturn($isPaused);
+
+        return $withdrawInfo;
     }
 
     private function mockWithdrawGatewayInterface(
         array $history,
         string $available = '0',
-        ?Invocation $withdrawInv = null
+        string $symbol = 'WEB',
+        ?InvokedCount $withdrawInv = null
     ): WithdrawGatewayInterface {
         $withdrawGatewayMock = $this->createMock(WithdrawGatewayInterface::class);
         $withdrawGatewayMock
             ->method('getHistory')
-            ->willReturn($history)
-        ;
+            ->willReturn($history);
         $withdrawGatewayMock
             ->method('getBalance')
-            ->willReturn(new Money($available, new Currency(Symbols::WEB)));
+            ->willReturn(new Money($available, new Currency($symbol)));
         $withdrawGatewayMock
-            ->method('address')
-            ->willReturn(true);
+            ->method('isContractAddress')
+            ->willReturn(false);
 
         $withdrawGatewayMock
             ->expects($withdrawInv ?? $this->never())
@@ -457,29 +573,34 @@ class WalletTest extends TestCase
     }
 
     private function mockBalanceHandler(
-        ?Invocation $withdrawInv = null,
+        ?InvokedCount $withdrawInv = null,
         string $available = '0',
-        string $availableToken = '0'
+        string $availableToken = '0',
+        string $changeSymbol = "TOK"
     ): BalanceHandlerInterface {
-        $balanceResultCrypto = $this->createMock(BalanceResult::class);
-        $balanceResultCrypto->method('getAvailable')
-            ->willReturn(new Money($available, new Currency(Symbols::WEB)));
-
-        $balanceResultToken = $this->createMock(BalanceResult::class);
-        $balanceResultToken->method('getAvailable')
-            ->willReturn(new Money($availableToken, new Currency(Symbols::TOK)));
-
         $handler = $this->createMock(BalanceHandlerInterface::class);
+
         $handler->method('balance')
             ->will($this->returnCallback(
-                function (User $user, TradebleInterface $tradable) use ($balanceResultCrypto, $balanceResultToken) {
-                    return Symbols::WEB === $tradable->getSymbol()
-                        ? $balanceResultCrypto
-                        : $balanceResultToken;
+                function (User $user, TradableInterface $tradable) use ($available, $availableToken) {
+                    $balanceResult = $this->createMock(BalanceResult::class);
+
+                    $balanceResult
+                        ->method('getAvailable')
+                        ->willReturn(new Money(
+                            Symbols::WEB === $tradable->getSymbol() ? $available : $availableToken,
+                            new Currency($tradable->getMoneySymbol())
+                        ));
+
+                    return $balanceResult;
                 }
             ));
 
-        $handler->expects($withdrawInv ?? $this->never())->method('withdraw');
+        $ubv = $this->createMock(UpdateBalanceView::class);
+        $ubv->method('getChange')->willReturn(new Money('10000000000000000', new Currency($changeSymbol)));
+        $handler->expects($withdrawInv ?? $this->never())
+            ->method('withdraw')
+            ->willReturn($ubv);
 
         return $handler;
     }
@@ -489,16 +610,13 @@ class WalletTest extends TestCase
         $transactionMock = $this->createMock(Transaction::class);
         $transactionMock
             ->method('getDate')
-            ->willReturn($this->mockDateTime($timestamp))
-        ;
+            ->willReturn($this->mockDateTime($timestamp));
         $transactionMock
             ->method('getTradable')
-            ->willReturn($this->mockCrypto($crypto))
-        ;
+            ->willReturn($this->mockCrypto($crypto));
         $transactionMock
             ->method('getType')
-            ->willReturn($this->mockType($type))
-        ;
+            ->willReturn($this->mockType($type));
 
         return $transactionMock;
     }
@@ -508,13 +626,12 @@ class WalletTest extends TestCase
         $typeMock = $this->createMock(Type::class);
         $typeMock
             ->method('getTypeCode')
-            ->willReturn($type)
-        ;
+            ->willReturn($type);
 
         return $typeMock;
     }
 
-    private function mockCrypto(string $symbol): Crypto
+    private function mockCrypto(string $symbol, ?string $wrappedTo = null): Crypto
     {
         $cryptoMock = $this->createMock(Crypto::class);
         $cryptoMock
@@ -524,34 +641,57 @@ class WalletTest extends TestCase
             );
         $cryptoMock
             ->method('getSymbol')
-            ->willReturn($symbol)
-        ;
+            ->willReturn($symbol);
+
+        $cryptoMock
+            ->method('getMoneySymbol')
+            ->willReturn($symbol);
+
+        if ($wrappedTo) {
+            $wrappedTo = $this->mockCrypto($wrappedTo);
+            $wrappedToken = $this->mockWrappedCryptoToken($cryptoMock, $wrappedTo);
+
+            $cryptoMock
+                ->method('getWrappedCryptoTokens')
+                ->willReturn([$wrappedToken]);
+
+            $cryptoMock
+                ->method('getWrappedTokenByCrypto')
+                ->with($wrappedTo)
+                ->willReturn($wrappedToken);
+
+            $cryptoMock
+                ->method('canBeWithdrawnTo')
+                ->with($wrappedTo)
+                ->willReturn(true);
+        }
 
         return $cryptoMock;
     }
 
-    private function mockCryptoManager(?Invocation $inv = null, bool $nullCrypto = false): CryptoManagerInterface
+    private function mockWrappedCryptoToken(Crypto $whom, Crypto $to): WrappedCryptoToken
     {
-        $manager = $this->createMock(CryptoManagerInterface::class);
+        $wrapped = $this->createMock(WrappedCryptoToken::class);
+        $wrapped->method('getCrypto')->willReturn($whom);
+        $wrapped->method('getCryptoDeploy')->willReturn($to);
+        $wrapped->method('getFee')->willReturn(new Money('0', new Currency($to->getSymbol())));
 
-        if ($nullCrypto) {
-            $manager->expects($inv ?? $this->never())
-                ->method('findBySymbol')
-                ->willReturn(null);
-        } else {
-            $manager->expects($inv ?? $this->never())
-                ->method('findBySymbol')
-                ->with(Symbols::WEB)
-                ->willReturn($this->mockCrypto(Symbols::WEB));
-        }
-
-        return $manager;
+        return $wrapped;
     }
 
-    private function mockToken(): Token
+    private function mockToken(?string $symbol = null): Token
     {
         $token = $this->createMock(Token::class);
         $token->method('getCryptoSymbol')->willReturn('WEB');
+        $token->method('getFee')->willReturn(
+            $symbol ?
+                new Money('30000000', new Currency($symbol)) :
+                null
+        );
+
+        $token
+            ->method('getMoneySymbol')
+            ->willReturn(Symbols::TOK);
 
         return $token;
     }
@@ -561,8 +701,7 @@ class WalletTest extends TestCase
         $dateMock = $this->createMock(DateTime::class);
         $dateMock
             ->method('getTimestamp')
-            ->willReturn($timestamp)
-        ;
+            ->willReturn($timestamp);
 
         return $dateMock;
     }
@@ -572,7 +711,7 @@ class WalletTest extends TestCase
         return $this->createMock(User::class);
     }
 
-    public function mockAddress(string $str): Address
+    private function mockAddress(string $str): Address
     {
         $address = $this->createMock(Address::class);
 
@@ -581,7 +720,7 @@ class WalletTest extends TestCase
         return $address;
     }
 
-    public function mockTokenManager(): TokenManagerInterface
+    private function mockTokenManager(): TokenManagerInterface
     {
         $tm = $this->createMock(TokenManagerInterface::class);
         $tm->method('getRealBalance')->willReturnCallback(
@@ -593,18 +732,31 @@ class WalletTest extends TestCase
         return $tm;
     }
 
-    public function mockTokenConfig(): TokenConfig
+    private function mockTokenConfig(): TokenConfig
     {
         return $this->createMock(TokenConfig::class);
     }
 
-    private function mockMoneyWrapper(): MoneyWrapperInterface
+    private function mockHideFeaturesConfig(): HideFeaturesConfig
     {
-        $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
-            return new Money((int)$amount, new Currency($symbol));
-        });
+        $config = $this->createMock(HideFeaturesConfig::class);
+        $config
+            ->method('isCryptoEnabled')
+            ->willReturn(true);
 
-        return $mw;
+        return $config;
+    }
+
+    private function mockInternalTransactionManager(array $transactions = []): InternalTransactionManagerInterface
+    {
+        $itm = $this->createMock(InternalTransactionManagerInterface::class);
+        $itm->method('getLatest')->willReturn($transactions);
+
+        return $itm;
+    }
+
+    private function mockWrappedCryptoTokenManager(): WrappedCryptoTokenManagerInterface
+    {
+        return $this->createMock(WrappedCryptoTokenManagerInterface::class);
     }
 }

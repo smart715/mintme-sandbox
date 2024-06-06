@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
+use App\Config\WithdrawalDelaysConfig;
+use App\Entity\User;
+use App\Events\PasswordChangeEvent;
+use App\Events\UserChangeEvents;
 use App\Form\ResetRequestType;
 use App\Form\ResettingType;
 use App\Logger\UserActionLogger;
+use App\Services\TranslatorService\TranslatorInterface;
 use FOS\UserBundle\Controller\ResettingController as FOSResettingController;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
@@ -17,18 +22,20 @@ use FOS\UserBundle\Util\TokenGeneratorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-/** @codeCoverageIgnore  */
+/**
+ * @codeCoverageIgnore
+ * @phpstan-ignore-next-line final class
+ */
 class ResettingController extends FOSResettingController
 {
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
-    /** @var UserManagerInterface */
-    private $userManager;
-
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private UserActionLogger $userActionLogger;
+    private UserManagerInterface $userManager;
+    private EventDispatcherInterface $eventDispatcher;
+    private UserPasswordEncoderInterface $encoder;
+    private TranslatorInterface $translator;
+    private WithdrawalDelaysConfig $withdrawalDelaysConfig;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -37,11 +44,18 @@ class ResettingController extends FOSResettingController
         TokenGeneratorInterface $tokenGenerator,
         MailerInterface $mailer,
         int $retryTtl,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        TranslatorInterface $translator,
+        UserPasswordEncoderInterface $encoder,
+        WithdrawalDelaysConfig $withdrawalDelaysConfig
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->userManager = $userManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->translator = $translator;
+        $this->encoder = $encoder;
+        $this->withdrawalDelaysConfig = $withdrawalDelaysConfig;
+
         parent::__construct(
             $eventDispatcher,
             $formFactory,
@@ -54,13 +68,42 @@ class ResettingController extends FOSResettingController
 
     public function sendEmailAction(Request $request): Response
     {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if ($user) {
+            return $this->redirectToRoute('trading');
+        }
+
         $form = $this->createForm(ResetRequestType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var User|null $user */
+            $user = $this->userManager->findUserByEmail($request->get('username'));
+
+            if ($user && $user->isBlocked()) {
+                return $this->render('pages/account_blocked.html.twig', [
+                    'email' => $user->getEmail(),
+                ]);
+            }
+
+            if ($user && !$user->isEnabled()) {
+                $this->addFlash(
+                    'error',
+                    $this->translator->trans('form.reset.email_not_confirmed')
+                );
+
+                return $this->redirectToRoute('fos_user_resetting_request');
+            }
+
             $this->userActionLogger->info('Forgot password', ['username' => $form->get('username')->getData()]);
 
-            return parent::sendEmailAction($request);
+            parent::sendEmailAction($request);
+
+            return $this->render('@FOSUser/Resetting/check_email.html.twig', [
+                'tokenLifetime' => ceil($this->getParameter('password_reset_retry_time') / 3600),
+            ]);
         }
 
         return $this->render('@FOSUser/Resetting/request.html.twig', [
@@ -90,23 +133,39 @@ class ResettingController extends FOSResettingController
             return $eventResponse;
         }
 
+        $isEnabled = $user->isEnabled();
+
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
-            $event = new FormEvent($resettingForm, $request);
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch($event, FOSUserEvents::RESETTING_RESET_SUCCESS);
+            if ($this->encoder->isPasswordValid($user, $resettingForm['plainPassword']->getData())) {
+                $this->addFlash(
+                    'error',
+                    $this->translator->trans('passwordmeter.duplicate')
+                );
+            } else {
+                $event = new FormEvent($resettingForm, $request);
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch($event, FOSUserEvents::RESETTING_RESET_SUCCESS);
 
-            $this->userManager->updatePassword($user);
-            $this->userManager->updateUser($user);
+                /** @var User $user */
+                $this->eventDispatcher->dispatch(
+                    new PasswordChangeEvent($this->withdrawalDelaysConfig, $user),
+                    UserChangeEvents::PASSWORD_UPDATED
+                );
 
-            $response = $this->redirectToRoute('fos_user_security_login');
+                $user->setEnabled($isEnabled);
+                $this->userManager->updatePassword($user);
+                $this->userManager->updateUser($user);
 
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new FilterUserResponseEvent($user, $request, $response),
-                FOSUserEvents::RESETTING_RESET_COMPLETED
-            );
+                $response = $this->redirectToRoute('fos_user_security_login');
 
-            return $response;
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch(
+                    new FilterUserResponseEvent($user, $request, $response),
+                    FOSUserEvents::RESETTING_RESET_COMPLETED
+                );
+
+                return $response;
+            }
         }
 
         return $this->render('bundles/FOSUserBundle/Resetting/reset.html.twig', [

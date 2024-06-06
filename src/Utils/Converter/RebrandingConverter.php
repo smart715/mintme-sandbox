@@ -18,8 +18,8 @@ class RebrandingConverter implements RebrandingConverterInterface
 
     public function reverseConvert(string $value): string
     {
-        $regExp =   ['/(MintMe Coin)/',  '/(mintMe Coin)/',  '/(MINTME)/',  '/(mintme)/'];
-        $replacer = ['Webchain', 'webchain', 'WEB', 'WEB'];
+        $regExp =   ['/(MintMe Coin)/',  '/(mintMe Coin)/', '/(^|\s)(mintme)(\s|$)/', '/(^|\s)(MINTME)(\s|$)/'];
+        $replacer = ['Webchain', 'webchain', '$1WEB$3', '$1WEB$3'];
 
         return (string) preg_replace($regExp, $replacer, $value);
     }

@@ -137,7 +137,7 @@ class MarketFetcherTest extends TestCase
     public function testUserExecutedHistory(bool $hasError, ?array $rpcResult): void
     {
         $method = 'market.user_deals';
-        $params = [3, "TOK000000000001WEB", 0, 100];
+        $params = [3, "TOK000000000001WEB", 0, 100, 0, 0, true];
         $offset = 1;
 
         $jsonResponse = $this->createMock(JsonRpcResponse::class);

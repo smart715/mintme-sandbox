@@ -29,8 +29,10 @@ class UserActionProcessor
     public function __invoke(array $record): array
     {
         $currentRequest = $this->requestStack->getCurrentRequest();
-
-        $record['extra']['username'] = $this->getUsername();
+        $viewOnly = $currentRequest && $currentRequest->getSession()->get('view_only_mode')
+            ? ' VIEW ONLY'
+            : '';
+        $record['extra']['username'] = $this->getUsername().$viewOnly;
         $record['extra']['ip_address'] = $currentRequest
             ? $currentRequest->getClientIp()
             : 'localhost';

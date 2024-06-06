@@ -30,6 +30,8 @@ class SlugConverter implements SlugConverterInterface
             $i++;
         }
 
-        return $slug;
+        return '' === $slug
+            ? $from
+            : $slug;
     }
 }

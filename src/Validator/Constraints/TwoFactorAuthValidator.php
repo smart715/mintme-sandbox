@@ -4,10 +4,10 @@ namespace App\Validator\Constraints;
 
 use App\Entity\User;
 use App\Manager\TwoFactorManager;
+use App\Services\TranslatorService\TranslatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TwoFactorAuthValidator extends ConstraintValidator
 {
@@ -34,7 +34,7 @@ class TwoFactorAuthValidator extends ConstraintValidator
     /** {@inheritdoc} */
     public function validate($value, Constraint $constraint): void
     {
-        if ($value && !$this->twoFactorManager->checkCode($this->user, $value)) {
+        if (!$value || !$this->twoFactorManager->checkCode($this->user, $value)) {
             $this->context->buildViolation($this->translator->trans($constraint->message))->addViolation();
         }
     }

@@ -2,6 +2,7 @@
 
 namespace App\Wallet\Deposit\Model;
 
+/** @codeCoverageIgnore */
 class DepositCredentials implements \IteratorAggregate
 {
     /** @var mixed[]*/

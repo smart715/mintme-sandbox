@@ -39,7 +39,7 @@ class UserAdminCRUDController extends Controller
 
         $this->addFlash(
             'sonata_flash_success',
-            'An email has been sent. It contains a link which user has to follow to reset their password.'
+            $this->trans('email.sent_password_reset', [], 'SonataAdminBundle')
         );
 
         return new RedirectResponse($this->admin->generateUrl('list'));

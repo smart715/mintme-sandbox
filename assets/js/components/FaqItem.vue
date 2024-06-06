@@ -10,7 +10,10 @@
             <b-card-body class="pt-1 pb-1">
                 <p class="card-text">
                     <slot name="body">
-                        {{ $t('faq_item.body.1') }} <code>{{ $t('faq_item.body.2') }}</code> {{ $t('faq_item.body.3') }} <code>{{ $t('faq_item.body.4') }}</code>
+                        {{ $t('faq_item.body.1') }}
+                        <code>{{ $t('faq_item.body.2') }}</code>
+                        {{ $t('faq_item.body.3') }}
+                        <code>{{ $t('faq_item.body.4') }}</code>
                     </slot>
                 </p>
             </b-card-body>
@@ -50,23 +53,23 @@ export default {
         groupName: {type: String, default: 'faq-accordion'},
     },
     data: function() {
-          return {
-              icon: 'chevron-down',
-          };
-      },
-      computed: {
-          identifier: function() {
-              return 'faq-' + Math.floor(Math.random() * 100) + Date.now();
-          },
-      },
-      methods: {
-          switchIcon: function() {
-              switch (this.icon) {
-                  case 'chevron-down': this.icon = 'chevron-up'; break;
-                  case 'chevron-up': this.icon = 'chevron-down'; break;
-              }
-              this.$emit('switch');
-          },
-      },
+        return {
+            icon: 'chevron-down',
+        };
+    },
+    computed: {
+        identifier: function() {
+            return 'faq-' + Math.floor(Math.random() * 100) + Date.now();
+        },
+    },
+    methods: {
+        switchIcon: function() {
+            switch (this.icon) {
+                case 'chevron-down': this.icon = 'chevron-up'; break;
+                case 'chevron-up': this.icon = 'chevron-down'; break;
+            }
+            this.$emit('switch');
+        },
+    },
 };
 </script>

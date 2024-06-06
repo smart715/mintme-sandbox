@@ -35,6 +35,7 @@ class RefererRequestHandler implements RefererRequestHandlerInterface
     {
         return [
             'fos_user_registration_register',
+            'fos_user_resetting_reset',
             'login_success',
             'login',
             'nelmio_security',
@@ -49,29 +50,6 @@ class RefererRequestHandler implements RefererRequestHandlerInterface
             $this->router->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL),
             $this->router->generate('fos_user_registration_register', [], UrlGeneratorInterface::ABSOLUTE_URL),
             $this->router->generate('homepage', [], UrlGeneratorInterface::ABSOLUTE_URL),
-        ];
-    }
-
-    public function noRedirectToMainPage(string $referer): bool
-    {
-        $noRedirect = true;
-
-        foreach ($this->refererRoutesForRedirectToMainPage() as $refererRoute) {
-            if (false !== strpos($referer, $refererRoute)) {
-                $noRedirect = false;
-
-                break;
-            }
-        }
-
-        return $noRedirect;
-    }
-
-    public function refererRoutesForRedirectToMainPage(): array
-    {
-        return [
-            '/token/',
-            '/profile/',
         ];
     }
 }

@@ -13,22 +13,19 @@ use App\Manager\AirdropCampaignManager;
 use App\Manager\TokenManagerInterface;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Repository\AirdropCampaign\AirdropRepository;
-use App\Tests\MockMoneyWrapper;
+use App\Tests\Mocks\MockMoneyWrapper;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\MockObject\InvocationMocker;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class AirdropCampaignManagerTest extends TestCase
 {
@@ -225,7 +222,7 @@ class AirdropCampaignManagerTest extends TestCase
             ->willReturn($this->createMock(AirdropRepository::class));
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
-        $bh->expects($this->once())->method('update');
+        $bh->expects($this->once())->method('depositBonus');
         /** @var User|MockObject */
         $owner = $this->createMock(User::class);
         /** @var Profile|MockObject */
@@ -368,7 +365,7 @@ class AirdropCampaignManagerTest extends TestCase
             ->method('getRepository')
             ->willReturn($this->createMock(AirdropRepository::class));
 
-        $em->expects($this->exactly(8))
+        $em->expects($this->exactly(9))
             ->method('persist')
             ->withConsecutive(
                 [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 0 === $action->getType() && 'twitterMessage' === $action->getData())],
@@ -378,7 +375,8 @@ class AirdropCampaignManagerTest extends TestCase
                 [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 4 === $action->getType() && 'facebookPost' === $action->getData())],
                 [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 5 === $action->getType() && 'linkedinMessage' === $action->getData())],
                 [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 6 === $action->getType() && 'youtubeSubscribe' === $action->getData())],
-                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 7 === $action->getType() && 'postLink' === $action->getData())]
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 7 === $action->getType() && 'postLink' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 8 === $action->getType() && 'visitExternalUrl' === $action->getData())]
             );
 
         /** @var BalanceHandlerInterface|MockObject $bh */
@@ -503,33 +501,39 @@ class AirdropCampaignManagerTest extends TestCase
         $user = $this->createMock(User::class);
         $session = $this->createMock(SessionInterface::class);
         $action = $this->createMock(AirdropAction::class);
+        $airdrop = $this->createMock(Airdrop::class);
 
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
+        $airdropParticipantRepo = $this->createMock(AirdropParticipantRepository::class);
+        $airdropParticipantRepo
+            ->method('getParticipantByUserAndAirdrop')
+            ->willReturn(new AirdropParticipant());
+
         $em->expects($this->at(0))
             ->method('getRepository')
-            ->willReturn($this->createMock(AirdropParticipantRepository::class));
+            ->willReturn($airdropParticipantRepo);
         $em->expects($this->at(1))
             ->method('getRepository')
             ->willReturn($this->createMock(AirdropRepository::class));
 
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
+        $token = $this->createMock(Token::class);
 
         $airdropManager = new AirdropCampaignManager(
             $em,
             $this->mockMoneyWrapper(),
             $bh,
             $this->mockEventDispatcher(),
-            $this->mockTokenManager(),
+            $this->mockTokenManager($token, $this->once()),
             $session
         );
 
         /** @var Token|MockObject */
-        $token = $this->createMock(Token::class);
         $sessionData = [$token->getName() =>[$action->getId()]];
-        $session->set('airdrops', $sessionData);
-        $token->expects(self::once())->method('findByName');
+        $session->expects($this->once())->method('get')->with('airdrops')->willReturn($sessionData);
+        $token->expects(self::exactly(4))->method('getActiveAirdrop')->willReturn($airdrop);
         $this->assertTrue($airdropManager->checkIfUserClaimed($user, $token));
         $session->expects(self::once())->method('remove')->with('airdrops');
         $airdropManager->claimAirdropsActionsFromSessionData($user);
@@ -549,21 +553,25 @@ class AirdropCampaignManagerTest extends TestCase
         $em->expects($this->at(1))
             ->method('getRepository')
             ->willReturn($this->createMock(AirdropRepository::class));
+        $airdropRepo = $this->createMock(ObjectRepository::class);
+        $em->expects($this->at(2))
+            ->method('getRepository')
+            ->willReturn($airdropRepo);
+
 
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
+        $token = $this->createMock(Token::class);
 
         $airdropManager = new AirdropCampaignManager(
             $em,
             $this->mockMoneyWrapper(),
             $bh,
             $this->mockEventDispatcher(),
-            $this->mockTokenManager(),
+            $this->mockTokenManager($token, $this->once()),
             $session
         );
 
-        /** @var Token|MockObject */
-        $token = $this->createMock(Token::class);
         $airdrop = new Airdrop();
         $airdrop
             ->setToken($token)
@@ -571,16 +579,22 @@ class AirdropCampaignManagerTest extends TestCase
             ->setActualAmount(new Money(0, new Currency(Symbols::TOK)))
             ->setLockedAmount(new Money(0, new Currency(Symbols::TOK)))
             ->setStatus(Airdrop::STATUS_ACTIVE);
+        $airdropAction = $this->createMock(AirdropAction::class);
+        $airdropAction->method('getAirdrop')->willReturn($airdrop);
+        $collection = $this->createMock(Collection::class);
+        $collection->method('getValues')->willReturn([]);
+        $airdropAction->method('getUsers')->willReturn($collection);
+        $airdropRepo->expects($this->once())->method('find')->willReturn($airdropAction);
 
         $airdropManager->deleteActiveAirdrop($token);
 
         $sessionData = [$token->getName() =>[$action->getId()]];
-        $session->set('airdrops', $sessionData);
-        $token->expects(self::once())->method('findByName');
+        $session->expects($this->once())->method('get')->with('airdrops')->willReturn($sessionData);
+        $token->expects(self::exactly(2))->method('getActiveAirdrop')->willReturn($airdrop);
         $this->assertEquals(Airdrop::STATUS_ACTIVE, $airdrop->getStatus());
         $session->expects(self::once())->method('remove')->with('airdrops');
         $airdropManager->claimAirdropsActionsFromSessionData($user);
-        $this->assertEquals([], $user->getAirdropActions());
+        $action->expects(self::never())->method('addUser');
     }
 
     public function testNotClaimAirdropActionOnActionCompletedByUser(): void
@@ -597,28 +611,37 @@ class AirdropCampaignManagerTest extends TestCase
         $em->expects($this->at(1))
             ->method('getRepository')
             ->willReturn($this->createMock(AirdropRepository::class));
+        $airdropRepo = $this->createMock(ObjectRepository::class);
+        $em->expects($this->at(2))
+            ->method('getRepository')
+            ->willReturn($airdropRepo);
 
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
+        $token = $this->createMock(Token::class);
 
         $airdropManager = new AirdropCampaignManager(
             $em,
             $this->mockMoneyWrapper(),
             $bh,
             $this->mockEventDispatcher(),
-            $this->mockTokenManager(),
+            $this->mockTokenManager($token, $this->once()),
             $session
         );
+        $airdropAction = $this->createMock(AirdropAction::class);
+        $airdropAction->method('getAirdrop')->willReturn($this->createMock(Airdrop::class));
+        $collection = $this->createMock(Collection::class);
+        $collection->method('getValues')->willReturn([$user]);
+        $airdropAction->method('getUsers')->willReturn($collection);
+        $airdropRepo->expects($this->once())->method('find')->willReturn($airdropAction);
+
         /** @var Token|MockObject */
-        $token = $this->createMock(Token::class);
         $sessionData = [$token->getName() =>[$action->getId()]];
-        $session->set('airdrops', $sessionData);
-        $action->addUser($user);
-        $token->expects(self::once())->method('findByName');
+        $session->expects($this->once())->method('get')->with('airdrops')->willReturn($sessionData);
+        $action->expects($this->never())->method('addUser')->with($user);
         $session->expects(self::once())->method('remove')->with('airdrops');
 
         $airdropManager->claimAirdropsActionsFromSessionData($user);
-        $this->assertEquals(true, in_array($user, $action->getUsers()->getValues(), true));
     }
 
     private function mockEventDispatcher(): EventDispatcherInterface
@@ -636,7 +659,7 @@ class AirdropCampaignManagerTest extends TestCase
         return $em;
     }
 
-    private function mockTokenManager(?Token $token = null, ?Invocation $invocation = null): TokenManagerInterface
+    private function mockTokenManager(?Token $token = null, ?InvokedCount $invocation = null): TokenManagerInterface
     {
         $tm = $this->createMock(TokenManagerInterface::class);
         $tm->expects($invocation ?? self::never())

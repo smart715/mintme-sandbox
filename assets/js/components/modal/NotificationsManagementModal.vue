@@ -22,84 +22,113 @@
                             :key="config.text"
                             class="row faq-block light-border no-decoration mx-0">
                             <faq-item>
-                                <template slot="title"> {{ config.text }} </template>
-                                    <template slot="body">
-                                        <div class="mb-2">
+                                <template slot="title">
+                                    {{ config.text }}
+                                    <guide v-if="tooltipNewInvestor(config)" class="tooltip-center">
+                                        <template slot="header">
+                                            {{ $t('userNotification.tooltip.new_investor') }}
+                                        </template>
+                                    </guide>
+                                </template>
+                                <template slot="body">
+                                    <div class="mb-2 mt-1 d-flex justify-content-between">
+                                        <div>
                                             <span> {{ config.channels.email.text }} </span>
-                                            <b-form-checkbox
-                                                v-model="config.channels.email.value"
-                                                class="float-right"
-                                                size="lg"
-                                                name="check-button"
-                                                switch
-                                            >
-                                            </b-form-checkbox>
                                         </div>
-                                        <div class="mb-2">
-                                            <span> {{ config.channels.website.text }} </span>
-                                            <b-form-checkbox
-                                                v-model="config.channels.website.value"
-                                                class="float-right"
-                                                size="lg"
-                                                name="check-button"
-                                                switch
-                                            >
-                                            </b-form-checkbox>
+                                        <b-form-checkbox
+                                            v-if="!savingCheckboxConfig.email"
+                                            v-model="config.channels.email.value"
+                                            class="float-right checkbox-dashed-onfocus no-top"
+                                            size="lg"
+                                            name="check-button"
+                                            switch
+                                            tabindex="0"
+                                            :disabled="saving"
+                                            @change="changeCheckboxConfig('email')"
+                                        />
+                                        <div v-else class="pr-4">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="sr-only">{{ $t('loading') }}</span>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div class="mb-2 d-flex justify-content-between">
+                                        <span> {{ config.channels.website.text }} </span>
+                                        <b-form-checkbox
+                                            v-if="!savingCheckboxConfig.website"
+                                            v-model="config.channels.website.value"
+                                            class="float-right checkbox-dashed-onfocus no-top"
+                                            size="lg"
+                                            name="check-button"
+                                            switch
+                                            :disabled="saving"
+                                            @change="changeCheckboxConfig('website')"
+                                        />
+                                        <div v-else class="pr-4">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="sr-only">{{ $t('loading') }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="isNewPostSettings(config)" class="mb-2 plain-text-content">
+                                        <a class="link" @click="openAdvancedModal">
+                                            {{ $t('userNotification.config.settings.advanced') }}
+                                        </a>
+                                    </div>
                                 </template>
                             </faq-item>
                         </div>
                     </template>
-                    <div v-if="loading" class="text-center w-100">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                    <div>
-                        <b-card>
-                            <button
-                                class="btn btn-primary float-left"
-                                @click="saveConfig"
-                                :disabled="saving"
-                            >
-                                {{ $t('save') }}
-                            </button>
-                            <div class="mt-1">
-                                <b-link class="ml-3" @click="$emit('close')" >{{ $t('cancel') }}</b-link>
-                            </div>
-                        </b-card>
+                    <div v-if="loading" class="text-center pb-4">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="sr-only">{{ $t('loading') }}</span>
+                        </div>
                     </div>
                 </div>
             </template>
         </modal>
+        <notifications-management-advanced-modal
+            v-if="notificationAdvancedModalVisible"
+            :notification-advanced-modal-visible="notificationAdvancedModalVisible"
+            :config-prop="userConfigModel"
+            :saving-config-data="saving"
+            @close="notificationAdvancedModalVisible = false"
+            @save-config="saveConfig"
+        />
     </div>
 </template>
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Modal from './Modal';
+import NotificationsManagementAdvancedModal from './NotificationsManagementAdvancedModal';
 import FaqItem from '../FaqItem';
-import {NotificationMixin, LoggerMixin} from '../../mixins/';
-import {BCard, BCardText, BLink, BFormCheckbox} from 'bootstrap-vue';
+import {NotificationMixin} from '../../mixins/';
+import {BCard, BCardText, BFormCheckbox} from 'bootstrap-vue';
+import {HTTP_ACCESS_DENIED} from '../../utils/constants';
+import Guide from '../Guide';
+import TruncateFilterMixin from '../../mixins/filters/truncate';
 
 library.add(faCircleNotch);
 
 export default {
-    name: 'NotificationManagementModal',
+    name: 'NotificationsManagementModal',
     components: {
+        Guide,
         BCard,
         BCardText,
-        BLink,
         BFormCheckbox,
         Modal,
         FaqItem,
-        FontAwesomeIcon,
+        NotificationsManagementAdvancedModal,
     },
     mixins: [
         NotificationMixin,
-        LoggerMixin,
+        TruncateFilterMixin,
     ],
     props: {
+        notificationConfigModalVisibleProp: Boolean,
         notificationConfigModalVisible: Boolean,
         noClose: Boolean,
     },
@@ -109,6 +138,11 @@ export default {
             saving: false,
             userConfig: {},
             userConfigModel: {},
+            savingCheckboxConfig: {
+                email: false,
+                website: false,
+            },
+            notificationAdvancedModalVisible: this.notificationConfigModalVisibleProp,
         };
     },
     computed: {
@@ -118,37 +152,61 @@ export default {
         },
     },
     mounted() {
-        this.fetchUserNotificationsConfig();
+        this.fetchUserNotificationsConfig(true);
     },
     methods: {
-        fetchUserNotificationsConfig: function() {
-            this.loading = true;
+        changeCheckboxConfig: async function(type) {
+            this.savingCheckboxConfig[type] = true;
+
+            try {
+                await this.saveConfig();
+            } finally {
+                this.savingCheckboxConfig[type] = false;
+            }
+        },
+        tooltipNewInvestor: function(config) {
+            return this.userConfigModel.new_investor.text === config.text;
+        },
+        fetchUserNotificationsConfig: function(loading = false) {
+            this.loading = loading;
             this.$axios.retry.get(this.$routing.generate('user_notifications_config'))
                 .then((res) => {
                     this.userConfig = res.data;
                     this.userConfigModel = JSON.parse(JSON.stringify(this.userConfig));
                 })
                 .catch((err) => {
-                    this.sendLogs('error', 'Error loading User Notifications config', err);
+                    this.$logger.error('Error loading User Notifications config', err);
                 })
                 .then(() => this.loading = false);
         },
-        saveConfig: function() {
+        saveConfig: async function(config) {
             this.saving = true;
-            let data = this.userConfigModel;
-            this.$axios.retry.post(this.$routing.generate('update_notifications_config'), data)
-                .then(() => {
-                    this.fetchUserNotificationsConfig();
-                    this.notifySuccess(this.$t('userNotification.config.updated'));
-                    this.$emit('close');
-                })
-                .catch((err) => {
-                    this.sendLogs('error', 'Error updating User Notifications config', err);
+            const data = config?.advancedConfig ?? this.userConfigModel;
+
+            try {
+                await this.$axios.retry.post(this.$routing.generate('update_notifications_config'), data);
+
+                this.fetchUserNotificationsConfig();
+                this.notifySuccess(this.$t('userNotification.config.updated'));
+            } catch (err) {
+                if (HTTP_ACCESS_DENIED === err.response.status && err.response.data.message) {
+                    this.notifyError(err.response.data.message);
+                } else {
                     this.notifyError(this.$t('toasted.error.try_later'));
-                })
-                .then(() => this.saving = false);
+                }
+                this.$logger.error('Error updating User Notifications config', err);
+            } finally {
+                this.saving = false;
+            }
+        },
+        isNewPostSettings: function(config) {
+            return this.userConfigModel.new_post.text === config.text;
+        },
+        openAdvancedModal: function() {
+            this.notificationAdvancedModalVisible = true;
         },
         closeModal: function() {
+            this.notificationAdvancedModalVisible = false;
             this.$emit('close');
             this.userConfigModel = JSON.parse(JSON.stringify(this.userConfig));
         },

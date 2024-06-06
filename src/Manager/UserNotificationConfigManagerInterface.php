@@ -2,6 +2,7 @@
 
 namespace App\Manager;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 
 interface UserNotificationConfigManagerInterface
@@ -13,4 +14,5 @@ interface UserNotificationConfigManagerInterface
         array $newConfig
     ): void;
     public function initializeUserNotificationConfig(User $user): void;
+    public function isAllowedToSendNotification(User $user, Token $token): bool;
 }

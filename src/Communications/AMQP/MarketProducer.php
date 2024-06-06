@@ -2,6 +2,7 @@
 
 namespace App\Communications\AMQP;
 
+use App\Entity\User;
 use App\Exchange\Config\Config;
 use App\Exchange\Market;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
@@ -20,7 +21,7 @@ class MarketProducer implements MarketAMQPInterface
         $this->config = $config;
     }
 
-    public function send(Market $market, int $retried = 0): void
+    public function send(Market $market, ?User $user = null, int $retried = 0): void
     {
         // TODO: split consumers for all branches.
         if ($this->config->getOffset() > 0 && !$this->config->isMarketConsumerEnabled()) {
@@ -31,6 +32,7 @@ class MarketProducer implements MarketAMQPInterface
             'retried' => $retried,
             'base' => $market->getBase()->getSymbol(),
             'quote' => $market->getQuote()->getSymbol(),
+            'user_id' => $user ? $user->getId() : null,
         ]));
     }
 }

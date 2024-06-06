@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserLoginInfo;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/** @codeCoverageIgnore */
 class NewDeviceDetectedEvent extends Event implements NewDeviceDetectedEventInterface
 {
     public const NAME = 'newdevice.detected';

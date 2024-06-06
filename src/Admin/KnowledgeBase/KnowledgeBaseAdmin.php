@@ -4,7 +4,6 @@ namespace App\Admin\KnowledgeBase;
 
 use App\Admin\Traits\CheckContentLinksTrait;
 use App\Entity\KnowledgeBase\KnowledgeBase;
-use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -12,19 +11,21 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Sonata\FormatterBundle\Form\Type\SimpleFormatterType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 final class KnowledgeBaseAdmin extends AbstractAdmin
 {
-
+    public array $internalLinks;
+    
     use CheckContentLinksTrait;
 
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
 
-    /** @var mixed overriding $datagridValues */
+    /** {@inheritdoc} */
     protected $datagridValues = [
         '_page' => 1,
         '_sort_order' => 'ASC',
@@ -35,7 +36,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     public function preValidate($object): void
     {
         if ($object instanceof KnowledgeBase && preg_match('/<a (.*)>(.*)<\/a>/i', $object->getDescription())) {
-            $result = $this->addNoopenerToLinks($object->getDescription());
+            $result = $this->addNoopenerNofollowToLinks($object->getDescription(), $this->internalLinks);
 
             if ($result['contentChanged']) {
                 $object->setDescription($result['content']);
@@ -78,8 +79,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ])
             ->add('title', TextType::class)
             ->add('url', TextType::class)
-            ->add('description', CKEditorType::class, [
+            ->add('description', SimpleFormatterType::class, [
                 'label' => 'Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
             ])
             ->end()
             ->with('spanish', [
@@ -90,8 +93,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'required' => false,
                 'label' => 'ES Title',
             ])
-            ->add('esDescription', CKEditorType::class, [
+            ->add('esDescription', SimpleFormatterType::class, [
                 'label' => 'ES Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
             ])
             ->end()
@@ -103,8 +108,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'required' => false,
                 'label' => 'AR Title',
             ])
-            ->add('arDescription', CKEditorType::class, [
+            ->add('arDescription', SimpleFormatterType::class, [
                 'label' => 'AR Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
             ])
             ->end()
@@ -116,8 +123,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'required' => false,
                 'label' => 'FR Title',
             ])
-            ->add('frDescription', CKEditorType::class, [
+            ->add('frDescription', SimpleFormatterType::class, [
                 'label' => 'FR Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
             ])
             ->end()
@@ -129,8 +138,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'required' => false,
                 'label' => 'PL Title',
             ])
-            ->add('plDescription', CKEditorType::class, [
+            ->add('plDescription', SimpleFormatterType::class, [
                 'label' => 'PL Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
             ])
             ->end()
@@ -142,8 +153,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'required' => false,
                 'label' => 'PT Title',
             ])
-            ->add('ptDescription', CKEditorType::class, [
+            ->add('ptDescription', SimpleFormatterType::class, [
                 'label' => 'PT Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
             ])
             ->end()
@@ -155,8 +168,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'required' => false,
                 'label' => 'RU Title',
             ])
-            ->add('ruDescription', CKEditorType::class, [
+            ->add('ruDescription', SimpleFormatterType::class, [
                 'label' => 'RU Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
             ])
             ->end()
@@ -168,11 +183,29 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'required' => false,
                 'label' => 'UA Title',
             ])
-            ->add('uaDescription', CKEditorType::class, [
+            ->add('uaDescription', SimpleFormatterType::class, [
                 'label' => 'UA Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
                 'required' => false,
             ])
-            ->end();
+            ->end()
+            ->with('deutsch', [
+                'class' => 'col-md-12',
+                'label' => 'Deutsch translation',
+            ])
+            ->add('deTitle', TextType::class, [
+                'required' => false,
+                'label' => 'DE Title',
+            ])
+            ->add('deDescription', SimpleFormatterType::class, [
+                'label' => 'DE Description (allow HTML tags)',
+                'format' => 'richhtml',
+                'ckeditor_context' => 'default',
+                'required' => false,
+            ])
+            ->end()
+        ;
     }
 
     protected function configureListFields(ListMapper $listMapper): void
@@ -183,12 +216,13 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->addIdentifier('title', TextType::class)
             ->add('url', TextType::class)
             ->add('description', TextareaType::class)
+            ->add('position')
             ->add('_action', null, [
                 'label' => false,
                 'actions' => [
                     'move' => [
-                        'template' => '@PixSortableBehavior/Default/_sort.html.twig',
-                        'enable_top_bottom_buttons' => false,
+                        'template' => '@PixSortableBehavior/Default/_sort_drag_drop.html.twig',
+                        'enable_top_bottom_buttons' => true,
                     ],
                 ],
             ])

@@ -2,7 +2,7 @@
 
 namespace App\Exchange\Donation;
 
-use App\Exchange\Donation\Model\CheckDonationResult;
+use App\Exchange\Donation\Model\CheckDonationRawResult;
 
 interface DonationFetcherInterface
 {
@@ -11,7 +11,7 @@ interface DonationFetcherInterface
         string $amount,
         string $fee,
         int $tokenCreatorId
-    ): CheckDonationResult;
+    ): CheckDonationRawResult;
 
     public function makeDonation(
         int $donorUserId,

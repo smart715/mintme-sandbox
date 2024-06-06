@@ -2,255 +2,205 @@
 
 namespace App\EventSubscriber;
 
-use App\Communications\CryptoRatesFetcherInterface;
-use App\Entity\Activity\Activity;
-use App\Entity\Activity\AirdropClaimedActivity;
-use App\Entity\Activity\AirdropCreatedActivity;
-use App\Entity\Activity\AirdropEndedActivity;
-use App\Entity\Activity\DonationActivity;
-use App\Entity\Activity\NewPostActivity;
-use App\Entity\Activity\TokenCreatedActivity;
-use App\Entity\Activity\TokenDeployedActivity;
-use App\Entity\Activity\TokenDepositedActivity;
-use App\Entity\Activity\TokenTradedActivity;
-use App\Entity\Activity\TokenWithdrawnActivity;
-use App\Entity\Crypto;
+use App\Activity\Factory\ActivityFactory;
+use App\Entity\Activity;
 use App\Entity\Token\Token;
+use App\Entity\User;
+use App\Events\Activity\ActivityEventInterface;
+use App\Events\Activity\BonusEventActivity;
+use App\Events\Activity\OrderEventActivity;
+use App\Events\Activity\RewardEventActivity;
+use App\Events\Activity\SignupBonusActivity;
+use App\Events\Activity\TipTokenEventActivity;
+use App\Events\Activity\TokenEventActivity;
+use App\Events\Activity\TokenImportedEvent;
+use App\Events\Activity\TokenReleaseActivityEvent;
+use App\Events\Activity\UserEventActivity;
+use App\Events\Activity\UserTokenEventActivity;
+use App\Events\Activity\UserVotingEventActivity;
+use App\Events\Activity\VotingEventActivity;
 use App\Events\DepositCompletedEvent;
-use App\Events\DonationEvent;
+use App\Events\MarketEvent;
 use App\Events\OrderEvent;
-use App\Events\OrderEventInterface;
 use App\Events\PostEvent;
-use App\Events\TokenEventInterface;
+use App\Events\RewardEvent;
 use App\Events\TokenEvents;
 use App\Events\TransactionCompletedEvent;
 use App\Events\UserAirdropEvent;
 use App\Events\WithdrawCompletedEvent;
-use App\Exchange\Factory\MarketFactoryInterface;
-use App\Exchange\Order;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\MarketStatusManagerInterface;
 use App\Mercure\PublisherInterface;
-use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
-use Money\Exchange\FixedExchange;
-use Money\Money;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ActivitySubscriber implements EventSubscriberInterface
 {
-    private const EVENT_ACTIVITY_MAP = [
-        TokenEvents::CREATED => TokenCreatedActivity::class,
-        TokenEvents::DEPLOYED => TokenDeployedActivity::class,
-        TokenEvents::AIRDROP_CREATED => AirdropCreatedActivity::class,
-        TokenEvents::AIRDROP_ENDED => AirdropEndedActivity::class,
-        TokenEvents::POST_CREATED => NewPostActivity::class,
-        TokenEvents::AIRDROP_CLAIMED => AirdropClaimedActivity::class,
-        TokenEvents::DONATION => DonationActivity::class,
-        DepositCompletedEvent::NAME => TokenDepositedActivity::class,
-        WithdrawCompletedEvent::NAME => TokenWithdrawnActivity::class,
-        OrderEvent::COMPLETED => TokenTradedActivity::class,
-    ];
-
     private EntityManagerInterface $entityManager;
-    private MoneyWrapperInterface $moneyWrapper;
     private PublisherInterface $publisher;
-    private MarketStatusManagerInterface $marketStatusManager;
-    private CryptoManagerInterface $cryptoManager;
-    private MarketFactoryInterface $marketFactory;
+    private ActivityFactory $activityFactory;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        MoneyWrapperInterface $moneyWrapper,
         PublisherInterface $publisher,
-        MarketStatusManagerInterface $marketStatusManager,
-        CryptoManagerInterface $cryptoManager,
-        MarketFactoryInterface $marketFactory
+        ActivityFactory $activityFactory
     ) {
         $this->entityManager = $entityManager;
-        $this->moneyWrapper = $moneyWrapper;
         $this->publisher = $publisher;
-        $this->marketStatusManager = $marketStatusManager;
-        $this->cryptoManager = $cryptoManager;
-        $this->marketFactory = $marketFactory;
+        $this->activityFactory = $activityFactory;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            TokenEvents::CREATED => 'handleTokenEvent',
-            TokenEvents::DEPLOYED => 'handleTokenEvent',
+            TokenEvents::AIRDROP_CLAIMED => 'handleAirdropClaimed',
+            TokenEvents::MARKET_CREATED => 'handleMarketEvent',
+            OrderEvent::COMPLETED => 'handleOrderEvent',
+            UserEventActivity::NAME => 'handleUserEvent',
+            TokenEvents::POST_SHARED => 'handlePostSharedEvent',
+
             TokenEvents::AIRDROP_CREATED => 'handleTokenEvent',
             TokenEvents::AIRDROP_ENDED => 'handleTokenEvent',
-            TokenEvents::POST_CREATED => 'handlePostEvent',
-            TokenEvents::AIRDROP_CLAIMED => 'airdropClaimed',
-            TokenEvents::DONATION => 'donation',
+            TokenEvents::DEPLOYED => 'handleTokenEvent',
+            TokenEvents::CONNECTED => 'handleTokenEvent',
+            TokenImportedEvent::NAME => 'handleTokenEvent',
+            TokenEvents::CREATED => 'handleTokenEvent',
+            TokenEventActivity::NAME => 'handleTokenEvent',
+            SignupBonusActivity::NAME => 'handleTokenEvent',
+            VotingEventActivity::NAME => 'handleTokenEvent',
+            UserVotingEventActivity::NAME => 'handleTokenEvent',
+            TipTokenEventActivity::NAME => 'handleTokenEvent',
+            TokenReleaseActivityEvent::NAME => 'handleTokenEvent',
+            TokenEvents::POST_CREATED => 'handleTokenEvent',
+
+            // events where a user interacts with a token
+            TokenEvents::DONATION => 'handleUserTokenEvent',
+            TokenEvents::POST_LIKED => 'handleUserTokenEvent',
+            TokenEvents::POST_COMMENTED => 'handleUserTokenEvent',
+            TokenEvents::COMMENT_LIKE => 'handleUserTokenEvent',
+            TokenEvents::NEW_DM => 'handleUserTokenEvent',
+            UserTokenEventActivity::NAME => 'handleUserTokenEvent',
+            BonusEventActivity::NAME => 'handleUserTokenEvent',
+
             DepositCompletedEvent::NAME => 'handleTransactionEvent',
             WithdrawCompletedEvent::NAME => 'handleTransactionEvent',
-            OrderEvent::COMPLETED => 'handleOrderEvent',
+
+            RewardEvent::REWARD_NEW => 'handleRewardEvent',
+            RewardEvent::PARTICIPANT_ADDED => 'handleRewardEvent',
+            RewardEvent::VOLUNTEER_NEW => 'handleRewardEvent',
+            RewardEvent::VOLUNTEER_ACCEPTED => 'handleRewardEvent',
+            RewardEvent::VOLUNTEER_COMPLETED => 'handleRewardEvent',
         ];
     }
 
-    public function handleTokenEvent(TokenEventInterface $event, string $eventName): void
+    public function handleUserEvent(UserEventActivity $event): void
     {
-        $token = $event->getToken();
-
-        $activity = $this->createActivity($eventName)->setToken($token);
-
-        $this->saveActivity($activity);
+        $this->initActivity($event);
     }
 
-    public function handlePostEvent(PostEvent $event, string $eventName): void
+    public function handleTokenEvent(TokenEventActivity $event): void
     {
-        $token = $event->getToken();
-        $post = $event->getPost();
+        if ($event->getToken()->isQuiet() ||
+            !$event->getToken()->getOwner() ||
+            !$event->getToken()->getOwner()->hasRole(User::ROLE_AUTHENTICATED)
+        ) {
+            return;
+        }
 
-        /** @var NewPostActivity $activity */
-        $activity = $this->createActivity($eventName);
-
-        $activity->setPost($post)->setToken($token);
-
-        $this->saveActivity($activity);
+        $this->initActivity($event);
     }
 
-    public function airdropClaimed(UserAirdropEvent $event, string $eventName): void
+    public function handleUserTokenEvent(UserTokenEventActivity $event): void
     {
-        $token = $event->getToken();
-        $user = $event->getUser();
-        $amount = $event->getAirdrop()->getReward();
+        if ($event->getToken()->isQuiet() || !$event->getUser()->hasRole(User::ROLE_AUTHENTICATED)) {
+            return;
+        }
 
-        /** @var AirdropClaimedActivity $activity */
-        $activity = $this->createActivity($eventName);
-
-        $activity->setUser($user)->setAmount($amount)->setToken($token);
-
-        $this->saveActivity($activity);
+        $this->initActivity($event);
     }
 
-    public function donation(DonationEvent $event, string $eventName): void
+    public function handleAirdropClaimed(UserAirdropEvent $event): void
     {
-        $token = $event->getToken();
-        $user = $event->getUser();
-        $amount = $event->getDonation()->getAmount();
-        $currency = $event->getDonation()->getCurrency();
+        if ($event->getToken()->isQuiet() || !$event->getUser()->hasRole(User::ROLE_AUTHENTICATED)) {
+            return;
+        }
 
-        /** @var DonationActivity $activity */
-        $activity = $this->createActivity($eventName);
-
-        $activity->setAmount($amount)->setCurrency($currency)->setUser($user)->setToken($token);
-
-        $this->saveActivity($activity);
+        $this->initActivity($event);
     }
 
-    public function handleTransactionEvent(TransactionCompletedEvent $event, string $eventName): void
+    public function handleRewardEvent(RewardEventActivity $event): void
+    {
+        if ($event->getReward()->getToken()->isQuiet() ||
+            ($event->getRewardMember() && !$event->getRewardMember()->getUser()->hasRole(User::ROLE_AUTHENTICATED))
+        ) {
+            return;
+        }
+
+        $this->initActivity($event);
+    }
+
+    public function handlePostSharedEvent(PostEvent $event): void
+    {
+        if (!$event->getPost()->getShareReward()->isZero()) {
+            return;
+        }
+
+        $this->handleUserTokenEvent($event);
+    }
+
+    public function handleTransactionEvent(TransactionCompletedEvent $event): void
     {
         $token = $event->getTradable();
 
-        if (!$token instanceof Token) {
+        if (!$token instanceof Token || $token->isQuiet() || !$event->getUser()->hasRole(User::ROLE_AUTHENTICATED)) {
             return;
         }
 
-        $user = $event->getUser();
-        $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
-
-        $lastPrice = $this->getLastPrice($token);
-        $lastPrice = $this->moneyWrapper->format($lastPrice);
-
-        $amountWorthInMintme = $this->moneyWrapper->convertByRatio(
-            $amount,
-            Symbols::WEB,
-            $lastPrice
-        );
-
-        /** @var TokenDepositedActivity|TokenWithdrawnActivity $activity */
-        $activity = $this->createActivity($eventName);
-
-        $activity
-            ->setAmount($amountWorthInMintme)
-            ->setCurrency(Symbols::WEB)
-            ->setUser($user)
-            ->setToken($token);
-
-        $this->saveActivity($activity);
+        $this->initActivity($event);
     }
 
-    public function handleOrderEvent(OrderEventInterface $event, string $eventName): void
+    public function handleOrderEvent(OrderEventActivity $event): void
     {
         $order = $event->getOrder();
         $market = $order->getMarket();
+        $token = $market->getQuote();
 
-        if (!$market->isTokenMarket()) {
+        if (!$token instanceof Token || $token->isQuiet()) {
             return;
         }
 
-        /** @var Token $token */
-        $token = $market->getQuote();
-
-        $base = $market->getBase();
-
-        $price = $order->getPrice();
-        $amount = $order->getAmount();
-        $amount = $this->moneyWrapper->format($amount);
-
-        $totalPrice = $price->multiply($amount);
-
-        $currency = $base instanceof Crypto
-            ? $base->getSymbol()
-            : Symbols::TOK;
-
-        $taker = $order->getTaker();
-        $maker = $order->getMaker();
-        $isSellOrder = Order::SELL_SIDE === $order->getSide();
-
-        $seller = $isSellOrder
-            ? $taker
-            : $maker;
-        $buyer = $isSellOrder
-            ? $maker
-            : $taker;
-
-        /** @var TokenTradedActivity $activity */
-        $activity = $this->createActivity($eventName);
-
-        $activity
-            ->setSeller($seller)
-            ->setBuyer($buyer)
-            ->setAmount($totalPrice)
-            ->setCurrency($currency)
-            ->setToken($token)
-        ;
-
-        $this->saveActivity($activity);
+        $this->initActivity($event);
     }
 
-    private function createActivity(string $eventName): Activity
+    public function handleMarketEvent(MarketEvent $event): void
     {
-        $class = self::EVENT_ACTIVITY_MAP[$eventName];
+        if ($event->getToken()->isQuiet() ||
+            !$event->getToken()->getOwner() ||
+            !$event->getToken()->getOwner()->hasRole(User::ROLE_AUTHENTICATED)) {
+            return;
+        }
 
-        return new $class();
+        $this->initActivity($event);
+    }
+
+    private function initActivity(ActivityEventInterface $event): void
+    {
+        $activity = $this->createActivity($event);
+        $this->saveActivity($activity);
+        $this->publishActivity($activity);
+    }
+
+    private function createActivity(ActivityEventInterface $activityEvent): Activity
+    {
+        return $this->activityFactory->create($activityEvent);
     }
 
     private function saveActivity(Activity $activity): void
     {
         $this->entityManager->persist($activity);
         $this->entityManager->flush();
-        $this->publishActivity($activity);
     }
 
     private function publishActivity(Activity $activity): void
     {
         $this->publisher->publish('activities', $activity);
-    }
-
-    private function getLastPrice(Token $token): Money
-    {
-        $base = $this->cryptoManager->findBySymbol(Symbols::WEB);
-        $market = $this->marketFactory->create($base, $token);
-        $marketStatus = $this->marketStatusManager->getMarketStatus($market);
-
-        return $marketStatus->getLastPrice();
     }
 }

@@ -3,8 +3,12 @@ const storage = {
     state: {
         sellOrders: [],
         buyOrders: [],
+        serviceUnavailable: false,
     },
     getters: {
+        isServiceUnavailable(state) {
+            return state.serviceUnavailable;
+        },
         getSellOrders(state) {
             return state.sellOrders;
         },
@@ -13,6 +17,9 @@ const storage = {
         },
     },
     mutations: {
+        setServiceUnavailable(state, n) {
+            state.serviceUnavailable = n;
+        },
         setSellOrders(state, n) {
             state.sellOrders = n;
         },

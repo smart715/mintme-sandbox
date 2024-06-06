@@ -3,7 +3,7 @@
 namespace App\Exchange\Balance\Strategy;
 
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
+use App\Entity\TradableInterface;
 use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -31,14 +31,14 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
         $this->tokenConfig = $tokenConfig;
     }
 
-    /** @param Token $tradeble */
-    public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
+    /** @param Token $tradable */
+    public function deposit(User $user, TradableInterface $tradable, string $amount): void
     {
-        if (!$tradeble->getFee()) {
-            $this->withdrawBaseFee($user, $tradeble);
+        if (!$tradable->getFee()) {
+            $this->withdrawBaseFee($user, $tradable);
         }
 
-        $this->depositTokens($user, $tradeble, $amount);
+        $this->depositTokens($user, $tradable, $amount);
     }
 
     private function depositTokens(User $user, Token $token, string $amount): void
@@ -67,7 +67,7 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
 
         $cryptoSymbol = $crypto->getSymbol();
 
-        $fee = in_array($cryptoSymbol, [Symbols::ETH, Symbols::BNB])
+        $fee = in_array($cryptoSymbol, [Symbols::ETH, Symbols::BNB, Symbols::SOL, Symbols::AVAX])
             ? $this->tokenConfig->getWithdrawFeeByCryptoSymbol($cryptoSymbol)
             : $crypto->getFee();
 

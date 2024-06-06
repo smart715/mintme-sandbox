@@ -26,7 +26,7 @@ export default {
     },
     methods: {
         redirect() {
-            location.href = this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'});
+            location.href = this.$routing.generate('token_show_post', {name: this.post.token.name});
         },
     },
 };

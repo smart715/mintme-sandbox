@@ -1,7 +1,7 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
 
-{% trans %} hello {% endtrans %}, {{ username }}!
+{% trans %} hello {% endtrans %} {{ nickname }}!
 
 {% trans with {'%tokenName%': tokenName} %} token_reminder.msg.description {% endtrans %}
 

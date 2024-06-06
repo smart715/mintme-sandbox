@@ -7,14 +7,18 @@ use App\Consumers\Helpers\DBConnection;
 use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Entity\Token\TokenDeploy;
+use App\Entity\TokenCrypto;
 use App\Entity\User;
+use App\Events\ConnectCompletedEvent;
 use App\Events\DeployCompletedEvent;
-use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketStatusManagerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
-use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -25,24 +29,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DeployConsumer implements ConsumerInterface
 {
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var int */
-    private $coinbaseApiTimeout;
-
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
-    /** @var DeployCostFetcherInterface */
-    private $deployCostFetcher;
-
+    private LoggerInterface $logger;
+    private int $coinbaseApiTimeout;
+    private EntityManagerInterface $em;
+    private BalanceHandlerInterface $balanceHandler;
+    private DeployCostFetcherInterface $deployCostFetcher;
     private EventDispatcherInterface $eventDispatcher;
-
     private CryptoManagerInterface $cryptoManager;
+    private MoneyWrapperInterface $moneyWrapper;
+    private MarketFactoryInterface $marketFactory;
+    private MarketStatusManagerInterface $marketStatusManager;
 
     public function __construct(
         LoggerInterface $logger,
@@ -51,7 +47,10 @@ class DeployConsumer implements ConsumerInterface
         BalanceHandlerInterface $balanceHandler,
         DeployCostFetcherInterface $deployCostFetcher,
         EventDispatcherInterface $eventDispatcher,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        MoneyWrapperInterface $moneyWrapper,
+        MarketFactoryInterface $marketFactory,
+        MarketStatusManagerInterface $marketStatusManager
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
@@ -60,6 +59,9 @@ class DeployConsumer implements ConsumerInterface
         $this->deployCostFetcher = $deployCostFetcher;
         $this->eventDispatcher = $eventDispatcher;
         $this->cryptoManager = $cryptoManager;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->marketFactory = $marketFactory;
+        $this->marketStatusManager = $marketStatusManager;
     }
 
     /** {@inheritdoc} */
@@ -74,7 +76,7 @@ class DeployConsumer implements ConsumerInterface
         }
 
         /** @var string $body */
-        $body = $msg->body ?? '';
+        $body = $msg->body;
 
         $this->logger->info("[deploy-consumer] Received new message: {$body}");
 
@@ -87,7 +89,6 @@ class DeployConsumer implements ConsumerInterface
         }
 
         try {
-            // wait to make sure that the the payment of the cost is done
             sleep($this->coinbaseApiTimeout + 10);
             $this->em->clear();
             $repo = $this->em->getRepository(Token::class);
@@ -95,57 +96,24 @@ class DeployConsumer implements ConsumerInterface
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
             if (!$token) {
-                $this->logger->info("[deploy-consumer] Invalid token '{$clbResult->getTokenName()}' given");
+                $this->logger->warning("[deploy-consumer] Invalid token '{$clbResult->getTokenName()}' given");
 
                 return true;
             }
 
-            /** @var LockIn */
-            $lockIn = $token->getLockIn();
-            /** @var User */
-            $user = $token->getProfile()->getUser();
+            $crypto = $this->cryptoManager->findBySymbol($clbResult->getCrypto());
+            $deploy = $token->getDeployByCrypto($crypto);
 
-            if (!$clbResult->getAddress()) {
-                if (null !== $token->getDeployCost()) {
-                    $amount = new Money($token->getDeployCost(), new Currency($token->getCryptoSymbol()));
+            if (!$deploy) {
+                $this->logger->warning(
+                    "[deploy-consumer] Invalid token deploy " .
+                    "{$clbResult->getTokenName()}/{$clbResult->getCrypto()} given"
+                );
 
-                    $this->balanceHandler->deposit(
-                        $user,
-                        $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
-                        $amount
-                    );
-
-                    $token->setAddress('');
-                    $token->setTxHash(null);
-                    $token->setDeployCost(null);
-                    $token->setDeployedDate(null);
-                    $token->setDeployed(false);
-                    $token->setCrypto(null);
-
-                    $this->logger->info(
-                        '[deploy-consumer] the money is payed back returned back'
-                        . json_encode([
-                            'userId' => $user->getId(),
-                            'tokenName' => $token->getName(),
-                            'amount' => $amount,
-                        ])
-                    );
-                }
-            } else {
-                $lockIn->setReleasedAtStart($lockIn->getReleasedAmount()->getAmount());
-                $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
-                $token->setDeployedDate(new \DateTimeImmutable());
-                $token->setDeployed(true);
-                $token->setAddress($clbResult->getAddress());
-                $token->setShowDeployedModal(true);
-                $token->setTxHash($clbResult->getTxHash());
-
-                $this->setDeployCostReward($user, $token);
+                return true;
             }
 
-            $this->em->persist($lockIn);
-            $this->em->persist($token);
-            $this->em->flush();
+            $this->processDeploymentMessage($token, $clbResult, $deploy);
         } catch (\Throwable $exception) {
             $this->logger->error(
                 '[deploy-consumer] Failed to update token address. Retry operation.'
@@ -153,25 +121,96 @@ class DeployConsumer implements ConsumerInterface
                     'Reason' => $exception->getMessage(),
                 ])
             );
+            $this->balanceHandler->rollback();
 
             return false;
         }
 
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new DeployCompletedEvent($token),
-            TokenEvents::DEPLOYED
-        );
-
         return true;
     }
 
-    private function setDeployCostReward(User $user, Token $token): void
+    private function updateTokenMarkets(Token $token): void
+    {
+        /** @var array<TokenCrypto> $tokenCryptos */
+        $tokenCryptos = $token->getExchangeCryptos()->toArray();
+
+        /** @var TokenCrypto $tokenCrypto */
+        foreach ($tokenCryptos as $tokenCrypto) {
+            $market = $this->marketFactory->create($tokenCrypto->getCrypto(), $token);
+            $this->marketStatusManager->updateMarketStatusNetworks($market);
+        }
+    }
+
+    private function processDeploymentMessage(Token $token, DeployCallbackMessage $clbResult, TokenDeploy $deploy): void
+    {
+        $this->balanceHandler->beginTransaction();
+
+        if (DeployCallbackMessage::STATUS_FAILURE === $clbResult->getStatus()) {
+            $this->handleDeployFailure($deploy, $token);
+
+            return;
+        }
+
+        $this->handleDeploySuccess($token, $deploy, $clbResult);
+    }
+
+    private function handleDeploySuccess(Token $token, TokenDeploy $deploy, DeployCallbackMessage $clbResult): void
+    {
+        $user = $token->getProfile()->getUser();
+
+        $isMainDeploy = $deploy->getId() === $token->getMainDeploy()->getId();
+
+        if ($isMainDeploy) {
+            /** @var LockIn $lockIn */
+            $lockIn = $token->getLockIn();
+            $lockIn->setReleasedAtStart($lockIn->getReleasedAmount()->getAmount());
+            $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
+
+            $this->setDeployCostReward($user, $deploy);
+
+            $token->setShowDeployedModal(true);
+            $this->em->persist($lockIn);
+        }
+
+        $deploy->setDeployDate(new \DateTimeImmutable());
+        $deploy->setAddress($clbResult->getAddress());
+        $deploy->setTxHash($clbResult->getTxHash());
+        $token->setDeployed(true);
+
+        $this->em->persist($deploy);
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $this->updateTokenMarkets($token);
+        $this->dispatchCompletedEvent($token);
+    }
+
+    private function dispatchCompletedEvent(Token $token): void
+    {
+        if ($token->getDeployed()) {
+            if ($token->getLastDeploy()->getId() === $token->getMainDeploy()->getId()) {
+                $this->eventDispatcher->dispatch(
+                    new DeployCompletedEvent($token, $token->getLastDeploy()),
+                    TokenEvents::DEPLOYED
+                );
+            } else {
+                $this->eventDispatcher->dispatch(
+                    new ConnectCompletedEvent($token, $token->getLastDeploy()),
+                    TokenEvents::CONNECTED
+                );
+            }
+        }
+    }
+
+    private function setDeployCostReward(User $user, TokenDeploy $deploy): void
     {
         $referencer = $user->getReferencer();
 
         if ($referencer) {
-            $reward = $this->deployCostFetcher->getDeployCostReferralReward($token->getCryptoSymbol());
+            $deployCrypto = $deploy->getCrypto();
+
+            $reward = $this->deployCostFetcher->getDeployCostReferralReward($deployCrypto->getMoneySymbol());
+            $rewardCrypto = $this->cryptoManager->findBySymbol($reward->getCurrency()->getCode());
 
             if ($reward->isPositive()) {
                 $userDeployTokenReward = new DeployTokenReward($user, $reward);
@@ -179,13 +218,13 @@ class DeployConsumer implements ConsumerInterface
 
                 $this->balanceHandler->deposit(
                     $user,
-                    $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+                    $rewardCrypto,
                     $reward
                 );
 
                 $this->balanceHandler->deposit(
                     $referencer,
-                    $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+                    $rewardCrypto,
                     $reward
                 );
 
@@ -197,14 +236,43 @@ class DeployConsumer implements ConsumerInterface
                     . json_encode([
                         'referredUserId' => $user->getId(),
                         'referrerUserId' => $referencer->getId(),
-                        'tokenName' => $token->getName(),
-                        'deployCost' => $this->deployCostFetcher->getDeployCost($token->getCryptoSymbol())
+                        'tokenName' => $deploy->getToken()->getName(),
+                        'deployCost' => $this->deployCostFetcher->getCost($deployCrypto->getMoneySymbol())
                             ->getAmount(),
-                        'deployCostCurrency' => $token->getCryptoSymbol(),
-                        'rewardAmountInMintme' => $reward->getAmount(),
+                        'deployCostCurrency' => $deployCrypto->getMoneySymbol(),
+                        'rewardAmount' => $reward->getAmount(),
+                        'rewardCurrency' => $reward->getCurrency()->getCode(),
                     ])
                 );
             }
         }
+    }
+
+    private function handleDeployFailure(TokenDeploy $deploy, Token $token): void
+    {
+        $user = $token->getProfile()->getUser();
+        $this->logFailedDeploy($deploy, $user, $token);
+        $token->removeDeploy($deploy);
+        $this->em->persist($token);
+        $this->em->remove($deploy);
+        $this->em->flush();
+    }
+
+    private function logFailedDeploy(TokenDeploy $deploy, User $user, Token $token): void
+    {
+        $cost = new Money(
+            $deploy->getDeployCost() ?? '0',
+            new Currency($deploy->getCrypto()->getMoneySymbol())
+        );
+
+        $this->logger->error(
+            '[deploy-consumer] deployment failed'
+            . json_encode([
+                'userId' => $user->getId(),
+                'tokenName' => $token->getName(),
+                'crypto' => $deploy->getCrypto()->getSymbol(),
+                'cost' => $this->moneyWrapper->format($cost, false),
+            ])
+        );
     }
 }

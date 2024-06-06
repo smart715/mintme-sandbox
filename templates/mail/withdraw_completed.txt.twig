@@ -1,9 +1,12 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
 
-{% trans %} hello {% endtrans %}, {{ username }}!
-
+{% trans %} hello {% endtrans %} {{ nickname }}!
 {% trans %} mail.withdrawal.msg {% endtrans %}.
+
+{% trans %} mail.amount {% endtrans %} : {{ amount }} {{ currency | rebranding }}
+{% trans %} mail.address {% endtrans %} : {{ address }}
+{% trans %} mail.blockchain {% endtrans %} : {{ blockchain }}
 
 {% endblock %}
 

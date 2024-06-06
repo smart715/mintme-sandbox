@@ -2,40 +2,86 @@
 
 namespace App\Manager;
 
-use App\Entity\Activity\Activity;
-use App\Repository\ActivityRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use ReflectionClass;
+use App\Activity\ActivityTypes;
+use App\Entity\Activity;
+use App\Repository\Activity\ActivityRepository;
 
+/**
+ * @codeCoverageIgnore
+ */
 class ActivityManager implements ActivityManagerInterface
 {
-    private EntityManagerInterface $entityManager;
     private ActivityRepository $activityRepository;
 
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        ActivityRepository $activityRepository
-    ) {
-        $this->entityManager = $entityManager;
+    public function __construct(ActivityRepository $activityRepository)
+    {
         $this->activityRepository = $activityRepository;
     }
 
+    /** @inheritDoc */
     public function getLast(int $limit): array
     {
-        $activities = $this->activityRepository->findBy([], ['createdAt' => 'DESC'], $limit);
+        $activities = [];
+        $offset = 0;
 
-        $defaultPropertyCount = count((new ReflectionClass(Activity::class))->getProperties());
+        while ($this->countPostGrouping($activities) < $limit) {
+            $newActivities = $this->activityRepository->getUniqueLast($offset, $limit);
 
-        // Since we find Activity-es, they only bring the properties from Activity. To get the subclass properties, we need to refresh them
-        // The reflections are to only refresh the ones with more properties than the Activity class (faster)
-        foreach ($activities as $activity) {
-            $propertyCount = count((new ReflectionClass($activity))->getProperties());
-
-            if ($propertyCount > $defaultPropertyCount) {
-                $this->entityManager->refresh($activity);
+            foreach ($newActivities as $activity) {
+                $activities[] = $activity;
             }
+
+            if (count($newActivities) < $limit) {
+                break;
+            }
+
+            $offset += $limit;
         }
 
         return $activities;
+    }
+
+    public function getLastByTypes(array $types, int $limit): array
+    {
+        return $this->activityRepository->getLastByTypesAndUniqueToken($types, $limit);
+    }
+
+    /**
+     * @param Activity[] $activities
+     * @return int
+     */
+    private function countPostGrouping(array $activities): int
+    {
+        $length = 0;
+        $pointer = '';
+
+        foreach ($activities as $activity) {
+            $type = $activity->getType();
+
+            if (!in_array($type, [ActivityTypes::TOKEN_TRADED, ActivityTypes::DONATION])) {
+                $length++;
+                $pointer = '';
+
+                continue;
+            }
+
+            if ($pointer !== $this->generateGroupedKey($type, $activity->getContext())) {
+                $pointer = $this->generateGroupedKey($type, $activity->getContext());
+                $length++;
+            }
+        }
+
+        return $length;
+    }
+
+    private function generateGroupedKey(int $type, array $context): string
+    {
+        $tokenName = $context['token'] ?? null;
+        $currency = $context['symbol'] ?? null;
+        $buyerId = $context['buyer'] ?? null;
+
+        return ActivityTypes::DONATION === $type
+            ? $tokenName . $currency
+            : $tokenName . $currency . $buyerId;
     }
 }

@@ -6,6 +6,7 @@ use Money\Money;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 abstract class AbstractOrder
 {
     public const ALL_SIDE = 0;
@@ -63,6 +64,13 @@ abstract class AbstractOrder
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /** @Groups({"Default", "API", "dev"}) */

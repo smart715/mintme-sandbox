@@ -4,6 +4,7 @@ namespace App\Entity\Message;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -26,7 +27,7 @@ class Thread
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="threads", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="threads", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @var Token
      */
@@ -55,6 +56,12 @@ class Thread
      * @var \DateTimeImmutable
      */
     private $createdAt;
+
+    public function __construct()
+    {
+        $this->metadata = new ArrayCollection();
+        $this->messages = new ArrayCollection();
+    }
 
     /** @ORM\PrePersist() */
     public function setCreatedAt(): self
@@ -109,7 +116,7 @@ class Thread
 
     public function addMetadata(ThreadMetadata $metadata): self
     {
-        $this->metadata[] = $metadata;
+        $this->metadata->add($metadata);
 
         return $this;
     }

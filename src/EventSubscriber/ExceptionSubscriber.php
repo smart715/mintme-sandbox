@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Exception\ApiBadRequestException;
 use App\Exception\ApiExceptionInterface;
 use App\Exception\ForbiddenException;
 use App\Exception\NotFoundAirdropException;
@@ -9,9 +10,12 @@ use App\Exception\NotFoundKnowledgeBaseException;
 use App\Exception\NotFoundPairException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundProfileException;
+use App\Exception\NotFoundRewardException;
 use App\Exception\NotFoundTokenException;
 use App\Exception\NotFoundVotingException;
 use App\Exception\RedirectException;
+use App\Exception\UnauthorizedPostException;
+use App\Services\TranslatorService\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -19,10 +23,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 /** @codeCoverageIgnore */
@@ -130,7 +134,31 @@ class ExceptionSubscriber implements EventSubscriberInterface
             ));
         }
 
+        if ($exception instanceof UnauthorizedPostException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/401.html.twig', [
+                    'error_message' => $this->translator->trans('401.post'),
+                ]),
+                401
+            ));
+        }
+
+        if ($exception instanceof NotFoundRewardException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => $this->translator->trans('404.reward'),
+                ]),
+                404
+            ));
+        }
+
         if ($exception instanceof MethodNotAllowedHttpException) {
+            $uriPath = $event->getRequest()->getUri();
+
+            if (preg_match("[/api/]", $uriPath)) {
+                throw new ApiBadRequestException('Method Not Allowed');
+            }
+
             $event->setResponse(new Response(
                 $this->template->render('bundles/TwigBundle/Exception/error404.html.twig'),
                 404
@@ -150,11 +178,24 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $event->setResponse($exception->getResponse());
         }
 
+        $requestUri = $event->getRequest()->getRequestUri();
+
+        // #7307 Redirect to hompepage when visiting /2fa and /admin-r8bn
         if ($exception instanceof AccessDeniedHttpException &&
-            $this->authorizationChecker->isGranted('ROLE_USER')
+            $this->authorizationChecker->isGranted('ROLE_USER') &&
+            str_contains($requestUri, '/2fa') || str_contains($requestUri, '/admin-r8bn')
         ) {
             $homePage = $this->route->generate('homepage');
             $event->setResponse(new RedirectResponse($homePage));
+        }
+
+        if ($exception instanceof UnauthorizedHttpException) {
+            $response = new JsonResponse(
+                ['message' => $exception->getMessage()],
+                $exception->getStatusCode()
+            );
+            $response->headers->add($exception->getHeaders());
+            $event->setResponse($response);
         }
     }
 }

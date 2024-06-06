@@ -1,51 +1,103 @@
 <template>
-    <div>
+    <div class="form-control-container">
         <slot></slot>
         <div class="pwdmeter">
-            <meter max="5" :value="pwdscore"></meter>
+            <meter max="5" :value="pwdScore"></meter>
         </div>
-        <div class="py-2 mb-2 bg-danger text-white text-center" v-if="strengthtext">
-            <ul class="pl-2 pr-2 m-0 list-unstyled">
-              <li v-if="strengthtext === 1">{{ $t('passwordmeter.strength_1') }}</li>
-              <li v-if="strengthtext === 2">{{ $t('passwordmeter.strength_2') }}</li>
-              <li v-if="strengthtext === 3">{{ $t('passwordmeter.strength_3') }}</li>
-              <li v-if="strengthtext === 4">{{ $t('passwordmeter.strength_4') }}</li>
-            </ul>
+        <div class="postfix-icon-container d-flex align-items-center">
+            <slot v-if="!checkingDuplicate" name="postfix-icon"></slot>
+            <template v-else>
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+            </template>
+        </div>
+        <div class="assistive d-flex px-0">
+            <div class="errors flex-1 min-height-50">
+                <div v-html="textStrengthSecurity"></div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import zxcvbn from 'zxcvbn';
+import {CheckPasswordMixin} from '../mixins/';
+import {API_TIMEOUT} from '../utils/constants';
 
 export default {
     name: 'passwordmeter',
     props: {
         password: String,
+        isForgotPassword: Boolean,
+        token: String,
+        isResetPassword: Boolean,
+        currentPassword: String,
+        showCurrentPasswordError: Boolean,
     },
+    mixins: [CheckPasswordMixin],
     data: function() {
         return {
-            pwdscore: 0,
-            strengthtext: 0,
+            pwdScore: 0,
+            strengthText: 0,
+            duplicateError: false,
+            checkingDuplicate: false,
         };
+    },
+    computed: {
+        textStrengthSecurity: function() {
+            if (1 === this.strengthText) {
+                return this.$t('passwordmeter.strength_1');
+            }
+
+            if (2 === this.strengthText) {
+                return this.$t('passwordmeter.strength_2');
+            }
+
+            if (3 === this.strengthText) {
+                return this.$t('passwordmeter.strength_3');
+            }
+
+            if (4 === this.strengthText) {
+                return this.$t('passwordmeter.strength_4');
+            }
+
+            if (!this.checkingDuplicate && this.duplicateError) {
+                return this.$t('passwordmeter.duplicate');
+            }
+
+            return '';
+        },
+        isPasswordDuplicate: function() {
+            return this.password === this.currentPassword;
+        },
+        isPasswordInvalid: function() {
+            return this.duplicateError || this.checkingDuplicate || !!this.strengthText;
+        },
+    },
+    methods: {
+        passwordEqualToSavedPassword: async function() {
+            this.duplicateError = await this.isPasswordEqualToSavedPassword(this.password, this.token);
+            this.checkingDuplicate = false;
+        },
     },
     watch: {
         password: function(val) {
-            let result = zxcvbn(val);
+            this.checkingDuplicate = false;
+            this.duplicateError = false;
+            const result = zxcvbn(val);
 
-            if (val !== '') {
+            if ('' !== val) {
                 result.score = result.score + 1;
             }
 
-            if (val.length <= 7 && result.score >= 4) {
+            if (7 >= val.length && 4 <= result.score) {
                 result.score = 3;
             }
 
-            this.pwdscore = result.score;
+            this.pwdScore = result.score;
 
-            if (val.length <= 7 && result.score >= 1) {
-                this.strengthtext = 1;
-            } else if (val.length >= 8 && result.score <= 5) {
+            if (7 >= val.length && 1 <= result.score) {
+                this.strengthText = 1;
+            } else if (8 <= val.length && 5 >= result.score) {
                 let number = 0;
                 let uppercase = 0;
                 let lowercase = 0;
@@ -62,25 +114,60 @@ export default {
                     uppercase = 1;
                 }
 
-                if (number + uppercase + lowercase !== 3) {
-                    this.strengthtext = 2;
-                } else if (val.length > 72) {
-                    this.strengthtext = 3;
+                if (3 !== number + uppercase + lowercase) {
+                    this.strengthText = 2;
+                } else if (72 < val.length) {
+                    this.strengthText = 3;
                 } else if (/\s/.test(val)) {
-                    this.strengthtext = 4;
+                    this.strengthText = 4;
                 } else {
-                    this.strengthtext = 0;
+                    this.strengthText = 0;
                 }
             } else {
                 if (/\s/.test(val)) {
-                    this.strengthtext = 4;
+                    this.strengthText = 4;
                 } else {
-                    this.strengthtext = 0;
+                    this.strengthText = 0;
                 }
             }
+
+            if (
+                0 === this.strengthText
+                && 0 < val.length
+                && this.isForgotPassword
+                && 0 < this.token.length
+            ) {
+                this.checkingDuplicate = true;
+                return setTimeout(this.passwordEqualToSavedPassword, API_TIMEOUT);
+            }
+
+            if (
+                0 === this.strengthText
+                && 0 < val.length
+                && this.isResetPassword
+                && !this.showCurrentPasswordError
+                && 0 < this.currentPassword.length
+            ) {
+                this.duplicateError = this.isPasswordDuplicate;
+            }
         },
-        strengthtext: function(val) {
+        strengthText: function() {
+            this.$emit('toggle-error', this.isPasswordInvalid);
+        },
+        checkingDuplicate: function() {
+            this.$emit('toggle-error', this.isPasswordInvalid);
+        },
+        duplicateError: function() {
+            this.$emit('toggle-error', this.isPasswordInvalid);
+        },
+        showCurrentPasswordError: function(val) {
+            this.checkingDuplicate = false;
+            this.duplicateError = false;
             this.$emit('toggle-error', !!val);
+        },
+        currentPassword: function() {
+            this.checkingDuplicate = false;
+            this.duplicateError = this.isPasswordDuplicate;
         },
     },
 };

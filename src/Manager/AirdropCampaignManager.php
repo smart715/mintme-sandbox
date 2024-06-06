@@ -2,6 +2,7 @@
 
 namespace App\Manager;
 
+use App\Activity\ActivityTypes;
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\AirdropCampaign\AirdropParticipant;
@@ -9,8 +10,10 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\AirdropEvent;
 use App\Events\TokenEvents;
+use App\Events\UserAirdropEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\BalanceTransactionBonusType;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Repository\AirdropCampaign\AirdropRepository;
 use App\Utils\Symbols;
@@ -89,16 +92,23 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $lockedAmount = $lockedAmount->add($reward->divide(2));
         $airdrop->setLockedAmount($lockedAmount);
 
+        try {
+            $this->balanceHandler->beginTransaction();
+            // Lock tokens for airdrop campaign
+            $this->balanceHandler->update(
+                $user,
+                $token,
+                $lockedAmount->negative(),
+                'airdrop_amount'
+            );
+        } catch (\Throwable $e) {
+            $this->balanceHandler->rollback();
+
+            throw $e;
+        }
+
         $this->em->persist($airdrop);
         $this->em->flush();
-
-        // Lock tokens for airdrop campaign
-        $this->balanceHandler->update(
-            $user,
-            $token,
-            $lockedAmount->negative(),
-            'airdrop_amount'
-        );
 
         return $airdrop;
     }
@@ -112,12 +122,19 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $amountToReturn = $this->getRestOfTokens($airdrop);
 
         if ($amountToReturn) {
-            $this->balanceHandler->update(
-                $token->getProfile()->getUser(),
-                $token,
-                $amountToReturn,
-                'airdrop_amount'
-            );
+            try {
+                $this->balanceHandler->beginTransaction();
+                $this->balanceHandler->update(
+                    $token->getProfile()->getUser(),
+                    $token,
+                    $amountToReturn,
+                    'airdrop_amount'
+                );
+            } catch (\Throwable $e) {
+                $this->balanceHandler->rollback();
+
+                throw $e;
+            }
         }
 
         if ($airdrop->getActualParticipants() > 0) {
@@ -133,7 +150,10 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $this->em->flush();
 
         /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(new AirdropEvent($airdrop), TokenEvents::AIRDROP_ENDED);
+        $this->eventDispatcher->dispatch(
+            new AirdropEvent($airdrop, ActivityTypes::AIRDROP_ENDED),
+            TokenEvents::AIRDROP_ENDED
+        );
     }
 
     public function deleteActiveAirdrop(Token $token): void
@@ -166,23 +186,64 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         $this->tokenBlockAirDropBalance($activeAirdrop);
 
-        $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
+        $participant = $this->createNewParticipant(
+            $user,
+            $activeAirdrop
+        );
 
-        $participant = $this->createNewParticipant($user, $activeAirdrop);
+        try {
+            $this->balanceHandler->beginTransaction();
 
-        if ($user->getAirdropReferrer() === $activeAirdrop) {
-            $referrer = $user->getAirdropReferrerUser();
+            if ($user->getAirdropReferrer() === $activeAirdrop) {
+                $referrer = $user->getAirdropReferrerUser();
 
-            $this->balanceHandler->update($referrer, $token, $airdropReward->divide(2), 'reward');
-            $activeAirdrop->incrementActualParticipants(true);
+                $rewardedForUserReferrer = $this->participantRepository
+                ->getParticipantByUserAndAirdrop($referrer, $activeAirdrop, $user);
+
+                if (!$rewardedForUserReferrer) {
+                    $activeAirdrop->incrementActualParticipants(true);
+                    $referralParticipant = $this->createNewParticipant(
+                        $referrer,
+                        $activeAirdrop,
+                        $user
+                    );
+
+                    $this->em->persist($referralParticipant);
+
+                    $this->balanceHandler->depositBonus(
+                        $referrer,
+                        $token,
+                        $airdropReward->divide(2),
+                        BalanceTransactionBonusType::AIRDROP_REFFERAL
+                    );
+
+                    $this->eventDispatcher->dispatch(new UserAirdropEvent(
+                        $activeAirdrop,
+                        $referrer,
+                        ActivityTypes::AIRDROP_REFERRAL
+                    ), TokenEvents::AIRDROP_CLAIMED);
+                }
+            }
+
+            $rewardSummary = $airdropReward->multiply($activeAirdrop->getActualParticipants());
+            $activeAirdrop->setActualAmount($rewardSummary);
+
+
+            $this->balanceHandler->depositBonus(
+                $user,
+                $token,
+                $airdropReward,
+                BalanceTransactionBonusType::AIRDROP_REWARD
+            );
+
+            $this->em->persist($activeAirdrop);
+            $this->em->persist($participant);
+            $this->em->flush();
+        } catch (\Throwable $e) {
+            $this->balanceHandler->rollback();
+
+            throw $e;
         }
-
-        $rewardSummary = $airdropReward->multiply($activeAirdrop->getActualParticipants());
-        $activeAirdrop->setActualAmount($rewardSummary);
-
-        $this->em->persist($activeAirdrop);
-        $this->em->persist($participant);
-        $this->em->flush();
 
         if ($activeAirdrop->getParticipants() - $activeAirdrop->getActualParticipants() < 1) {
             $this->deleteAirdrop($activeAirdrop);
@@ -213,7 +274,6 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     public function updateOutdatedAirdrops(): int
     {
-
         /** @var Airdrop[] $outdatedAirdrops */
         $outdatedAirdrops = $this->airdropRepository->getOutdatedAirdrops();
 
@@ -255,14 +315,17 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     public function checkIfUserCompletedActions(Airdrop $airdrop, User $user): bool
     {
-        return $airdrop->getActions()->forAll(fn (int $key, AirdropAction $action) => $action->getUsers()->contains($user));
+        return $airdrop
+            ->getActions()
+            ->forAll(fn (int $key, AirdropAction $action) => $action->getUsers()->contains($user));
     }
 
-    private function createNewParticipant(User $user, Airdrop $airdrop): AirdropParticipant
+    private function createNewParticipant(User $user, Airdrop $airdrop, ?User $referral = null): AirdropParticipant
     {
         return (new AirdropParticipant())
             ->setUser($user)
-            ->setAirdrop($airdrop);
+            ->setAirdrop($airdrop)
+            ->setReferral($referral);
     }
 
     private function getRestOfTokens(Airdrop $airdrop): ?Money
@@ -304,9 +367,8 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
 
         foreach ($airdropCompletedActions as $tokenName => $airdropSessionData) {
-
             /** @var Token $token */
-            $token = $this->tokenManager->findByName($tokenName);
+            $token = $this->tokenManager->findByName((string)$tokenName);
 
             if ($this->checkIfUserClaimed($user, $token)) {
                 continue;

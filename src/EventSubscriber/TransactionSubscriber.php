@@ -5,37 +5,28 @@ namespace App\EventSubscriber;
 use App\Entity\Token\Token;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
+use App\Events\TransactionDelayedEvent;
 use App\Events\WithdrawCompletedEvent;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\DepositNotificationStrategy;
 use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\TransactionDelayedNotificationStrategy;
 use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
-use Money\Money;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TransactionSubscriber implements EventSubscriberInterface
 {
-    /** @var MailerInterface */
-    private $mailer;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var UserNotificationManagerInterface */
+    private MailerInterface $mailer;
+    private MoneyWrapperInterface $moneyWrapper;
+    private LoggerInterface $logger;
+    private EntityManagerInterface $em;
     private UserNotificationManagerInterface $userNotificationManager;
 
     public function __construct(
@@ -63,6 +54,9 @@ class TransactionSubscriber implements EventSubscriberInterface
                ['sendTransactionCompletedMail'],
                ['updateTokenWithdraw'],
            ],
+           TransactionDelayedEvent::NAME => [
+               ['sendTransactionDelayedMail'],
+           ],
         ];
     }
 
@@ -71,8 +65,6 @@ class TransactionSubscriber implements EventSubscriberInterface
         $user = $event->getUser();
 
         try {
-            $this->mailer->checkConnection();
-
             if ($event instanceof WithdrawCompletedEvent) {
                 $notificationType = NotificationTypes::WITHDRAWAL;
                 $strategy = new WithdrawalNotificationStrategy(
@@ -98,11 +90,21 @@ class TransactionSubscriber implements EventSubscriberInterface
             );
 
             if ($isAvailableEmailNotification) {
-                $this->mailer->sendTransactionCompletedMail($user, $event::TYPE);
+                $this->mailer->sendTransactionCompletedMail(
+                    $user,
+                    $event->getTradable(),
+                    $this->moneyWrapper->parse($event->getAmount(), $event->getTradable()->getMoneySymbol()),
+                    $event->getAddress(),
+                    $event::TYPE,
+                    $event->getCryptoNetworkName()
+                );
                 $this->logger->info("Sent ".$event::TYPE." completed e-mail to user {$user->getEmail()}");
             }
         } catch (\Throwable $e) {
-            $this->logger->error("Couldn't send ".$event::TYPE." completed e-mail to user {$user->getEmail()}. Reason: {$e->getMessage()}");
+            $this->logger->error(
+                "Couldn't send ".$event::TYPE
+                ." completed e-mail to user {$user->getEmail()}. Reason: {$e->getMessage()}"
+            );
         }
     }
 
@@ -119,10 +121,7 @@ class TransactionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $withdrawnObj = new Money(
-            $tradable->getWithdrawn(),
-            new Currency(Symbols::TOK)
-        );
+        $withdrawnObj = $tradable->getWithdrawn();
 
         if ($event instanceof DepositCompletedEvent) {
             $withdrawnObj = $withdrawnObj->subtract($amount);
@@ -140,11 +139,34 @@ class TransactionSubscriber implements EventSubscriberInterface
                 "[transaction-subscriber] Success token update withdrawn operation.",
                 [
                     'tokenName' => $tradable->getName(),
-                    'tokenWithdrawn' => $tradable->getWithdrawn(),
+                    'tokenWithdrawn' => $tradable->getWithdrawn()->getAmount(),
                 ]
             );
         } catch (\Throwable $exception) {
             $this->logger->error("[transaction-subscriber] Failed to update token withdrawn. Reason: {$exception->getMessage()}");
+        }
+    }
+
+    public function sendTransactionDelayedMail(TransactionDelayedEvent $event): void
+    {
+        $user = $event->getReport()->getUser();
+
+        $strategy = new TransactionDelayedNotificationStrategy(
+            $this->userNotificationManager,
+            $event->getType()
+        );
+
+        $notificationContext = new NotificationContext($strategy);
+        $notificationContext->sendNotification($user);
+
+        $isAvailableEmailNotification = $this->userNotificationManager->isNotificationAvailable(
+            $user,
+            $strategy->getParentNotificationType(),
+            NotificationChannels::EMAIL
+        );
+
+        if ($isAvailableEmailNotification) {
+            $this->mailer->sendTransactionDelayedMail($user);
         }
     }
 }

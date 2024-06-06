@@ -41,7 +41,14 @@ function createWrapper(overrideVoting = {}) {
                         return {
                             userVotings: [
                                 {
-                                    user: {profile: {nickname: 'foo'}},
+                                    user: {
+                                        profile: {
+                                            nickname: 'foo',
+                                            image: {
+                                                avatar_small: 'profileAvatar.png',
+                                            },
+                                        },
+                                    },
                                     option: {title: 'bar'},
                                     amountMoney: '100',
                                 },
@@ -75,12 +82,26 @@ describe('VotingVotes', () => {
                     return {
                         userVotings: [
                             {
-                                user: {profile: {nickname: 'foo'}},
+                                user: {
+                                    profile: {
+                                        nickname: 'foo',
+                                        image: {
+                                            avatar_small: 'profileAvatar.png',
+                                        },
+                                    },
+                                },
                                 option: {title: 'bar'},
                                 amountMoney: '100',
                             },
                             {
-                                user: {profile: {nickname: 'foo2'}},
+                                user: {
+                                    profile: {
+                                        nickname: 'foo2',
+                                        image: {
+                                            avatar_small: 'profileAvatar.png',
+                                        },
+                                    },
+                                },
                                 option: {title: 'bar2'},
                                 amountMoney: '1002',
                             },
@@ -96,9 +117,12 @@ describe('VotingVotes', () => {
         const wrapper = createWrapper();
         expect(wrapper.vm.votes).toEqual([
             {
-                trader: 'foo',
+                trader: {
+                    name: 'foo',
+                    profileAvatarUrl: 'profileAvatar.png',
+                },
                 option: 'bar',
-                amount: '100 baz',
+                amount: '100',
             },
         ]);
     });

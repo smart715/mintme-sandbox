@@ -105,7 +105,7 @@
 {% block logo %}
     {% spaceless %}
         <a class="logo" href="{{ path('sonata_admin_dashboard') }}">
-            <img src="{{ asset('build/images/logo.png') }}" alt="imp-logo">
+            <img src="{{ asset('build/images/logo.svg') }}" alt="imp-logo">
         </a>
     {% endspaceless %}
 {% endblock %}
@@ -123,6 +123,11 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('admin') }}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
+        {{ parent() }}
+        {{ encore_entry_script_tags('admin') }}
+    {% endapply %}
 {% endblock %}

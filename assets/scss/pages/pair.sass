@@ -1,14 +1,72 @@
 @import '../variables'
 @import '../mixins'
 @import '../posts'
-@import '../markitup'
 @import '../date-picker'
 
-.pair-container
-  margin-top: 1.5rem !important
+$social-btn-size: 35px
+$avatar-size: 60px
+$avatar-top: -45px
+$avatar-size-md: 100px
+$avatar-top-md: -85px
+$avatar-size-lg: 152px
+$avatar-top-lg: -135px
 
-  @include media-breakpoint-down(md)
-    margin-top: 0.3rem !important
+@media (max-width: $page-content-width-widest - 1px)
+  .hide-lg
+    display: none
+
+@media (min-width: $page-content-width-widest)
+  .main
+    max-width: $page-content-width-widest
+
+  .hide-xlg
+    display: none
+
+  .token-page
+    .airdrop-container
+      .container
+        max-width: $page-content-width !important
+
+    .main-content
+      display: flex
+      justify-content: space-between
+
+      .main-column
+        max-width: $page-content-width
+
+        .col-widest-12
+          flex: 0 0 100% !important
+          max-width: 100% !important
+
+      .second-column
+        width: 370px
+
+.crypto-page
+  max-width: $page-content-width
+
+table
+  .text-white:not(input):not(.bg-danger)
+    color: $bg-secondary !important
+
+.h-fit-content
+  .text-white:not(input):not(.bg-danger)
+    color: $bg-danger-input !important
+
+.token-price-overview
+  .period-switcher
+    & > div
+      border-radius: $border-radius
+      font-weight: 600
+      cursor: pointer
+      &.active
+        background-color: $primary
+        color: $text-color-secondary
+        pointer-events: none
+
+.pair-container
+  @media (min-width: $page-content-width)
+    padding-left: 0 !important
+    padding-right: 0 !important
 
 .chat
   &:nth-child(even)
@@ -16,6 +74,346 @@
 
   img
     height: 22px
+
+.cover-image-wrapper
+  max-height: 260px
+  min-height: 100px
+  background-color: $bg-primary-dark
+  border-top-left-radius: $border-radius
+  border-top-right-radius: $border-radius
+  z-index: 3
+
+  &.transparent-bg
+    background-color: transparent
+
+  .cover-image
+    min-width: 100%
+
+.token-created-step a
+  &::selection
+    background-color: $bg-secondary
+
+.faq-block
+  &.light-border
+    border-top: none !important
+    border-bottom: 1px solid $secondary !important
+
+    &:last-child
+      border: none !important
+
+  &.no-decoration a
+    text-decoration: none
+    white-space: normal
+
+  a:hover
+    color: white
+
+  a:focus
+    color: white
+    border-style: dotted
+    border-width: 1px
+    border-color: $link-color
+
+.table-restricted-height
+  max-height: 17.7rem
+
+.image-uploader
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  z-index: 100
+  width: 100%
+  height: 100%
+  opacity: 0
+  background-color: rgba(0,0,0,0.5)
+
+  &:hover
+    transition: opacity 1s ease
+    opacity: 1
+
+.avatar .image-uploader
+  border-radius: 100%
+
+.token-edit, .notification-config
+  .image-uploader
+    opacity: 1 !important
+
+  .faq-block
+    border-top: none !important
+    border-bottom-color: $bg-primary-light !important
+
+    &:last-child
+      border: none
+
+  .card
+    border: none
+
+    a
+      text-decoration: none
+      white-space: normal
+
+.token-social-media-edit
+  a:hover
+    text-decoration: underline
+
+.follow-log-in-modal
+  opacity: 1 !important
+
+  .tooltip-inner
+    padding: 0.5rem 1rem
+    width: 220px
+    border-radius: $btn-border-radius
+    text-align: left
+    color: $text-color-dark
+    background: $bg-secondary
+
+    a
+      color: $primary
+
+.faq-block .discord-help
+  a:hover
+    text-decoration: underline
+    color: $link-color-hover
+  a:focus
+    color: $blue
+
+#token
+  .token-info-bar
+    background-color: $bg-primary-dark
+  .token-nav
+    background-color: $bg-primary-dark
+    border-top: 1px solid $bg-primary-light
+    border-bottom-left-radius: $border-radius
+    border-bottom-right-radius: $border-radius
+
+    a.active
+      font-weight: 600
+      text-decoration: none
+    .navbar
+      overflow-x: auto
+      overflow-y: hidden
+      -webkit-overflow-scrolling: touch
+      -ms-overflow-style: -ms-autohiding-scrollbar
+
+      &::-webkit-scrollbar
+        display: none
+    .btn-social
+      background-color: $text-color-primary-dark
+      color: $bg-primary-dark
+      font-size: 1.5rem
+      width: $social-btn-size
+      height: $social-btn-size
+      padding: 0px
+      display: inline-flex
+      justify-content: center
+      align-items: center
+
+      &:hover
+        background-color: $primary
+  .nav-tabs
+    padding-bottom: 0 !important
+
+  .tab-content
+    padding: 0
+
+  .token-description-wrp
+    background-color: $bg-primary-dark
+    padding: 16px 16px 0 16px
+
+    #description-text
+      font-size: 16px
+      color: $subtitle-text-color
+      position: relative
+
+      .show-more-wrp
+        padding: 0.75rem 0
+        display: flex
+        align-items: center
+        justify-content: center
+        background-color: red
+        background: $bg-primary-dark
+        background: linear-gradient(0deg, rgba(32,32,32,1) 33%, transparentize($bg-primary-dark, 1) 100%)
+
+        &:not(.opened)
+          position: absolute
+          bottom: 0
+          left: 0
+          right: 0
+
+  .token-avatar-name
+    max-width: 86%
+
+  .description
+    background: none
+    overflow: hidden
+    transition: max-height 0.3s
+
+    &.closed
+      max-height: 0
+
+    .btn-cancel
+      color: white
+
+  .circle-progress
+    width: 44px
+    height: 44px
+
+    .circle
+      background: none
+
+    .circle, canvas
+      width: 100% !important
+      height: 100% !important
+
+    .percent-text
+      font-size: 15px !important
+
+    @include media-breakpoint-down(md)
+      width: 38px
+      height: 38px
+
+      .percent-text
+        font-size: 13px !important
+
+    @include media-breakpoint-down(sm)
+      width: 30px
+      height: 30px
+
+      .percent-text
+        font-size: 10px !important
+
+  .statistics-show-more
+    width: 19rem !important
+
+  .mintme-gray-icon
+    filter: grayscale(100%)
+
+  .deployed-icon-container
+    min-width: 70px !important
+    @include media-breakpoint-down('md')
+      min-width: 57px !important
+    @include media-breakpoint-down('sm')
+      min-width: 45px !important
+
+  .deployed-icon, .not-deployed-icon, .token-creator-avatar
+    height: 42px !important
+    @include media-breakpoint-down('md')
+      height: 34px !important
+    @include media-breakpoint-down('sm')
+      height: 27px !important
+
+  .not-deployed-icon
+      @extend .mintme-gray-icon
+
+  .buy-order, .sell-order
+    @include media-breakpoint-up('xl')
+      flex: 0 0 35%
+      max-width: 35%
+
+  .chart
+    @include media-breakpoint-up('xl')
+      flex: 0 0 30%
+      max-width: 30%
+
+  .fix-height
+    overflow-y: hidden
+
+  .profile-link
+    padding-left: 2px
+
+  #token-social-media-icons
+    position: absolute
+    right: 15px
+    bottom: 5px
+    background: rgba(0,0,0,0.3)
+
+    .icon-default:hover
+      color: $primary
+
+  ul.nav .token-avatar-left
+    background: transparent
+    z-index: 1
+
+    @include media-breakpoint-down(md)
+      margin-left: 110px
+
+    @include media-breakpoint-down(sm)
+      margin-left: 80px
+
+    @include media-breakpoint-down(xs)
+      margin-left: 0
+
+    a
+      background: transparent
+
+  .token-avatar
+    left: 7px
+    z-index: 5
+    width: $avatar-size
+    min-width: $avatar-size
+
+    @include media-breakpoint-up('md')
+      width: $avatar-size-md
+      min-width: $avatar-size-md
+      .avatar
+        top: $avatar-top-md !important
+    @include media-breakpoint-up('lg')
+      width: $avatar-size-lg
+      min-width: $avatar-size-lg
+      .avatar
+        top: $avatar-top-lg !important
+
+    .avatar
+      position: absolute
+      top: $avatar-top
+      width: 100%
+      img
+        width: 100%
+
+    &--default .avatar
+      border: none !important
+
+    .user-avatar
+      width: 37%
+      @include media-breakpoint-down('md')
+        width: 50%
+      @include media-breakpoint-down('sm')
+        width: 60%
+
+      img
+        position: relative
+        top: 103px
+        left: 5px
+        z-index: 9999
+        background-color: $bg-avatar-primary
+        @include media-breakpoint-down('md')
+          left: -10px
+          top: 64px
+        @include media-breakpoint-down('sm')
+          left: -11px
+          top: 36px
+
+    .user-avatar-border
+      border: 2px outset $bg-primary-dark
+
+  .token-xs-before-tabs
+    @include media-breakpoint-down(xs)
+      position: absolute
+      width: 100%
+      bottom: 0
+
+      #token-social-media-icons
+        margin-left: auto
+        position: relative
+        right: auto
+        bottom: auto
+
+      .token-avatar
+        bottom: 5px
+
+.parent-trade-tab
+  margin-top: 1.4rem
 
 #token-data-form
   .custom-btn
@@ -34,6 +432,11 @@
   flex: 1 1 auto
   width: 1%
 
+.input-group-text
+  background: $dark-white
+  border: none
+  padding: 0.5rem 0.2rem
+
 .social-help
   padding-left: 0
 
@@ -49,165 +452,122 @@
       table-layout: fixed
       display: table
 
+/* stylelint-disable no-descending-specificity */
+.table-orders
+  max-height: 17rem
+
+  th, td
+    white-space: nowrap
+    padding-right: 0.35rem
+    padding-left: 0.35rem
+
+  tbody
+    td
+      &:first-child
+        padding-left: 1.5rem
+
+      &:last-child
+        padding-right: 0.5rem
+
+    white-space: nowrap
+
+    tr
+      z-index: 1
+      position: relative
+      border: 1px solid $bg-primary-dark !important
+      --orderFillWidth: 0%
+
+      &:after
+        content: ""
+        display: block
+        width: var(--orderFillWidth)
+        height: 100%
+        position: absolute
+        top: 0
+        right: 0
+        z-index: -1
+
+      &:hover
+        cursor: pointer
+
+.table-trade-history
+  thead tr th
+    padding-right: 2rem !important
+
+  &:nth-child(1)
+    width: 9%
+
+  &:nth-child(2)
+    width: 9%
+
+  &:nth-child(4)
+    width: 40%
+
+  td
+    padding-right: 2rem !important
+
+.bounty-table
+  thead
+    tr th
+      &:first-child
+        padding-left: 0.75rem
+        width: 100%
+
+      &:nth-child(2)
+        min-width: 75px
+
+      &:last-child
+        min-width: 92px
+
+  tbody
+    tr td
+      &:first-child
+        padding-left: 0.75rem
+
+      &:last-child
+        padding-right: 0.4rem
+/* stylelint-enable no-descending-specificity */
+
+.sell-order-price
+  color: $sell-order-price-color
+
+.buy-order-price
+  color: $buy-order-price-color
+
+.sell-order
+  &:after
+    background-color: $sell-order-fill-color
+
+.buy-order
+  &:after
+    background-color: $buy-order-fill-color
+
+
 .token-name-input
   background-color: $card-input-color !important
   color: $dark-white
   border-radius: 0
   border: none
 
-.token-social-media-edit
-  a:hover
-    text-decoration: underline
+.alert-float
+  font-size: 14px !important
+  padding: 0 10px !important
+  margin-bottom: 5px
 
-#token
-  .deployed-icon, .not-deployed-icon
-    height: 42px
-    @include media-breakpoint-down('md')
-      height: 34px
-    @include media-breakpoint-down('sm')
-      height: 27px
+.token-general-information
+  max-width: 100%
 
-  min-height: 800px
-
-  .not-deployed-icon
-    img
-      filter: grayscale(100%)
-
-  .buy-order, .sell-order
-    @include media-breakpoint-up('xl')
-      flex: 0 0 35%
-      max-width: 35%
-
-  .chart
-    @include media-breakpoint-up('xl')
-      flex: 0 0 30%
-      max-width: 30%
-
-  .fix-height
-    overflow-y: hidden
-
-  .profile-link
-    padding-left: 2px
-
-  ul.nav .token-avatar-left
-    margin-left: 132px
-    background: transparent
-    z-index: 1
-    @media(max-width: 1199px)
-      margin-left: 128px
-
-    @media(max-width: 991px)
-      margin-left: 112px
-
-    @media(max-width: 767px)
-      margin-left: 0
-
-    a
-      background: transparent
-
-  .token-avatar
-    z-index: 1
-    min-width: 0
-    &.show-avatar
-      margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
-
-    @media(max-width: 1199px)
-      margin-left: calc(111px + 20px) !important
-
-    @media(max-width: 991px)
-      margin-left: calc(94px + 20px) !important
-
-    @media(max-width: 767px)
-      margin-left: calc(54px + 20px) !important
-
-    .token-avatar-link
-      position: absolute
-      top: 0
-      left: 2%
-
-      img
-        width: 126px
-
-      @include media-breakpoint-down(md)
-        img
-          width: 104px
-        top: 29%
-        left: 23px
-
-      @include media-breakpoint-down(sm)
-        img
-          width: 74px
-        top: 4%
-        left: 23px
-
-      @include media-breakpoint-down(xs)
-        img
-          width: 64px
-        left: 22px
-        top: 3px
-
-    .token-name
-      min-width: 100px
-      margin-left: 8px
-      margin-top: 15px
-
-      @include media-breakpoint-down(md)
-        margin-top: 19px
-      @include media-breakpoint-down(sm)
-        margin-top: 11px
-
-      .current-token-name
-        margin-bottom: -3px
-        font-size: 25px
-        white-space: nowrap
-        overflow: hidden
-        text-overflow: ellipsis
-        display: block
-
-        @include media-breakpoint-down(md)
-          margin-bottom: -2px !important
-        @include media-breakpoint-down(sm)
-          margin-bottom: 5px !important
-        @include media-breakpoint-down(xs)
-          margin-bottom: 1px !important
-
-  .token-profile-avatar
-    width: 26px
-    height: 26px
-
-.token-point-progress
-  margin-top: 15px
-  margin-bottom: -9px
-
-  @include media-breakpoint-down(md)
-    margin-top: 18px
-  @include media-breakpoint-down(sm)
-    margin-top: 4px
-
-.token-deploy-icon
-  margin-top: 19px
-
-  @include media-breakpoint-down(md)
-    margin-top: 23px
-  @include media-breakpoint-down(sm)
-    margin-top: 9px
-
-.token-edit-icon
-  margin-top: 12px
-
-  @include media-breakpoint-down(sm)
-    margin-top: 4px
-
-.parent-trade-tab
-  margin-top: 1.4rem
-
-.token-introduction-profile-icon
-  width: 22px
-  height: 20px
+.check-icon
+  &:hover
+    color: $primary
 
 .airdrop-container
-  background: $secondary !important
+  background: $primary-dark !important
+  border: 1px solid $primary
   font-size: 18px
+
+  .airdrop-loading-container
+    min-height: 46px
 
   button
     &.btn-primary
@@ -222,79 +582,481 @@
 .airdrop-campaign__token-youtube-address
   margin-left: 0.9rem
 
-@media (min-width: 992px)
-  .resetlabel
-    position: absolute
-    bottom: 1.2rem
-    right: 1rem
+  @include media-breakpoint-up(lg)
+    text-align: left !important
 
-  .token-info-container
-    height: 410px
+  @include media-breakpoint-down(md)
+    text-align: center !important
+    font-size: 16px
 
-    .posts-container
-      position: absolute
-      top: 0
-      bottom: 0
+  @include media-breakpoint-only(xs)
+    span.message
+      display: block !important
 
-    .read-more
-      position: absolute
-      background-color: $card-body-bg
-      bottom: 0
-      padding: 10px
-      width: 100%
-      text-align: center
+.overview_chart
+  height: 200px
 
-.socialMediaIcon
-  margin-top: 58px
+.qt-card-horizontal-spinner
+  height: 116px
 
-.dropdown-menu-social-media
-  min-width: 7rem
-  left: -68px
+.qt-card-spinner
+  min-height: 280px
 
-.social-media-menu
-  margin-right: 13px
+.chart-spinner
+  min-height: 200px
 
-.top-holders
-  td:not(:first-child)
-    white-space: nowrap
+.qt-input-wrapper
+  min-width: 0
 
-.quick-trade-nav
-  .nav-item
-    .nav-link
-      background: none !important
-      padding: 0 5px !important
+.qt-tooltip
+  font-size: 1.1rem
 
-    &:first-child
-      .nav-link
-        padding: 0 5px 0 0 !important
+.qt-balance
+  font-size: 0.9rem
+  color: $text-color-secondary-light
+  padding: 0.5rem 0.5rem 0 1rem
+  border-top-left-radius: $border-radius !important
 
-.discord-role
+.qt-input-container
+  min-height: 108px
+
+.quicktrade-input
+  height: auto !important
+  border-right: none !important
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem
+  border-radius: $border-radius 0 0 $border-radius !important
+
+  &, &:focus, &:hover
+    border: thin solid white !important
+
+.qt-dropdown
+  .dropdown-toggle
+    width: 105px
+    height: 100%
+    padding: 0.75rem 1rem !important
+
+  .form-control-field, .b-dropdown
+    height: 100%
+
+.qt-toggle-icon
+  $rotateDeg: 90deg
   display: flex
-  gap: 5px
+  margin-left: auto
+  width: 100%
+  max-width: 50%
 
+  .fa-exchange-alt
+    transform: translateX(-10px) rotateZ($rotateDeg)
+
+  @include media-breakpoint-down(sm)
+    justify-content: end
+
+    .fa-exchange-alt
+      transform: rotateZ($rotateDeg)
+
+.qt-sm-nowrap
+  white-space: nowrap
+
+  @include media-breakpoint-down(sm)
+    white-space: normal
+
+.qt-field-height
+  height: 63px
+
+.qt-action-btn
+  height: 60%
+  
+  &.error
+    border-color: $btn-border-color
+    color: $btn-error-text-color
+
+  &:disabled
+    color: $text-color-primary !important
+    background-color: $primary !important
+    opacity: 0.5
+    cursor: default
+
+#open-market-currency
+  width: 104px
+
+.reward-bounty-td-title
+  @include media-breakpoint-down('xs')
+    padding: 0 !important
+
+/*fix for spinner's mobile view of centered b-tabs */
+.pair-spinner-container
+  .nav.nav-tabs.justify-content-center
+    @include media-breakpoint-down('xs')
+      justify-content: flex-start !important
+
+.explorer-url:hover
+  color: $link-color-hover !important
+  text-decoration: underline !important
+
+.trading-tabs
+  border-bottom: none
+  .nav-link
+    &:hover
+      border-color: transparent
+      color: $primary
+      &::selection
+        color: $primary
+        background-color: $bg-secondary
+    &.active
+      pointer-events: none
+      color: $primary
+      background-color: transparent
+      font-weight: 600
+      border: none
+      &::selection
+        color: $primary
+        background-color: $bg-secondary
+
+.remove-orders-table
+  text-align: left
+  overflow-y: scroll
+  max-height: 300px
+
+.sell-order-width
+  max-width: 85%
+  @media (max-width: 1135px) and (min-width: 992px)
+    max-width: 90%
+
+.sell-order-longBalance
+  @media (min-width: 992px)
+    width: 28%
+
+    @media (max-width: 1190px)
+      width: 18%
+
+    @media (max-width: 1090px)
+      width: 14%
+
+.sell-order-shortBalance
+  @media (min-width: 992px)
+    width: 44%
+
+    @media (max-width: 1170px)
+      width: 33%
+
+    @media (max-width: 1090px)
+      width: 22%
+
+.sell-order-balance
+  @media (min-width: 992px)
+    width: 75%
+
+    @media (max-width: 1090px)
+      width: 70%
+
+.order-input
+  @media (max-width: 1135px) and (min-width: 992px)
+    max-width: 48%
+
+.token-title
+  max-width: $token-title-width
+
+#auth-modal
+  .modal-dialog
+    max-width: 400px
+    margin: auto
+
+  .modal-content, .modal-header
+    background-color: $bg-secondary
+
+  .form-control-container
+    .form-control-field
+      .outline
+        .left-outline, .right-outline, .label-outline
+          border-color: $text-color-dark
+          label
+            color: $text-color-dark
+
+  .borderless-form-control
+    .form-control-field
+      .outline
+        .left-outline, .right-outline, .label-outline
+          border-color: transparent
+          label
+            color: transparent
+
+  input[type="email"], input[type="text"], input[type="password"]
+    color: $text-color-dark !important
+    box-shadow: none !important
+
+    &:-webkit-autofill
+      -webkit-text-fill-color: $text-color-dark !important
+      box-shadow: inset 0 0 0 30px $bg-secondary !important
+
+      &:hover, &:focus, &:active, &:valid
+        -webkit-text-fill-color: $text-color-dark !important
+        box-shadow: inset 0 0 0 30px $bg-secondary !important
+
+  input[type="checkbox"]
+    background-color: transparent
+    height: 16px !important
+
+    &:checked
+        background-color: $primary !important
+
+  .modal-close
+    color: $bg-secondary !important
+    text-shadow: -1px -1px 0 $green, 1px -1px 0 $green, -1px 1px 0 $green, 1px 1px 0 $green
+
+  .loading-spinner
+    color: $bg-color-darkest !important
+
+  .agree-label
+    color: $text-color-dark !important
+
+#login-form-container, #register-form-container
+  animation: fadeIn 2s
+  @keyframes fadeIn
+    from
+      opacity: 0
+    to
+      opacity: 1
+
+  .margin-text-input
+    margin-top: 1rem !important
+
+.token-release-chart
+  max-width: 266px
+
+  @media (max-width: 1121px) and (min-width: 572px)
+    max-width: 250px
+  @media (max-width: 655px) and (min-width: 572px)
+    max-width: 200px
+
+.date-column-width
+  max-width: 5rem
+
+.container-slider
+  padding: 0 18px
+
+.trade-slider-dot
+  background-color: $bg-primary-light
+  border-radius: 0
+  border: 4px solid $primary
+  -webkit-transform: rotate(43deg)
+  -moz-transform: rotate(45deg)
+  -ms-transform: rotate(45deg)
+  -o-transform: rotate(45deg)
+  transform: rotate(45deg)
+  height: 7px
+  width: 7px
+
+.vue-slider-mark
+  top: -4px !important
+  width: 7px !important
+  height: 7px !important
+  background-color: $bg-primary-dark
+  border: 3px solid $bg-primary-light
+  -webkit-transform: rotate(43deg) !important
+  -moz-transform: rotate(45deg) !important
+  -ms-transform: rotate(45deg) !important
+  -o-transform: rotate(45deg) !important
+  transform: rotate(45deg) !important
+
+  &-step
+    -moz-border-radius: 50%
+    -webkit-border-radius: 50%
+    border-radius: 50%
+
+  &-active
+    background-color: $primary
+    border: 3px solid $bg-primary-dark
+    border-radius: 5px
+    top: -4px !important
+
+  &-label
+    display: none
+
+.vue-slider-marks
+  div:nth-child(1)
+    left: -1.5% !important
+  div:nth-child(2)
+    left: 23.5% !important
+  div:nth-child(3)
+    left: 48.5% !important
+  div:nth-child(4)
+    left: 73.5% !important
+  div:nth-child(5)
+    left: 98.5% !important
+
+.vue-slider-rail
+  background-color: $bg-primary-light
+  height: 7px
+
+.slider-tooltip
+  background-color: $bg-secondary-dark
+  border-color: $bg-secondary-dark
+  border-radius: 5px
+  -webkit-box-sizing: content-box
+  box-sizing: content-box
+  color: #fff
+  font-size: 14px
+  min-width: 20px
+  padding: 2px 5px
+  text-align: center
+  white-space: nowrap
+
+  &::after
+    border: 5px solid transparent
+    border-top-color: inherit
+    top: 100%
+    content: ""
+    position: absolute
+    height: 0
+    left: 50%
+    -webkit-transform: translate(-50%)
+    transform: translate(-50%)
+    width: 0
+
+.trade-order-input
+  height: auto !important
+  border-right: none !important
+  border-top-right-radius: 0
+  border-bottom-right-radius: 0
+
+.trade-order-input--overflow
+  height: 48px !important
+  bottom: 0
+
+.max-amount-warning
+  color: $toast-error-bg
+  font-size: $small-font-size
+
+.price-order
+  background-color: $bg-secondary
+  border-radius: 0 5px 5px 0
+
+#input-amount
+  .tooltip-inner
+    background-color: $toast-error-bg !important
+
+  .arrow:before
+    border-top-color: $toast-error-bg !important
+
+.ve-candle-container
+  min-height: 400px
+
+.sm-responsive-text
+  @media (max-width: 510px)
+    font-size: 3.5vw
+    vertical-align: middle
+
+.token-created-modal-dialog
   @include media-breakpoint-down(xs)
-    flex-direction: column
+    .text-small-responsive
+      @include font-scale(xs)
 
-  .name-input
-    width: 50%
+    .space-next-btn
+      padding-right: 0 !important
+      padding-left: 0.25rem !important
 
-    @include media-breakpoint-down(xs)
-      width: 100%
+    .space-prev-btn
+      padding-left: 0 !important
+      padding-right: 0.25rem !important
 
-  .color-input
-    width: 20%
+.bounty-reward-dropdown
+  button
+    transform: rotate(90deg)
+    color: $primary
 
-    @include media-breakpoint-down(xs)
-      width: 100%
+    &:hover
+      background: none !important
 
-  .required-balance-input
-    width: 30%
+    &:focus
+      outline: none !important
 
-    @include media-breakpoint-down(xs)
-      width: 100%
+  .bounty-reward-dropdown-menu
+    div.bounty-reward-dropdown-item
+      &:hover
+        background: $dropdown-link-bg-hover
 
-  .remove-role-button
+.reward-td-title
+  display: -webkit-box
+  -webkit-line-clamp: 1
+  -webkit-box-orient: vertical
+  overflow: hidden
+
+.reward-td-title:hover
+  @media (hover: none)
+    .truncatable
+      display: none
+
+.close-icon
+  &:hover
+    color: lighten($bg-danger-input, 5) !important
+
+.summary-modal
+  max-width: 700px!important
+
+.text-link
+  color: $text-color-primary
+
+.truncate-token-name
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  width: 100%
+
+.truncate-address
+  .token-address-buttons
     display: flex
-    flex-direction: column
-    justify-content: flex-end
-    padding-bottom: 4px
+    padding-left: 6px
+
+  span
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+.token-created-step
+  $stepMinHeight: 330px
+  $imageMaxHeight: 300px
+  $imageMaxHeightSM: 200px
+
+  display: none
+
+  &:first-child
+    display: block
+
+  .token-created-step-height
+    min-height: $stepMinHeight
+
+  .token-created-step-image
+    max-height: $imageMaxHeight
+
+  .token-created-list
+    li::marker
+      content: '+ '
+
+  .token-text
+    h1
+      font-size: $font-size-xl !important
+      font-weight: lighter !important
+      font-style: italic !important
+      color: #fff !important
+
+  @media (max-width: map-get($container-max-widths, "sm"))
+    .token-created-step-image
+      max-height: $imageMaxHeightSM
+
+    h1
+      font-size: $font-size-ml
+
+    .token-text
+      h1
+        font-size: $font-size-lg
+
+.link-primary-underscored
+  color: $primary !important
+  border-bottom: 1px solid $primary
+
+  &::selection
+    background-color: $bg-secondary
+
+  &:hover
+    color: $primary-highlight !important
+    border-bottom: 1px solid $primary-highlight

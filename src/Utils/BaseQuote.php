@@ -23,4 +23,9 @@ class BaseQuote
 
         return $market;
     }
+
+    public static function reverseMarketInPlace(Market $market): Market
+    {
+        return new Market($market->getQuote(), $market->getBase());
+    }
 }

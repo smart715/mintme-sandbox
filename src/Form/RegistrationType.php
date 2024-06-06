@@ -3,14 +3,14 @@
 namespace App\Form;
 
 use App\Form\Type\NicknameType;
-use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
-use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
+use App\Form\Type\RegisterRecaptchaType;
+use App\Form\Validator\Constraints\RecaptchaTrue;
+use App\Services\TranslatorService\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class RegistrationType extends AbstractType
 {
     /** @var TranslatorInterface */
@@ -27,10 +27,10 @@ class RegistrationType extends AbstractType
             ->remove('username')
             ->remove('plainPassword')
             ->add('nickname', NicknameType::class)
-            ->add('recaptcha', EWZRecaptchaType::class, [
+            ->add('recaptcha', RegisterRecaptchaType::class, [
                 'attr' => [
                     'options' => [
-                        'theme' => 'dark',
+                        'theme' => 'white',
                         'size' => 'normal',
                         'type'  => 'image',
                         'injectScript' => false,

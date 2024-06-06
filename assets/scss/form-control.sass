@@ -1,0 +1,376 @@
+@import "variables"
+
+$input-common-padding: $spacer * 1.5
+$input-half-padding: $spacer * 0.75
+$assistive-padding-y: $spacer * 0.25
+
+.form-control-container
+  .form-control-field
+    position: relative
+    margin-top: 8px
+
+    &.form-control-select
+      display: flex
+      &:focus
+        border: 1px solid $text-color-primary !important
+    select
+      flex: 1
+      background-color: transparent
+      color: $text-color-primary
+      border: none
+      padding: $input-half-padding $input-common-padding
+      margin-right: $input-half-padding
+      &:hover
+        cursor: pointer
+      &:focus
+        outline: none !important
+        border: 0 !important
+
+      option
+        background-color: $bg-primary
+    .content-editable-textarea
+      outline: none
+      max-height: 400px
+      overflow: auto
+      white-space: pre-wrap
+    .outline
+      position: absolute
+      left: 0px
+      top: 0px
+      height: 100%
+      width: 100%
+      display: flex
+      pointer-events: none
+
+      .left-outline
+        border: 1px solid $primary
+        border-radius: $half-border-radius
+        border-right: 0
+        border-top-right-radius: 0
+        border-bottom-right-radius: 0
+        flex: 0 0 0.9rem
+      .right-outline
+        border: 1px solid $primary
+        border-radius: $half-border-radius
+        border-left: 0
+        border-top-left-radius: 0
+        border-bottom-left-radius: 0
+        flex: 1
+      .label-outline
+        border-bottom: 1px solid $primary
+        padding: 0 0.5rem
+        max-width: 80%
+
+        @media (max-width: 575px)
+          max-width: 100%
+
+        label
+          padding: 0px
+          transform: translateY(-10px)
+          color: $primary
+          font-size: 0.9rem
+          overflow: hidden
+          white-space: nowrap
+          text-overflow: ellipsis
+          max-width: 100%
+          &::selection
+            background-color: $bg-secondary
+
+          .label-bg-primary-dark
+            background: $bg-primary-dark
+
+          .form-control-label-guide
+            pointer-events: all
+            &.font-size-2
+              margin-top: -3px
+            &.font-size-1
+              margin-top: -3px
+
+    /* stylelint-disable */
+    &.disabled
+      input
+        pointer-events: none
+
+      .btn.dropdown-toggle, .btn.dropdown-toggle:hover:not(:disabled):not(.disabled)
+        color: $text-color-primary-darker !important
+
+      .outline
+        .left-outline, .right-outline, .label-outline, .label-outline label
+          border-color: $text-color-primary-darker
+          color: $text-color-primary-darker
+
+        .label-outline .guide-icon
+          background-color: $text-color-primary-darker
+
+    &.invalid
+      .btn.dropdown-toggle, .btn.dropdown-toggle:hover:not(:disabled):not(.disabled)
+        color: $danger !important
+
+      .outline
+        .left-outline, .right-outline, .label-outline, .label-outline label
+          border-color: $danger
+          color: $danger
+    /* stylelint-enable */
+
+    .postfix-icon-container
+      position: absolute
+      right: $input-half-padding
+      top: 0
+      height: 100%
+
+    .form-control
+      border: none !important
+      background-color: transparent
+      color: $text-color-primary
+      padding: $input-common-padding
+
+    &.has-postfix-icon
+      .form-control
+        padding-right: $input-half-padding + $input-common-padding
+
+  &.dark-form-control
+    .form-control-field
+      input
+        color: $text-color-dark
+      .outline
+        .left-outline, .right-outline, .label-outline
+          border-color: $text-color-dark
+          label
+            color: $text-color-dark
+  &.borderless-form-control
+    .form-control-field
+      .outline
+        .left-outline, .right-outline, .label-outline
+          border-color: transparent
+          label
+            color: transparent
+
+  .dropdown
+    width: 100%
+
+    &.white-dropdown
+      background-color: $bg-secondary
+
+      .outline
+        .left-outline, .right-outline, .label-outline
+          border-color: $bg-secondary
+
+    .dropdown-toggle
+      background-color: transparent !important
+      color: $primary !important
+      padding: $input-half-padding $input-common-padding !important
+      position: relative
+      &::selection
+        color: $primary
+        background-color: $bg-secondary
+
+      @media (hover: hover)
+        &:hover:not(:disabled):not(.disabled)
+          background-color: transparent !important
+          color: $primary !important
+          &::selection
+            background-color: $bg-secondary
+
+      &::after
+        position: absolute
+        top: $input-common-padding
+        right: $input-common-padding
+        border-left: 0.4rem solid transparent
+        border-right: 0.4rem solid transparent
+        border-top: 0.4rem solid
+
+    .dropdown-menu
+      width: 100%
+      background-color: $bg-primary-light
+
+      .dropdown-item
+        color: $text-color-primary
+        padding: $input-half-padding $input-common-padding
+
+        &:hover
+          background-color: lighten($bg-primary-light, 5)
+          color: $text-color-primary
+
+      li.active
+        .dropdown-item
+          background-color: lighten($bg-primary-light, 5)
+          font-weight: 600
+          cursor: default
+
+  .assistive
+    min-height: 1.85rem
+    padding: $assistive-padding-y $input-common-padding
+    font-size: 0.9rem
+
+    .hint
+      color: $text-color-primary-darker
+      @include link-highlight-selection
+
+      *
+        @include link-highlight-selection
+
+    .errors
+      color: $danger
+      div::selection
+        background-color: $bg-secondary
+
+/* stylelint-disable */
+.form-control-container .form-control-field.white-theme
+  .dropdown .dropdown-toggle
+    background-color: $bg-secondary !important
+    color: $text-color-secondary-light !important
+
+    &:hover:not(:disabled):not(.disabled)
+      background-color: $bg-secondary !important
+      color: $text-color-secondary !important
+
+  .outline
+    .left-outline, .right-outline, .label-outline
+      border-color: $bg-secondary
+      color: $text-color-secondary-light
+
+  .dropdown-menu
+    background-color: $bg-secondary
+
+    .dropdown-item
+      color: $text-color-secondary-light
+
+      &:hover
+        background-color: darken($bg-secondary, 10)
+        color: $text-color-secondary
+
+    li.active
+      .dropdown-item
+        background-color: darken($bg-secondary, 10)
+        color: $text-color-secondary
+.no-assistive-padding
+  .assistive
+    padding-right: 0
+    padding-left: 0
+.form-control-container.no-spacer
+  .assistive
+    display: none !important
+
+.max-search-input
+  .form-control-field
+    width: 20rem
+    .form-control
+      width: 18.3rem
+
+.vue-tel-input
+  -webkit-box-shadow: none
+  border-radius: 0px
+  border: none !important
+  height: 42px !important
+  border-radius: $form-radius !important
+
+  input
+    height: auto !important
+    border: 1px solid $primary !important
+    border-left-color: $bg-primary-light !important
+    border-top-right-radius: $form-radius
+    border-bottom-right-radius: $form-radius
+
+  &:focus-within
+    box-shadow: none !important
+
+.vti__dropdown
+  background-color: transparent !important
+  color: $text-color-primary
+  border: 1px solid $primary
+  padding: 0.75rem !important
+  border-radius: $form-radius
+  border-top-right-radius: 0px
+  border-right: none
+  border-bottom-right-radius: 0px
+
+.vti__dropdown-item
+  white-space: nowrap !important
+  overflow: hidden !important
+  text-overflow: ellipsis
+  strong 
+    font-weight: normal !important 
+
+.vti__selection
+  span
+    &:nth-child(3)
+      padding-left: 20px
+
+.vti__country-code
+  color: $text-color-primary !important
+
+.vti__dropdown.open
+  background-color: $bg-primary !important
+
+.vti__dropdown-list
+  background-color: $bg-primary !important
+
+.vti__dropdown-item.highlighted
+  background-color: $bg-primary-light !important
+  text-align: left !important
+
+.vti-border
+  border: none !important
+  border-radius: $border-radius
+/* stylelint-enable */
+
+// styles for static checkboxes
+input[type="checkbox"]
+  appearance: none
+  background-color: transparent
+  margin: 0
+  font: inherit
+  color: $checkbox-border-color
+  width: 16px
+  height: 16px
+  border: 1px solid $checkbox-border-color
+  border-radius: 0.2rem
+  transform: translate(-1.5rem, 2px)
+  display: grid
+  place-content: center
+  transition: $micro-transition-speed background ease-in-out, $micro-transition-speed border ease-in-out
+
+input[type="checkbox"][disabled]
+  background: $checkbox-border-color
+
+input[type="checkbox"]::before
+  content: ""
+  width: 12px
+  height: 12px
+  transition: $micro-transition-speed opacity ease-in-out
+  background-repeat: no-repeat
+  background-size: 100%
+  opacity: 0
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='iso-8859-1'%3F%3E%3Csvg version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 17.837 17.837' style='enable-background:new 0 0 17.837 17.837;' xml:space='preserve'%3E%3Cg%3E%3Cpath style='fill:%23fff;' d='M16.145,2.571c-0.272-0.273-0.718-0.273-0.99,0L6.92,10.804l-4.241-4.27 c-0.272-0.274-0.715-0.274-0.989,0L0.204,8.019c-0.272,0.271-0.272,0.717,0,0.99l6.217,6.258c0.272,0.271,0.715,0.271,0.99,0 L17.63,5.047c0.276-0.273,0.276-0.72,0-0.994L16.145,2.571z'/%3E%3C/g%3E%3C/svg%3E%0A")
+
+input[type="checkbox"]:checked
+  background: $primary
+  border-color: $primary
+
+input[type="checkbox"][disabled]:checked
+  background: $checkbox-border-color
+  border-color: $checkbox-border-color
+
+input[type="checkbox"]:checked::before
+  opacity: 1
+
+.hashtags-recommendation-hint
+  background-color: $bg-primary
+  z-index: 1
+  max-width: 100%
+  max-height: 400px
+  min-height: 48px
+  overflow: auto
+  border-radius: $half-border-radius
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px
+  border: 1px solid $bg-primary-light
+  font-size: 1.1rem
+
+  & > div
+    padding: 0.75rem 2rem
+    cursor: pointer
+    max-width: 400px
+
+    &:hover
+      background-color: $bg-primary-dark
+      color: $primary

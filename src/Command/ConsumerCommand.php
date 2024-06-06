@@ -16,6 +16,7 @@ class ConsumerCommand extends BaseConsumerCommand
     {
         try {
             parent::execute($input, $output);
+        /** @phpstan-ignore-next-line never throws this exception */
         } catch (AMQPConnectionClosedException $e) {
             $this->reconnectAndConsumeAgain($output);
         }

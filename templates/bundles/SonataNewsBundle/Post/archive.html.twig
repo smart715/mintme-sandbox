@@ -1,94 +1,159 @@
 {% extends 'base.html.twig' %}
 {% block title %}
     {% spaceless %}
-        {% trans %}page.news.title{% endtrans %} | mintMe
+        {% if pager.page == 1 %}
+            {% trans %}page.news.title_without_number{% endtrans %} | mintMe
+        {% else %}
+            {% trans with {'%page%': pager.page } %}page.news.title{% endtrans %} | mintMe
+        {% endif %}
     {% endspaceless %}
 {% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     {{ encore_entry_link_tags('pages/news') }}
-    <noscript>
-        <style>
-            [data-aos] {
-                opacity: 1 !important;
-                transform: translate(0) scale(1) !important;
-            }
-        </style>
-    </noscript>
 {% endblock %}
-
 {% block content %}
-    <div class="container pt-4 text-white news">
-        <div class="row justify-content-center">
-            <div class="col-md-12 card-fixed-large px-0">
-                <div id="news-selector">
+    <div class="container pt-4 text-white">
+        <div class="text-center pb-5 pt-3">
+            <h1 class="news-title">
+                {% trans %} page.news.title_mintme {% endtrans %}
+                <strong class="text-primary">
+                    {% trans %} page.news.title_without_number {% endtrans %}
+                </strong>
+            </h1>
+        </div>
+        <div class="justify-content-center">
+            <div id="news-selector">
+                <div class="row align-items-end">
                     {% set i = 0 %}
                     {% for post in pager.getResults() %}
-                        <div class="news-box p-4 mb-5" data-aos="fade-up">
-                            <header>
-                                <h2 class="word-break">
+                        <div class="col-12 col-sm-6 col-lg-6 col-xl-4 p-3 my-3">
+                            <div class="card posts-width-height rounded news" data-aos="fade-up">
+                                <div class="news-img-area position-relative">
                                     <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">
-                                        {{ post|translateArticle('title') }}
-                                    </a>
-                                </h2>
-
-                                <div>{{ post.publicationDateStart | format_date }}</div>
-                            </header>
-
-                            <div class="row">
-                                {% if post.image != null %}
-                                    <div class="center-block text-center col-12">
-                                        <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">
+                                        {% if post.image != null %}
                                             <noscript>
-                                                <img src="{% path post.image, 'wide' %}"/>
+                                                <img
+                                                    class="card-img-top"
+                                                    loading="lazy"
+                                                    src="{% path post.image, 'wide' %}"
+                                                    alt="{{ post|translateArticle('title') }}"
+                                                />
                                             </noscript>
-                                            <news-image src="{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
-                                        {% set i = i+1 %}
+                                            <div class="main-image-wrp position-absolute w-100 d-flex align-items-center justify-content-center">
+                                                <news-image
+                                                    class="news-img-thumbnail main-image"
+                                                    v-bind:query-number="{{i}}"
+                                                    src="{% path post.image, 'wide' %}"
+                                                ></news-image>
+                                            </div>
+                                            <news-image
+                                                class="news-img-thumbnail object-fit-cover blurred-bg-image"
+                                                v-bind:query-number="{{i}}"
+                                                src="{% path post.image, 'wide' %}"
+                                            ></news-image>
+                                            {% set i = i+1 %}
+                                        {% else %}
+                                            <noscript>
+                                                <img
+                                                    class="card-img-top"
+                                                    loading="lazy"
+                                                    src="{{ asset('build/images/default-post-image.png') }}" 
+                                                    alt="{{ post|translateArticle('title') }}"
+                                                />
+                                            </noscript>
+                                            <news-image
+                                                class="news-img-thumbnail"                                         
+                                                src="{{ asset('build/images/default-post-image.png') }}"
+                                            > 
+                                            </news-image>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="card-body px-4 pb-0">
+                                    <h5>
+                                        <a
+                                            class="line-clamp news-article-title"
+                                            href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}"
+                                        >
+                                            {{ post|translateArticle('title') }}
                                         </a>
+                                    </h5>
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-6 col-md-7 col-lg-8 separator-line mt-2"></div>
+                                            <div class="col-6 col-md-5 col-lg-4 px-0">
+                                                <p class="news-article-date text-right">
+                                                    {{ post.publicationDateStart | format_date }}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
-                                {% endif %}
-                                <p class="mt-4 mb-1 col-12 word-break">
-                                    {{ post|translateArticle('abstract') }}
-                                </p>
-                                <div class="col-12 pt-3 read-more">
-                                    <a class="py-1 undraggable float-right" href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">{% trans %}page.news.read_more{% endtrans %}</a>
+                                </div>
+                                <div class="container px-4 mb-4">
+                                    <p class="news-article-preview text-justify line-clamp space-height">
+                                        {{ post|translateArticle('abstract') }}
+                                    </p>
+                                    <a
+                                        class="btn btn-primary py-2 px-3 mt-2"
+                                        href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}"
+                                    >
+                                        {% trans %} page.news.read_more {% endtrans %}
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     {% else %}
-                        <div class="h-100">
-                            <div class="row">
-                                <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
-                                    <h1>{{ 'no_post_found'|trans({}, 'SonataNewsBundle') }}</h1>
-                                </div>
-                            </div>
+                        <div class="text-center">
+                            <h2 class="font-weight-bold text-primary">
+                                {{ 'no_post_found'|trans({}, 'SonataNewsBundle') }}
+                            </h2>
                         </div>
                     {% endfor %}
-
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item {% if pager.page == pager.firstPage %} disabled {% endif %}">
-                                <a class="page-link" href="{{ url(route, route_parameters|merge({'page': pager.previouspage})) }}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">{% trans %}previous{% endtrans %}</span>
-                                </a>
-                            </li>
-                            {% for pageNumber in pager.getLinks(5) %}
-                                <li class="page-item {% if pager.page == pageNumber %} active {% endif %}">
-                                    <a class="page-link" href="{{ url(route, route_parameters|merge({'page': pageNumber})) }}">{{ pageNumber }}</a>
-                                    {% if pager.page == pageNumber %} <span class="sr-only">{% trans %}page.news.current{% endtrans %}</span> {% endif %}
-                                </li>
-                            {% endfor %}
-                            <li class="page-item {% if pager.page == pager.lastPage %} disabled{% endif %}">
-                                <a class="page-link" href="{{ url(route, route_parameters|merge({'page': pager.nextpage})) }}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">{% trans %}next{% endtrans %}</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if pager.page == pager.firstPage %} disabled {% endif %}">
+                            <a
+                                class="page-link"
+                                href="{{ url(route, route_parameters|merge({'page': pager.previouspage})) }}"
+                                aria-label="Previous"
+                            >
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">
+                                    {% trans %} previous {% endtrans %}
+                                </span>
+                            </a>
+                        </li>
+                        {% for pageNumber in pager.getLinks(5) %}
+                            <li class="page-item {% if pager.page == pageNumber %} active {% endif %}">
+                                <a
+                                    class="page-link"
+                                    href="{{ url(route, route_parameters|merge({'page': pageNumber})) }}"
+                                >
+                                    {{ pageNumber }}
+                                </a>
+                                {% if pager.page == pageNumber %}
+                                    <span class="sr-only">
+                                        {% trans %} page.news.current {% endtrans %}
+                                    </span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        <li class="page-item {% if pager.page == pager.lastPage %} disabled {% endif %}">
+                            <a
+                                class="page-link"
+                                href="{{ url(route, route_parameters|merge({'page': pager.nextpage})) }}"
+                                aria-label="Next"
+                            >
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">
+                                    {% trans %} next {% endtrans %}
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>

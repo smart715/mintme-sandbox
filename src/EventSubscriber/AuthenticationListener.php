@@ -5,6 +5,10 @@ namespace App\EventSubscriber;
 use FOS\UserBundle\EventListener\AuthenticationListener as BaseAuthenticationListener;
 use FOS\UserBundle\FOSUserEvents;
 
+/**
+ * @codeCoverageIgnore
+ * @phpstan-ignore-next-line final class
+ */
 class AuthenticationListener extends BaseAuthenticationListener
 {
     /**

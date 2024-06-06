@@ -1,15 +1,11 @@
 <template>
-    <div>
+    <div v-b-tooltip.hover="tooltipConfig">
         <template v-if="!loaded || btnDisabled">
             <span class="btn-cancel px-0 m-1 text-muted pointer-events-none">
                 {{ $t('token.delete.delete_token') }}
             </span>
-            <span v-if="!loaded">
-                <font-awesome-icon
-                    icon="circle-notch"
-                    spin class="loading-spinner"
-                    fixed-width
-                />
+            <span v-if="!loaded && !serviceUnavailable">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
             </span>
             <guide v-else>
                 <template slot="header">
@@ -25,16 +21,21 @@
                 </template>
             </guide>
         </template>
-        <span
+        <m-button
             v-else
-            class="btn-cancel px-0 c-pointer m-1"
+            type="primary"
             @click="deleteToken"
+            :loading="isDeleting"
         >
-            {{ $t('token.delete.delete_token') }}
-        </span>
+            <template v-slot:prefix>
+                <font-awesome-icon :icon="['far', 'window-close']"/>
+            </template>
+            <span class="ml-1">{{ $t('token.delete.delete_token') }}</span>
+        </m-button>
         <two-factor-modal
             :visible="showTwoFactorModal"
             :twofa="twofa"
+            :loading="isDeleting"
             @verify="doDeleteToken"
             @close="closeTwoFactorModal"
         />
@@ -44,27 +45,34 @@
 <script>
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
-import {LoggerMixin, NotificationMixin} from '../../mixins';
+import {NotificationMixin} from '../../mixins';
 import {HTTP_OK} from '../../utils/constants';
 import {mapGetters} from 'vuex';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {faWindowClose} from '@fortawesome/fontawesome-free-regular';
+import {MButton} from '../UI';
+import {VBTooltip} from 'bootstrap-vue';
 
-library.add(faCircleNotch);
+library.add(faCircleNotch, faWindowClose);
 
 export default {
     name: 'TokenDelete',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [NotificationMixin],
     props: {
         isTokenNotDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
     },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     components: {
         Guide,
         TwoFactorModal,
         FontAwesomeIcon,
+        MButton,
     },
     data() {
         return {
@@ -72,21 +80,32 @@ export default {
             showTwoFactorModal: false,
             soldOnMarket: null,
             isTokenOverDeleteLimit: null,
+            serviceUnavailable: false,
+            isDeleting: false,
         };
     },
     mounted() {
         this.$axios.retry.get(this.$routing.generate('token_over_delete_limit', {name: this.tokenName}))
             .then((res) => this.isTokenOverDeleteLimit = res.data)
             .catch((err) => {
-              this.sendLogs('error', 'Can not get tokens in curculation', err);
+                this.serviceUnavailable = true;
+                this.$logger.error('Can not get tokens in curculation', err);
             });
     },
     computed: {
         ...mapGetters('tokenStatistics', {
             tokenDeleteSoldLimit: 'getTokenDeleteSoldLimit',
         }),
+        tooltipConfig: function(data) {
+            return this.serviceUnavailable
+                ? {title: this.$t('toasted.error.service_unavailable_short'), boundary: 'viewport'}
+                : null;
+        },
         btnDisabled: function() {
-            return this.isTokenOverDeleteLimit || !this.isTokenNotDeployed;
+            return this.isTokenOverDeleteLimit
+                || !this.isTokenNotDeployed
+                || this.serviceUnavailable
+            ;
         },
         loaded: function() {
             return null !== this.tokenDeleteSoldLimit
@@ -115,31 +134,36 @@ export default {
                 return;
             }
 
+            this.isDeleting = true;
             this.$axios.single.post(this.$routing.generate('token_delete', {
-                    name: this.tokenName,
-                }), {
-                    code: code,
-                })
+                name: this.tokenName,
+            }), {
+                code: code,
+            })
                 .then((response) => {
                     if (HTTP_OK === response.status) {
                         this.notifySuccess(response.data.message);
                         this.showTwoFactorModal = false;
                         location.href = this.$routing.generate('homepage');
                     }
-                }, (error) => {
+                })
+                .catch((error) => {
                     if (!error.response) {
                         this.notifyError(this.$t('toasted.error.network'));
-                        this.sendLogs('error', 'Delete token network error', error);
+                        this.$logger.error('Delete token network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not delete token', error);
+                        this.$logger.error('Can not delete token', error);
                         if ('2fa code is expired' === error.response.data.message) {
                             this.sendConfirmCode();
                         }
                     } else {
                         this.notifyError(this.$t('toasted.error.try_later'));
-                        this.sendLogs('error', 'An error has occurred, please try again later', error);
+                        this.$logger.error('An error has occurred, please try again later', error);
                     }
+                })
+                .finally(() => {
+                    this.isDeleting = false;
                 });
         },
         sendConfirmCode: function() {
@@ -149,8 +173,8 @@ export default {
             }
 
             this.$axios.single.post(this.$routing.generate('token_send_code', {
-                    name: this.tokenName,
-                }))
+                name: this.tokenName,
+            }))
                 .then((response) => {
                     if (HTTP_OK === response.status && null !== response.data.message) {
                         this.notifySuccess(response.data.message);
@@ -159,13 +183,13 @@ export default {
                 }, (error) => {
                     if (!error.response) {
                         this.notifyError(this.$t('toasted.error.network'));
-                        this.sendLogs('error', 'Send confirm code network error', error);
+                        this.$logger.error('Send confirm code network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not send confirm code', error);
+                        this.$logger.error('Can not send confirm code', error);
                     } else {
                         this.notifyError(this.$t('toasted.error.try_later'));
-                        this.sendLogs('error', 'An error has occurred, please try again later', error);
+                        this.$logger.error('An error has occurred, please try again later', error);
                     }
                 });
         },

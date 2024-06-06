@@ -6,8 +6,8 @@ use App\Entity\GoogleAuthenticatorEntry;
 use App\Entity\User;
 use App\Manager\TwoFactorManager;
 use App\Repository\GoogleAuthenticatorEntryRepository;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
@@ -113,7 +113,7 @@ class TwoFactorManagerTest extends TestCase
         return $user;
     }
 
-    private function mockEntityManager(?ObjectRepository $repository = null): EntityManagerInterface
+    private function mockEntityManager(?EntityRepository $repository = null): EntityManagerInterface
     {
         /** @var EntityManagerInterface|MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);

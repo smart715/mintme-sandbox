@@ -12,7 +12,7 @@
                         if (errorDivs.length) {
                             errorDivs[0].className = '';
                         }
-
+                        
                         var errorMsgs = document.getElementsByClassName('recaptcha-error-message');
                         if (errorMsgs.length) {
                             errorMsgs[0].parentNode.removeChild(errorMsgs[0]);
@@ -37,12 +37,64 @@
                 {%- if attr.options.async is defined and attr.options.async %} async{% endif -%}
             ></script>
             {% endif -%}
-            <div class="g-recaptcha" data-theme="{{ attr.options.theme }}" data-size="{{ attr.options.size }}" data-type="{{ attr.options.type }}" data-sitekey="{{ form.vars.public_key }}"
-                 {%- if attr.options.callback is defined %} data-callback="{{ attr.options.callback }}"{% endif -%}
-                 {%- if attr.options.expiredCallback is defined %} data-expired-callback="{{ attr.options.expiredCallback }}"{% endif -%}
-                 {%- if attr.options.bind is defined %} data-bind="{{ attr.options.bind }}"{% endif -%}
-                 {%- if attr.options.badge is defined %} data-badge="{{ attr.options.badge }}"{% endif -%}
+            <div
+                class="g-recaptcha"
+                data-theme="{{ attr.options.theme }}"
+                data-size="{{ attr.options.size }}"
+                data-type="{{ attr.options.type }}"
+                data-sitekey="{{ form.vars.public_key }}"
+                {%- if attr.options.callback is defined %}
+                    data-callback="{{ attr.options.callback }}"
+                {% else %}
+                    data-callback="verifyRecaptcha"
+                {% endif -%}
+                {%- if attr.options.expiredCallback is defined %}
+                    data-expired-callback="{{ attr.options.expiredCallback }}"
+                {% endif -%}
+                {%- if attr.options.bind is defined %}
+                    data-bind="{{ attr.options.bind }}"
+                {% endif -%}
+                {%- if attr.options.badge is defined %}
+                    data-badge="{{ attr.options.badge }}"
+                {% endif -%}
             ></div>
+                
+            <script type="application/javascript">
+                window.onload = function() {
+                    const pendingCaptcha = document.getElementById('pending-captcha');
+
+                    if (!pendingCaptcha) {
+                        return;
+                    }
+
+                    const loginForm = document.getElementById('login');
+                    const registerForm = document.getElementById('register');
+                    const resettingForm = document.getElementById('resetting');
+                    const verifyElement = (element) => {
+                        if (!element) {
+                            return;
+                        }
+
+                        element.addEventListener('submit', function(evt) {
+                            if(!grecaptcha || !grecaptcha.getResponse()){
+                                evt.preventDefault();
+                                pendingCaptcha.classList.remove('d-none');
+                            }
+                        });
+                    };
+                    verifyElement(loginForm);
+                    verifyElement(registerForm);
+                    verifyElement(resettingForm);
+                }
+
+                var verifyRecaptcha = function() {
+                    const pendingCaptcha = document.getElementById('pending-captcha');
+
+                    if (grecaptcha.getResponse() && pendingCaptcha) {
+                        pendingCaptcha.classList.add('d-none');
+                    }
+                };
+            </script>
             {%- if attr.options.injectScript is not defined or attr.options.injectScript %}
             <noscript>
                 <div style="width: 302px; height: 352px;">

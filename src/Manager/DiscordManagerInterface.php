@@ -84,4 +84,8 @@ interface DiscordManagerInterface
     public function getManageableRoles(Guild $guild): array;
 
     public function updateRoleOfUser(User $user, Token $token, bool $updateOnDiscordIfSame = false): void;
+
+    public function updateRolesOfUsers(Token $token): void;
+
+    public function removeAllGuildMembersRole(Token $token, DiscordRole $role): void;
 }

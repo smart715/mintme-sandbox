@@ -3,6 +3,8 @@ import TokenDiscordChannel from '../../js/components/token/TokenDiscordChannel';
 import moxios from 'moxios';
 import axios from 'axios';
 
+const localVue = mockVue();
+
 /**
  * @return {Wrapper<Vue>}
  */
@@ -14,13 +16,34 @@ function mockVue() {
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$logger = {error: () => {}};
         },
     });
     return localVue;
 }
 
+/**
+ * @param {Object} props
+ * @return {Object}
+ */
+function createSharedTestProps(props = {}) {
+    return {
+        currentDiscord: '',
+        editingDiscord: true,
+        tokenName: 'TokenJasm',
+        ...props,
+    };
+}
+
 describe('TokenDiscordChannel', () => {
+    let wrapper;
+
     beforeEach(() => {
+        wrapper = shallowMount(TokenDiscordChannel, {
+            localVue: localVue,
+            propsData: createSharedTestProps(),
+        });
+
         moxios.install();
     });
 
@@ -28,26 +51,22 @@ describe('TokenDiscordChannel', () => {
         moxios.uninstall();
     });
 
-    it('save correct link', (done) => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenDiscordChannel, {
-            localVue,
-            propsData: {
-                editingDiscord: true,
-                updateUrl: 'token_update',
-            },
+    it('save correct link', async (done) => {
+        await wrapper.setProps({
+            editingDiscord: true,
+            updateUrl: 'token_update',
         });
 
-        wrapper.setData({
+        await wrapper.setData({
             showDiscordError: false,
+            newDiscord: 'https://discord.gg/newdiscord',
         });
-
-        wrapper.find('input').setValue('https://discord.gg/newdiscord');
-        wrapper.vm.editDiscord();
 
         moxios.stubRequest('token_update', {
             status: 200,
         });
+
+        wrapper.vm.editDiscord();
 
         moxios.wait(() => {
             expect(wrapper.vm.showDiscordError).toBe(false);
@@ -56,46 +75,60 @@ describe('TokenDiscordChannel', () => {
         });
     });
 
-    it('do not save incorrect link', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenDiscordChannel, {
-            localVue,
-            data() {
-              return {
-                  howDiscordError: false,
-              };
-            },
-            propsData: {
-                editingDiscord: true,
-            },
+    it('do not save incorrect link', async () => {
+        await wrapper.setProps({
+            editingDiscord: true,
         });
 
-        wrapper.find('input').setValue('incorrect_link');
+        await wrapper.setData({
+            showDiscordError: false,
+            newDiscord: 'incorrect_link',
+        });
+
         wrapper.vm.editDiscord();
 
         expect(wrapper.vm.showDiscordError).toBe(true);
     });
 
-    it('show invitation text when link is not specified', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenDiscordChannel, {
-            localVue,
-            propsData: {
-                editingDiscord: false,
-            },
+    it('show invitation text when link is not specified', async () => {
+        await wrapper.setProps({
+            editingDiscord: false,
         });
-        expect(wrapper.find('#discord-link').text()).toBe('token.discord.empty_address');
+
+        expect(wrapper.findComponent('#discord-link').text()).toBe('token.discord.empty_address');
     });
 
-    it('show link when specified', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenDiscordChannel, {
-            localVue,
-            propsData: {
-                currentDiscord: 'https://discord.gg/newdiscord',
-                editingDiscord: false,
-            },
+    it('show link when specified', async () => {
+        await wrapper.setProps({
+            currentDiscord: 'https://discord.gg/newdiscord',
+            editingDiscord: false,
         });
-        expect(wrapper.find('#discord-link').text()).toBe(wrapper.vm.currentDiscord);
+
+        expect(wrapper.findComponent('#discord-link').text()).toBe(wrapper.vm.currentDiscord);
+    });
+
+    describe('Verify that the "toggleEdit" event is emitted correctly', () => {
+        it('When "editing" is false', async () => {
+            await wrapper.setData({
+                editing: false,
+            });
+
+            wrapper.vm.toggleEdit();
+
+            expect(wrapper.vm.editing).toBe(true);
+            expect(wrapper.emitted('toggleEdit')).toBeTruthy();
+            expect(wrapper.emitted('toggleEdit')[0]).toEqual(['discord']);
+        });
+
+        it('When "editing" is true', async () => {
+            await wrapper.setData({
+                editing: true,
+            });
+
+            wrapper.vm.toggleEdit();
+
+            expect(wrapper.vm.editing).toBe(false);
+            expect(wrapper.emitted('toggleEdit')).toBeFalsy();
+        });
     });
 });

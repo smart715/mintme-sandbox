@@ -11,6 +11,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  * @method AuthCode|null findOneBy(array $criteria, array $orderBy = null)
  * @method AuthCode[]    findAll()
  * @method AuthCode[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @codeCoverageIgnore
  */
 class AuthCodeRepository extends ServiceEntityRepository
 {

@@ -2,7 +2,7 @@
 
 namespace App\Exception\Discord;
 
-/** @codeCoverageIgnore  */
+/** @codeCoverageIgnore */
 class MissingPermissionsException extends DiscordException
 {
 }

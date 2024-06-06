@@ -11,14 +11,9 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class CommentNormalizer implements NormalizerInterface
 {
-    /** @var ObjectNormalizer */
-    private $normalizer;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
+    private ObjectNormalizer $normalizer;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         ObjectNormalizer $objectNormalizer,
@@ -30,11 +25,19 @@ class CommentNormalizer implements NormalizerInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param Comment $object
+     */
     public function normalize($object, $format = null, array $context = array())
     {
         /** @var array $comment */
         $comment = $this->normalizer->normalize($object, $format, $context);
+
+        $comment['content'] = $this->authorizationChecker->isGranted('view', $object->getPost())
+            ? $comment['content']
+            : null;
 
         $comment['editable'] = $this->authorizationChecker->isGranted('edit', $object);
         $comment['deletable'] = $this->authorizationChecker->isGranted('delete', $object);
@@ -44,9 +47,23 @@ class CommentNormalizer implements NormalizerInterface
             ? $token->getUser()
             : null;
 
-        $comment['liked'] = $user instanceof User
-            ? $object->getLikedBy($user)
-            : false;
+        $comment['liked'] = $user instanceof User && $object->getLikedBy($user);
+
+        $tips = [];
+        $isTipped = false;
+
+        if (count($object->getTips())) {
+            foreach ($object->getTips() as $key => $tip) {
+                $tips[$key] = $this->normalizer->normalize($tip, $format, ['groups' => ['API_BASIC']]);
+
+                if ($user && $tip->getUser() == $user) {
+                    $isTipped = true;
+                }
+            }
+        }
+
+        $comment['tips'] = $tips;
+        $comment['tipped'] = $isTipped;
 
         return $comment;
     }

@@ -10,14 +10,9 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 
 abstract class APIController extends AbstractFOSRestController
 {
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var MarketFactoryInterface */
-    private $marketFactory;
+    protected TokenManagerInterface $tokenManager;
+    protected CryptoManagerInterface $cryptoManager;
+    protected MarketFactoryInterface $marketFactory;
 
     public function __construct(
         CryptoManagerInterface $cryptoManager,
@@ -37,5 +32,29 @@ abstract class APIController extends AbstractFOSRestController
         return ($base && $quote) && ($base !== $quote)
             ? $this->marketFactory->create($base, $quote)
             : null;
+    }
+
+    /**
+     * @param array<string>|null $intProps
+     * @param array<string>|null $floatProps
+     * @param \Throwable|null $exception
+     */
+    protected function validateProperties(?array $intProps = null, ?array $floatProps = null, ?\Throwable $exception = null): void
+    {
+        $intProps = $intProps ?? ['0'];
+        $floatProps = $floatProps ?? ['0'];
+        $exception = $exception ?? new \InvalidArgumentException('Invalid arguments');
+
+        foreach ($intProps as $value) {
+            if (!preg_match('/^\d+$/', (string) $value)) {
+                throw $exception;
+            }
+        }
+
+        foreach ($floatProps as $value) {
+            if (!preg_match('/^\d+(\.\d+)?$/', (string) $value)) {
+                throw $exception;
+            }
+        }
     }
 }

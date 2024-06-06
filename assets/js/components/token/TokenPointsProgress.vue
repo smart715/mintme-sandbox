@@ -4,8 +4,8 @@
         <template slot="icon">
             <circle-progress
                 class="circle-progress"
-                :points-gained=tokenPointsGained
-                :total-points=18
+                :points-gained="tokenPointsGained"
+                :total-points="100"
             />
         </template>
         <template slot="body">
@@ -22,7 +22,7 @@ import {mapGetters} from 'vuex';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
-    name: 'TokenPointProgress',
+    name: 'TokenPointsProgress',
     props: {
         profileName: String,
         profileLastname: String,
@@ -33,7 +33,7 @@ export default {
         tokenYoutube: String,
         tokenWebsite: String,
         tokenStatus: String,
-        isControlledToken: Boolean,
+        isCreatedOnMintmeSite: Boolean,
         hasReleasePeriod: Boolean,
     },
     components: {
@@ -45,27 +45,26 @@ export default {
             releasePeriod: 'getReleasePeriod',
         }),
         tokenReleasePeriodSet: function() {
-            return this.hasReleasePeriod || (typeof this.releasePeriod === 'number') || !this.isControlledToken ? 4 : 0;
+            return this.hasReleasePeriod
+                || 'number' === typeof this.releasePeriod
+                || !this.isCreatedOnMintmeSite ? 22 : 0;
         },
         tokenDescriptionSet: function() {
-            return this.tokenDescription ? 4 : 0;
+            return this.tokenDescription ? 22 : 0;
         },
         socialMediaSet: function() {
-            return this.tokenYoutube || this.tokenFacebook || this.tokenWebsite ? 2 : 0;
+            return this.tokenYoutube
+                || this.tokenFacebook
+                || this.tokenWebsite ? 12 : 0;
         },
         tokenDeployedSet: function() {
-            return this.tokenStatus === tokenDeploymentStatus.deployed ? 4 : 0;
+            return this.tokenStatus === tokenDeploymentStatus.deployed ? 22 : 0;
         },
         userProfileWithOutTradeAnonymouslySet: function() {
-            if (
-                this.profileName !== '' &&
-                this.profileLastName !== '' &&
-                this.profileDescription !== '' &&
-                !this.profileAnonymously
-            ) {
-                return 4;
-            }
-            return 0;
+            return !this.profileAnonymously
+                && '' !== this.profileName
+                && '' !== this.profileLastName
+                && '' !== this.profileDescription ? 22 : 0;
         },
         tokenPointsGained: function() {
             return this.tokenReleasePeriodSet +

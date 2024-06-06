@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\Entity\Post;
 use App\Entity\User;
 use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
@@ -10,6 +9,7 @@ use App\Manager\TokenManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
+use App\Utils\Policy\NotificationPolicyInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,17 +22,20 @@ class SendEmailGroupedPosts extends Command
     private PostManagerInterface $postManager;
     private TokenManagerInterface $tokenManager;
     private UserNotificationManagerInterface $userNotificationManager;
+    private NotificationPolicyInterface $notificationPolicy;
 
     public function __construct(
         MailerInterface $mail,
         PostManagerInterface $postManager,
         TokenManagerInterface $tokenManager,
-        UserNotificationManagerInterface $userNotificationManager
+        UserNotificationManagerInterface $userNotificationManager,
+        NotificationPolicyInterface $notificationPolicy
     ) {
         $this->postManager = $postManager;
         $this->tokenManager = $tokenManager;
         $this->mail = $mail;
         $this->userNotificationManager = $userNotificationManager;
+        $this->notificationPolicy = $notificationPolicy;
         parent::__construct();
     }
 
@@ -59,7 +62,7 @@ class SendEmailGroupedPosts extends Command
             }
 
             if (!$this->validateDate($date)) {
-                $output->writeln('$date: is not a valid date');
+                $output->writeln("$date: is not a valid date");
 
                 return 1;
             }
@@ -79,7 +82,7 @@ class SendEmailGroupedPosts extends Command
         }
 
         foreach ($data as $tokenName => $groupedPosts) {
-            $token = $this->tokenManager->findByName($tokenName);
+            $token = $this->tokenManager->findByName((string)$tokenName);
             $users = $token->getUsers();
             $groupedPostsCount = count($groupedPosts);
 
@@ -87,9 +90,10 @@ class SendEmailGroupedPosts extends Command
                 if ($this->isNotificationAvailable($user)
                     && $user->getId() !== $token->getOwner()->getId()
                     && 2 < $groupedPostsCount
+                    && $this->notificationPolicy->canReceiveNotification($user, $token)
                 ) {
                     array_pop($groupedPosts);
-                    $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);
+                    $this->mail->sendGroupedPosts($user, (string)$tokenName, $groupedPosts);
                 }
             }
         }
