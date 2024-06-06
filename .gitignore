@@ -20,6 +20,9 @@
 config/parameters.yaml
 node_modules
 public/build
+public/media
+# any file that starts with capital letter (crypto icons)
+assets/img/[A-Z]*
 /maintenance_on
 
 /.idea
@@ -44,3 +47,4 @@ public/media/cache
 
 ###< translations ###
 translations/ui/auto_gen_keys.json
+translations/crypto/
