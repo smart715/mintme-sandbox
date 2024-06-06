@@ -41,11 +41,6 @@ class ActivityManager implements ActivityManagerInterface
         return $activities;
     }
 
-    public function getLastByTypes(array $types, int $limit): array
-    {
-        return $this->activityRepository->getLastByTypesAndUniqueToken($types, $limit);
-    }
-
     /**
      * @param Activity[] $activities
      * @return int

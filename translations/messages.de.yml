@@ -460,8 +460,10 @@ page.coin.key_fact.body.7:
 page.coin.key_fact.body.8:
 page.coin.key_fact.body.9:
 page.coin.tradable.header:
+page.coin.stake_and_earn:
 page.coin.classic_exchange:
 page.coin.move_to_blockchains:
+page.coin.swap_coins:
 page.coin.what_are_mintme.header:
 page.coin.what_are_mintme.text:
 page.coin.monetization.header:
@@ -1775,7 +1777,6 @@ api.wallet.not_found:
 api.wallet.invalid_network:
 api.tokens.token_not_exists:
 api.tokens.user_not_created_token:
-api.tokens.token_blocked:
 api.tokens.you_need_all_tokens_to_change_name:
 api.tokens.deploying:
 api.tokens.forbidden_name:
@@ -2382,7 +2383,6 @@ user_feed.deploy_token.title:
 user_feed.deploy_token.description:
 user_feed.deploy_token.button:
 user_feed.top_tokens.title:
-user_feed.top_tokens.guide:
 post_create_no_token.modal.description:
 load_more:
 dynamic.popular_tags.posts:

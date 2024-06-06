@@ -70,6 +70,28 @@ main
     img
       max-height: 38px
 
+      &.coinsbit-logo
+        max-height: 30px
+
+  .actions-logo
+    @include media-breakpoint-down(lg)
+      max-width: 900px
+      margin: 0 auto
+
+    a
+      max-width: none
+
+      &.mmf-logo-link
+        max-width: 160px
+
+        @include media-breakpoint-down(lg)
+          max-width: none
+    img
+      max-height: 32px
+
+      &.mmf-logo
+        max-height: 42px
+
   a.logo
     background: transparent
 

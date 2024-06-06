@@ -16,11 +16,8 @@ class CommentLikeActivityCreator extends AbstractActivityCreator
 
         return new Activity($event->getType(), [
             'commentUrl' => $this->router->generate(
-                'token_show_post',
-                [
-                    'name' => $event->getComment()->getToken()->getName(),
-                    'slug' => $event->getComment()->getPost()->getSlug(),
-                ],
+                'show_post',
+                ['id' => $event->getComment()->getPost()->getId()]
             ) . '#comment-' . $event->getComment()->getId(),
             'comment' => $this->activityHelper->truncate($event->getComment()->getContent(), 32),
             'userIconUrl' => $this->activityHelper->profileIcon($event->getUser()),

@@ -2,7 +2,7 @@
 parameters:
     locale: 'en'
 
-    version: 'V2.10.0'
+    version: 'V2.3.0'
     is_beta_version: false
 
 # Meant to idenfity if panel is running in real production (mintme.com) or within any dev/test environment
@@ -181,7 +181,9 @@ parameters:
 
 #Coin page links
     lbank_link: 'https://www.lbank.com/exchange/mintme/usdt'
-    bitmart_link: 'https://www.bitmart.com/trade/en-US?symbol=MINTME_USDT'
+    coinbit_link: 'https://coinsbit.io/trade/MINTME_USDC'
+    mmf_link: 'https://mm.finance/farms'
+    photonswap_link: 'https://www.photonswap.finance/#/swap'
 
 # Deployment
     # For blockchain expressed in USD
@@ -467,7 +469,7 @@ parameters:
         ETH: 'https://goerli.etherscan.io'
         BNB: 'https://testnet.bscscan.com'
         CRO: 'https://testnet.cronoscan.com'
-        SOL: 'https://explorer.solana.com'
+        SOL: 'https://explorer.solana.com/?cluster=testnet'
         AVAX: 'https://testnet.snowtrace.io'
 
 # UI Parameters

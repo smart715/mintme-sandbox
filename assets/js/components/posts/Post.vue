@@ -12,10 +12,7 @@
             ref="post-link"
             @click.prevent="goToPost(post)"
         >
-            <div
-                :class="avatarClass"
-                @click.stop.prevent="goToIntro(post)"
-            >
+            <div :class="avatarClass">
                 <img :src="tokenAvatar" class="avatar-img rounded-circle">
             </div>
             <div class="flex-fill">
@@ -390,9 +387,6 @@ export default {
         sharePost() {
             this.postActionsRef.sharePost(this.post);
             return false;
-        },
-        goToIntro(post) {
-            location.href = this.$routing.generate('token_show_intro', {name: post.token.name});
         },
         goToPost(post) {
             this.$emit('go-to-post', post);

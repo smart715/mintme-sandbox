@@ -11,8 +11,7 @@ libs=${libs//\//\\\/}
 c="s/INCS =/INCS =${cflags}/g"
 l="s/LIBS =/LIBS =${libs}/g"
 
-
-export PATH=$PATH:/usr/local/bin:/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/go/bin:$GOPATH/bin
+export GOPROXY=https://proxy.golang.org
 
 cd  /src/viabtc/mintme_backend/marketprice
 make

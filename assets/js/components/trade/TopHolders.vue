@@ -56,13 +56,7 @@
     <div v-else class="card">
         <div class="card-body">
             <div class="text-center">
-                <b-link @click="isFolded = false">
-                    <span
-                        v-html="$t('show', {thing: $t('trade.top_holders.header')})"
-                        class="font-size-3 font-weight-semibold header-highlighting"
-                    >
-                    </span>
-                </b-link>
+                <b-link @click="isFolded = false" v-html="$t('show', {thing: $t('trade.top_holders.header')})"></b-link>
             </div>
         </div>
     </div>

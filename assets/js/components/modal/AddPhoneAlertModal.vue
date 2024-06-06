@@ -138,7 +138,6 @@ import {
     HTTP_OK,
     HTTP_UNAUTHORIZED,
     PHONE_VERIF_REQUEST_CODE_INTERVAL,
-    EMAIL_VERIF_REQUEST_CODE_INTERVAL,
     TIMERS,
 } from '../../utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
@@ -316,7 +315,6 @@ export default {
                 this.handleSendCodeResponse(
                     await this.$axios.single.post(this.$routing.generate('send_mail_phone_verification_code'))
                 );
-
                 this.justSentCode = true;
 
                 if (this.$refs['verifyEmailCode']) {
@@ -327,7 +325,7 @@ export default {
             } catch (error) {
                 this.handleSendCodeError(error);
             } finally {
-                this.startTimer(TIMERS.SEND_EMAIL_CODE, EMAIL_VERIF_REQUEST_CODE_INTERVAL);
+                this.startTimer(TIMERS.SEND_EMAIL_CODE, PHONE_VERIF_REQUEST_CODE_INTERVAL);
                 this.isRequestingEmailCode = false;
             }
         },

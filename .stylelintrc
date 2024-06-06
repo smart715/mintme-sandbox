@@ -2,7 +2,15 @@
   "extends": "stylelint-config-recommended-scss",
   "rules": {
     "declaration-block-no-duplicate-properties": true,
-    "block-no-empty": true
+    "block-no-empty": true,
+    "scss/no-global-function-names": null
   },
-  "ignoreFiles": ["node_modules", "assets/scss/lang-menu.sass"]
+  "ignoreFiles": [
+    "node_modules",
+    "assets/scss/lang-menu.sass",
+    "assets/scss/avatar.sass",
+    "assets/scss/embeded.sass",
+    "assets/scss/icons.sass",
+    "assets/scss/posts.sass"
+  ]
 }

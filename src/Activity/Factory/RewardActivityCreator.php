@@ -21,7 +21,7 @@ class RewardActivityCreator extends AbstractActivityCreator
                 ['name' => $event->getReward()->getToken()->getName()]
             ),
             'token' => $this->activityHelper->truncate($event->getReward()->getToken()->getName(), 12),
-            'rewardTitle' => $this->activityHelper->truncate($event->getReward()->getTitle(), 32),
+            'rewardTitle' => $this->activityHelper->truncate($event->getReward()->getTitle(), 12),
             'rewardUrl' => $this->router->generate(
                 'token_show_intro',
                 [

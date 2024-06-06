@@ -96,7 +96,7 @@
             <div class="card mt-2 p-3">
                 <h5 class="card-title" v-html="$t('page.token_settings.tab.sign_up.header')" />
                 <div class="row">
-                    <div class="col-12 col-md-7 mb-2">
+                    <div class="col-12 col-md-5 mb-2">
                         <token-signup-bonus-link
                             :token-name="getTokenName"
                             :token-avatar="getTokenAvatar"
@@ -107,13 +107,13 @@
                     <div class="col">
                         <h5 class="text-uppercase tips-title">{{ $t('page.token_settings.tips') }}</h5>
                         <div v-if="tokenSignUpBonusLink">
+                            <span class="text-reset link c-text d-inline highlight">
+                                {{ truncateMiddleFunc(tokenSignUpBonusLink, 30) }}
+                            </span>
                             <copy-link
                                 class="code-copy c-pointer ml-2"
                                 :content-to-copy="tokenSignUpBonusLink"
                             >
-                                <span class="text-reset link d-inline highlight">
-                                    {{ truncateMiddleFunc(tokenSignUpBonusLink, 30) }}
-                                </span>
                                 <font-awesome-icon
                                     :icon="['far', 'copy']"
                                     class="hover-icon"

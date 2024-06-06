@@ -1139,7 +1139,7 @@ class Token implements TradableInterface, ImagineInterface
 
     public function getRank(): ?int
     {
-        return $this->rank && $this->isDeployed()
+        return $this->rank
             ? $this->rank->getRank()
             : null;
     }

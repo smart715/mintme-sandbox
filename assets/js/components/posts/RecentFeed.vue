@@ -157,7 +157,7 @@ export default {
         },
         translationsContext() {
             return {
-                tradingUrl: this.$routing.generate('trading', {type: 'tokens'}),
+                tradingUrl: this.$routing.generate('trading'),
             };
         },
         noRecentPostsAndCommentsMessage() {

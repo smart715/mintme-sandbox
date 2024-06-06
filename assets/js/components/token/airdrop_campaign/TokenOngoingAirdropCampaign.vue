@@ -391,16 +391,16 @@
                                 >
                                     <div v-html="$t('ongoing_airdrop.referral', translationsContext)" />
                                     <div class="my-2">
+                                        <a
+                                            :href="referralLink"
+                                            class="link highlight"
+                                        >
+                                            {{ referralLink }}
+                                        </a>
                                         <copy-link
                                             class="c-pointer"
                                             :content-to-copy="referralLink"
                                         >
-                                            <a
-                                                :href="referralLink"
-                                                class="link highlight"
-                                            >
-                                                {{ referralLink }}
-                                            </a>
                                             <font-awesome-icon
                                                 :icon="['far', 'copy']"
                                                 class="icon-default"

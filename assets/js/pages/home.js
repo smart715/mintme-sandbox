@@ -14,7 +14,6 @@ import Feed from '../components/Feed';
 import UserFeed from '../components/posts/UserFeed';
 import TopTokensList from '../components/TopTokensList';
 import FeedTrendingTags from '../components/posts/FeedTrendingTags';
-import Guide from '../components/Guide';
 import {mapMutations} from 'vuex/dist/vuex.common.js';
 import {debounce} from 'lodash';
 import {MButton} from '../components/UI';
@@ -50,7 +49,6 @@ new Vue({
         UserFeed,
         TopTokensList,
         FeedTrendingTags,
-        Guide,
         MButton,
         FontAwesomeIcon,
     },

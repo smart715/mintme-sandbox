@@ -52,7 +52,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $repoC,
-            $this->mockLockFactory()
+            $this->mockLockFactory(),
+            $this->createMock(TokenConfig::class)
         );
 
         $upw->withdrawExpirationTime = 1;
@@ -91,7 +92,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $repoC,
-            $this->mockLockFactory()
+            $this->mockLockFactory(),
+            $this->createMock(TokenConfig::class)
         );
 
         $upw->withdrawExpirationTime = 1;

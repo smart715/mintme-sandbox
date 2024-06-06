@@ -339,7 +339,7 @@ export const DISCORD_DEFAULT_URL = 'https://discord.gg/';
 export const TELEGRAM_DEFAULT_URL = 'https://t.me/';
 
 export const PHONE_VERIF_REQUEST_CODE_INTERVAL = 60;
-export const EMAIL_VERIF_REQUEST_CODE_INTERVAL = 61;
+export const EMAIL_VERIF_REQUEST_CODE_INTERVAL = 60;
 
 export const TIMERS = {
     SEND_PHONE_CODE: 'phone_code_timer',

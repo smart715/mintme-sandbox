@@ -4,7 +4,6 @@ import {
     HTTP_OK,
     HTTP_UNAUTHORIZED,
     PHONE_VERIF_REQUEST_CODE_INTERVAL,
-    EMAIL_VERIF_REQUEST_CODE_INTERVAL,
     TIMERS,
 } from '../utils/constants';
 import {NotificationMixin, OpenPageMixin, TimerMixin} from '../mixins/';
@@ -141,7 +140,7 @@ new Vue({
             } catch (error) {
                 this.handleSendCodeError(error);
             } finally {
-                this.startTimer(TIMERS.SEND_EMAIL_CODE, EMAIL_VERIF_REQUEST_CODE_INTERVAL);
+                this.startTimer(TIMERS.SEND_EMAIL_CODE, PHONE_VERIF_REQUEST_CODE_INTERVAL);
                 this.isRequestingMailCode = false;
             }
         },
@@ -179,7 +178,7 @@ new Vue({
                 })
                 .catch(() => {
                     this.startTimer(TIMERS.SEND_PHONE_CODE, PHONE_VERIF_REQUEST_CODE_INTERVAL);
-                    this.startTimer(TIMERS.SEND_EMAIL_CODE, EMAIL_VERIF_REQUEST_CODE_INTERVAL);
+                    this.startTimer(TIMERS.SEND_EMAIL_CODE, PHONE_VERIF_REQUEST_CODE_INTERVAL);
                 })
                 .finally(() => {
                     this.isRequestingMailCode = false;

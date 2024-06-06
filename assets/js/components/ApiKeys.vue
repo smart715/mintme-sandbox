@@ -5,32 +5,31 @@
                 <div class="text-left">
                     <div class="text-left d-inline-block ml-api">
                         {{ $t('api_keys.public_key') }}<br />
-                        <copy-link
-                            id="pub-copy-btn"
-                            class="code-copy c-pointer ml-2"
-                            :content-to-copy="keys.publicKey"
-                        >
                             <span class="text-danger word-break">{{ keys.publicKey }}</span>
-                            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                        </copy-link><br />
-                        {{ $t('api_keys.private_key') }}<br />
-                        <div v-if="keys.plainPrivateKey">
-                            <template>
-                                <copy-link
-                                    class="code-copy c-pointer ml-2"
-                                    id="private-copy-btn"
-                                    :content-to-copy="keys.plainPrivateKey"
-                                >
+                            <copy-link
+                                id="pub-copy-btn"
+                                class="code-copy c-pointer ml-2"
+                                :content-to-copy="keys.publicKey"
+                            >
+                                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                            </copy-link><br />
+                            {{ $t('api_keys.private_key') }}<br />
+                            <div v-if="keys.plainPrivateKey">
+                                <template>
                                     <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
-                                    <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                                </copy-link>
-                            </template>
-                        </div>
-                        <div v-else>
-                            <template>
-                                <span class="text-white-50">{{ $t('api_clients.hidden') }}</span>
-                            </template>
-                        </div>
+                                    <copy-link
+                                            class="code-copy c-pointer ml-2"
+                                            id="private-copy-btn"
+                                            :content-to-copy="keys.plainPrivateKey">
+                                        <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                                    </copy-link>
+                                </template>
+                            </div>
+                            <div v-else>
+                                <template>
+                                    <span class="text-white-50">{{ $t('api_clients.hidden') }}</span>
+                                </template>
+                            </div>
                     </div>
                 </div>
                <span v-show="keys.plainPrivateKey" class="small">

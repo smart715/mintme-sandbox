@@ -1,0 +1,220 @@
+{
+    "debug": true,
+    "process": {
+        "file_limit": 1000000,
+        "core_limit": 1000000000
+    },
+    "log": {
+        "path": "/var/log/trade/marketprice",
+        "flag": "fatal,error,warn,info",
+        "num": 10
+    },
+    "alert": {
+        "host": "matchengine",
+        "addr": "127.0.0.1:4444"
+    },
+    "svr": {
+        "bind": [
+            "0.0.0.0:7316"
+        ],
+        "buf_limit": 100,
+        "max_pkg_size": 10240,
+        "heartbeat_check": false
+    },
+    "cli": "127.0.0.1:7317",
+    "db_log": {
+        "host": "db",
+        "user": "root",
+        "pass": "root",
+        "name": "trade_log"
+    },
+    "db_history": {
+        "host": "db",
+        "user": "root",
+        "pass": "root",
+        "name": "trade_history"
+    },
+    "db_market": {
+        "host": "db",
+        "user": "root",
+        "pass": "root",
+        "name": "trade_market"
+    },
+    "db_marketprice": {
+        "host": "db",
+        "user": "root",
+        "pass": "root",
+        "name": "marketprice"
+    },
+    "assets": [
+        {"name": "WEB","prec_save": 20,"prec_show": 8},
+        {"name": "ETH","prec_save": 20,"prec_show": 8},
+        {"name": "USDC","prec_save": 20,"prec_show": 8},
+        {"name": "BTC","prec_save": 20,"prec_show": 8},
+        {"name": "BNB","prec_save": 20,"prec_show": 8},
+        {"name": "CRO","prec_save": 20,"prec_show": 8},
+        {"name": "SOL","prec_save": 20,"prec_show": 8},
+        {"name": "AVAX","prec_save": 20,"prec_show": 8},
+        {"name": "ARB","prec_save": 20,"prec_show": 8}
+    ],
+    "markets": [
+        {
+            "name": "WEBBTC",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "BTC",
+                "prec": 8
+            },
+          "min_amount": "0.001"
+        },
+        {
+          "name": "WEBETH",
+          "stock": {
+            "name": "WEB",
+            "prec": 4
+          },
+          "money": {
+            "name": "ETH",
+            "prec": 8
+          },
+          "min_amount": "0.001"
+        },
+        {
+            "name": "WEBUSDC",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "USDC",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        },
+        {
+            "name": "WEBBNB",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "BNB",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        },
+        {
+            "name": "WEBCRO",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "CRO",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        },
+        {
+            "name": "WEBSOL",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "SOL",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        },
+        {
+            "name": "WEBAVAX",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "AVAX",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        },
+        {
+            "name": "WEBARB",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "ARB",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        }
+    ],
+    "token_markets": [
+        {
+            "name": "WEB",
+            "stock_prec": 4,
+            "money_prec": 12,
+            "min_amount": "0.0001"
+        },
+        {
+            "name": "BTC",
+            "stock_prec": 8,
+            "money_prec": 12,
+            "min_amount": "0.00000001"
+        },
+        {
+            "name": "ETH",
+            "stock_prec": 8,
+            "money_prec": 12,
+            "min_amount": "0.00000001"
+        },
+        {
+            "name": "BNB",
+            "stock_prec": 8,
+            "money_prec": 12,
+            "min_amount": "0.00000001"
+        },
+        {
+            "name": "USDC",
+            "stock_prec": 6,
+            "money_prec": 12,
+            "min_amount": "0.000001"
+        },
+        {
+            "name": "CRO",
+            "stock_prec": 8,
+            "money_prec": 12,
+            "min_amount": "0.00000001"
+        },
+        {
+            "name": "SOL",
+            "stock_prec": 8,
+            "money_prec": 12,
+            "min_amount": "0.000001"
+        },
+        {
+            "name": "AVAX",
+            "stock_prec": 8,
+            "money_prec": 12,
+            "min_amount": "0.00000001"
+        },
+        {
+            "name": "ARB",
+            "stock_prec": 8,
+            "money_prec": 12,
+            "min_amount": "0.00000001"
+        }
+    ],
+    "brokers": "mq:9092",
+    "balances_topic": "balances",
+    "orders_topic": "orders",
+    "deals_topic": "deals",
+    "slice_interval": 3600,
+    "slice_keeptime": 259200
+}

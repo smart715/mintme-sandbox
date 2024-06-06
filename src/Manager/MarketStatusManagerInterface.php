@@ -87,6 +87,4 @@ interface MarketStatusManagerInterface
      * @throws FetchException
      */
     public function getTokenHighestPrice(array $markets): HighestPriceModel;
-
-    public function findByBaseQuoteNames(string $symbol, string $quote): ?MarketStatus;
 }

@@ -183,6 +183,7 @@ import {Decimal} from 'decimal.js';
 import {
     toMoney,
     toMoneyWithTrailingZeroes,
+    formatMoney,
     getPriceAbbreviation,
 } from '../../utils';
 import {
@@ -335,7 +336,7 @@ export default {
                         subunit: this.getPriceSubunits(history.market),
                     },
                     total: {
-                        value: this.calculateTotalCost(history, isDonationOrder, isQuoteToken),
+                        value: formatMoney(this.calculateTotalCost(history, isDonationOrder, isQuoteToken)),
                         symbol: history.market.base.symbol,
                         currency: this.rebrandingFunc(history.market.base),
                     },

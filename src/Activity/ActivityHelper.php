@@ -90,11 +90,9 @@ class ActivityHelper
 
     public function truncate(string $value, int $max): string
     {
-        $decodedValue = html_entity_decode($value);
-
-        return strlen($decodedValue) > $max
-            ? mb_substr($decodedValue, 0, $max) . '...'
-            : $decodedValue;
+        return strlen($value) > $max
+            ? substr($value, 0, $max) . '...'
+            : $value;
     }
 
     public function getLastPriceWorthInMintMe(TransactionCompletedEventInterface $event): string

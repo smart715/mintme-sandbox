@@ -313,11 +313,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
     }
 
-    public function findByBaseQuoteNames(string $base, string $quote): ?MarketStatus
-    {
-        return $this->repository->findByBaseQuoteNames($base, $quote);
-    }
-
     /** {@inheritDoc} */
     public function isValid(Market $market, bool $reverseBaseQuote = false): bool
     {
@@ -701,7 +696,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
      * @param array<MarketStatus|null> $marketStatuses
      * @return array<MarketStatus|null>
      */
-    public function convertMarketStatusKeys(array $marketStatuses): array
+    private function convertMarketStatusKeys(array $marketStatuses): array
     {
         $info = [];
 

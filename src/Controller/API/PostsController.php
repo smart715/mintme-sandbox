@@ -161,8 +161,6 @@ class PostsController extends APIController
 
         if (!$token) {
             throw new ApiNotFoundException($this->translator->trans('api.tokens.user_not_created_token'));
-        } elseif ($token->isBlocked()) {
-            throw new ApiForbiddenException($this->translator->trans('api.tokens.token_blocked', ['%tokenName%' => $token->getName()]));
         }
 
         $limitation = $this->userLimitsConfig->getMaxPostsLimit();

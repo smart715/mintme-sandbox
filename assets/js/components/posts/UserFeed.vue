@@ -94,15 +94,11 @@ export default {
         hashtag: String,
         isAllTab: Boolean,
         ownDeployedTokens: {
-            type: [Object, Array],
-            default: () => [],
+            type: () => [Object, Array],
+            default: () => {},
         },
         lazyLoadingDisabled: Boolean,
         firstPagePostsAmount: Number,
-        postRewardsCollectableDays: {
-            type: Number,
-            default: 30,
-        },
     },
     created() {
         this.setPostRewardsCollectableDays(this.postRewardsCollectableDays);
@@ -192,7 +188,6 @@ export default {
 
             this.loading = true;
             this.page = 0;
-            this.items = [];
 
             this.fetchItemsDebounced();
         },
@@ -225,9 +220,9 @@ export default {
                 return;
             }
 
-            const isReachedBottom = container.offsetTop + container.clientHeight <= window.scrollY + window.innerHeight;
+            const bottomOfContainer = container.scrollTop + container.clientHeight >= container.scrollHeight;
 
-            if (isReachedBottom && !this.loading && this.hasMoreItems) {
+            if (bottomOfContainer && !this.loading && this.hasMoreItems) {
                 this.fetchItems();
             }
         },
@@ -248,7 +243,7 @@ export default {
         },
         translationsContext() {
             return {
-                tradingUrl: this.$routing.generate('trading', {type: 'tokens'}),
+                tradingUrl: this.$routing.generate('trading'),
             };
         },
         noRecentPostsAndCommentsMessage() {

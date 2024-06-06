@@ -16,7 +16,6 @@ use App\Manager\TokenManagerInterface;
 use App\Manager\WrappedCryptoTokenManagerInterface;
 use App\SmartContract\Model\AddTokenResult;
 use App\Utils\AssetType;
-use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\Symbols;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Status;
@@ -30,8 +29,6 @@ use Exception;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Routing\RouterInterface;
 
 class ContractHandler implements ContractHandlerInterface
 {
@@ -57,8 +54,6 @@ class ContractHandler implements ContractHandlerInterface
     private TokenConfig $tokenConfig;
     private LimitHistoryConfig $limitHistoryConfig;
     private WrappedCryptoTokenManagerInterface $wrappedCryptoTokenManager;
-    private TokenNameConverterInterface $tokenNameConverter;
-    private RouterInterface $router;
 
     public function __construct(
         JsonRpcInterface $rpc,
@@ -68,9 +63,7 @@ class ContractHandler implements ContractHandlerInterface
         TokenManagerInterface $tokenManager,
         TokenConfig $tokenConfig,
         LimitHistoryConfig $limitHistoryConfig,
-        WrappedCryptoTokenManagerInterface $wrappedCryptoTokenManager,
-        TokenNameConverterInterface $tokenNameConverter,
-        RouterInterface $router
+        WrappedCryptoTokenManagerInterface $wrappedCryptoTokenManager
     ) {
         $this->rpc = $rpc;
         $this->logger = $logger;
@@ -80,8 +73,6 @@ class ContractHandler implements ContractHandlerInterface
         $this->tokenConfig = $tokenConfig;
         $this->limitHistoryConfig = $limitHistoryConfig;
         $this->wrappedCryptoTokenManager = $wrappedCryptoTokenManager;
-        $this->tokenNameConverter = $tokenNameConverter;
-        $this->router = $router;
     }
 
     public function deploy(TokenDeploy $deploy, bool $isMainDeploy): void
@@ -115,11 +106,6 @@ class ContractHandler implements ContractHandlerInterface
                 'releasedAtCreation' => $this->moneyWrapper->format($releasedAtCreation),
                 'releasePeriod' => $releasePeriod,
                 'userId' => $token->getProfile()->getUser()->getId(),
-                'metadataUri' => $this->router->generate(
-                    'token_metadata',
-                    ['tokenId' => $this->tokenNameConverter->convertId($token->getId())],
-                    Router::ABSOLUTE_URL,
-                ),
             ]
         );
 

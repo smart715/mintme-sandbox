@@ -7,11 +7,7 @@
             >
                 <h5>
                     <span
-                        :class="[
-                          isSettingPage
-                            ? 'card-title'
-                            : 'font-size-3 font-weight-semibold header-highlighting text-capitalize'
-                        ]"
+                        :class="[isSettingPage ? 'card-title' : 'font-size-3 font-weight-semibold header-highlighting']"
                         v-html="$t('token.rewards.header')"
                     ></span>
                     <guide class="tooltip-title-center">

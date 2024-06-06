@@ -21,7 +21,7 @@ export default {
             tokensNetworks: {},
             cryptosNetworks: {},
             isTokenModal: false,
-            depositTokens: null,
+            tokens: null,
             predefinedTokens: null,
             selectedCurrency: null,
             depositAddPhoneModalVisible: null,
@@ -44,14 +44,14 @@ export default {
         },
         currentSubunit: function() {
             if (
-                (this.isTokenModal && !this.depositTokens) ||
+                (this.isTokenModal && !this.tokens) ||
                 (!this.isTokenModal && !this.predefinedTokens)
             ) {
                 return WEB.subunit;
             }
 
             const asset = this.isTokenModal
-                ? this.depositTokens[this.selectedCurrency]
+                ? this.tokens[this.selectedCurrency]
                 : this.predefinedTokens[this.selectedCurrency];
 
             return asset ? asset.subunit : WEB.subunit;
@@ -80,7 +80,7 @@ export default {
                 ));
                 const tokensData = response.data;
 
-                this.depositTokens = tokensData.common;
+                this.tokens = tokensData.common;
                 this.predefinedTokens = tokensData.predefined;
             } catch (error) {
                 this.$logger.error('Error while load tokens data', error);
@@ -153,8 +153,8 @@ export default {
         },
         openDepositModal: function(currency) {
             const isCrypto = !!this.predefinedTokens[currency];
-            const isToken = !!this.depositTokens[currency];
-            const isBlockedToken = isToken && this.depositTokens[currency].blocked;
+            const isToken = !!this.tokens[currency];
+            const isBlockedToken = isToken && this.tokens[currency].blocked;
             const action = this.getDepositCryptoActionDisabled(currency, 'DepositsDisabled');
 
             if (this.isDisabledCrypto(currency)
@@ -178,7 +178,7 @@ export default {
 
             this.hasConfirmedAlert = false;
 
-            if (isToken && !this.depositTokens[currency].deployed) {
+            if (isToken && !this.tokens[currency].deployed) {
                 return;
             }
 

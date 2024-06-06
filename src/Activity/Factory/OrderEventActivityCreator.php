@@ -47,7 +47,6 @@ class OrderEventActivityCreator extends AbstractActivityCreator
             'tokenIconUrl' => $this->activityHelper->tokenIcon($token),
             'tokenUrl' => $this->router->generate('token_show_intro', ['name' => $token->getName()]),
             'token' => $this->activityHelper->truncate($token->getName(), 12),
-            'fullTokenName' => $token->getName(),
             'amount' => $this->moneyWrapper->format($totalPrice, false),
             'symbol' => $this->activityHelper->rebrand($base->getSymbol()),
             'tradeIconUrl' => $this->activityHelper->tradeIcon($base->getSymbol()),

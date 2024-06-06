@@ -55,6 +55,7 @@ function mockVue() {
 const defaultProps = {
     withdrawUrl: 'withdraw_url',
     createTokenUrl: 'createTokenUrl',
+    tradingUrl: 'tradingUrl',
     depositMore: 'depositMore',
     twofa: 'twofa',
     websocketUrl: '',
@@ -307,7 +308,6 @@ describe('Wallet', () => {
 
                 await wrapper.setData({
                     tokens: {},
-                    depositTokens: {},
                     predefinedTokens: predefinedTokensTest,
                 });
                 wrapper.vm.openDeposit(webSymbol);
@@ -325,7 +325,6 @@ describe('Wallet', () => {
                 await wrapper.setData({
                     depositMore: webSymbol,
                     tokens: [],
-                    depositTokens: [],
                     predefinedTokens: {[webSymbol]: {subunit: 8}},
                 });
 

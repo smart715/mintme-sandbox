@@ -24,7 +24,6 @@ export default {
                 placement: 'bottom',
                 arrow: true,
                 trigger: 'click',
-                followCursor: 'initial',
                 delay: [100, 1500],
             },
         };

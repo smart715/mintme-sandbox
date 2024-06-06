@@ -249,7 +249,7 @@ page.pair.tab.introduction: Introducción
 page.pair.buy_title: Comprar
 page.pair.latest_news: 'Últimas <span>noticias</span>'
 page.pair.add_post: 'Crear una publicación'
-page.pair.recent_feed:
+page.pair.recent_feed: 'Últimas <span class="text-primary">novedades</span>'
 page.pair.recent_activities:
 page.pair.tooltip.recent_feed: 'En esta página puede encontrar todas las publicaciones y comentarios recientes de los creadores de todos los tokens que sigue actualmente.'
 page.pair.tooltip.by_hashtag: 'En esta página, puedes encontrar todas las publicaciones y comentarios recientes con la etiqueta #%tag%.'
@@ -466,8 +466,10 @@ page.coin.key_fact.body.7: 'Nuestro equipo cree que MINTME es demasiado valioso 
 page.coin.key_fact.body.8: 'Tenemos nuestra propia blockchain y, al mismo tiempo, mantenemos la plena compatibilidad con Ethereum. Esto significa que puedes utilizar la misma clave privada para acceder a la misma dirección en ambas cadenas de bloques. Para acceder a MINTME tienes que utilizar la billetera de MintMe.'
 page.coin.key_fact.body.9: 'No es sólo una moneda, es todo un ecosistema. Por favor, echa un vistazo a los proyectos de abajo que apoyan plenamente MINTME. Hemos cambiado el nombre de Webchain a MintMe.com Coin para representar mejor los verdaderos valores.'
 page.coin.tradable.header: '¡Aquí no sólo puede operar con MINTME, <br> sino también <span class="text-primary">crear su propio token basado en el!</span>'
+page.coin.stake_and_earn: 'Stake MintMe y gana'
 page.coin.classic_exchange: 'También puede utilizar el trading clásico de divisas MINTME'
 page.coin.move_to_blockchains: 'Trasladar MintMe a otros blockchains'
+page.coin.swap_coins: 'Intercambio de monedas'
 page.coin.what_are_mintme.header: '¿Qué es <span class="text-primary">MintMe?</span>'
 page.coin.what_are_mintme.text: '<p>MintMe es una nueva e innovadora forma de crowdfunding. En MintMe se puede crear un token propio o crear un proyecto enfocado a sus seguidores. También es una plataforma social donde los traders pueden interactuar con los creadores de tokens y otros traders.</p><p>Puede crear su propio token de forma gratuita y animar a otros a que le apoyen, ganar y ayudar apoyando a sus creadores favoritos, socializar con otros creadores y traders y obtener ganancias a través de nuestro programa de referidos.</p><p>Es muy fácil, así que, anímate y</p>'
 page.coin.monetization.header: 'Monetización de sitios web <span class="text-primary">vía CoinMP</span>'
@@ -973,9 +975,9 @@ token_edit_modal.tooltip.delete: 'Si tiene al menos el 99% del suministro de tok
 2fa_modal.cancel: Cancelar
 2fa_modal.require: 'El código es requerido'
 withdraw_modal.title: Retirar
-withdraw_modal.address: 'Dirección'
+withdraw_modal.address: 'Dirección:'
 withdraw_modal.wrong_address: 'Dirección incorrecta'
-withdraw_modal.amount: 'Monto (Saldo %balance%)'
+withdraw_modal.amount: 'Monto (Saldo %balance%):'
 withdraw_modal.insufficient_funds: 'No tiene suficiente(s) %currency%'
 withdraw_modal.max: max
 withdraw_modal.do_not_have: 'No tiene suficiente(s) %currency%'
@@ -1401,7 +1403,7 @@ token.telegram.cancel: Cancelar
 token.searcher.placeholder: 'Buscar un token'
 token.row_tables.show_more: 'Ver más'
 token.row_tables.show_less: 'Ver menos'
-token.not_deployed.notification:
+token.not_deployed.notification: 'Su token no está desplegado. <a href="%url%">Despliégalo en la blockchain</a> para que otros puedan descubrirlo.'
 token.create_token_prompt.notification:
 token.not_deployed_response:
 token.not_deployed_response.p_1:
@@ -1823,7 +1825,6 @@ api.wallet.not_found: 'No encontrado'
 api.wallet.invalid_network: 'Red del token inválida'
 api.tokens.token_not_exists: 'El token no existe'
 api.tokens.user_not_created_token: 'El usuario actual no ha creado un token'
-api.tokens.token_blocked:
 api.tokens.you_need_all_tokens_to_change_name: 'Usted necesita todos sus tokens para cambiar el nombre'
 api.tokens.deploying: 'El Token se está desplegando o se ha desplegado.'
 api.tokens.forbidden_name: 'Nombre no permitido, por favor intente otro'
@@ -2447,7 +2448,7 @@ connect: Conectar
 btn.watch_video: 'Ver video'
 blockchain_unavailable: 'La red %blockchainName% no está disponible en este momento'
 trading_disabled: 'El trading está desactivado'
-popular_tags.title:
+popular_tags.title: 'Etiquetas <span>populares</span>'
 user_feed.latest_activity: 'Última <span>Actividad</span>'
 user_feed.tabs.my_feed: 'Mis noticias'
 user_feed.tabs.all:
@@ -2458,7 +2459,6 @@ user_feed.deploy_token.title:
 user_feed.deploy_token.description:
 user_feed.deploy_token.button:
 user_feed.top_tokens.title:
-user_feed.top_tokens.guide:
 post_create_no_token.modal.description:
 load_more:
 dynamic.popular_tags.posts: '%amount% publicación|%amount% publicaciones'

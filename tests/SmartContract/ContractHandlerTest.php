@@ -19,7 +19,6 @@ use App\Manager\WrappedCryptoTokenManagerInterface;
 use App\SmartContract\ContractHandler;
 use App\SmartContract\Model\AddTokenResult;
 use App\Utils\AssetType;
-use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currencies;
@@ -28,7 +27,6 @@ use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class ContractHandlerTest extends TestCase
 {
@@ -45,7 +43,6 @@ class ContractHandlerTest extends TestCase
                     'releasePeriod' => 10,
                     'userId' => 1,
                     'crypto' => 'WEB',
-                    'metadataUri' => null,
                 ]
             )
             ->willReturn($this->mockResponse(false, []));
@@ -58,9 +55,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $deploy = (new TokenDeploy())
@@ -84,9 +79,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(\Throwable::class);
@@ -111,7 +104,6 @@ class ContractHandlerTest extends TestCase
                     'releasePeriod' => 10,
                     'userId' => 1,
                     'crypto' => 'WEB',
-                    'metadataUri' => null,
                 ]
             )
             ->willReturn($this->mockResponse(true, []));
@@ -124,9 +116,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(\Throwable::class);
@@ -168,9 +158,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $token = $this->mockToken(true, '1');
@@ -206,9 +194,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $token = $this->mockToken(true, '1');
@@ -241,9 +227,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $handler->updateMintDestination(
@@ -266,9 +250,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(\Throwable::class);
@@ -303,9 +285,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(\Throwable::class);
@@ -341,9 +321,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $crypto = $this->mockCrypto('WEB');
@@ -379,9 +357,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $crypto = $this->mockCrypto('WEB');
@@ -426,9 +402,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
 
@@ -509,9 +483,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $result = $handler->getTransactions(
@@ -564,9 +536,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $this->expectException(FetchException::class);
@@ -598,9 +568,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $expectedMinDeposit = new Money('1000000000000', new Currency(Symbols::TOK));
@@ -628,9 +596,7 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockTokenConfig(),
             $this->mockLimitHistoryConfig(),
-            $this->mockWrappedCryptoTokenManager(),
-            $this->mockTokenNameConverter(),
-            $this->mockRouter()
+            $this->mockWrappedCryptoTokenManager()
         );
 
         $result = $handler->getDepositCredentials(
@@ -792,15 +758,5 @@ class ContractHandlerTest extends TestCase
     private function mockWrappedCryptoTokenManager(): WrappedCryptoTokenManagerInterface
     {
         return $this->createMock(WrappedCryptoTokenManagerInterface::class);
-    }
-
-    private function mockRouter(): RouterInterface
-    {
-        return $this->createMock(RouterInterface::class);
-    }
-
-    private function mockTokenNameConverter(): TokenNameConverterInterface
-    {
-        return $this->createMock(TokenNameConverterInterface::class);
     }
 }

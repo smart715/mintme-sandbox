@@ -93,14 +93,7 @@
                             :class="{'active': 'top-tokens' === activeTab}"
                             @click="changeTab('top-tokens')"
                         >
-                            <div class="row d-inline">
-                                {% trans %} user_feed.top_tokens.title {% endtrans %}
-                                <guide class="mb-2 ml-1">
-                                    <template slot="body">
-                                        {% trans %} user_feed.top_tokens.guide {% endtrans %}
-                                    </template>
-                                </guide>
-                            </div>
+                            {% trans %} user_feed.top_tokens.title {% endtrans %}
                         </div>
                     </div>
                     <div class="card posts-container pt-3 p-sm-3 pl-2">
@@ -153,8 +146,6 @@
                             <top-tokens-list
                                 v-if="'top-tokens' === activeTab"
                                 websocket-url="{{ global_websocket_url }}"
-                                mercure-hub-url="{{ mercure_hub_url }}"
-                                :top-tokens="{{ topTokens | json_encode }}"
                             ></top-tokens-list>
 
                             <feed
@@ -205,32 +196,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center ml-0 ml-md-2 mb-3">
-                    <div class="card h-100 posts-container col-12 overflow-hidden mt-3">
-                        <div class="card-header d-flex justify-content-start align-items-center text-white mt-3 px-0">
-                            <h2 class="header-highlighting">
-                                {% trans %} user_feed.top_tokens.title {% endtrans %}
-                            </h2>
-                            <guide class="mb-2 ml-1" placement="bottom-end">
-                                <template slot="body">
-                                    {% trans %} user_feed.top_tokens.guide {% endtrans %}
-                                </template>
-                            </guide>
-                        </div>
-                        <div class="card-body p-0 trending-tags pb-4">
-                            <top-tokens-list
-                                websocket-url="{{ global_websocket_url }}"
-                                mercure-hub-url="{{ mercure_hub_url }}"
-                                :top-tokens="{{ topTokens | json_encode }}"
-                            ></top-tokens-list>
-                            <div v-if="false" class="d-flex p-3 align-items-center justify-content-center">
-                                <span class="spinner-border spinner-border-md">
-                                    <span class="sr-only"> {% trans %} loading {% endtrans %} </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div v-if="showPopularHashtags" class="row mt-3 mb-3 justify-content-center ml-0 ml-md-2">
                     <div class="card h-100 posts-container col-12 overflow-hidden">
                         <div class="card-header d-flex justify-content-between text-white mt-3 px-0">
@@ -244,6 +209,25 @@
                                 @hashtag-change="onHashtagChange"
                                 @hashtags-loaded="onHashtagsLoaded"
                             ></feed-trending-tags>
+                            <div v-if="false" class="d-flex p-3 align-items-center justify-content-center">
+                                <span class="spinner-border spinner-border-md">
+                                    <span class="sr-only"> {% trans %} loading {% endtrans %} </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center ml-0 ml-md-2 mb-3">
+                    <div class="card h-100 posts-container col-12 overflow-hidden mt-3">
+                        <div class="card-header d-flex justify-content-between text-white mt-3 px-0">
+                            <h2 class="header-highlighting">
+                                {% trans %} user_feed.top_tokens.title {% endtrans %}
+                            </h2>
+                        </div>
+                        <div class="card-body p-0 trending-tags pb-4">
+                            <top-tokens-list
+                                websocket-url="{{ global_websocket_url }}"
+                            ></top-tokens-list>
                             <div v-if="false" class="d-flex p-3 align-items-center justify-content-center">
                                 <span class="spinner-border spinner-border-md">
                                     <span class="sr-only"> {% trans %} loading {% endtrans %} </span>

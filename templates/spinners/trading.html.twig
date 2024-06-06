@@ -57,12 +57,10 @@
                     </span>
                 {% endif %}
             </p>
-            {% if isTokenTrading %}
-                <span class="h2 font-weight-semibold">
-                    {% trans %} trading.deployed {% endtrans %}
-                     <span class="text-primary"> {% trans %} trading.on {% endtrans %} </span>
-                </span>
-            {% endif %}
+            <span class="h2 font-weight-semibold">
+                {% trans %} trading.deployed {% endtrans %}
+                 <span class="text-primary"> {% trans %} trading.on {% endtrans %} </span>
+            </span>
         </div>
         {% if isTokenTrading %}
             <div class="mt-1 pt-3">

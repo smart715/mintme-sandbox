@@ -6,7 +6,7 @@
                 v-html="$t('page.token_settings.tab.advanced.initial_orders')"
             />
             <div class="row">
-                <div class="col-12 col-md-7">
+                <div class="col-12 col-md-5">
                     <initial-token-sell-orders
                         :config="initialSellOrderConfig"
                         :tokenName="getTokenName"
@@ -21,7 +21,7 @@
         <div class="card mt-2 px-3 py-3">
             <h5 class="card-title" v-html="$t('page.token_settings.tab.advanced.social_media')"></h5>
             <div class="row">
-                <div class="col-12 col-md-7">
+                <div class="col-12 col-md-5">
                     <token-social-media-edit
                         editable
                         :discord-url="getSocialUrls.discordUrl"
@@ -50,7 +50,7 @@
         <div v-if="showTokenReleaseAddress" class="card mt-2 px-3 py-3">
             <h5 class="card-title" v-html="$t('page.token_settings.tab.advanced.modify_address')"></h5>
             <div class="row">
-                <div class="col-12 col-md-7">
+                <div class="col-12 col-md-5">
                     <token-release-address
                         is-owner
                         :is-token-deployed="isTokenDeployed"

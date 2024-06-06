@@ -187,7 +187,7 @@
                         is-user-token
                     />
                 </div>
-                <div class="w-100 pr-1">
+                <div class="w-100 overflow-hidden pr-1">
                     <m-input
                         v-model="title"
                         :label="$t('post_form.title')"
@@ -236,7 +236,7 @@
                             v-b-toggle.collapse-options
                             class="text-content-primary my-2 ml-auto mr-2 expand-post-options"
                         >
-                            <a href="#" @click.prevent="" v-b-tooltip.hover="getShowHideButtonLabel">
+                            <a href="#" @click.prevent="" v-b-tooltip="getShowHideButtonLabel">
                                 <font-awesome-icon
                                     :icon="['fas', 'sliders-h']"
                                 />

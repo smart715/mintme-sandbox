@@ -126,15 +126,14 @@ describe('BuyCryptoModal', () => {
         expect(wrapper.findComponent('modal-stub').attributes('visible')).toBe('true');
     });
 
-    it('Verify that "getTradingCoinsUrl" returns the correct value', () => {
+    it('Verify that "generateFullUrl" returns the correct value', () => {
         const wrapper = mockBuyCryptoModal();
         delete window.location;
         window.location = {
-            origin: 'https://mintme.com',
+            host: 'https://mintme.com',
         };
-        wrapper.vm.$routing.generate = jest.fn().mockReturnValue('/coin');
 
-        expect(wrapper.vm.getTradingCoinsUrl()).toBe('https://mintme.com/coin');
+        expect(wrapper.vm.generateFullUrl('/coin')).toBe('https://mintme.com/coin');
     });
 
     it('Verify that "cryptoToExchangeWithMintme" returns the correct value', () => {

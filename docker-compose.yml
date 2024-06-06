@@ -2,7 +2,7 @@ version: "3.8"
 services:
   # APP
   panel:
-    image: gitlab.abchosting.org:5050/abc-hosting/prog-selflearning/mintme-sandbox:composer-2
+    image: gitlab.abchosting.org:5050/abc-hosting/cryptocurrencies/mintme/panel:composer-2
     depends_on:
       - db
       - rabbitmq

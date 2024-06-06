@@ -18,7 +18,6 @@ class DonationActivityCreator extends AbstractActivityCreator
             'tokenIconUrl' => $this->activityHelper->tokenIcon($event->getToken()),
             'tokenUrl' => $this->router->generate('token_show_intro', ['name' => $event->getToken()->getName()]),
             'token' => $this->activityHelper->truncate($event->getToken()->getName(), 12),
-            'fullTokenName' => $event->getToken()->getName(),
             'amount' => $this->moneyWrapper->format($event->getDonation()->getAmount(), false),
             'symbol' => $this->activityHelper->rebrand($event->getDonation()->getCurrency()),
             'tradeIconUrl' => $this->activityHelper->tradeIcon(

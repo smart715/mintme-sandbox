@@ -106,6 +106,12 @@
                             {% if app.user.profile.tokens is not empty %}
                                 {% for token in app.user.profile.tokens %}
                                     <code class="code-link d-block word-break-all">
+                                        <span>
+                                            {{ absolute_url(path(
+                                                'register-referral-by-token',
+                                                { userToken: token.name }
+                                            )) }}
+                                        </span>
                                         <copy-link
                                             class="code-copy c-pointer"
                                             content-to-copy="{{ absolute_url(path(
@@ -113,12 +119,6 @@
                                                 { userToken: token.name }
                                             )) }}"
                                         >
-                                            <span>
-                                                {{ absolute_url(path(
-                                                    'register-referral-by-token',
-                                                    { userToken: token.name }
-                                                )) }}
-                                            </span>
                                             <font-awesome-icon
                                                 :icon="['far', 'copy']">
                                             </font-awesome-icon>
@@ -127,6 +127,9 @@
                                 {% endfor %}
                             {% else %}
                             <code class="code-link">
+                                <span>
+                                    {{ absolute_url(path('register-referral-by-code', { code: referralCode })) }}
+                                </span>
                                 <copy-link
                                     class="code-copy c-pointer"
                                     content-to-copy="{{ absolute_url(path(
@@ -134,9 +137,6 @@
                                         { code: referralCode }
                                     )) }}"
                                 >
-                                    <span>
-                                        {{ absolute_url(path('register-referral-by-code', { code: referralCode })) }}
-                                    </span>
                                     <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                                 </copy-link>
                             </code>

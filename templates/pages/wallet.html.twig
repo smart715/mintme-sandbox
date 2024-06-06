@@ -46,7 +46,7 @@
                             hash="{{ hash }}"
                             websocket-url="{{ global_websocket_url }}"
                             create-token-url="{{ path('token_create') }}"
-                            trading-tokens-url="{{ path('trading', {'type' : trading_tokens_type}) }}"
+                            trading-url="{{ path('trading', {'type' : trading_coins_type}) }}"
                             withdraw-url="{{ path('withdraw') }}"
                             :deposit-more-prop="depositMoreCurrency"
                             twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"

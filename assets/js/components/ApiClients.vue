@@ -11,12 +11,12 @@
                     <div class="text-left">
                         <div class="text-left d-inline-block ml-api">
                             {{ $t('api_clients.id.title') }}<br />
+                            <span class="text-danger word-break">{{ row.item.id }}</span>
                             <copy-link
                                 id="client-copy-btn"
                                 class="code-copy c-pointer ml-2"
                                 :content-to-copy="row.item.id"
                             >
-                                <span class="text-danger word-break">{{ row.item.id }}</span>
                                 <font-awesome-icon :icon="['far', 'copy']" class="hover-icon"></font-awesome-icon>
                             </copy-link>
                             <button
@@ -31,12 +31,12 @@
                             {{ $t('api_clients.secret.title') }}<br />
                             <div v-if="row.item.secret">
                                 <template>
+                                    <span class="text-danger word-break">{{ row.item.secret }}</span>
                                     <copy-link
                                         id="secret-copy-btn"
                                         class="code-copy c-pointer ml-2"
                                         :content-to-copy="row.item.secret"
                                     >
-                                        <span class="text-danger word-break">{{ row.item.secret }}</span>
                                         <font-awesome-icon
                                             :icon="['far', 'copy']"
                                             class="hover-icon"

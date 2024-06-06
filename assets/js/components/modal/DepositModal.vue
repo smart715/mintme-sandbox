@@ -76,10 +76,10 @@
                         >
                     </div>
                     <code class="wallet-code text-blue" id="walletaddress">
+                        <span>
+                            {{ address }}
+                        </span>
                         <copy-link :content-to-copy="address" class="c-pointer">
-                            <span>
-                                {{ address }}
-                            </span>
                             <font-awesome-icon :icon="['far', 'copy']" />
                         </copy-link>
                     </code>

@@ -32,7 +32,6 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
-use App\Manager\ActivityManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
@@ -53,7 +52,6 @@ use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
-use App\Utils\Converter\TokenNameConverter;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
 use App\Utils\Verify\WebsiteVerifier;
@@ -64,7 +62,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
@@ -1483,57 +1480,21 @@ class TokensController extends APIController implements TwoFactorAuthenticatedIn
 
     /**
      * @Rest\View(serializerGroups={"API", "EXTENDED_INFO"})
-     * @Rest\Get("/top/{limit}", name="top_tokens", options={"expose"=true})
+     * @Rest\Get("/top", name="top-tokens", options={"expose"=true})
      */
-    public function topTokens(
-        int $limit,
-        ActivityManagerInterface $activityManager,
-        MarketStatusManager $marketStatusManager,
-        RebrandingConverterInterface $rebrandingConverter
-    ): View {
-        $topTokens = $activityManager->getLastByTypes(
-            [ActivityTypes::TOKEN_TRADED, ActivityTypes::DONATION],
-            $limit
+    public function topTokens(MarketStatusManager $marketStatusManager): View
+    {
+        $markets = $marketStatusManager->getFilteredMarketStatuses(
+            0,
+            10,
+            MarketStatusManager::SORT_RANK,
+            Criteria::ASC,
+            [],
+            null,
+            null,
         );
-        $markets = [];
 
-        foreach ($topTokens as $token) {
-            if (null === $token['fullTokenName']) {
-                continue;
-            }
-
-            $markets[] = $marketStatusManager->findByBaseQuoteNames(
-                $rebrandingConverter->reverseConvert($token['symbol']),
-                $token['fullTokenName']
-            );
-        }
-
-        return $this->view($marketStatusManager->convertMarketStatusKeys($markets), Response::HTTP_OK);
-    }
-
-    /**
-     * @Rest\Get("/metadata/{tokenId}", name="token_metadata", options={"expose"=true})
-     */
-    public function tokenMetadata(
-        string $tokenId,
-        TokenNameConverter $tokenNameConverter,
-        CacheManager $imageCacheManager
-    ): Response {
-        $tokenId = $tokenNameConverter->parseConvertedId($tokenId);
-        $token = $this->tokenManager->findById($tokenId);
-
-        if (!$token) {
-            throw $this->createNotFoundException();
-        }
-
-        $response = new Response(json_encode([
-            "name" => $token->getName(),
-            "description" => $token->getDescription(),
-            "image" => $imageCacheManager->generateUrl($token->getImage()->getUrl(), 'avatar_small'),
-        ], JSON_UNESCAPED_SLASHES), Response::HTTP_OK);
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
-        return $response;
+        return $this->view($markets, Response::HTTP_OK);
     }
 
     private function isTokenOverDeleteLimit(Token $token): bool

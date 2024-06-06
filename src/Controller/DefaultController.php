@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Activity\ActivityTypes;
 use App\Config\PostsConfig;
 use App\Entity\Translation;
 use App\Entity\User;
@@ -10,13 +9,11 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\ActivityManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MainDocumentsManagerInterfaces;
-use App\Manager\MarketStatusManager;
 use App\Manager\ReciprocalLinksManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TranslationsManagerInterface;
 use App\Services\TranslatorService\TranslatorInterface;
 use App\Utils\BaseQuote;
-use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Symbols;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -31,8 +28,6 @@ use Symfony\Contracts\Cache\ItemInterface;
 class DefaultController extends Controller
 {
     private const ACTIVITIES_AMOUNT = 30;
-    private const USERS_TOP_TOKENS_AMOUNT = 10;
-    private const GUESTS_TOP_TOKENS_AMOUNT = 5;
 
     /**
      * @Route("/",
@@ -46,19 +41,10 @@ class DefaultController extends Controller
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         PostsConfig $postsConfig,
-        MarketFactoryInterface $marketFactory,
-        MarketStatusManager $marketStatusManager,
-        RebrandingConverterInterface $rebrandingConverter
+        MarketFactoryInterface $marketFactory
     ): Response {
         /** @var User|null $user */
         $user = $this->getUser();
-
-        $topTokens = $this->getTopTokens(
-            $activityManager,
-            $marketStatusManager,
-            $rebrandingConverter,
-            $user
-        );
 
         if ($user) {
             return $this->renderUserFeedPage(
@@ -68,7 +54,6 @@ class DefaultController extends Controller
                 $cryptoManager,
                 $tokenManager,
                 $postsConfig,
-                $topTokens,
             );
         }
 
@@ -97,7 +82,6 @@ class DefaultController extends Controller
             'market' => $this->normalize($market),
             'hashtag' => $request->query->get('hashtag'),
             'activeTab' => $tab,
-            'topTokens' => $this->normalize($topTokens),
         ]);
     }
 
@@ -257,8 +241,7 @@ class DefaultController extends Controller
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        PostsConfig $postsConfig,
-        array $topTokens
+        PostsConfig $postsConfig
     ): Response {
         $market = $marketFactory->create(
             $cryptoManager->findBySymbol(Symbols::WEB),
@@ -286,39 +269,6 @@ class DefaultController extends Controller
             'tokens' => $this->normalize($tokenManager->getOwnTokens(), ['API_BASIC']),
             'activities' => $this->normalize($activities),
             'activeTab' => $tab,
-            'topTokens' => $this->normalize($topTokens),
         ]);
-    }
-
-    private function getTopTokens(
-        ActivityManagerInterface $activityManager,
-        MarketStatusManager $marketStatusManager,
-        RebrandingConverterInterface $rebrandingConverter,
-        ?User $user
-    ): array {
-        $topTokens = $activityManager->getLastByTypes(
-            [ActivityTypes::TOKEN_TRADED, ActivityTypes::DONATION],
-            $user ? self::USERS_TOP_TOKENS_AMOUNT : self::GUESTS_TOP_TOKENS_AMOUNT
-        );
-        $markets = [];
-
-        foreach ($topTokens as $token) {
-            if (null === $token['fullTokenName']) {
-                continue;
-            }
-
-            $market = $marketStatusManager->findByBaseQuoteNames(
-                $rebrandingConverter->reverseConvert($token['symbol']),
-                $token['fullTokenName']
-            );
-
-            if (null === $market) {
-                continue;
-            }
-
-            $markets[] = $market;
-        }
-
-        return $marketStatusManager->convertMarketStatusKeys($markets);
     }
 }

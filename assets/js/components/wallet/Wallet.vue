@@ -2,6 +2,7 @@
     <div class="px-0 py-2 wallet-tab">
         <buy-crypto
             class="px-4 mt-1"
+            :trading-url="tradingUrl"
             :coinify-ui-url="coinifyUiUrl"
             :coinify-partner-id="coinifyPartnerId"
             :coinify-crypto-currencies="coinifyCryptoCurrencies"
@@ -39,20 +40,14 @@
                             class="d-flex align-items-center"
                             :class="getCryptoClass(data.item.cryptoSymbol)"
                         >
-                            <div class="d-flex align-items-center justify-content-center">
-                                <coin-avatar
-                                    :class="getCryptoAvatarClass(data.item.cryptoSymbol)"
-                                    :symbol="data.item.cryptoSymbol"
-                                    image-class="coin-avatar-lg"
-                                    is-crypto
-                                />
-                                <div class="p-2">
-                                    <a :href="data.item.url" class="text-white">
-                                        {{ data.item.fullname|rebranding }}
-                                    </a>
-                                    <div class="text-secondary-light">{{ data.item.name|rebranding }}</div>
-                                </div>
-                            </div>
+                            <coin-avatar
+                                :class="getCryptoAvatarClass(data.item.cryptoSymbol)"
+                                :symbol="data.item.cryptoSymbol"
+                                is-crypto
+                            />
+                            <a :href="data.item.url" class="text-white">
+                                {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
+                            </a>
                         </div>
                     </template>
                     <template v-slot:cell(available)="data">
@@ -282,9 +277,7 @@
                             <tr>
                                 <td colspan="3">
                                     {{ $t('wallet.no_tokens_1') }}
-                                    <a :href="tradingTokensUrl" class="link highlight">
-                                        {{ $t('wallet.no_tokens_2') }}
-                                    </a>
+                                    <a :href="tradingUrl" class="link highlight"> {{ $t('wallet.no_tokens_2') }} </a>
                                     {{ $t('wallet.no_tokens_3') }}
                                 </td>
                             </tr>
@@ -433,7 +426,7 @@ export default {
         panelEnv: String,
         withdrawUrl: {type: String, required: true},
         createTokenUrl: String,
-        tradingTokensUrl: String,
+        tradingUrl: String,
         depositMoreProp: String,
         twofa: String,
         expirationTime: Number,

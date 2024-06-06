@@ -40,6 +40,7 @@
             :addresses-signature="addressesSignature"
             :refresh-token="refreshToken"
             :predefined-tokens="predefinedTokens"
+            :trading-url="tradingUrl"
             @close="modalVisible = false"
         />
     </div>
@@ -67,6 +68,7 @@ export default {
         predefinedTokens: Array,
         mintmeExchangeMailSent: Boolean,
         viewOnly: Boolean,
+        tradingUrl: String,
     },
     data() {
         return {

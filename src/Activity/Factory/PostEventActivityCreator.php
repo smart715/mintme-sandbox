@@ -23,7 +23,7 @@ class PostEventActivityCreator extends AbstractActivityCreator
                 'name' => $token->getName(),
                 'slug' => $post->getSlug(),
             ]),
-            'post' => $this->activityHelper->truncate($post->getTitle(), 32),
+            'post' => $this->activityHelper->truncate($post->getTitle(), 12),
             'userIconUrl' => $this->activityHelper->profileIcon($user),
             'userUrl' => $this->router->generate('profile-view', [
                 'nickname' => $user->getProfile()->getNickname(),

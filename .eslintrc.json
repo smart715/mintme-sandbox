@@ -4,7 +4,7 @@
         "plugin:vue/essential"
     ],
     "parserOptions": {
-        "parser": "babel-eslint",
+        "parser": "@babel/eslint-parser",
         "ecmaVersion": 7,
         "sourceType": "module",
         "ecmaFeatures": {
@@ -12,6 +12,13 @@
         }
     },
     "rules": {
-        "max-len": ["warn", 120]
+        "max-len": ["error", 120],
+        "no-console": "error",
+        "yoda": ["error", "always"],
+        "no-return-await": "error",
+        "complexity": ["warn", 8],
+        "indent": ["error", 4, {"SwitchCase": 1, "ignoredNodes": ["TemplateLiteral"]}],
+        "no-duplicate-imports": ["error", { "includeExports": true }],
+        "prefer-const": "error"
     }
 }

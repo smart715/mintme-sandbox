@@ -75,9 +75,9 @@
                     </div>
                 </template>
             </m-input>
-            <div class="pb-0 px-0">
+            <div class="pb-3 px-0">
                 {{ $t('token.sign_up_bonus.reward') }}
-                <span class="text-nowrap text-primary">
+                <span class="text-nowrap">
                     {{ reward | toMoney(tokSubunit) | formatMoney }}
                     <span v-b-tooltip="tooltipConfig">
                         <coin-avatar

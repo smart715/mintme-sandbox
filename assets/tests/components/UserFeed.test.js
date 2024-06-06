@@ -146,15 +146,13 @@ describe('RecentPostsAndComments', () => {
         moxios.uninstall();
     });
 
-    it('Shouldn\'t display the items', async () => {
+    it('Shouldnt display the itens', async () => {
         await wrapper.setData({items: []});
 
         expect(wrapper.vm.hasItems).toBe(false);
     });
 
-    it('Should display the items', async () => {
-        await wrapper.setData({items: [testPost, testComment]});
-
+    it('Should display the items', () => {
         expect(wrapper.vm.hasItems).toBe(true);
     });
 

@@ -503,8 +503,7 @@ class TokenController extends Controller
         ?string $crypto,
         ?string $tab,
         ?string $modal = null,
-        ?string $slug = null,
-        int $page = 1
+        ?string $slug = null
     ): Response {
         if (self::TRADE_TAB === $tab) {
             return $this->redirectToRoute(
@@ -523,7 +522,6 @@ class TokenController extends Controller
                 [
                     'name' => $name,
                     'slug' => $slug,
-                    'page' => $page,
                     'saveSuccess' => $request->query->get('saveSuccess'),
                 ]
             );

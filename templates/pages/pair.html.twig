@@ -185,11 +185,19 @@
                                     :logged-in="{{ loggedIn }}"
                                 ></token-general-information>
                             </div>
-                            <div class="flex-fill d-flex mt-2">
-                                <div class="flex-fill d-flex justify-content-end mx-2">
+                            <div class="flex-fill d-flex overflow-hidden mt-2">
+                                <div class="flex-fill d-flex justify-content-center overflow-hidden mx-2">
                                     {% if deploys|length > 0 %}
                                         <div class="mw-100">
+                                            <div class="font-weight-bold text-truncate">
+                                                {{ deploys|length > 1
+                                                    ? 'page.pair.contract_addresses'|trans
+                                                    : 'page.pair.contract_address'|trans
+                                                }}
+                                            </div>
+                                            <div class="text-truncate">
                                                 <token-contract-addresses></token-contract-addresses>
+                                            </div>
                                         </div>
                                     {% endif %}
                                 </div>

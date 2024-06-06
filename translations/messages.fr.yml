@@ -467,8 +467,10 @@ page.coin.key_fact.body.7: null
 page.coin.key_fact.body.8: null
 page.coin.key_fact.body.9: null
 page.coin.tradable.header: null
+page.coin.stake_and_earn: null
 page.coin.classic_exchange: null
 page.coin.move_to_blockchains: null
+page.coin.swap_coins: null
 page.coin.what_are_mintme.header: null
 page.coin.what_are_mintme.text: null
 page.coin.monetization.header: null
@@ -981,9 +983,9 @@ token_edit_modal.tooltip.delete: 'If you hold at least 99% of the token supply a
 2fa_modal.cancel: Annuler
 2fa_modal.require: 'Code requis'
 withdraw_modal.title: Retrati
-withdraw_modal.address: 'Adresse'
+withdraw_modal.address: 'Adresse:'
 withdraw_modal.wrong_address: 'Adresse erronée'
-withdraw_modal.amount: 'Montant (Solde %balance%)'
+withdraw_modal.amount: 'Montant (Solde %balance%):'
 withdraw_modal.max: null
 withdraw_modal.insufficient_funds: 'Vous n''avez pas assez de %currency%'
 withdraw_modal.min_withdraw: 'Montant minimum de retrait est %minAmount% %currency%'
@@ -1815,7 +1817,6 @@ api.wallet.not_found: Introuvable
 api.wallet.invalid_network: 'Invalid token network'
 api.tokens.token_not_exists: 'Jeton inexistant'
 api.tokens.user_not_created_token: 'Current user has not created a token'
-api.tokens.token_blocked:
 api.tokens.you_need_all_tokens_to_change_name: 'Vous avez besoin de tous vos jetons afin de changer le nom de ce dernier'
 api.tokens.deploying: 'Jeton en cours de déploiement ou déployé.'
 api.tokens.forbidden_name: 'Nom de jeton non autorisé, essayer un autre'
@@ -2444,7 +2445,6 @@ user_feed.deploy_token.title:
 user_feed.deploy_token.description:
 user_feed.deploy_token.button:
 user_feed.top_tokens.title:
-user_feed.top_tokens.guide:
 post_create_no_token.modal.description:
 load_more:
 dynamic.popular_tags.posts:

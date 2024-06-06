@@ -100,13 +100,65 @@
                     </div>
                     <div class="col-12 col-sm-6 col-lg-4 p-3 text-center">
                         <a
-                            href="{{ bitmart_link }}"
+                            href="{{ coinbit_link }}"
                             target="_blank"
                             class="logo"
                         >
                             <img
-                                src="{{ asset('build/images/bitmart.png') }}"
-                                alt="bitmart-logo"
+                                src="{{ asset('build/images/coinsbit.png') }}"
+                                alt="coinsbit-logo"
+                                class="coinsbit-logo"
+                                loading="lazy"
+                            />
+                        </a>
+                    </div>
+                </div>
+                <div class="row flex-wrap justify-content-center actions-logo mt-5">
+                    <h5
+                        class="order-sm-1 col-sm-12 col-xl-6 section-subheader mb-2 mb-sm-4
+                            text-center d-flex align-items-center justify-content-center"
+                    >
+                        {% trans %} page.coin.stake_and_earn {% endtrans %}
+                    </h5>
+                    <a
+                        href="{{ mmf_link }}"
+                        target="_blank"
+                        class="logo order-xl-3 order-sm-3 col-sm-6 col-xl-6 d-flex align-items-center justify-content-center mb-3 mb-xl-auto"
+                    >
+                        <img
+                            src="{{ asset('build/images/mmf.png') }}"
+                            alt="coinsbit-logo"
+                            class="mmf-logo"
+                            loading="lazy"
+                        />
+                    </a>
+                    <h5
+                        class="order-xl-2 order-sm-5 col-sm-12 col-xl-6 mt-xl-0 section-subheader
+                            mb-2 mb-sm-4 mt-4 mt-xl-0 text-center d-flex align-items-center justify-content-center"
+                    >
+                        {% trans %} page.coin.swap_coins {% endtrans %}
+                    </h5>
+                    <div class="row order-sm-6 col-sm-12 col-xl-6 flex-wrap flex-lg-nowrap justify-content-around m-0">
+                        <a
+                            href="{{ mmf_link }}"
+                            target="_blank"
+                            class="logo mmf-logo-link col-12 col-sm-6 col-md-4 px-3 mb-2 mb-lg-0"
+                        >
+                            <img
+                                src="{{ asset('build/images/mmf.png') }}"
+                                alt="coinsbit-logo"
+                                class="mmf-logo"
+                                loading="lazy"
+                            />
+                        </a>
+                        <a
+                            href="{{ photonswap_link }}"
+                            target="_blank"
+                            class="logo col-12 col-sm-6 col-md-4 px-3 mb-4 mb-lg-0"
+                        >
+                            <img
+                                src="{{ asset('build/images/photon_swap.png') }}"
+                                alt="photonswap-logo"
                                 loading="lazy"
                             />
                         </a>

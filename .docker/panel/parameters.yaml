@@ -1,0 +1,563 @@
+# This file is auto-generated during the composer install
+parameters:
+    locale: en
+    version: V2.3.0
+    is_beta_version: false
+    panel_environment: dev
+    viabtc_response_timeout_seconds: 60
+    viabtc_response_internal_timeout_seconds: 60
+    viabtc_auth:
+        - user
+        - pass
+        - basic
+    withdraw_response_timeout_seconds: 60
+    withdraw_after_login_seconds: 60
+    withdraw_after_register_seconds: 60
+    withdraw_after_user_changes_seconds: 360
+    withdraw_expiration_time: 3600
+    withdrawal_delay: 60
+    min_coin_withdrawal:
+        BTC: 0.0005
+        ETH: 0.005
+        BNB: 0.05
+        USDC: 10
+        CRO: 50
+        WEB: 10
+        SOL: 0.01
+        AVAX: 0.01
+        ARB: 0.0001
+    deposit_response_timeout_seconds: 60
+    order_fee_rates:
+        coin: 0.003
+        token: 0.004
+    token_withdrawal_fees:
+        WEB: null
+        ETH: 0.01
+        BNB: 0.01
+        CRO: 0.01
+        SOL: 0.01
+        AVAX: 0.01
+        ARB: 0.01
+    token_internal_withdrawal_fees:
+        WEB: null
+        ETH: null
+        BNB: null
+        CRO: null
+        SOL: null
+        AVAX: null
+        ARB: null
+    crypto_internal_withdrawal_fees:
+        WEB: null
+        ETH: null
+        BNB: null
+        CRO: null
+        USDC: null
+        SOL: null
+        AVAX: null
+        ARB: null
+    crypto_default_network:
+        USDC: ETH
+    token_quantity: 10000000
+    token_delete_sold_limit: 100000
+    token_precision: 4
+    token_deletion_confirm_code_expiration_time: 60
+    token_marketing_tips_intervals:
+        - '2 day'
+        - '4 day'
+        - '7 day'
+        - '10 day'
+        - '15 day'
+        - '21 day'
+    token_promotion_intervals:
+        - '1 year'
+    token_create_limit: 5
+    referral_fee: 0.5
+    deploy_referral_rewards:
+        MINTME: 0.1
+        ETH: 0.1
+        BNB: 0.1
+        CRO: 0.1
+        AVAX: 0.1
+        ARB: 0.1
+    post_rewards_collectable_days: 30
+    post_comments_tip:
+        cost: 1
+        min_amount: 0.1
+        max_amount: 100000
+    min_wallet_tokens_amount: 0.0001
+    disable_coin_withdrawals: false
+    disable_coin_deposits: false
+    disable_token_deposits: false
+    disable_token_withdrawals: false
+    disable_deposits:
+        BNB: false
+        BTC: false
+        ETH: false
+        USDC: false
+        CRO: false
+        MINTME: false
+        SOL: false
+        AVAX: false
+        ARB: false
+    disable_withdrawals:
+        BNB: false
+        BTC: false
+        ETH: false
+        USDC: false
+        CRO: false
+        MINTME: false
+        SOL: false
+        AVAX: false
+        ARB: false
+    disable_coin_trades:
+        BNB: false
+        BTC: false
+        ETH: false
+        USDC: false
+        CRO: false
+        MINTME: false
+        SOL: null
+        AVAX: false
+        ARB: false
+    disable_all: false
+    admin_emails:
+        - gateway@mintme.com
+    user_tokens_per_page: 200
+    is_hacker_allowed: true
+    quick_registration_password: blockchaincrowdfunding
+    coinbase_api_url: 'https://api.coingecko.com/api/v3'
+    coinbase_api_timeout: '10'
+    coinbase_api_methods:
+        simple_price: /simple/price
+        coin_list: /coins/list
+    mintme_supply: 'https://mintme.com/coin/supply.txt'
+    mintme_coin: 'MintMe Coin'
+    mintme_coin_link: 'https://www.mintme.com/coin/'
+    mintme_link: 'https://www.mintme.com/'
+    mintme_web_wallet: 'https://www.mintme.com/web-wallet/'
+    mintme_pool: 'https://www.mintme.com/pool'
+    lbank_link: 'https://www.lbank.com/exchange/mintme/usdt'
+    coinbit_link: 'https://coinsbit.io/trade/MINTME_USDC'
+    mmf_link: 'https://mm.finance/farms'
+    photonswap_link: 'https://www.photonswap.finance/#/swap'
+    deploy_costs:
+        MINTME: 0
+        ETH: 0
+        BNB: 0
+        CRO: 0
+        SOL: 0
+        AVAX: 0
+        ARB: 0
+    deploy_fees:
+        ETH: 0.01
+        BNB: 0.01
+        CRO: 0.01
+        SOL: 0.01
+        AVAX: 0.01
+        ARB: 0.01
+    connect_fees:
+        ETH: 0.01
+        BNB: 0.01
+        CRO: 0.01
+        SOL: 0.01
+        AVAX: 0.01
+        ARB: 0.01
+    connect_costs:
+        MINTME: 0
+        ETH: 0
+        BNB: 0
+        CRO: 0
+        SOL: 0
+        AVAX: 0
+        ARB: 0
+    disable_deploy_tokens: false
+    blockchain_deploy_status:
+        MINTME: true
+        ETH: true
+        BNB: true
+        CRO: true
+        SOL: false
+        AVAX: true
+        ARB: true
+    deploy_response_timeout_seconds: 60
+    blockchain_disabled: null
+    trusted_device_enabled: true
+    trusted_device_cookie_lifetime: 604800
+    trusted_device_extend_lifetime: true
+    origin_to_disposable_email_domains: 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/'
+    name_of_files_for_disposable_domains_index: index.json
+    name_of_files_for_disposable_domains_wildcard: wildcard.json
+    disposable_domains_timeout_seconds: 30
+    docs_path: /docs
+    images_path: /uploads/images
+    liip_data_root: '%kernel.project_dir%/public'
+    google_cert: '%kernel.project_dir%/secrets/client_secret_sample.json'
+    public_dir: '%kernel.project_dir%/public'
+    disposable_phone_numbers: '%kernel.project_dir%/config/blacklist/disposable_phone_numbers.json'
+    parameters_path: '%kernel.project_dir%/config/parameters.yaml'
+    assets_img_dir: '%kernel.project_dir%/assets/img/'
+    password_reset_expiration_time: 3600
+    password_reset_retry_time: 3600
+    landing_web_bonus_limit: 50000
+    landing_web_bonus: 5
+    minimum_volume_for_marketcap: 100000
+    tokens_market_pagination:
+        markets_on_first_page: 15
+        markets_per_page: 10
+    top_holders: 10
+    airdrop_params:
+        min_tokens_amount: 0.01
+        min_participants_amount: 100
+        max_participants_amount: 999999
+        min_token_reward: 0.0001
+    marketing_airdrop_feature_intervals:
+        - '7 day'
+    token_signup_bonus_params:
+        min_tokens_amount: 0.01
+        min_participants_amount: 100
+        max_participants_amount: 999999
+        min_token_reward: 0.0001
+    website_verify_proxy: 'http://mintme:Iw87wqelIwsced823FXuswL9@212.32.255.5:38425'
+    twitter_social_media_link: 'https://twitter.com/mintmeproject'
+    reddit_social_media_link: 'https://www.reddit.com/r/MintMeCom'
+    telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
+    telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
+    facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
+    instagram_social_media_link: 'https://www.instagram.com/mintme.project'
+    mintme_wallet_url: 'https://mintme.com/web-wallet/'
+    mintme_pool_url: 'https://mintme.com/pool'
+    mintme_github_url: 'https://github.com/mintme-com/'
+    coinify_api_url: 'https://app-api.sandbox.coinify.com'
+    coinify_ui_url: 'https://trade-ui.sandbox.coinify.com'
+    coinify_api_timeout: 0.1
+    coinify_partner_id: 135
+    coinify_crypto_currencies:
+        - BTC
+        - ETH
+        - USDC
+        - BNB
+        - SOL
+        - AVAX
+    coinify_pem_file: '%kernel.project_dir%/config/jwt/coinify_private.pem'
+    coinify_pem_passphrase: null
+    disable_trading: false
+    disable_new_trades: false
+    quick_trade:
+        buy_fee:
+            coin: 0.005
+            token: 0.005
+        sell_fee:
+            coin: 0.005
+            token: 0.005
+    quick_trade_min_amounts:
+        TOK: 0.0001
+        BTC: 1.0E-6
+        MINTME: 0.01
+        ETH: 0.0001
+        USDC: 0.1
+        CRO: 0.1
+        BNB: 0.001
+        SOL: 0.1
+        AVAX: 0.0003
+        ARB: 0.1
+    translation_prefixes: '/ru|/uk|/es|/ar|/pt|/fr|/pl|/de|\s*'
+    translation_locales:
+        - en
+        - ru
+        - uk
+        - es
+        - ar
+        - pt
+        - fr
+        - pl
+        - de
+    translation_requirements: en|ru|uk|es|ar|pt|fr|pl|de
+    translation_auto_detect:
+        - es
+    translation_flags:
+        en:
+            label: English
+            flag: gb
+        es:
+            label: Español
+            flag: es
+        ru:
+            label: Русский
+            flag: ru
+        uk:
+            label: Українська
+            flag: ua
+        pl:
+            label: Polski
+            flag: pl
+        ar:
+            label: العربية
+            flag: ae
+        pt:
+            label: Portugues
+            flag: pt
+        fr:
+            label: Française
+            flag: fr
+        de:
+            label: Deutsch
+            flag: de
+    kb_links:
+        - Quickstart-Guide-to-MintMe
+        - Talking-to-your-followers-about-MintMe-we-got-some-ideas
+        - Time-for-token-sales-how-can-I-make-a-difference
+        - Ideas-to-promote-and-sell-your-token
+        - Aiming-at-a-strong-token
+        - The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported
+    freeDays: 7
+    price: 100
+    mintmeHostPath: 'https://mintme.host'
+    available_mails:
+        - MintmeHost
+    sms_providers:
+        d7:
+            name: d7
+            enabled: true
+            priority: 1
+            retry: 1
+        clickatell:
+            name: clickatell
+            enabled: true
+            priority: 2
+            retry: 2
+    disable_sms: true
+    disable_email: true
+    phone_codes:
+        sms_limits:
+            failed: 5
+            daily: 3
+            weekly: 10
+            monthly: 20
+            overall: 50
+        email_limits:
+            failed: 5
+            daily: 3
+            weekly: 10
+            monthly: 20
+            overall: 50
+    2fa_backup_codes:
+        sms_limits:
+            failed: 5
+            daily: 3
+            weekly: 10
+            monthly: 20
+            overall: 50
+    email_change_codes:
+        current_email_limits:
+            failed: 5
+            daily: 3
+            weekly: 10
+            monthly: 20
+            overall: 50
+        new_email_limits:
+            failed: 5
+            daily: 3
+            weekly: 10
+            monthly: 20
+            overall: 50
+    edit_phone:
+        attempts: 3
+        interval: 30D
+    origin_to_disposable_phone_numbers: 'https://raw.githubusercontent.com/iP1SMS/disposable-phone-numbers/master/number-list.json'
+    explorer_urls:
+        WEB: 'https://mintme.com/explorer'
+        ETH: 'https://goerli.etherscan.io'
+        BNB: 'https://testnet.bscscan.com'
+        CRO: 'https://testnet.cronoscan.com'
+        SOL: 'https://explorer.solana.com/?cluster=testnet'
+        AVAX: 'https://testnet.snowtrace.io'
+        ARB: 'https://sepolia.arbiscan.io'
+    ui_extra_keys_filepath: '%kernel.project_dir%/translations/ui/extra_keys.json'
+    ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
+    auth_make_disable_sell: false
+    auth_make_disable_trading: false
+    auth_make_disable_token_creation: false
+    auth_make_disable_withdrawals: false
+    auth_make_disable_deposit: false
+    auth_make_disable_donations: false
+    auth_make_disable_post_reward: true
+    auth_make_disable_2fa: true
+    discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_base_commands_url: 'https://discord.com/api/v8/applications/'
+    discord_api_timeout: '10'
+    discord_social_media_link: 'https://discord.com/invite/uuZXhCn'
+    market_costs:
+        BTC: 100
+        ETH: 100
+        BNB: 100
+        CRO: 100
+        USDC: 100
+        SOL: 100
+        AVAX: 100
+        ARB: 100
+    order_delay: 3
+    ignore_request_delay_ips:
+        - 172.20.0.1
+    initial_sell_order_config:
+        minTokensAmount: 0.01
+        maxTokensAmount: 99999.9999
+        minTokenForSale: 10000
+        maxTokenForSale: 1000000
+        totalOrders: 100
+    minimum_order_value_usd: 0.1
+    minimum_order_value_fallback:
+        WEB: 0.5
+        BTC: 3.0E-6
+        ETH: 5.0E-5
+        BNB: 0.0003
+        CRO: 0.2
+        USDC: 0.1
+        SOL: 0.1
+        AVAX: 0.1
+        ARB: 0.1
+    orders_filled_intervals:
+        - '10 minutes'
+        - '1 day'
+        - '30 day'
+    orders_cancelled_intervals:
+        - '1 day'
+        - '30 day'
+    max_allowed_active_orders: 100
+    user_limit:
+        posts_max_per_day: 10
+        comments_max_per_day: 25
+        votings_max_per_day: 10
+        oauth_keys_limit: 10
+        backup_codes_monthly_limit: 10
+        likes_max_per_day: 30
+    verify_timeout_seconds: 10
+    auto_logout_timer_duration: 10800
+    idle_modal_duration: 60
+    voting:
+        proposal_min_amount: 100
+        min_balance_to_vote: 1
+    failed_login:
+        max_chances: 5
+        max_hours: 2
+        blacklist_ip:
+            max_hours: 2
+            max_chances: 8
+            days: 5
+    enable_google_tag_manager: false
+    google_tag_manager_id: GTM-MZL3H7B
+    tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
+    show_full_data_in_profile: false
+    front_end_logs_cut_headers: true
+    mintme_url: mintme.com
+    contact_email: support@mintme.com
+    market_consumer_enabled: false
+    hmac_sha_one_key: qwerty
+    firebase_twitter_api_key: AIzaSyB2UsC0LZkRyuXCXE84PLe1ha3YyhGgPaM
+    firebase_twitter_auth_domain: mintme.firebaseapp.com
+    firebase_twitter_project_id: mintme
+    firebase_twitter_storage_bucket: mintme.appspot.com
+    firebase_twitter_messaging_sender_id: '912700451204'
+    firebase_twitter_app_id: '1:912700451204:web:fa32aa9edbf1630baf55d1'
+    firebase_twitter_measurement_id: G-M4P0GWMR20
+    coinbase_cryptos:
+        WEB: webchain
+        BTC: bitcoin
+        ETH: ethereum
+        USDC: usd-coin
+        BNB: binancecoin
+        CRO: crypto-com-chain
+        SOL: solana
+        AVAX: avalanche-2
+        ARB: arbitrum
+    internalLinks:
+        - mintme.com
+        - mintme.host
+        - coinimp.com
+        - webchain.network
+        - cba.pl
+        - zzz.com
+        - zz.com.ve
+        - hit.ng
+        - lea.mx
+        - aba.ae
+        - for.ug
+        - mintme.abchosting.abc
+    rewards_bounties:
+        rewards_max_limit: 10
+        bounties_max_limit: 10
+    post_news_recommended: 432000
+    footer_posts_and_tokens: 432000
+    gem_modal:
+        article: null
+        appearance_delay: 9000
+        max_views: 2
+    feature_create_new_markets_enabled: true
+    feature_token_connect_enabled: true
+    feature_rewards_enabled: true
+    enabled_cryptos:
+        WEB: true
+        ETH: true
+        BNB: true
+        CRO: true
+        BTC: true
+        USDC: true
+        SOL: true
+        AVAX: true
+        ARB: true
+    news_per_page: 12
+    mercure_default_publish_topics:
+        - activities
+    mercure_default_subscribe_topics: {  }
+    mercure_public_publish_topics: {  }
+    mercure_public_subscribe_topics:
+        - activities
+    homepage_youtube_video_id: kFGCW1_63lA
+    market_pairs:
+        - MINTME/BTC
+        - MINTME/ETH
+        - MINTME/BNB
+        - MINTME/USDC
+        - MINTME/CRO
+        - MINTME/SOL
+        - MINTME/AVAX
+        - MINTME/ARB
+    market_pairs_top_list:
+        - MINTME/BTC
+        - MINTME/ETH
+        - MINTME/BNB
+        - MINTME/USDC
+        - MINTME/CRO
+        - MINTME/SOL
+        - MINTME/AVAX
+        - MINTME/ARB
+    limit_history_months: 12
+    hashtags_cache_max_age: 1200
+    hashtags_pick_interval: 86400
+    tracked_accounts_emails: {  }
+    token_promotion_tariffs:
+        -
+            duration: '1 year'
+            cost: 0.1
+        -
+            duration: '5 years'
+            cost: 0.5
+    session_cookie_lifetime_seconds: 172800
+    known_hosts:
+        - youtube.com
+        - twitter.com
+        - discord.com
+        - discord.gg
+        - facebook.com
+        - instagram.com
+        - reddit.com
+        - old.reddit.com
+        - t.me
+    inactive_account_assets_period: '3 months'
+    min_inactive_account_trade: 0.005
+    min_inactive_account_trade_usd: 5
+    conversion_map:
+        MINTME: WEB
+        BSC: BNB
+        POLYGON: MATIC
+    deploy_notifications_bot_limit: 1
+    deploy_notifications_bot_ids: {  }

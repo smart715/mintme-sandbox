@@ -13,8 +13,8 @@
                     <span>
                         {{ $t('wallet.buy_crypto.can_exchange', translationContext) }}
                     </span>
-                    <a :href="getTradingCoinsUrl()" target="_blank">
-                        {{ getTradingCoinsUrl() }}
+                    <a :href="tradingUrl" target="_blank">
+                        {{ generateFullUrl(tradingUrl) }}
                     </a>
                 </div>
                 <iframe
@@ -71,6 +71,7 @@ export default {
         addresses: Object,
         addressesSignature: Object,
         predefinedTokens: Array,
+        tradingUrl: String,
     },
     computed: {
         cryptoToExchangeWithMintme: function() {
@@ -126,8 +127,8 @@ export default {
         },
     },
     methods: {
-        getTradingCoinsUrl: function() {
-            return `${window.location.origin}` + this.$routing.generate('trading', {type: 'coins'});
+        generateFullUrl: function(target) {
+            return window.location.host + target;
         },
         listenForEvents: function() {
             window.addEventListener('message', (event) => {

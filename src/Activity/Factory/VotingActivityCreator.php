@@ -18,10 +18,7 @@ class VotingActivityCreator extends AbstractActivityCreator
         $token = $event->getToken();
         $voting = $event->getVoting();
         $context = [
-            'propositionUrl' => $this->router->generate('token_show_voting', [
-                'name' => $token->getName(),
-                'slug' => $voting->getSlug(),
-            ]),
+            'propositionUrl' => $this->router->generate('show_voting', ['slug' => $voting->getSlug()]),
             'proposition' => $this->activityHelper->truncate($voting->getTitle(), 32),
             'tokenIconUrl' => $this->activityHelper->tokenIcon($token),
             'tokenUrl' => $this->router->generate('token_show_intro', ['name' => $token->getName()]),
