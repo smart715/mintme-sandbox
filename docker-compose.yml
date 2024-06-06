@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   # APP
   panel:
@@ -10,8 +9,12 @@ services:
       - btc
       - mailhog
     networks:
-      - middleend
-      - backward
+      middleend:
+        aliases:
+          - panel
+      backward:
+        aliases:
+          - panel
     volumes:
       - .:/var/www/html/panel
       - .docker/panel/.env:/var/www/html/panel/.env
@@ -35,7 +38,9 @@ services:
     ports:
       - 4001:4001
     networks:
-      - middleend
+      middleend:
+        aliases:
+          - mintme-gateway
 
   nginx:
     image: nginx:1.23.1-alpine
@@ -48,8 +53,12 @@ services:
       - panel
       - btc
     networks:
-      - middleend
-      - backward
+      middleend:
+        aliases:
+          - nginx
+      backward:
+        aliases:
+          - nginx
     volumes:
       - .docker/nginx:/etc/nginx/conf.d
       - .:/var/www/html/panel
@@ -62,8 +71,12 @@ services:
     ports:
       - 3306:3306
     networks:
-      - middleend
-      - backend
+      middleend:
+        aliases:
+          - db
+      backend:
+        aliases:
+          - db
     volumes:
       - .docker/db/init:/docker-entrypoint-initdb.d
       - .docker/db/my.cnf:/etc/mysql/my.cnf
@@ -74,7 +87,9 @@ services:
       - 15672:15672
       - 5672:5672
     networks:
-      - middleend
+      middleend:
+        aliases:
+          - rabbitmq
     volumes:
       - .docker/rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
 
@@ -106,8 +121,12 @@ services:
       - redis_sentinel
       - redis_master
     networks:
-      - backend
-      - backward
+      backend:
+        aliases:
+          - btc
+      backward:
+        aliases:
+          - btc
 
   redis_master:
     container_name: btc-redis-master
@@ -116,7 +135,9 @@ services:
     ports:
       - 16379:6379
     networks:
-      - backend
+      backend:
+        aliases:
+          - redis-master
     volumes:
       - .docker/redis.master.conf:/usr/local/etc/redis/redis.conf
 
@@ -130,7 +151,9 @@ services:
     depends_on:
       - redis_master
     networks:
-      - backend
+      backend:
+        aliases:
+          - redis-sentinel
     ports:
       - 26379:26379
 
