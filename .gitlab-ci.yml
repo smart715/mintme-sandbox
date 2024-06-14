@@ -7,25 +7,12 @@
 # *********************
 
 stages:
-  - update-repository
   - tests
-  - build-sites
-  - clean-unused-sites
-  - auto-merge
 
 variables:
   NODE_VERSION: "v16.17.0"
   COMPOSER_VERSION: "2"
 # "v" preffix is mandatory to define node version PATH 
-
-update_repository_redmine_training.abchosting.org:
-  script:
-    - cd /home/git/gitlab/mintme-panel.git && sudo git fetch --all -p
-  stage: update-repository
-  needs: []
-  tags:
-    # this job will be executed only on training.abchosting.org server
-    - training.abchosting.org
 
 before_script:
   - export PATH=/usr/local/php74:$PATH
@@ -34,7 +21,6 @@ before_script:
 
 tests_php:
   stage: tests
-  needs: ['update_repository_redmine_training.abchosting.org']
   script:
     - export $(grep -v '^#' .env.dist | xargs)
     - echo "composer${COMPOSER_VERSION} will be used further"
@@ -53,7 +39,6 @@ tests_php:
 
 tests_assets:
   stage: tests
-  needs: ['update_repository_redmine_training.abchosting.org']
   script:
     - export PATH=/usr/local/nvm/versions/node/${NODE_VERSION}/bin:$PATH
     - npm ci --cache .npm --prefer-offline
@@ -69,121 +54,3 @@ tests_assets:
     - mintme-tests
   except:
     - translations
-
-integration_and_functional_tests:
-  stage: tests
-  script:
-    - sudo start-tests.sh $CI_COMMIT_REF_NAME
-  tags:
-    # This job only will be executed by this runner:
-    - mintme-docker.abchosting.org
-  only:
-    # this job only will be executed for branches
-    - functional-test
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-
-build_mintme_sites:
-  stage: build-sites
-  needs: ['update_repository_redmine_training.abchosting.org']
-  script:
-    - SRC=$(pwd)
-    - export PATH=/usr/local/nvm/versions/node/${NODE_VERSION}/bin:$PATH
-    - sudo --preserve-env=PATH build-sites-mintme-new.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC -c $COMPOSER_VERSION
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for branches
-    - branches
-
-staging_release:
-  stage: build-sites
-  needs: ['update_repository_redmine_training.abchosting.org']
-  script:
-    - sudo /root/update-staging.sh $CI_COMMIT_REF_NAME
-  tags:
-    # This job only will be executed by this runner:
-    - staging
-  only:
-    # this job only will be executed for branches
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
-
-staging2_release:
-  stage: build-sites
-  needs: ['update_repository_redmine_training.abchosting.org']
-  environment:
-    name: staging2
-  script:
-    - sudo /usr/local/bin/update-staging.sh $CI_COMMIT_REF_NAME
-  tags:
-    # This job only will be executed by this runner:
-    - staging2
-  only:
-    # this job only will be executed for branches
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
-
-clean_mintme_unused_sites:
-  stage: clean-unused-sites
-  script:
-    - sudo /usr/local/bin/clean-unused-sites-mintme.py
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
-
-auto_merge_release_branch:
-  stage: auto-merge
-  script:
-    - sudo auto-merge-release-branch.py
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
-
-auto_merge_newdesign:
-  stage: auto-merge
-  script:
-    - sudo --user=mintme-git /home/mintme-git/auto-merge.sh -s v2.0.0 -d newdesign-v200
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - v2.0.0
-  allow_failure: true
-
-auto_merge_v210:
-  stage: auto-merge
-  script:
-    - sudo --user=mintme-git /home/mintme-git/auto-merge.sh -s v2.0.0 -d v2.1.0
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - v2.0.0
-  allow_failure: true
-
-auto_merge_v1100:
-  stage: auto-merge
-  script:
-    - sudo --user=mintme-git /home/mintme-git/auto-merge.sh -s v1.10.0 -d v2.0.0
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - v1.10.0
-  allow_failure: true
